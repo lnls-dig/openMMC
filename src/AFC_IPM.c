@@ -179,15 +179,6 @@ static void prvHardwareInit ( void )
     Chip_GPIO_SetPinDIR(LPC_GPIO, ledBLUE_PORT, ledBLUE_PIN, true);
     Chip_GPIO_SetPinDIR(LPC_GPIO, ledGREEN_PORT, ledGREEN_PIN, true);
     Chip_GPIO_SetPinDIR(LPC_GPIO, ledRED_PORT, ledRED_PIN, true);
-#if 0
-    /* Init GAddr pins as inputs without pull-up/down resistor */
-    Chip_GPIO_SetPinDIR(LPC_GPIO, GA_PORT, GA0_PIN, false);
-    Chip_IOCON_PinMux(LPC_IOCON, GA_PORT, GA0_PIN, IOCON_MODE_INACT, 0);
-    Chip_GPIO_SetPinDIR(LPC_GPIO, GA_PORT, GA1_PIN, false);
-    Chip_IOCON_PinMux(LPC_IOCON, GA_PORT, GA1_PIN, IOCON_MODE_INACT, 0);
-    Chip_GPIO_SetPinDIR(LPC_GPIO, GA_PORT, GA2_PIN, false);
-    Chip_IOCON_PinMux(LPC_IOCON, GA_PORT, GA2_PIN, IOCON_MODE_INACT, 0);
-#endif
     /* Init GAddr test pin as output */
     Chip_GPIO_SetPinDIR(LPC_GPIO, GA_PORT, GA_TEST_PIN, true);
 }
