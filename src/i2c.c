@@ -38,10 +38,6 @@
 #define I2CADDR_READ( id )          LPC_I2Cx(id)->ADR0
 #define I2CMASK( id, val )          LPC_I2Cx(id)->MASK[0] = val
 
-/*static SemaphoreHandle_t pxI2C0_Mutex;
-static SemaphoreHandle_t pxI2C1_Mutex;
-static SemaphoreHandle_t pxI2C2_Mutex;*/
-
 /* Configuration struct for each I2C interface */
 xI2C_Config i2c_cfg[] = {
     {
@@ -292,65 +288,54 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 
 I2C_err vI2CWrite( I2C_ID_T i2c_id, uint32_t addr, uint32_t * tx_data, uint32_t tx_len )
 {
-    if (xSemaphoreTake(i2c_cfg[i2c_id].mutex, portMAX_DELAY))
-    {
-        /* Copy the message to the i2c global struture (controlled by the mutex) */
-
-        /* Maybe use memcpy to pass the tx buffer to the global structure */
-        i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
-        i2c_cfg[i2c_id].msg.addr = addr;
-        i2c_cfg[i2c_id].msg.tx_data = tx_data;
-        i2c_cfg[i2c_id].msg.tx_len = tx_len;
-        i2c_cfg[i2c_id].msg.rx_data = NULL;
-        i2c_cfg[i2c_id].msg.rx_len = 0;
-
-        i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
-        /* Trigger the i2c interruption */
-        /* Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
-        I2CCONSET( i2c_id, ( I2C_I2EN | I2C_STA ) );
-    }
-
-    if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) == pdTRUE )
-    {
+    /* Copy the message to the i2c global struture */
+    
+    /* Maybe use memcpy to pass the tx buffer to the global structure */
+    i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
+    i2c_cfg[i2c_id].msg.addr = addr;
+    i2c_cfg[i2c_id].msg.tx_data = tx_data;
+    i2c_cfg[i2c_id].msg.tx_len = tx_len;
+    i2c_cfg[i2c_id].msg.rx_data = NULL;
+    i2c_cfg[i2c_id].msg.rx_len = 0;
+    i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
+    
+    /* Trigger the i2c interruption */
+    /* Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
+    I2CCONSET( i2c_id, ( I2C_I2EN | I2C_STA ) );
+    
+    if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) == pdTRUE ){
         /* Include the error in i2c_cfg global structure */
-        xSemaphoreGive( i2c_cfg[i2c_id].mutex );
         return i2c_cfg[i2c_id].msg.error;
     }
-
+    
     /* Should not get here, so return failure */
-    xSemaphoreGive( i2c_cfg[i2c_id].mutex );
     return err_FAILURE;
 }
 
 I2C_err vI2CRead( I2C_ID_T i2c_id, uint32_t addr, uint32_t * rx_data, uint32_t rx_len )
 {
-    if (xSemaphoreTake(i2c_cfg[i2c_id].mutex, portMAX_DELAY))
-    {
-        /* Copy the message to the i2c global struture (controlled by the mutex) */
+    /* Copy the message to the i2c global struture */
+    
+    /* Maybe use memcpy to pass the tx buffer to the global structure */
+    i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
+    i2c_cfg[i2c_id].msg.addr = addr;
+    i2c_cfg[i2c_id].msg.tx_data = NULL;
+    i2c_cfg[i2c_id].msg.tx_len = 0;
+    i2c_cfg[i2c_id].msg.rx_data = rx_data;
+    i2c_cfg[i2c_id].msg.rx_len = rx_len;
+    i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
 
-        /* Maybe use memcpy to pass the tx buffer to the global structure */
-        i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
-        i2c_cfg[i2c_id].msg.addr = addr;
-        i2c_cfg[i2c_id].msg.tx_data = NULL;
-        i2c_cfg[i2c_id].msg.tx_len = 0;
-        i2c_cfg[i2c_id].msg.rx_data = rx_data;
-        i2c_cfg[i2c_id].msg.rx_len = rx_len;
+    /* Trigger the i2c interruption */
+    /* Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
+    I2CCONSET( i2c_id, ( I2C_I2EN | I2C_STA ) );
 
-        i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
-        /* Trigger the i2c interruption */
-        /* Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
-        I2CCONSET( i2c_id, ( I2C_I2EN | I2C_STA ) );
-
-        /* Wait here until the message is received */
-        if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) == pdTRUE )
-        {
-            /* Debug asserts */
-            configASSERT(rx_data);
-            configASSERT(i2c_cfg[i2c_id].msg.rx_data);
-            /* Copy the received message to the given pointer */
-            memcpy (rx_data, i2c_cfg[i2c_id].msg.rx_data, ( i2c_cfg[i2c_id].msg.rx_len * sizeof( uint32_t ) ) );
-        }
-        xSemaphoreGive( i2c_cfg[i2c_id].mutex );
+    /* Wait here until the message is received */
+    if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) == pdTRUE ){
+        /* Debug asserts */
+        configASSERT(rx_data);
+        configASSERT(i2c_cfg[i2c_id].msg.rx_data);
+        /* Copy the received message to the given pointer */
+        memcpy (rx_data, i2c_cfg[i2c_id].msg.rx_data, ( i2c_cfg[i2c_id].msg.rx_len * sizeof( uint32_t ) ) );
     }
     return i2c_cfg[i2c_id].msg.error;
 }
@@ -359,19 +344,15 @@ I2C_err vI2CSlaveTransfer ( I2C_ID_T i2c_id, uint32_t * rx_data )
 {
     /* Register this task as the one to be notified when a message comes */
     i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
+
     /* Function blocks here until a message is received */
     if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) == pdTRUE )
     {
-        /* Try to take the mutex so we can safely read from the global struct */
-        if ( xSemaphoreTake( i2c_cfg[i2c_id].mutex, ( TickType_t ) 1 ) )
-        {
             /* Debug asserts */
             configASSERT(rx_data);
             configASSERT(i2c_cfg[i2c_id].msg.rx_data);
             /* Copy the rx buffer to the pointer given */
             memcpy( rx_data, i2c_cfg[i2c_id].msg.rx_data, ( i2c_cfg[i2c_id].msg.rx_len * sizeof( uint32_t ) ) );
-            xSemaphoreGive( i2c_cfg[i2c_id].mutex );
-        }
     }
     /* Return error code */
     return i2c_cfg[i2c_id].msg.error;
