@@ -101,18 +101,20 @@ typedef struct xI2C_msg
     I2C_err error;
 } xI2C_msg;
 
-/* I2C common interface structure */
-typedef struct xI2C_Config {
-    LPC_I2C_T *reg;      /* IP base address of the I2C device */
-    IRQn_Type irq;
-    I2C_Mode mode;
+typedef struct xI2C_pins {
     uint8_t sda_port;
     uint8_t sda_pin;
     uint8_t scl_port;
     uint8_t scl_pin;
     uint8_t pin_func;
-    SemaphoreHandle_t isr_smphr;
-    SemaphoreHandle_t mutex;
+} xI2C_pins_t;
+
+/* I2C common interface structure */
+typedef struct xI2C_Config {
+    LPC_I2C_T *reg;      /* IP base address of the I2C device */
+    xI2C_pins_t pins;
+    IRQn_Type irq;
+    I2C_Mode mode;
     TaskHandle_t caller_task;
     xI2C_msg msg;
 } xI2C_Config;
