@@ -9,11 +9,11 @@ MCPU = cortex-m3
 #Used for program operation (LPCLink specific software) and newlib files
 LPCXPRESSO_PATH=/usr/local/lpcxpresso_7.8.0_426/lpcxpresso
 
-DEFS = -DCORE_M3 -D__CODE_RED -D__USE_LPCOPEN -DNO_BOARD_LIB -D__LPC17XX__ -D__NEWLIB__
+DEFS = -DDEBUG -DCORE_M3 -D__CODE_RED -D__USE_LPCOPEN -DNO_BOARD_LIB -D__LPC17XX__ -D__NEWLIB__
 
 LD_SCRIPT = afcipm.ld
 MAP = afcipm.map
-LD_FLAGS = -T $(LD_SCRIPT) -Xlinker -Map=$(MAP) 
+LD_FLAGS = -T $(LD_SCRIPT) -Xlinker -Map=$(MAP)
 LD_FLAGS += -Xlinker --gc-sections
 
 LPCOPEN_PATH = ./chip
@@ -32,18 +32,17 @@ INCLUDES = -I./inc
 INCLUDES += -I$(LPCOPEN_INCPATH)
 INCLUDES += -I$(FREERTOS_INCPATH)
 
-EXTRA_CFLAGS = -Wall -Os -std=gnu99 -fno-strict-aliasing
+EXTRA_CFLAGS = -Wall -O0 -g3 -std=gnu99
 CFLAGS = $(DEFS) $(INCLUDES)
 CFLAGS += -mcpu=$(MCPU) -mthumb
-CFLAGS += -fno-builtin -ffunction-sections -fdata-sections -nostdlib
+CFLAGS += -fno-builtin -ffunction-sections -fdata-sections -fno-strict-aliasing  -fmessage-length=0 -nostdlib
 CFLAGS += $(EXTRA_CFLAGS)
 
 #See if we can find these libraries in a standard path, not depending on LPCXpresso (libgcc.a, libc.a, libm.a, libcr_newlib_nohost.a)
 LIB_PATHS = -L$(LPCXPRESSO_PATH)/tools/lib/gcc/arm-none-eabi/4.9.3/thumb
-LIB_PATHS += -L/usr/local/lpcxpresso_7.8.0_426/lpcxpresso/tools/arm-none-eabi/lib/thumb
+LIB_PATHS += -L$(LPCXPRESSO_PATH)/tools/arm-none-eabi/lib/thumb
 
-#Do we need this? Dependecy file lists - not being used now
-DEPS := -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)"
+DEPS = -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)"
 
 PROJ_SRCDIR = src
 PROJ_SRC = $(shell find $(PROJ_SRCDIR) -name '*.c')
@@ -53,7 +52,7 @@ ALL_OBJS = $(PROJ_OBJS)
 ALL_OBJS += $(FREERTOS_OBJS)
 ALL_OBJS += $(LPCOPEN_OBJS)
 
-all: $(PROJ).bin
+all: $(PROJ).axf $(PROJ).bin
 
 %.bin: %.axf
 	@echo 'Creating Binary file from .axf'
@@ -68,7 +67,8 @@ all: $(PROJ).bin
 #Sources Compile
 %.o: %.c
 	@echo 'Building $< '
-	$(CC) $(CFLAGS) -o $@ -c $<
+	$(CC) $(CFLAGS) $(DEPS) -o $@ -c $<
+-include $(@:%.o=%.d)
 	@echo ' $< built successfully!'
 	@echo ' '
 
