@@ -38,3 +38,10 @@ Debug/
 
 #Temporary files
 *.swp
+
+#Dependency files
+*.d
+
+#Binaries
+*.axf
+*.bin
