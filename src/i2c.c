@@ -51,80 +51,184 @@ xI2C_Config i2c_cfg[] = {
         .reg = LPC_I2C0,
         .irq = I2C0_IRQn,
         .mode = I2C_Mode_IPMB,
-        .sda_port = I2C0_PORT,
-        .sda_pin = I2C0_SDA_PIN,
-        .scl_port = I2C0_PORT,
-        .scl_pin = I2C0_SCL_PIN,
-        .pin_func = I2C0_PIN_FUNC,
-        .isr_smphr = NULL,
-        .mutex = NULL,
-        .caller_task = NULL
-        //.i2c_msg = /* null ? */
+        .pins = {
+            .sda_port = I2C0_PORT,
+            .sda_pin = I2C0_SDA_PIN,
+            .scl_port = I2C0_PORT,
+            .scl_pin = I2C0_SCL_PIN,
+            .pin_func = I2C0_PIN_FUNC
+        },
+        .caller_task = NULL,
     },
     {
         .reg = LPC_I2C1,
         .irq = I2C1_IRQn,
         .mode = I2C_Mode_Local_Master,
-        .sda_port = I2C1_PORT,
-        .sda_pin = I2C1_SDA_PIN,
-        .scl_port = I2C1_PORT,
-        .scl_pin = I2C1_SCL_PIN,
-        .pin_func = I2C1_PIN_FUNC,
-        .isr_smphr = NULL,
-        .mutex = NULL,
-        .caller_task = NULL
-        //.i2c_msg = /* null ? */
+        .pins = {
+            .sda_port = I2C1_PORT,
+            .sda_pin = I2C1_SDA_PIN,
+            .scl_port = I2C1_PORT,
+            .scl_pin = I2C1_SCL_PIN,
+            .pin_func = I2C1_PIN_FUNC
+        },
+        .caller_task = NULL,
     },
     {
         .reg = LPC_I2C2,
         .irq = I2C2_IRQn,
         .mode = I2C_Mode_Local_Master,
-        .sda_port = I2C2_PORT,
-        .sda_pin = I2C2_SDA_PIN,
-        .scl_port = I2C2_PORT,
-        .scl_pin = I2C2_SCL_PIN,
-        .pin_func = I2C2_PIN_FUNC,
-        .isr_smphr = NULL,
-        .caller_task = NULL
-        //.i2c_msg = /* null ? */
+        .pins = {
+            .sda_port = I2C2_PORT,
+            .sda_pin = I2C2_SDA_PIN,
+            .scl_port = I2C2_PORT,
+            .scl_pin = I2C2_SCL_PIN,
+            .pin_func = I2C2_PIN_FUNC
+        },
+        .caller_task = NULL,
     }
 };
 
 /* Function prototypes */
-void vI2C_ISR(SemaphoreHandle_t pxI2Cx_ISRSemaphore);
+void vI2C_ISR( uint8_t i2c_id );
 uint8_t ulCFG_MMC_GA( void );
 
 void I2C0_IRQHandler( void )
 {
-    vI2C_ISR( i2c_cfg[I2C0].isr_smphr );
-    NVIC_DisableIRQ( i2c_cfg[I2C0].irq );
+    vI2C_ISR( I2C0 );
 }
 
 void I2C1_IRQHandler( void )
 {
-    vI2C_ISR( i2c_cfg[I2C1].isr_smphr );
-    NVIC_DisableIRQ( i2c_cfg[I2C1].irq );
+    vI2C_ISR( I2C1 );
 }
 
 void I2C2_IRQHandler( void )
 {
-    vI2C_ISR( i2c_cfg[I2C2].isr_smphr );
-    NVIC_DisableIRQ( i2c_cfg[I2C2].irq );
+    vI2C_ISR( I2C2 );
 }
 
+static uint8_t rx_cnt;
+static uint8_t tx_cnt;
+static uint8_t rx_data[i2cMAX_MSG_LENGTH];
+
 /* I2C_ISR - I2C interrupt service routine */
-void vI2C_ISR(SemaphoreHandle_t pxI2Cx_ISRSemaphore)
+void vI2C_ISR( uint8_t i2c_id )
 {
     /* Declare local variables */
-    static portBASE_TYPE xI2CSemaphoreWokeTask;
+    portBASE_TYPE xI2CSemaphoreWokeTask;
 
     /* Initialize variables */
     xI2CSemaphoreWokeTask = pdFALSE;
 
-    /* Give the I2C specific semaphore, indicating that a status in the I2C has occurred */
-    xSemaphoreGiveFromISR( pxI2Cx_ISRSemaphore, &xI2CSemaphoreWokeTask );
+    /* I2C status handling */
+    switch ( LPC_I2Cx( i2c_id )->STAT ){
+    case I2C_STAT_START:
+    case I2C_STAT_REPEATED_START:
+        rx_cnt = 0;
+        tx_cnt = 0;
+        /* Write Slave Address in the I2C bus, if there's nothing
+         * to transmit, the last bit (R/W) will be set to 1
+         */
+        I2CDAT_WRITE( i2c_id, ( i2c_cfg[i2c_id].msg.addr << 1 ) | ( i2c_cfg[i2c_id].msg.tx_len == 0 ) );
+        break;
 
-    /* Upon return from ISR yield to a higher priority task if necessary */
+    case I2C_STAT_SLA_W_SENT_ACK:
+        /* Send first data byte */
+        I2CDAT_WRITE( i2c_id, *( i2c_cfg[i2c_id].msg.tx_data+tx_cnt ) );
+        tx_cnt++;
+        I2CCONCLR( i2c_id, I2C_STA );
+        break;
+
+    case I2C_STAT_DATA_SENT_ACK:
+        /* Transmit the remaining bytes */
+        if ( i2c_cfg[i2c_id].msg.tx_len != tx_cnt ){
+            I2CDAT_WRITE( i2c_id, *( i2c_cfg[i2c_id].msg.tx_data+tx_cnt ) );
+            tx_cnt++;
+            I2CCONCLR( i2c_id, I2C_STA );
+        } else {
+            /* If there's no more data to be transmitted,
+             * finish the communication and notify the caller task */
+            I2CCONSET( i2c_id, I2C_STO );
+            I2CCONCLR( i2c_id, I2C_STA );
+            vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+        }
+        break;
+
+    case I2C_STAT_SLA_R_SENT_ACK:
+        /* SLA+R has been transmitted and ACK'd
+         * If we want to receive only 1 byte, return NACK on the next byte */
+        i2c_cfg[i2c_id].msg.rx_data = rx_data;
+        if ( i2c_cfg[i2c_id].msg.rx_len == 1 ){
+            I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
+        } else {
+            /* If we expect to receive more than 1 byte,
+             * return ACK on the next byte */
+            I2CCONSET( i2c_id, I2C_AA );
+            I2CCONCLR( i2c_id, I2C_STA );
+        }
+        break;
+
+    case I2C_STAT_DATA_RECV_ACK:
+        *(i2c_cfg[i2c_id].msg.rx_data+rx_cnt) = I2CDAT_READ( i2c_id );
+        rx_cnt++;
+        if (rx_cnt != (i2c_cfg[i2c_id].msg.rx_len) - 1 ){
+            I2CCONCLR( i2c_id, I2C_STA );
+            I2CCONSET( i2c_id, I2C_AA );
+        } else {
+            I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
+        }
+        break;
+
+    case I2C_STAT_DATA_RECV_NACK:
+        *(i2c_cfg[i2c_id].msg.rx_data+rx_cnt) = I2CDAT_READ( i2c_id );
+        rx_cnt++;
+        I2CCONSET( i2c_id, I2C_STO );
+        I2CCONCLR( i2c_id, I2C_STA );
+        /* There's no more data to be received */
+        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+        break;
+
+    case I2C_STAT_SLA_R_SENT_NACK:
+        I2CCONSET( i2c_id, I2C_STO );
+        I2CCONCLR( i2c_id, I2C_STA );
+        /* Notify the error ? */
+        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+        break;
+
+        /* Slave Mode */
+    case I2C_STAT_SLA_W_RECV_ACK:
+    case I2C_STAT_ARB_LOST_SLA_W_RECV_ACK:
+        i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
+        i2c_cfg[i2c_id].msg.rx_data = rx_data;
+        rx_cnt = 0;
+        I2CCONSET( i2c_id, I2C_AA );
+        break;
+
+    case I2C_STAT_SLA_DATA_RECV_ACK:
+        i2c_cfg[i2c_id].msg.rx_data[rx_cnt] = I2CDAT_READ( i2c_id );
+        rx_cnt++;
+        I2CCONSET ( i2c_id, ( I2C_AA ) );
+        break;
+
+    case I2C_STAT_SLA_DATA_RECV_NACK:
+        I2CCONCLR ( i2c_id, ( I2C_STA ) );
+        I2CCONSET ( i2c_id, ( I2C_AA ) );
+        break;
+
+    case I2C_STAT_SLA_STOP_REP_START:
+        i2c_cfg[i2c_id].msg.rx_len = rx_cnt;
+        if (rx_cnt > 0){
+            vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+        }
+        I2CCONCLR ( i2c_id, ( I2C_STA ) );
+        I2CCONSET ( i2c_id, ( I2C_AA ) );
+        break;
+
+    default:
+        break;
+    }
+    I2CCONCLR( i2c_id, I2C_SI );
+
     if (xI2CSemaphoreWokeTask == pdTRUE) {
         portYIELD_FROM_ISR(pdTRUE);
     }
@@ -154,11 +258,11 @@ void vI2CInitTask( I2C_ID_T i2c_id, uint32_t uxPriority, I2C_Mode mode )
      * Example: (if using LPC17xx and LPCOpen library)
      * #define PIN_FUNC_CFG( port, pin, func ) Chip_IOCON_PinMux(...)
     */
-    Chip_IOCON_PinMux( LPC_IOCON, i2c_cfg[i2c_id].sda_port, i2c_cfg[i2c_id].sda_pin, IOCON_MODE_INACT, i2c_cfg[i2c_id].pin_func );
-    Chip_IOCON_PinMux( LPC_IOCON, i2c_cfg[i2c_id].scl_port, i2c_cfg[i2c_id].scl_pin, IOCON_MODE_INACT, i2c_cfg[i2c_id].pin_func );
-    Chip_IOCON_EnableOD( LPC_IOCON, i2c_cfg[i2c_id].sda_port, i2c_cfg[i2c_id].sda_pin );
-    Chip_IOCON_EnableOD( LPC_IOCON, i2c_cfg[i2c_id].scl_port, i2c_cfg[i2c_id].scl_pin );
-    NVIC_SetPriority(i2c_cfg[i2c_id].irq, configKERNEL_INTERRUPT_PRIORITY);
+    Chip_IOCON_PinMux( LPC_IOCON, i2c_cfg[i2c_id].pins.sda_port, i2c_cfg[i2c_id].pins.sda_pin, IOCON_MODE_INACT, i2c_cfg[i2c_id].pins.pin_func );
+    Chip_IOCON_PinMux( LPC_IOCON, i2c_cfg[i2c_id].pins.scl_port, i2c_cfg[i2c_id].pins.scl_pin, IOCON_MODE_INACT, i2c_cfg[i2c_id].pins.pin_func );
+    Chip_IOCON_EnableOD( LPC_IOCON, i2c_cfg[i2c_id].pins.sda_port, i2c_cfg[i2c_id].pins.sda_pin );
+    Chip_IOCON_EnableOD( LPC_IOCON, i2c_cfg[i2c_id].pins.scl_port, i2c_cfg[i2c_id].pins.scl_pin );
+    NVIC_SetPriority(i2c_cfg[i2c_id].irq, configMAX_SYSCALL_INTERRUPT_PRIORITY);
     NVIC_EnableIRQ( i2c_cfg[i2c_id].irq );
 
     /* Create the ISR semaphore */
