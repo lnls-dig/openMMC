@@ -30,9 +30,6 @@
 #include "board_defs.h"
 
 /* Project definitions */
-#define i2cSTACK_SIZE   ((unsigned short) 300)
-#define i2cQUEUE_DEBUG
-
 #define I2CCONSET( id, val )        LPC_I2Cx(id)->CONSET = val
 #define I2CCONCLR( id, val )        LPC_I2Cx(id)->CONCLR = val
 #define I2CDAT_WRITE( id, val )     LPC_I2Cx(id)->DAT = val
@@ -239,7 +236,7 @@ void vI2C_ISR( uint8_t i2c_id )
  ***************
  * I2C initialization code called by main
  */
-void vI2CInitTask( I2C_ID_T i2c_id, uint32_t uxPriority, I2C_Mode mode )
+void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 {
     char pcI2C_Tag[4];
 
@@ -265,22 +262,8 @@ void vI2CInitTask( I2C_ID_T i2c_id, uint32_t uxPriority, I2C_Mode mode )
     NVIC_SetPriority(i2c_cfg[i2c_id].irq, configMAX_SYSCALL_INTERRUPT_PRIORITY);
     NVIC_EnableIRQ( i2c_cfg[i2c_id].irq );
 
-    /* Create the ISR semaphore */
-    i2c_cfg[i2c_id].isr_smphr = xSemaphoreCreateBinary();
-    vQueueAddToRegistry(i2c_cfg[i2c_id].isr_smphr, "I2Cn ISR Semaphore");
-
-    /* Create the I2C driver task */
-    TaskHandle_t handle;
-    xTaskCreate( vI2CTask, pcI2C_Tag, i2cSTACK_SIZE, NULL, uxPriority, &handle );
-
-    /* Pass the interface number to the task */
-    vTaskSetApplicationTaskTag ( handle, (void *)i2c_id );
-
     /* Set I2C operating mode */
     i2c_cfg[i2c_id].mode = mode;
-
-    /* Create the I2C Mutex that controls access to the cfg struct*/
-    i2c_cfg[i2c_id].mutex = xSemaphoreCreateMutex();
 
     /* Enable and configure I2C clock */
     Chip_I2C_Init( i2c_id );
@@ -306,140 +289,6 @@ void vI2CInitTask( I2C_ID_T i2c_id, uint32_t uxPriority, I2C_Mode mode )
     I2CCONCLR( i2c_id, I2C_SI );
 
 } /* End of vI2C_Init */
-
-void vI2CTask ( void* pvParameters )
-{
-    /* Declare local variables */
-    uint32_t rx_data[i2cMAX_MSG_LENGTH];
-    uint32_t i2c_id = (uint32_t) xTaskGetApplicationTaskTag( NULL );
-    uint8_t tx_cnt;
-    uint8_t rx_cnt;
-
-#if 0
-    /* Variable that stores the actual used stack by this task */
-    uint8_t stack = uxTaskGetStackHighWaterMark( xTaskGetCurrentTaskHandle() );
-#endif
-
-    for ( ;; ) {
-        /* Check the I2C semaphore for a deferred I2C interrupt
-         * - proceed only if a the semaphore has been "given"
-         * - if semaphore hasn't been given, delay 10 "ticks" and try again
-         */
-        if ( xSemaphoreTake( i2c_cfg[i2c_id].isr_smphr, (TickType_t) 10 ) )
-        {
-            switch (LPC_I2Cx(i2c_id)->STAT){
-                case I2C_STAT_START:
-                case I2C_STAT_REPEATED_START:
-                    rx_cnt = 0;
-                    tx_cnt = 0;
-                    /* Write Slave Address in the I2C bus, if there's nothing
-                     * to transmit, the last bit (R/W) will be set to 1
-                     */
-                    I2CDAT_WRITE( i2c_id, ( i2c_cfg[i2c_id].msg.addr << 1 ) | ( i2c_cfg[i2c_id].msg.tx_len == 0 ) );
-                    break;
-
-                case I2C_STAT_SLA_W_SENT_ACK:
-                    /* Send first data byte */
-                    I2CDAT_WRITE( i2c_id, *( i2c_cfg[i2c_id].msg.tx_data+tx_cnt ) );
-                    tx_cnt++;
-                    I2CCONCLR( i2c_id, I2C_STA );
-                    break;
-
-                case I2C_STAT_DATA_SENT_ACK:
-                    /* Transmit the remaining bytes */
-                    if ( i2c_cfg[i2c_id].msg.tx_len != tx_cnt ){
-                        I2CDAT_WRITE( i2c_id, *( i2c_cfg[i2c_id].msg.tx_data+tx_cnt ) );
-                        tx_cnt++;
-                        I2CCONCLR( i2c_id, I2C_STA );
-                    } else {
-                        /* If there's no more data to be transmitted,
-                         * finish the communication and notify the caller task */
-                        I2CCONSET( i2c_id, I2C_STO );
-                        I2CCONCLR( i2c_id, I2C_STA );
-                        xTaskNotifyGive( i2c_cfg[i2c_id].caller_task );
-                    }
-                    break;
-
-                case I2C_STAT_SLA_R_SENT_ACK:
-                    /* SLA+R has been transmitted and ACK'd
-                     * If we want to receive only 1 byte, return NACK on the next byte */
-                    i2c_cfg[i2c_id].msg.rx_data = rx_data;
-                    if ( i2c_cfg[i2c_id].msg.rx_len == 1 ){
-                        I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
-                    } else {
-                        /* If we expect to receive more than 1 byte,
-                         * return ACK on the next byte */
-                        I2CCONSET( i2c_id, I2C_AA );
-                        I2CCONCLR( i2c_id, I2C_STA );
-                    }
-                    break;
-
-                case I2C_STAT_DATA_RECV_ACK:
-                    *(i2c_cfg[i2c_id].msg.rx_data+rx_cnt) = I2CDAT_READ( i2c_id );
-                    rx_cnt++;
-                    if (rx_cnt != (i2c_cfg[i2c_id].msg.rx_len) - 1 ){
-                        I2CCONCLR( i2c_id, I2C_STA );
-                        I2CCONSET( i2c_id, I2C_AA );
-                    } else {
-                        I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
-                    }
-                    break;
-
-                case I2C_STAT_DATA_RECV_NACK:
-                    *(i2c_cfg[i2c_id].msg.rx_data+rx_cnt) = I2CDAT_READ( i2c_id );
-                    rx_cnt++;
-                    I2CCONSET( i2c_id, I2C_STO );
-                    I2CCONCLR( i2c_id, I2C_STA );
-                    /* There's no more data to be received */
-                    xTaskNotifyGive( i2c_cfg[i2c_id].caller_task );
-                    break;
-
-                case I2C_STAT_SLA_R_SENT_NACK:
-                    I2CCONSET( i2c_id, I2C_STO );
-                    I2CCONCLR( i2c_id, I2C_STA );
-                    /* Notify the error ? */
-                    xTaskNotifyGive( i2c_cfg[i2c_id].caller_task );
-                    break;
-
-                    /* Slave Mode */
-                case I2C_STAT_SLA_W_RECV_ACK:
-                case I2C_STAT_ARB_LOST_SLA_W_RECV_ACK:
-                    i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
-                    i2c_cfg[i2c_id].msg.rx_data = rx_data;
-                    rx_cnt = 0;
-                    I2CCONSET( i2c_id, I2C_AA );
-                    break;
-
-                case I2C_STAT_SLA_DATA_RECV_ACK:
-                    i2c_cfg[i2c_id].msg.rx_data[rx_cnt] = I2CDAT_READ( i2c_id );
-                    rx_cnt++;
-                    I2CCONSET ( i2c_id, ( I2C_AA ) );
-                    break;
-
-                case I2C_STAT_SLA_DATA_RECV_NACK:
-                    I2CCONCLR ( i2c_id, ( I2C_STA ) );
-                    I2CCONSET ( i2c_id, ( I2C_AA ) );
-                    break;
-
-                case I2C_STAT_SLA_STOP_REP_START:
-                    i2c_cfg[i2c_id].msg.rx_len = rx_cnt;
-                    if (rx_cnt > 0)
-                    {
-                        xTaskNotifyGive( i2c_cfg[i2c_id].caller_task );
-                    }
-                    I2CCONCLR ( i2c_id, ( I2C_STA ) );
-                    I2CCONSET ( i2c_id, ( I2C_AA ) );
-                    break;
-
-                default:
-                    break;
-            }
-            I2CCONCLR( i2c_id, I2C_SI );
-            NVIC_ClearPendingIRQ( i2c_cfg[i2c_id].irq );
-            NVIC_EnableIRQ( i2c_cfg[i2c_id].irq );
-        }
-    }
-}
 
 I2C_err vI2CWrite( I2C_ID_T i2c_id, uint32_t addr, uint32_t * tx_data, uint32_t tx_len )
 {

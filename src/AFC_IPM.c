@@ -68,13 +68,13 @@ int main(void)
 
     /* Create project's tasks */
 #if ((DEBUG_I2C == 0) || (DEBUG_I2C == 3))
-    vI2CInitTask(I2C0, mainI2C0_TASK_PRIORITY, I2C_Mode_IPMB);
-    xTaskCreate( prvSlaveTestTask, (const char*)"Slave Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainTEST_TASK_PRIORITY, ( xTaskHandle * ) NULL );
+    vI2CInit(I2C0, I2C_Mode_IPMB);
+    xTaskCreate( prvSlaveTestTask, (const char*)"Slave Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, (UBaseType_t) 2, ( TaskHandle_t * ) NULL );
 
 #endif
 #if ((DEBUG_I2C == 1) || (DEBUG_I2C == 3))
-    vI2CInitTask(I2C1, mainI2C1_TASK_PRIORITY, I2C_Mode_Local_Master);
-    xTaskCreate( prvMasterTestTask, (const char*)"Master Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainTEST_TASK_PRIORITY, ( xTaskHandle * ) NULL );
+    vI2CInit(I2C1, I2C_Mode_Local_Master);
+    xTaskCreate( prvMasterTestTask, (const char*)"Master Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, (UBaseType_t) 1, ( TaskHandle_t * ) NULL );
 
 #endif
     /* Start the tasks running. */
