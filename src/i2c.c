@@ -286,7 +286,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 
 } /* End of vI2C_Init */
 
-I2C_err vI2CWrite( I2C_ID_T i2c_id, uint32_t addr, uint32_t * tx_data, uint32_t tx_len )
+I2C_err vI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len )
 {
     /* Copy the message to the i2c global struture */
     
@@ -312,7 +312,7 @@ I2C_err vI2CWrite( I2C_ID_T i2c_id, uint32_t addr, uint32_t * tx_data, uint32_t 
     return err_FAILURE;
 }
 
-I2C_err vI2CRead( I2C_ID_T i2c_id, uint32_t addr, uint32_t * rx_data, uint32_t rx_len )
+I2C_err vI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len )
 {
     /* Copy the message to the i2c global struture */
     
@@ -340,7 +340,7 @@ I2C_err vI2CRead( I2C_ID_T i2c_id, uint32_t addr, uint32_t * rx_data, uint32_t r
     return i2c_cfg[i2c_id].msg.error;
 }
 
-I2C_err vI2CSlaveTransfer ( I2C_ID_T i2c_id, uint32_t * rx_data )
+I2C_err vI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data )
 {
     /* Register this task as the one to be notified when a message comes */
     i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();

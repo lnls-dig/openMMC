@@ -89,7 +89,7 @@ int main(void)
 #if ((DEBUG_I2C == 1) || (DEBUG_I2C == 3))
 static void prvMasterTestTask( void *pvParameters )
 {
-    uint32_t rx_data[i2cMAX_MSG_LENGTH];
+    uint8_t rx_data[i2cMAX_MSG_LENGTH];
 #if 0
     /* Variable that stores the actual stack used by this task */
     uint8_t stack = uxTaskGetStackHighWaterMark( xTaskGetCurrentTaskHandle() );
@@ -117,7 +117,8 @@ static void prvMasterTestTask( void *pvParameters )
 
 static void prvSlaveTestTask( void *pvParameters )
 {
-    uint32_t rx_buff[i2cMAX_MSG_LENGTH];
+    uint8_t rx_buff[i2cMAX_MSG_LENGTH];
+    static uint8_t mch_retries;
     for( ;; )
     {
         /* Place this task in the blocked state until it is time to run again.
@@ -126,7 +127,11 @@ static void prvSlaveTestTask( void *pvParameters )
            time. */
         vI2CSlaveTransfer( I2C0, rx_buff );
         if (rx_buff[2] == 32){
-            prvToggleLED( LED_RED );
+            mch_retries++;
+            if ( mch_retries == 3 ){
+                prvToggleLED( LED_RED );
+                mch_retries = 0;
+            }
         }
     }
 }
