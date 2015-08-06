@@ -127,8 +127,8 @@ extern struct xI2C_Config i2c_cfg[];
 /* Function Prototypes */
 void vI2CTask( void * pvParameters );
 void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
-I2C_err vI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len );
-I2C_err vI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len );
-I2C_err vI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data );
+I2C_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len );
+I2C_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len );
+I2C_err xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data );
 
 #endif /*I2C_H_*/
