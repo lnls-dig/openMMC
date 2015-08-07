@@ -26,6 +26,7 @@
 #define IPMB_TASK_PRIORITY      1
 #define IPMB_TXQUEUE_LEN        5
 #define IPMB_RXQUEUE_LEN        5
+#define IPMB_MAX_RETRIES        3
 
 #define IPMI_MAX_MSG_LENGTH     32
 #define MCH_ADDRESS             0x20
@@ -50,4 +51,10 @@ typedef struct ipmi_msg {
     uint8_t msg_chksum;
 } ipmi_msg_t;
 
+typedef struct ipmi_msg_cfg {
+    ipmi_pkt_t ipmi_msg;
+    TaskHandle_t caller_task;
+    uint8_t retries;
+    uint32_t timestamp;
+} ipmi_msg_cfg_t;
 #endif
