@@ -35,22 +35,42 @@ static QueueHandle_t ipmb_rxqueue;
 
 void IPMB_Task ( void *pvParameters )
 {
-    /* Change to union */
-    ipmi_pkt_t temp_msg;
+
+    ipmi_msg_cfg_t msg_cfg;
 
     for ( ;; ) {
         /* Checks if there's any message to be sent */
-        if ( xQueueReceive( ipmb_txqueue, &temp_msg, 0 ) ){
+        if ( xQueueReceive( ipmb_txqueue, &msg_cfg, 0 ) ){
             /* This function blocks here until the message is successfully sent or an error returns */
-            xI2CWrite( IPMB_I2C, temp_msg.msg.rsSA, &temp_msg.msg.netfn, sizeof(temp_msg.msg)-1 );
+            if (msg_cfg.msg.netfn && 0x01) {
+                /* We're sending a response, no need to keep a copy of the message here */
+                xI2CWrite( IPMB_I2C, msg_cfg.ipmi_msg.msg.dest_addr, &msg_cfg.ipmi_msg.msg.netfn, sizeof(msg_cfg.ipmi_msg.msg)-1 );
+                /* TODO: Find a way to pass the error to the client */
+            } else {
+                if (msg_cfg.retries == 0) {
+                    /* Get the time when the message is first sent */
+                    nsg_cfg.timestamp = get_timestamp;
+                }
+                if (msg_cfg.retries < IPMB_MAX_RETRIES) {
+                    xI2CWrite( IPMB_I2C, msg_cfg.ipmi_msg.msg.dest_addr, &msg_cfg.ipmi_msg.msg.netfn, sizeof(msg_cfg.ipmi_msg.msg)-1 );
+                    msg_cfg.retries++;
+                    xQueueSendToFront( ipmb_txqueue, &msg_cfg, 0 );
+                }
+            }
         }
 
         /* Checks if there's any incoming messages */
-        if ( xI2CSlaveTransfer( IPMB_I2C, &temp_msg, 0 ) == err_SUCCESS ){
+        if ( xI2CSlaveTransfer( IPMB_I2C, msg_cfg.buffer, 0 ) == err_SUCCESS ){
             /* Handle the received message and notify the client */
+            /* Is it a response? */
+            if (msg_cfg.msg.netfn && 0x1) {
+                /* Match with previous request and verify timeout */
+            } else {
+                /* Copy request to client task */
+                /* Maybe keep the request in the queue, so we can match our response */
+            }
         }
     }
-
 }
 
 ipmb_error ipmb_init ( void )
@@ -61,7 +81,7 @@ ipmb_error ipmb_init ( void )
     xTaskCreate( ipmb_task, (const char*)"IPMB", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, IPMB_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
 }
 
-ipmb_error ipmb_send ( uint8_t netfn, uint8_t cmd, uint8_t * data, QueueHandle_t txqueue_handle )
+ipmb_error ipmb_send ( uint8_t netfn, uint8_t cmd, uint8_t * data )
 {
     static ipmi_pkt temp;
 
