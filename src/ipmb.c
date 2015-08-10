@@ -54,6 +54,7 @@ void IPMB_Task ( void *pvParameters )
                             msg_cfg.retries++;
                         xQueueSendToFront( ipmb_txqueue, &msg_cfg, 0 );
                         }
+                        xTaskNotifyGive( msg_cfg.caller_task );
                     }
                 }
                 /* If we're here, either the message has been successfully transmitted or we've exhausted our options to send it, give up */
