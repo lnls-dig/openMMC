@@ -83,10 +83,10 @@ typedef enum {
 } I2C_Mode;
 
 typedef enum {
-    err_SUCCESS = 0,
+    i2c_err_SUCCESS = 0,
     /* TODO: Improve error labels (maybe MASTER_W_NACK?) */
-    err_FAILURE
-} I2C_err;
+    i2c_err_FAILURE
+} i2c_err;
 
 /* I2C transaction parameter structure
  */
@@ -98,7 +98,7 @@ typedef struct xI2C_msg
     uint32_t tx_len;                        /* Number of bytes to transmit */
     uint32_t *rx_data;                      /* Pointer to received bytes */
     uint32_t rx_len;                        /* Number of bytes to receive */
-    I2C_err error;
+    i2c_err error;
 } xI2C_msg;
 
 typedef struct xI2C_pins {
@@ -127,9 +127,9 @@ extern struct xI2C_Config i2c_cfg[];
 /* Function Prototypes */
 void vI2CTask( void * pvParameters );
 void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
-I2C_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len );
-I2C_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len );
-I2C_err xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data );
+i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len );
+i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len );
+i2c_err xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout );
 uint8_t ulCFG_MMC_GA( void );
 
 #endif /*I2C_H_*/
