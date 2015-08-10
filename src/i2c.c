@@ -83,7 +83,6 @@ xI2C_Config i2c_cfg[] = {
 
 /* Function prototypes */
 void vI2C_ISR( uint8_t i2c_id );
-uint8_t ulCFG_MMC_GA( void );
 
 void I2C0_IRQHandler( void )
 {
