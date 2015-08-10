@@ -103,7 +103,7 @@ static void prvMasterTestTask( void *pvParameters )
         vTaskDelay( 50 / portTICK_PERIOD_MS );
 
         /* Send I2C message to the queue  */
-        vI2CRead( I2C1, mainLM75_1_ADDR, rx_data, 2 );
+        xI2CRead( I2C1, mainLM75_1_ADDR, rx_data, 2 );
 
         if (*rx_data < 40){
             prvToggleLED( LED_GREEN );
@@ -125,7 +125,7 @@ static void prvSlaveTestTask( void *pvParameters )
            The block state is specified in ticks, the constant used converts ticks
            to ms.  While in the blocked state this task will not consume any CPU
            time. */
-        vI2CSlaveTransfer( I2C0, rx_buff );
+        xI2CSlaveTransfer( I2C0, rx_buff, portMAX_DELAY );
         if (rx_buff[2] == 32){
             mch_retries++;
             if ( mch_retries == 3 ){
