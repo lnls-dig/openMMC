@@ -74,6 +74,7 @@ licensing and training services.
 #define configUSE_MALLOC_FAILED_HOOK            0
 #define configENABLE_BACKWARD_COMPATIBILITY     1
 #define configUSE_APPLICATION_TASK_TAG          1
+#define configUSE_TASK_NOTIFICATIONS            1
 
 #if (configGENERATE_RUN_TIME_STATS == 1)
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vConfigureTimerForRunTimeStats()
