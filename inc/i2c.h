@@ -84,8 +84,11 @@ typedef enum {
 
 typedef enum {
     i2c_err_SUCCESS = 0,
-    /* TODO: Improve error labels (maybe MASTER_W_NACK?) */
-    i2c_err_FAILURE
+    i2c_err_FAILURE,
+    i2c_err_SLA_R_SENT_NACK,
+    i2c_err_SLA_DATA_RECV_NACK,
+    i2c_err_SLA_W_SENT_NACK,
+    i2c_err_DATA_SENT_NACK
 } i2c_err;
 
 /* I2C transaction parameter structure

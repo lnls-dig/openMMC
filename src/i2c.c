@@ -131,6 +131,13 @@ void vI2C_ISR( uint8_t i2c_id )
         I2CCONCLR( i2c_id, I2C_STA );
         break;
 
+    case I2C_STAT_SLA_W_SENT_NACK:
+        I2CCONSET( i2c_id, I2C_STO );
+        I2CCONCLR( i2c_id, I2C_STA );
+        i2c_cfg[i2c_id].msg.error = i2c_err_SLA_W_SENT_NACK;
+        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+        break;
+
     case I2C_STAT_DATA_SENT_ACK:
         /* Transmit the remaining bytes */
         if ( i2c_cfg[i2c_id].msg.tx_len != tx_cnt ){
@@ -145,6 +152,12 @@ void vI2C_ISR( uint8_t i2c_id )
             vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
         }
         break;
+
+    case I2C_STAT_DATA_SENT_NACK:
+        I2CCONSET( i2c_id, I2C_STO );
+        I2CCONCLR( i2c_id, I2C_STA );
+        i2c_cfg[i2c_id].msg.error = i2c_err_DATA_SENT_NACK;
+        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
 
     case I2C_STAT_SLA_R_SENT_ACK:
         /* SLA+R has been transmitted and ACK'd
@@ -183,7 +196,8 @@ void vI2C_ISR( uint8_t i2c_id )
     case I2C_STAT_SLA_R_SENT_NACK:
         I2CCONSET( i2c_id, I2C_STO );
         I2CCONCLR( i2c_id, I2C_STA );
-        /* Notify the error ? */
+        /* Notify the error */
+        i2c_cfg[i2c_id].msg.error = i2c_err_SLA_R_SENT_NACK;
         vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
         break;
 
@@ -205,11 +219,12 @@ void vI2C_ISR( uint8_t i2c_id )
     case I2C_STAT_SLA_DATA_RECV_NACK:
         I2CCONCLR ( i2c_id, ( I2C_STA ) );
         I2CCONSET ( i2c_id, ( I2C_AA ) );
+        i2c_cfg[i2c_id].msg.error = i2c_err_SLA_DATA_RECV_NACK;
         break;
 
     case I2C_STAT_SLA_STOP_REP_START:
         i2c_cfg[i2c_id].msg.rx_len = rx_cnt;
-        if (rx_cnt > 0){
+        if (((rx_cnt > 0) && (i2c_cfg[i2c_id].mode == I2C_Mode_Local_Master )) || ((rx_cnt > 1) && (i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ))) {
             vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
         }
         I2CCONCLR ( i2c_id, ( I2C_STA ) );
