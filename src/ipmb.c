@@ -44,14 +44,14 @@ void IPMB_Task ( void *pvParameters )
     for ( ;; ) {
         /* Checks if there's any message to be sent */
         if ( xQueueReceive( ipmb_txqueue, &msg_cfg, 0 ) ) {
-            if ( msg_cfg.msg.netfn && 0x01 ) {
+            if ( msg_cfg.msg.netfn & 0x01 ) {
                 /* We're sending a response */
                 /* Match with previous request */
                 if ( msg_cfg.msg.seq == msg_cfg_recv_req.msg.seq ) {
                     /* TODO: check if the response was built in time, comparing the timeout value with the matching request */
                     if ( msg_cfg.retries < IPMB_MAX_RETRIES ) {
                         ipmb_encode( &buffer[0], &msg_cfg.msg );
-                        if ( xI2CWrite( IPMB_I2C, buffer[0], &buffer[1], (sizeof(buffer)/sizeof(buffer[0]) - 1) ) != i2c_err_SUCCESS) {
+                        if ( xI2CWrite( IPMB_I2C, buffer[0] >> 1, &buffer[1], msg_cfg.msg.data_len + 6 ) != i2c_err_SUCCESS) {
                             /* Message couldn't be transmitted right now, increase retry counter and try again later */
                             msg_cfg.retries++;
                         xQueueSendToFront( ipmb_txqueue, &msg_cfg, 0 );
@@ -69,7 +69,7 @@ void IPMB_Task ( void *pvParameters )
                 }
                 if ( msg_cfg.retries < IPMB_MAX_RETRIES ) {
                     ipmb_encode( &buffer[0], &msg_cfg.msg );
-                    if ( xI2CWrite( IPMB_I2C, buffer[0], &buffer[1], ( sizeof(buffer)/sizeof(buffer[0]) - 1 ) ) != i2c_err_SUCCESS ) {
+                    if ( xI2CWrite( IPMB_I2C, buffer[0] >> 1, &buffer[1], ( sizeof(buffer)/sizeof(buffer[0]) - 1 ) ) != i2c_err_SUCCESS ) {
                         msg_cfg.retries++;
                         xQueueSendToFront( ipmb_txqueue, &msg_cfg, 0 );
                     } else {
@@ -80,14 +80,15 @@ void IPMB_Task ( void *pvParameters )
                 /* If we're here, either the message has been successfully transmitted or we've exhausted our options to send it, give up */
             }
         }
-        
+
         /* Checks if there's any incoming messages */
-        if ( xI2CSlaveTransfer( IPMB_I2C, &buffer[0], 0 ) == i2c_err_SUCCESS ) {
+        uint8_t rx_len = xI2CSlaveTransfer( IPMB_I2C, &buffer[0], 0 );
+        if ( rx_len > 0 ) {
             /* Perform a checksum test on the message, if it doesn't pass, just ignore it. We have no way to know if we're the one who should receive it */
-            if ( ipmb_assert_chksum( &buffer[0] ) ) {
+            if ( ipmb_assert_chksum( buffer, rx_len ) == ipmb_err_success ) {
                 /* Maybe clear the msg_cfg struct before writing new data into it */
-                ipmb_decode( &msg_cfg.msg, &buffer[0] );
-                if ( msg_cfg.msg.netfn && 0x1 ) {
+                ipmb_decode( &msg_cfg.msg, buffer, rx_len );
+                if ( msg_cfg.msg.netfn & 0x1 ) {
                     /* The received message is a response, check the matching request */
                     if ( msg_cfg.msg.seq == msg_cfg_sent_req.msg.seq ) {
                         /* Seq number checking is enough to match the messages */
@@ -97,14 +98,14 @@ void IPMB_Task ( void *pvParameters )
                 } else {
                     /* The message is a request */
                     /* TODO: check if this is a repeated request (same SEQ), in this case just ignore this message, since it'll be responded shortly (I hope) */
-                    if ( msg_cfg_recv_req.msg.seq != msg_cfg_sent_req.msg.seq ) {
+                    //if ( msg_cfg_recv_req.msg.seq != msg_cfg.msg.seq ) {
                         /* Start counting the time, so we know if our response will be built in time */
                         //msg_cfg.timestamp = get_timestamp;
                         /* Save the message to pair with the future response */
                         msg_cfg_recv_req = msg_cfg;
                         /* Notify the client about the new request */
                         ipmb_notify_client ( msg_cfg );
-                    }
+                    //}
                 }
             }
         }
