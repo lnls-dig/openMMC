@@ -358,7 +358,7 @@ i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_l
     return i2c_cfg[i2c_id].msg.error;
 }
 
-i2c_err xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout )
+uint8_t xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout )
 {
     /* Register this task as the one to be notified when a message comes */
     i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
@@ -370,10 +370,12 @@ i2c_err xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout
             configASSERT(rx_data);
             configASSERT(i2c_cfg[i2c_id].msg.rx_data);
             /* Copy the rx buffer to the pointer given */
-            memcpy( rx_data, i2c_cfg[i2c_id].msg.rx_data, ( i2c_cfg[i2c_id].msg.rx_len * sizeof( uint32_t ) ) );
+            memcpy( rx_data, i2c_cfg[i2c_id].msg.rx_data, i2c_cfg[i2c_id].msg.rx_len );
+    } else {
+        return 0;
     }
-    /* Return error code */
-    return i2c_cfg[i2c_id].msg.error;
+    /* Return message lenght */
+    return i2c_cfg[i2c_id].msg.rx_len;
 }
 
 /*==============================================================
