@@ -96,11 +96,11 @@ typedef enum {
 typedef struct xI2C_msg
 {
     I2C_ID_T i2c_id;                        /* I2C interface number (0, 1 or 2) */
-    uint32_t addr;                          /* Slave address of I2C device */
-    uint32_t *tx_data;                      /* Pointer to bytes to transmit */
-    uint32_t tx_len;                        /* Number of bytes to transmit */
-    uint32_t *rx_data;                      /* Pointer to received bytes */
-    uint32_t rx_len;                        /* Number of bytes to receive */
+    uint8_t addr;                          /* Slave address of I2C device */
+    uint8_t *tx_data;                      /* Pointer to bytes to transmit */
+    uint8_t tx_len;                        /* Number of bytes to transmit */
+    uint8_t *rx_data;                      /* Pointer to received bytes */
+    uint8_t rx_len;                        /* Number of bytes to receive */
     i2c_err error;
 } xI2C_msg;
 
@@ -132,7 +132,7 @@ void vI2CTask( void * pvParameters );
 void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
 i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len );
 i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len );
-i2c_err xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout );
+uint8_t xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout );
 uint8_t ulCFG_MMC_GA( void );
 
 #endif /*I2C_H_*/
