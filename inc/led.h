@@ -9,6 +9,7 @@ typedef enum LED_id {
     LED_RED
 } LED_id;
 
-static void vToggleLED( LED_id led );
+/* Function to toggle the LED */
+void prvToggleLED( LED_id led );
 
 #endif /* LED_H_ */
