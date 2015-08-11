@@ -167,25 +167,22 @@ uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
 {
     configASSERT( pkt );
     uint8_t chksum = 0;
-
-    for ( uint8_t i = 0; i < range; i++ ) {
-        /* We must not include the header chksum when calculating the message final chksum */
-        if ( i == 2 ) {
-            continue;
-        }
+    uint8_t i;
+    for ( i = 0; i < range; i++ ) {
         chksum -= buffer[i];
     }
     return chksum;
 }
 
-ipmb_err ipmb_assert_chksum ( uint8_t * buffer )
+ipmb_err ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
 {
     /* Debug assert */
     configASSERT( buffer );
+
     uint8_t header_chksum = buffer[2];
-    uint8_t msg_chksum = buffer[(sizeof(buffer)/sizeof(buffer[0]))-1];
+    uint8_t msg_chksum = buffer[buffer_len-1];
     uint8_t calc_header_chksum = ipmb_calculate_chksum( buffer, IPMI_HEADER_LENGTH );
-    uint8_t calc_msg_chksum = ipmb_calculate_chksum( buffer, IPMI_MSG_MAX_LENGTH );
+    uint8_t calc_msg_chksum = ipmb_calculate_chksum( buffer, buffer_len-1 );
     if ( header_chksum == calc_header_chksum ) {
         if ( msg_chksum == calc_msg_chksum ) {
             return ipmb_err_success;
