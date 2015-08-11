@@ -207,6 +207,10 @@ void vI2C_ISR( uint8_t i2c_id )
         i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
         i2c_cfg[i2c_id].msg.rx_data = rx_data;
         rx_cnt = 0;
+        if ( i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ){
+            i2c_cfg[i2c_id].msg.rx_data[rx_cnt] = I2CADDR_READ(i2c_id);
+            rx_cnt++;
+        }
         I2CCONSET( i2c_id, I2C_AA );
         break;
 
