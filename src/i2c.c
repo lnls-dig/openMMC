@@ -307,7 +307,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len )
 {
     /* Copy the message to the i2c global struture */
-    
+
     /* Maybe use memcpy to pass the tx buffer to the global structure */
     i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
     i2c_cfg[i2c_id].msg.addr = addr;
@@ -316,11 +316,11 @@ i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_
     i2c_cfg[i2c_id].msg.rx_data = NULL;
     i2c_cfg[i2c_id].msg.rx_len = 0;
     i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
-    
+
     /* Trigger the i2c interruption */
     /* Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
     I2CCONSET( i2c_id, ( I2C_I2EN | I2C_STA ) );
-    
+
     if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) == pdTRUE ){
         /* Include the error in i2c_cfg global structure */
         return i2c_cfg[i2c_id].msg.error;
@@ -333,7 +333,7 @@ i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_
 i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len )
 {
     /* Copy the message to the i2c global struture */
-    
+
     /* Maybe use memcpy to pass the tx buffer to the global structure */
     i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
     i2c_cfg[i2c_id].msg.addr = addr;
