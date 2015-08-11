@@ -152,9 +152,13 @@ ipmb_err ipmb_notify_client ( ipmi_msg_cfg msg_cfg )
 {
     configASSERT( client_queue );
     /* Sends only the ipmi msg, not the control struct */
-    if ( xQueueSend( client_queue, &msg_cfg.msg, CLIENT_NOTIFY_TIMEOUT ) ) {
-        xTaskNotifyGive( msg_cfg.caller_task );
-        return ipmb_err_success;
+    if ( client_queue ) {
+        if ( xQueueSend( client_queue, &msg_cfg.msg, CLIENT_NOTIFY_TIMEOUT ) ) {
+            if ( msg_cfg.caller_task ) {
+                xTaskNotifyGive( msg_cfg.caller_task );
+            }
+            return ipmb_err_success;
+        }
     }
     return ipmb_err_timeout;
 }
