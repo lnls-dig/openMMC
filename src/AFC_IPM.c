@@ -30,9 +30,10 @@
 #include "board_defs.h"
 #include "i2c.h"
 #include "led.h"
+#include "ipmb.h"
 
 /* Priorities at which the tasks are created. */
-#define mainI2C0_TASK_PRIORITY		        ( tskIDLE_PRIORITY + 3 )
+#define mainI2C0_TASK_PRIORITY		    ( tskIDLE_PRIORITY + 3 )
 #define mainI2C1_TASK_PRIORITY              ( tskIDLE_PRIORITY + 2 )
 #define mainTEST_TASK_PRIORITY              ( tskIDLE_PRIORITY + 1 )
 
@@ -48,14 +49,16 @@
  * -> I2C1 = 1
  * -> Both = 3
  */
-#define DEBUG_I2C   3
+//#define DEBUG_I2C   2
+#define IPMB_DEBUG
 
 /* Tasks function prototypes */
+#ifdef DEBUG_I2C
 static void prvMasterTestTask( void *pvParameters );
 static void prvSlaveTestTask( void *pvParameters );
+#endif
+static void IPMBTestTask( void *pvParameters );
 
-/* Function to toggle the LED */
-static void prvToggleLED( LED_id led );
 /* LED pins initialization */
 static void prvHardwareInit( void );
 
@@ -65,7 +68,7 @@ int main(void)
 {
     /* Configure LED pins */
     prvHardwareInit();
-
+#ifdef DEBUG_I2C
     /* Create project's tasks */
 #if ((DEBUG_I2C == 0) || (DEBUG_I2C == 3))
     vI2CInit(I2C0, I2C_Mode_IPMB);
@@ -75,7 +78,11 @@ int main(void)
 #if ((DEBUG_I2C == 1) || (DEBUG_I2C == 3))
     vI2CInit(I2C1, I2C_Mode_Local_Master);
     xTaskCreate( prvMasterTestTask, (const char*)"Master Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, (UBaseType_t) 1, ( TaskHandle_t * ) NULL );
-
+#endif
+#endif
+#ifdef IPMB_DEBUG
+    ipmb_init();
+    xTaskCreate ( IPMBTestTask, (const char*)"IPMB Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, (UBaseType_t) 3, ( TaskHandle_t * ) NULL );
 #endif
     /* Start the tasks running. */
     vTaskStartScheduler();
@@ -115,7 +122,7 @@ static void prvMasterTestTask( void *pvParameters )
 #endif
 #if ((DEBUG_I2C == 0) || (DEBUG_I2C == 3))
 
-static void prvSlaveTestTask( void *pvParameters )
+void prvSlaveTestTask( void *pvParameters )
 {
     uint8_t rx_buff[i2cMAX_MSG_LENGTH];
     static uint8_t mch_retries;
@@ -136,9 +143,53 @@ static void prvSlaveTestTask( void *pvParameters )
     }
 }
 #endif
-/*-----------------------------------------------------------*/
 
-static void prvToggleLED( LED_id led )
+/*-----------------------------------------------------------*/
+#ifdef IPMB_DEBUG
+static void IPMBTestTask( void *pvParameters )
+{
+    static ipmi_msg rx_msg;
+    static ipmi_msg diff_rx_msg;
+    uint8_t txbuf[12];
+    txbuf[0] = 0x00; /* Completion Code */
+
+    txbuf[1] = 0x0A; /* Dev ID */
+    txbuf[2] = 0x02; /* Dev Rev */
+
+    txbuf[3] = 0x05; /* Dev FW Rev UPPER */
+    txbuf[4] = 0x50; /* Dev FW Rev LOWER */
+
+    txbuf[5] = 0x02; /* IPMI Version 2.0 */
+
+    txbuf[6] = 0x1F; /* Dev Support */
+
+    txbuf[7] = 0x5A; /* Manufacturer ID LSB */
+    txbuf[8] = 0x31;
+    txbuf[9] = 0x00; /* ID MSB */
+
+    txbuf[10] = 0x01; /* Product ID LSB */
+    txbuf[11] = 0x01; /* Product ID MSB */
+
+    QueueHandle_t ipmb_rx = xQueueCreate ( 5, sizeof(ipmi_msg));
+    ipmb_register_rxqueue( ipmb_rx );
+    for( ;; )
+    {
+        xQueueReceive( ipmb_rx, &rx_msg, portMAX_DELAY);
+        if (rx_msg.cmd == 1 && rx_msg.netfn == 0x06) {
+            if (ipmb_send( rx_msg.netfn + 1, rx_msg.cmd, rx_msg.seq, txbuf, 12 ) == ipmb_err_success) {;
+                prvToggleLED( LED_GREEN );
+            } else {
+                prvToggleLED( LED_RED );
+                continue;
+            }
+        } else {
+            diff_rx_msg = rx_msg;
+        }
+    }
+}
+#endif
+
+void prvToggleLED( LED_id led )
 {
     unsigned long ulLEDState;
     unsigned long ulLEDport;
