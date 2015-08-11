@@ -201,33 +201,33 @@ ipmb_err ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
     configASSERT( buffer );
 
     buffer[0] = msg->dest_addr;
-    buffer[1] = ( ( ( msg->netfn << 2 ) && IPMB_NETFN_MASK ) || ( msg->dest_LUN && IPMB_DEST_LUN_MASK ) );
+    buffer[1] = ( ( ( msg->netfn << 2 ) & IPMB_NETFN_MASK ) | ( msg->dest_LUN & IPMB_DEST_LUN_MASK ) );
     buffer[2] = ipmb_calculate_chksum( &buffer[0], IPMI_HEADER_LENGTH );
     buffer[3] = msg->src_addr;
-    buffer[4] = ( ( ( msg->seq << 2 ) && IPMB_SEQ_MASK ) || ( msg->src_LUN && IPMB_SRC_LUN_MASK ) );
+    buffer[4] = ( ( ( msg->seq << 2 ) & IPMB_SEQ_MASK ) | ( msg->src_LUN & IPMB_SRC_LUN_MASK ) );
     buffer[5] = msg->cmd;
     memcpy (&buffer[6], &msg->data[0], msg->data_len);
-    buffer[6+msg->data_len] = ipmb_calculate_chksum( &buffer[0], msg->data_len );
+    buffer[6+msg->data_len] = ipmb_calculate_chksum( &buffer[0], 6+msg->data_len );
 
     return ipmb_err_success;
 }
 
-ipmb_err ipmb_decode ( ipmi_msg * msg, uint8_t * buffer )
+ipmb_err ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
 {
     configASSERT( msg );
     configASSERT( buffer );
 
     msg->dest_addr = buffer[0];
-    msg->netfn = ( ( buffer[1] && IPMB_NETFN_MASK ) >> 2 );
-    msg->dest_LUN = ( buffer[1] && IPMB_DEST_LUN_MASK );
+    msg->netfn = buffer[1] >> 2;
+    msg->dest_LUN = ( buffer[1] & IPMB_DEST_LUN_MASK );
     msg->hdr_chksum = buffer[2];
     msg->src_addr = buffer[3];
-    msg->seq = ( ( buffer[4] && IPMB_SEQ_MASK ) >> 2 );
-    msg->src_LUN = ( buffer[4] && IPMB_SRC_LUN_MASK );
+    msg->seq = buffer[4] >> 2;
+    msg->src_LUN = ( buffer[4] & IPMB_SRC_LUN_MASK );
     msg->cmd = buffer[5];
-    msg->data_len = ( sizeof(buffer)/sizeof(buffer[0]) - 8 );
+    msg->data_len = len - 7;
     memcpy( &msg->data[0], &buffer[6], msg->data_len);
 
     return ipmb_err_success;
 }
-    
+
