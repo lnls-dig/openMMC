@@ -31,10 +31,10 @@
 #define IPMI_HEADER_LENGTH      2
 #define IPMI_MSG_MAX_LENGTH     32
 
-#define IPMB_NETFN_MASK         0xFFFFFF00
-#define IPMB_DEST_LUN_MASK      0x000000FF
-#define IPMB_SEQ_MASK           0xFFFFFF00
-#define IPMB_SRC_LUN_MASK       0x000000FF
+#define IPMB_NETFN_MASK         0xFC
+#define IPMB_DEST_LUN_MASK      0x3
+#define IPMB_SEQ_MASK           0xFC
+#define IPMB_SRC_LUN_MASK       0x3
 
 #define MCH_ADDRESS             0x20
 
