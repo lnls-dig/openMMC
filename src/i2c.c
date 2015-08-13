@@ -454,7 +454,7 @@ uint8_t ulCFG_MMC_GA( void )
         ga1 = UNCONNECTED;
     }
 
-    if ( ga2 != Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA1_PIN) )
+    if ( ga2 != Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA2_PIN) )
     {
         ga2 = UNCONNECTED;
     }
