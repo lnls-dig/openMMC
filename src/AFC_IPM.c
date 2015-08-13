@@ -151,25 +151,19 @@ static void IPMBTestTask( void *pvParameters )
 {
     static ipmi_msg rx_msg;
     static ipmi_msg diff_rx_msg;
-    uint8_t txbuf[12];
-    txbuf[0] = 0x00; /* Completion Code */
-
-    txbuf[1] = 0x0A; /* Dev ID */
-    txbuf[2] = 0x02; /* Dev Rev */
-
-    txbuf[3] = 0x05; /* Dev FW Rev UPPER */
-    txbuf[4] = 0x50; /* Dev FW Rev LOWER */
-
-    txbuf[5] = 0x02; /* IPMI Version 2.0 */
-
-    txbuf[6] = 0x1F; /* Dev Support */
-
-    txbuf[7] = 0x5A; /* Manufacturer ID LSB */
-    txbuf[8] = 0x31;
-    txbuf[9] = 0x00; /* ID MSB */
-
-    txbuf[10] = 0x01; /* Product ID LSB */
-    txbuf[11] = 0x01; /* Product ID MSB */
+    uint8_t txbuf[] = { 0x00, /* Completion Code */
+                        0x0A, /* Dev ID */
+                        0x02, /* Dev Rev */
+                        0x05, /* Dev FW Rev UPPER */
+                        0x50, /* Dev FW Rev LOWER */
+                        0x02, /* IPMI Version 2.0 */
+                        0x1F, /* Dev Support */
+                        0x5A, /* Manufacturer ID LSB */
+                        0x31,
+                        0x00, /* ID MSB */
+                        0x01, /* Product ID LSB */
+                        0x01  /* Product ID MSB */
+    };
 
     QueueHandle_t ipmb_rx = xQueueCreate ( 5, sizeof(ipmi_msg));
     ipmb_register_rxqueue( ipmb_rx );
@@ -177,7 +171,7 @@ static void IPMBTestTask( void *pvParameters )
     {
         xQueueReceive( ipmb_rx, &rx_msg, portMAX_DELAY);
         if (rx_msg.cmd == 1 && rx_msg.netfn == 0x06) {
-            if (ipmb_send( rx_msg.netfn + 1, rx_msg.cmd, rx_msg.seq, txbuf, 12 ) == ipmb_err_success) {;
+            if (ipmb_send( rx_msg.netfn + 1, rx_msg.cmd, rx_msg.seq, txbuf, sizeof(txbuf)/sizeof(txbuf[0]) ) == ipmb_err_success) {;
                 prvToggleLED( LED_GREEN );
             } else {
                 prvToggleLED( LED_RED );
