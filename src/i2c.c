@@ -25,6 +25,10 @@
 #include "queue.h"
 #include "semphr.h"
 
+/* C Standard includes */ 
+#include "stdio.h"
+#include "string.h"
+
 /* Project includes */
 #include "i2c.h"
 #include "board_defs.h"
