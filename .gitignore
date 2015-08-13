@@ -30,3 +30,18 @@
 
 # Debug files
 *.dSYM/
+Debug/
+*.launch
+*.xml
+.cproject
+.project
+
+#Temporary files
+*.swp
+
+#Dependency files
+*.d
+
+#Binaries
+*.axf
+*.bin
