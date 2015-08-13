@@ -33,9 +33,9 @@
 #include "ipmb.h"
 
 /* Priorities at which the tasks are created. */
-#define mainI2C0_TASK_PRIORITY		    ( tskIDLE_PRIORITY + 3 )
-#define mainI2C1_TASK_PRIORITY              ( tskIDLE_PRIORITY + 2 )
-#define mainTEST_TASK_PRIORITY              ( tskIDLE_PRIORITY + 1 )
+#define mainIPMBTEST_TASK_PRIORITY          ( IPMB_TASK_PRIORITY - 1 )
+#define mainMASTERTEST_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
+#define mainSLAVETEST_TASK_PRIORITY         ( tskIDLE_PRIORITY + 1 )
 
 /* LM75 Addresses */
 #define mainLM75_1_ADDR                     ((uint32_t) 0x4C)
@@ -72,18 +72,19 @@ int main(void)
     /* Create project's tasks */
 #if ((DEBUG_I2C == 0) || (DEBUG_I2C == 3))
     vI2CInit(I2C0, I2C_Mode_IPMB);
-    xTaskCreate( prvSlaveTestTask, (const char*)"Slave Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, (UBaseType_t) 2, ( TaskHandle_t * ) NULL );
+    xTaskCreate( prvSlaveTestTask, (const char*)"Slave Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainMASTERTEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
 
 #endif
 #if ((DEBUG_I2C == 1) || (DEBUG_I2C == 3))
     vI2CInit(I2C1, I2C_Mode_Local_Master);
-    xTaskCreate( prvMasterTestTask, (const char*)"Master Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, (UBaseType_t) 1, ( TaskHandle_t * ) NULL );
+    xTaskCreate( prvMasterTestTask, (const char*)"Master Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainSLAVETEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
 #endif
 #endif
 #ifdef IPMB_DEBUG
     ipmb_init();
-    xTaskCreate ( IPMBTestTask, (const char*)"IPMB Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, (UBaseType_t) 3, ( TaskHandle_t * ) NULL );
+    xTaskCreate ( IPMBTestTask, (const char*)"IPMB Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainIPMBTEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
 #endif
+
     /* Start the tasks running. */
     vTaskStartScheduler();
 
