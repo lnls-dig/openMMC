@@ -208,28 +208,36 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t * data, uint8_t data_len
     }
     return ipmb_error_success;
 }
+
+ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
 {
     configASSERT( client_queue );
     /* Sends only the ipmi msg, not the control struct */
-    if ( client_queue ) {
-        if ( xQueueSend( client_queue, &msg_cfg.msg, CLIENT_NOTIFY_TIMEOUT ) ) {
-            if ( msg_cfg.caller_task ) {
-                xTaskNotifyGive( msg_cfg.caller_task );
-            }
-            return ipmb_err_success;
+    if ( xQueueSend( client_queue, &(msg_cfg->buffer), CLIENT_NOTIFY_TIMEOUT ) ) {
+        if ( msg_cfg->caller_task ) {
+            xTaskNotifyGive( msg_cfg->caller_task );
         }
+        return ipmb_error_success;
     }
-    return ipmb_err_timeout;
+    return ipmb_error_timeout;
 }
 
-ipmb_err ipmb_register_rxqueue ( QueueHandle_t queue )
+/* Creates and returns a queue in which the client can block to receive the incoming requests */
+ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
 {
     configASSERT( queue );
 
-    client_queue = queue;
-    return ipmb_err_success;
+    *queue = xQueueCreate( IPMB_CLIENT_QUEUE_LEN, sizeof(ipmi_msg) );
+    /* Copies the queue handler so we know where to write */
+    client_queue = *queue;
+    if ( *queue ) {
+        return ipmb_error_success;
+    } else {
+        return ipmb_error_queue_creation;
+    }
 }
 
+/* Calculate the message checksum performing a simple 2's complement sum up to the specified 'range' byte */
 uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
 {
     configASSERT( pkt );
