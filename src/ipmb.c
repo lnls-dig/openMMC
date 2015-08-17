@@ -35,88 +35,101 @@
 
 /* Macro to check is the message is a response (odd netfn) */
 #define IS_RESPONSE(msg) (msg.netfn & 0x01)
+
+/* Local variables */
 QueueHandle_t ipmb_txqueue = NULL;
 QueueHandle_t client_queue = NULL;
+static uint8_t current_seq;
+static ipmi_msg_cfg last_sent_req;
+static ipmi_msg_cfg last_received_req;
 
-void IPMB_Task ( void *pvParameters )
+void IPMB_TXTask ( void * pvParameters )
 {
-    /* Declare these structs as static so they're zero-initialized */
-    static ipmi_msg_cfg msg_cfg;
-    static ipmi_msg_cfg msg_cfg_sent_req;
-    static ipmi_msg_cfg msg_cfg_recv_req;
-    static uint8_t buffer[IPMI_MSG_MAX_LENGTH];
+    static ipmi_msg_cfg current_msg_tx;
+    static uint8_t ipmb_buffer_tx[IPMI_MSG_MAX_LENGTH];
 
     for ( ;; ) {
-        /* Checks if there's any message to be sent */
-        if ( xQueueReceive( ipmb_txqueue, &msg_cfg, 0 ) ) {
-            if ( msg_cfg.msg.netfn & 0x01 ) {
-                /* We're sending a response */
-                /* Match with previous request */
-                if ( msg_cfg.msg.seq == msg_cfg_recv_req.msg.seq ) {
-                    /* Check if the response was built in time, comparing the timeout value with the matching request */
-                    if ( (xTaskGetTickCount() - msg_cfg_recv_req.timestamp) < IPMB_MSG_TIMEOUT ) {
-                        /* See if we've already tried sending this message 3 times */
-                        if ( msg_cfg.retries < IPMB_MAX_RETRIES ) {
-                            /* Encode the message buffer to the IPMB format */
-                            ipmb_encode( &buffer[0], &msg_cfg.msg );
-                            if ( xI2CWrite( IPMB_I2C, buffer[0] >> 1, &buffer[1], msg_cfg.msg.data_len + 6 ) != i2c_err_SUCCESS) {
-                                /* Message couldn't be transmitted right now, increase retry counter and try again later */
-                                msg_cfg.retries++;
-                                xQueueSendToFront( ipmb_txqueue, &msg_cfg, 0 );
-                            }
-                            /* TODO: Find a way to pass the error to the client */
-                            xTaskNotifyGive( msg_cfg.caller_task );
+        configASSERT( current_msg_tx );
+        xQueueReceive( ipmb_txqueue, &current_msg_tx, portMAX_DELAY);
+        if ( IS_RESPONSE(current_msg_tx.buffer) ) {
+            /* We're sending a response */
+            /* Match with previous request */
+            if ( current_msg_tx.buffer.seq == last_received_req.buffer.seq ) {
+                /* Check if the response was built in time, comparing the timeout value with the matching request */
+                if ( (xTaskGetTickCount() - last_received_req.timestamp) < IPMB_MSG_TIMEOUT ) {
+                    /* See if we've already tried sending this message 3 times */
+                    if ( current_msg_tx.retries < IPMB_MAX_RETRIES ) {
+                        /* Encode the message buffer to the IPMB format */
+                        ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx.buffer );
+                        if ( xI2CWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], current_msg_tx.buffer.data_len + IPMB_HEADER_LENGTH ) != i2c_err_SUCCESS) {
+                            /* Message couldn't be transmitted right now, increase retry counter and try again later */
+                            current_msg_tx.retries++;
+                            xQueueSendToFront( ipmb_txqueue, &current_msg_tx, 0 );
                         }
-                    }
-                }
-                /* If we're here, either the message has been successfully transmitted or we've exhausted our options to send it, give up */
-            } else {
-                /* We're sending a request */
-                if ( msg_cfg.retries == 0 ) {
-                    /* Get the time when the message is first sent */
-                    msg_cfg.timestamp = xTaskGetTickCount();
-                }
-                if ( msg_cfg.retries < IPMB_MAX_RETRIES ) {
-                    ipmb_encode( &buffer[0], &msg_cfg.msg );
-                    if ( xI2CWrite( IPMB_I2C, buffer[0] >> 1, &buffer[1], ( sizeof(buffer)/sizeof(buffer[0]) - 1 ) ) != i2c_err_SUCCESS ) {
-                        msg_cfg.retries++;
-                        xQueueSendToFront( ipmb_txqueue, &msg_cfg, 0 );
-                    } else {
-                        /* Request was successfully sent, keep a copy here for future comparison */
-                        msg_cfg_sent_req = msg_cfg;
+                        /* TODO: Find a way to pass the error to the client */
+                        xTaskNotifyGive( current_msg_tx.caller_task );
                     }
                 }
                 /* If we're here, either the message has been successfully transmitted or we've exhausted our options to send it, give up */
             }
         }
+        /* We're sending a request */
+        else {
+            if ( current_msg_tx.retries == 0 ) {
+                /* Get the time when the message is first sent */
+                current_msg_tx.timestamp = xTaskGetTickCount();
+            }
+            if ( current_msg_tx.retries < IPMB_MAX_RETRIES ) {
+                ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx.buffer );
+                if ( xI2CWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], current_msg_tx.buffer.data_len + IPMB_HEADER_LENGTH ) != i2c_err_SUCCESS) {
+                    current_msg_tx.retries++;
+                    xQueueSendToFront( ipmb_txqueue, &current_msg_tx, 0 );
+                } else {
+                    /* Request was successfully sent, keep a copy here for future comparison */
+                    last_sent_req = current_msg_tx;
+                }
+            }
+            /* If we're here, either the message has been successfully transmitted or we've exhausted our options to send it, give up */
+        }
+    }
+}
 
-        /* Checks if there's any incoming messages */
-        uint8_t rx_len = xI2CSlaveTransfer( IPMB_I2C, &buffer[0], 0 );
+void IPMB_RXTask ( void *pvParameters )
+{
+    /* Declare these structs as static so they're zero-initialized */
+    static ipmi_msg_cfg current_msg_rx;
+    static uint8_t ipmb_buffer_rx[IPMI_MSG_MAX_LENGTH];
+    uint8_t rx_len;
+
+    for ( ;; ) {
+        /* Checks if there's any incoming messages (the task remains blocked here) */
+        /* TODO: Discover why when we put the timeout here as portMAX_DELAY the firmware deadlocks */
+        rx_len = xI2CSlaveTransfer( IPMB_I2C, &ipmb_buffer_rx[0], 50 );
         if ( rx_len > 0 ) {
             /* Perform a checksum test on the message, if it doesn't pass, just ignore it. We have no way to know if we're the one who should receive it */
-            if ( ipmb_assert_chksum( buffer, rx_len ) == ipmb_err_success ) {
+            if ( ipmb_assert_chksum( ipmb_buffer_rx, rx_len ) == ipmb_error_success ) {
                 /* Maybe clear the msg_cfg struct before writing new data into it */
-                ipmb_decode( &msg_cfg.msg, buffer, rx_len );
-                if ( msg_cfg.msg.netfn & 0x1 ) {
+                ipmb_decode( &current_msg_rx.buffer, ipmb_buffer_rx, rx_len );
+                if ( IS_RESPONSE(current_msg_rx.buffer ) ) {
                     /* The message is a response, check if it's been received in time */
-                    if ( (xTaskGetTickCount() - msg_cfg_sent_req.timestamp) < IPMB_MSG_TIMEOUT ) {
+                    if ( (xTaskGetTickCount() - last_sent_req.timestamp) < IPMB_MSG_TIMEOUT ) {
                         /* Seq number checking is enough to match the messages */
-                        if ( msg_cfg.msg.seq == msg_cfg_sent_req.msg.seq ) {
-                            ipmb_notify_client ( msg_cfg );
+                        if ( current_msg_rx.buffer.seq == last_sent_req.buffer.seq ) {
+                            ipmb_notify_client ( &current_msg_rx );
                         }
                         /* If we received a response that doesn't match a previously sent request, just discard it */
                     }
-
-                } else {
-                    /* The message is a request */
+                }
+                else {
+                    /* The received message is a request */
                     /* Check if this is a repeated request (same SEQ), in this case just ignore this message, since it'll be responded shortly (I hope) */
-                    if ( msg_cfg_recv_req.msg.seq != msg_cfg.msg.seq ) {
+                    if ( current_msg_rx.buffer.seq != last_received_req.buffer.seq ) {
                         /* Start counting the time, so we know if our response will be built in time */
-                        msg_cfg.timestamp = xTaskGetTickCount();
+                        current_msg_rx.timestamp = xTaskGetTickCount();
                         /* Save the message to pair with the future response */
-                        msg_cfg_recv_req = msg_cfg;
+                        last_received_req = current_msg_rx;
                         /* Notify the client about the new request */
-                        ipmb_notify_client ( msg_cfg );
+                        ipmb_notify_client ( &current_msg_rx );
                     }
                 }
             }
@@ -124,11 +137,18 @@ void IPMB_Task ( void *pvParameters )
     }
 }
 
+/* Initializes the IPMB Layer:
+ * -> Configures the I2C Driver
+ * -> Creates the TX queue for the IPMB Task
+ * -> Creates both IPMB RX and IPMB TX tasks
+ */
 void ipmb_init ( void )
 {
     vI2CInit( IPMB_I2C, I2C_Mode_IPMB );
     ipmb_txqueue = xQueueCreate( IPMB_TXQUEUE_LEN, sizeof(ipmi_msg_cfg) );
-    xTaskCreate( IPMB_Task, (const char*)"IPMB", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, IPMB_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
+    vQueueAddToRegistry( ipmb_txqueue, "IPMB_TX_QUEUE");
+    xTaskCreate( IPMB_TXTask, (const char*)"IPMB_TX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, IPMB_TXTASK_PRIORITY, ( TaskHandle_t * ) NULL );
+    xTaskCreate( IPMB_RXTask, (const char*)"IPMB_RX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, IPMB_RXTASK_PRIORITY, ( TaskHandle_t * ) NULL );
 }
 
 ipmb_err ipmb_send ( uint8_t netfn, uint8_t cmd, uint8_t seq, uint8_t * data, uint8_t data_len )
