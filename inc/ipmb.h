@@ -57,7 +57,7 @@ uint8_t msg_chksum;
 } ipmi_msg;
 
 typedef struct ipmi_msg_cfg {
-ipmi_msg msg;
+ipmi_msg buffer;
 TaskHandle_t caller_task;
 uint8_t retries;
 uint32_t timestamp;
