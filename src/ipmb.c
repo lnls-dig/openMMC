@@ -33,6 +33,8 @@
 #include "ipmb.h"
 #include "board_defs.h"
 
+/* Macro to check is the message is a response (odd netfn) */
+#define IS_RESPONSE(msg) (msg.netfn & 0x01)
 QueueHandle_t ipmb_txqueue = NULL;
 QueueHandle_t client_queue = NULL;
 
