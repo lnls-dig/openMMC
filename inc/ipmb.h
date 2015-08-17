@@ -63,24 +63,27 @@ uint8_t retries;
 uint32_t timestamp;
 } ipmi_msg_cfg;
 
-typedef enum ipmb_err {
-ipmb_err_success = 0,
-     ipmb_err_failure,
-     ipmb_err_timeout,
-     ipmb_err_hdr_chksum,
-     ipmb_err_msg_chksum
-} ipmb_err;
+typedef enum ipmb_error {
+ipmb_error_success = 0,
+ipmb_error_failure,
+ipmb_error_timeout,
+ipmb_error_hdr_chksum,
+ipmb_error_msg_chksum,
+ipmb_error_queue_creation
+} ipmb_error;
 
 /* Function Prototypes */
-void IPMB_Task ( void *pvParameters );
+void IPMB_TXTask ( void *pvParameters );
+void IPMB_RXTask ( void *pvParameters );
 void ipmb_init ( void );
-ipmb_err ipmb_send ( uint8_t netfn, uint8_t cmd, uint8_t seq, uint8_t * data, uint8_t data_len );
-ipmb_err ipmb_register_rxqueue ( QueueHandle_t queue );
+ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8_t data_len );
+ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t * data, uint8_t data_len );
+ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue );
 /* Maybe put these prototypes on the ipmb.c since they're "private" functions */
-ipmb_err ipmb_notify_client ( ipmi_msg_cfg msg_cfg );
-ipmb_err ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len );
+ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg );
+ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len );
 uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range );
-ipmb_err ipmb_encode ( uint8_t * buffer, ipmi_msg * msg );
-ipmb_err ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len );
+ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg );
+ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len );
 
 #endif

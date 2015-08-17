@@ -192,42 +192,43 @@ uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
     return chksum;
 }
 
-ipmb_err ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
+/* Asserts the input message checksums by calculating them using our local functions */
+ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
 {
     /* Debug assert */
     configASSERT( buffer );
 
     uint8_t header_chksum = buffer[2];
     uint8_t msg_chksum = buffer[buffer_len-1];
-    uint8_t calc_header_chksum = ipmb_calculate_chksum( buffer, IPMI_HEADER_LENGTH );
+    uint8_t calc_header_chksum = ipmb_calculate_chksum( buffer, IPMI_HEADER_CHECKSUM_POSITION );
     uint8_t calc_msg_chksum = ipmb_calculate_chksum( buffer, buffer_len-1 );
     if ( header_chksum == calc_header_chksum ) {
         if ( msg_chksum == calc_msg_chksum ) {
-            return ipmb_err_success;
+            return ipmb_error_success;
         }
-        return ipmb_err_hdr_chksum;
+        return ipmb_error_hdr_chksum;
     }
-    return ipmb_err_msg_chksum;
+    return ipmb_error_msg_chksum;
 }
 
-ipmb_err ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
+ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
 {
     configASSERT( msg );
     configASSERT( buffer );
 
     buffer[0] = msg->dest_addr;
     buffer[1] = ( ( ( msg->netfn << 2 ) & IPMB_NETFN_MASK ) | ( msg->dest_LUN & IPMB_DEST_LUN_MASK ) );
-    buffer[2] = ipmb_calculate_chksum( &buffer[0], IPMI_HEADER_LENGTH );
+    buffer[2] = ipmb_calculate_chksum( &buffer[0], IPMI_HEADER_CHECKSUM_POSITION );
     buffer[3] = msg->src_addr;
     buffer[4] = ( ( ( msg->seq << 2 ) & IPMB_SEQ_MASK ) | ( msg->src_LUN & IPMB_SRC_LUN_MASK ) );
     buffer[5] = msg->cmd;
     memcpy (&buffer[6], &msg->data[0], msg->data_len);
     buffer[6+msg->data_len] = ipmb_calculate_chksum( &buffer[0], 6+msg->data_len );
 
-    return ipmb_err_success;
+    return ipmb_error_success;
 }
 
-ipmb_err ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
+ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
 {
     configASSERT( msg );
     configASSERT( buffer );
@@ -243,6 +244,6 @@ ipmb_err ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
     msg->data_len = len - 7;
     memcpy( &msg->data[0], &buffer[6], msg->data_len);
 
-    return ipmb_err_success;
+    return ipmb_error_success;
 }
 
