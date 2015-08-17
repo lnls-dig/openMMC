@@ -151,36 +151,63 @@ void ipmb_init ( void )
     xTaskCreate( IPMB_RXTask, (const char*)"IPMB_RX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, IPMB_RXTASK_PRIORITY, ( TaskHandle_t * ) NULL );
 }
 
-ipmb_err ipmb_send ( uint8_t netfn, uint8_t cmd, uint8_t seq, uint8_t * data, uint8_t data_len )
+ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8_t data_len )
 {
-    static ipmi_msg_cfg cfg_pkt;
+    static ipmi_msg_cfg req;
 
     /* Builds the message according to the IPMB specification */
-    cfg_pkt.msg.dest_addr = MCH_ADDRESS;
-    cfg_pkt.msg.netfn = netfn;
-    cfg_pkt.msg.dest_LUN = 0;
-    cfg_pkt.msg.src_addr = ulCFG_MMC_GA();
-    cfg_pkt.msg.seq = seq;
-    cfg_pkt.msg.src_LUN = 0;
-    cfg_pkt.msg.cmd = cmd;
-    cfg_pkt.msg.data_len = data_len;
-    memcpy(cfg_pkt.msg.data, data, data_len);
-    cfg_pkt.caller_task = xTaskGetCurrentTaskHandle();
+    req.buffer.dest_addr = MCH_ADDRESS;
+    req.buffer.netfn = netfn;
+    req.buffer.dest_LUN = 0;
+    req.buffer.src_addr = ulCFG_MMC_GA();
+    req.buffer.seq = current_seq++;
+    req.buffer.src_LUN = 0;
+    req.buffer.cmd = cmd;
+    req.buffer.data_len = data_len;
+    memcpy(req.buffer.data, data, data_len);
+    req.caller_task = xTaskGetCurrentTaskHandle();
 
     /* Blocks here until is able put message in tx queue */
-    if (xQueueSend( ipmb_txqueue, &cfg_pkt, 1) != pdTRUE ){
-        return ipmb_err_failure;
+    if (xQueueSend( ipmb_txqueue, &req, 1) != pdTRUE ){
+        return ipmb_error_failure;
     }
 
-    /* Use this notification just to block the function while the response does not arrive */
-    if ( ulTaskNotifyTake( pdTRUE, 10 ) != pdTRUE ){
-        return ipmb_err_failure;
+    /* Use this notification to block the function while the response does not arrive */
+    /* TODO: We may use the notification value to receive an error number here */
+    if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) != pdTRUE ){
+        return ipmb_error_failure;
     }
-    /* Should not be here, return failure */
-    return ipmb_err_success;
+    return ipmb_error_success;
 }
 
-ipmb_err ipmb_notify_client ( ipmi_msg_cfg msg_cfg )
+ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t * data, uint8_t data_len )
+{
+    static ipmi_msg_cfg resp;
+
+    /* Builds the message according to the IPMB specification */
+    resp.buffer.dest_addr = req->src_addr;
+    resp.buffer.netfn = req->netfn + 1;
+    resp.buffer.dest_LUN = req->src_LUN;
+    resp.buffer.src_addr = req->dest_addr;
+    resp.buffer.seq = req->seq;
+    resp.buffer.src_LUN = req->dest_LUN;
+    resp.buffer.cmd = req->cmd;
+    resp.buffer.data_len = data_len;
+    memcpy(resp.buffer.data, data, data_len);
+    resp.caller_task = xTaskGetCurrentTaskHandle();
+
+    /* Blocks here until is able put message in tx queue */
+    if (xQueueSend( ipmb_txqueue, &resp, portMAX_DELAY) != pdTRUE ){
+        return ipmb_error_failure;
+    }
+
+    /* Use this notification to block the function while the response does not arrive */
+    /* TODO: We may use the notification value to receive an error number here */
+    if ( ulTaskNotifyTake( pdTRUE, 1000 ) != pdTRUE ){
+        return ipmb_error_failure;
+    }
+    return ipmb_error_success;
+}
 {
     configASSERT( client_queue );
     /* Sends only the ipmi msg, not the control struct */

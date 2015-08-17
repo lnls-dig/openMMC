@@ -171,7 +171,7 @@ static void IPMBTestTask( void *pvParameters )
     {
         xQueueReceive( ipmb_rx, &rx_msg, portMAX_DELAY);
         if (rx_msg.cmd == 1 && rx_msg.netfn == 0x06) {
-            if (ipmb_send( rx_msg.netfn + 1, rx_msg.cmd, rx_msg.seq, txbuf, sizeof(txbuf)/sizeof(txbuf[0]) ) == ipmb_err_success) {;
+            if (ipmb_send_response( &rx_msg, txbuf, sizeof(txbuf)/sizeof(txbuf[0]) ) == ipmb_error_success) {;
                 prvToggleLED( LED_GREEN );
             } else {
                 prvToggleLED( LED_RED );
