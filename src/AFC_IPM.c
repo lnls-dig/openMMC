@@ -33,7 +33,7 @@
 #include "ipmb.h"
 
 /* Priorities at which the tasks are created. */
-#define mainIPMBTEST_TASK_PRIORITY          ( IPMB_TASK_PRIORITY - 1 )
+#define mainIPMBTEST_TASK_PRIORITY          ( IPMB_RXTASK_PRIORITY - 1 )
 #define mainMASTERTEST_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
 #define mainSLAVETEST_TASK_PRIORITY         ( tskIDLE_PRIORITY + 1 )
 
@@ -151,6 +151,7 @@ static void IPMBTestTask( void *pvParameters )
 {
     static ipmi_msg rx_msg;
     static ipmi_msg diff_rx_msg;
+    QueueHandle_t rx_queue;
     uint8_t txbuf[] = { 0x00, /* Completion Code */
                         0x0A, /* Dev ID */
                         0x02, /* Dev Rev */
@@ -165,20 +166,21 @@ static void IPMBTestTask( void *pvParameters )
                         0x01  /* Product ID MSB */
     };
 
-    QueueHandle_t ipmb_rx = xQueueCreate ( 5, sizeof(ipmi_msg));
-    ipmb_register_rxqueue( ipmb_rx );
-    for( ;; )
-    {
-        xQueueReceive( ipmb_rx, &rx_msg, portMAX_DELAY);
+    ipmb_register_rxqueue( &rx_queue );
+    for( ;; ) {
+        configASSERT( rx_queue );
+        xQueueReceive( rx_queue, &rx_msg, portMAX_DELAY);
+        /* Respond only to the GET_DEVICE_ID command (the only one implemented so far ) */
         if (rx_msg.cmd == 1 && rx_msg.netfn == 0x06) {
             if (ipmb_send_response( &rx_msg, txbuf, sizeof(txbuf)/sizeof(txbuf[0]) ) == ipmb_error_success) {;
                 prvToggleLED( LED_GREEN );
             } else {
                 prvToggleLED( LED_RED );
-                continue;
             }
         } else {
+            /* We received an unknown message, save here for debug reasons */
             diff_rx_msg = rx_msg;
+            prvToggleLED( LED_BLUE );
         }
     }
 }
