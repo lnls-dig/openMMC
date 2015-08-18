@@ -25,6 +25,8 @@
 /* TODO: Join all priority defines in a single header so we can manage them in a easier way */
 #define IPMI_TASK_PRIORITY 3
 
+#define IPMI_MAX_DATA_LEN 24
+
 /* Known NetFn codes (even request codes only) */
 #define NETFN_CHASSIS                                           0x00
 #define NETFN_BRIDGE                                            0x02
@@ -282,5 +284,16 @@
 /* Function Prototypes */
 void IPMITask ( void *pvParameters );
 void ipmb_init ( void );
+
+/* Parsing functions prototypes */
+void ipmi_parse_chassis ( ipmi_msg * req );
+void ipmi_parse_bridge ( ipmi_msg * req );
+void ipmi_parse_se ( ipmi_msg * req );
+void ipmi_parse_app ( ipmi_msg * req );
+void ipmi_parse_firmware ( ipmi_msg * req );
+void ipmi_parse_storage ( ipmi_msg * req );
+void ipmi_parse_transport ( ipmi_msg * req );
+void ipmi_parse_picmg ( ipmi_msg * req );
+void ipmi_parse_custom ( ipmi_msg * req );
 
 #endif
