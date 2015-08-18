@@ -31,6 +31,7 @@
 #include "i2c.h"
 #include "led.h"
 #include "ipmb.h"
+#include "ipmi.h"
 
 /* Priorities at which the tasks are created. */
 #define mainIPMBTEST_TASK_PRIORITY          ( IPMB_RXTASK_PRIORITY - 1 )
@@ -47,6 +48,7 @@
 //#define DEBUG_I2C0
 //#define DEBUG_I2C1
 //#define DEBUG_IPMB
+#define DEBUG_IPMI
 
 /* Tasks function prototypes */
 #ifdef DEBUG_I2C1
@@ -85,6 +87,9 @@ int main(void)
     xTaskCreate ( IPMBTestTask, (const char*)"IPMB Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainIPMBTEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
 #endif
 
+#ifdef DEBUG_IPMI
+    ipmi_init();
+#endif
     /* Start the tasks running. */
     vTaskStartScheduler();
 
