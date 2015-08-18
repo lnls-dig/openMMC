@@ -15,6 +15,8 @@ LD_SCRIPT = afcipm.ld
 MAP = afcipm.map
 LD_FLAGS = -T $(LD_SCRIPT) -Xlinker -Map=$(MAP)
 LD_FLAGS += -Xlinker --gc-sections
+LD_FLAGS += -mcpu=$(MCPU) -mthumb
+LD_FLAGS += --specs=nosys.specs
 
 LPCOPEN_PATH = ./chip
 LPCOPEN_SRCPATH = $(LPCOPEN_PATH)/src
@@ -61,7 +63,7 @@ all: $(PROJ).axf $(PROJ).bin
 #Linker
 %.axf: $(ALL_OBJS) $(MAKEFILE)
 	@echo 'Invoking MCU Linker'
-	$(CC) $(LIB_PATHS) $(LIBS) $(CFLAGS) $(EXTRA_CFLAGS) $(LD_FLAGS) -o $@ $(ALL_OBJS)
+	$(CC) $(LIB_PATHS) $(LIBS) $(LD_FLAGS) -o $@ $(ALL_OBJS)
 	@echo '$< linked successfully!'
 
 #Sources Compile
@@ -82,13 +84,13 @@ boot:
 	@echo 'LPCLink booted!'
 
 program:
-	if [ ! -f $(PROJ).bin ]; then \
-	$(MAKE) $(PROJ).bin; \
+	if [ ! -f $(PROJ).axf ]; then \
+	$(MAKE) $(PROJ).axf; \
 	fi
 	$(MAKE) -i boot
 	@echo 'Programing Flash...'
 #Program flash and reset chip
-	$(LPCXPRESSO_PATH)/bin/crt_emu_cm3_nxp -wire=winusb -pLPC1764 -flash-load-exec=$(PROJ).bin
+	$(LPCXPRESSO_PATH)/bin/crt_emu_cm3_nxp -wire=winusb -pLPC1764 -flash-load-exec=$(PROJ).axf
 	@echo 'Programed Successfully!'
 
 .PHONY: all clean boot program
