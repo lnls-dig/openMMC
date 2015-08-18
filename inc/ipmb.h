@@ -34,8 +34,11 @@
 #define CLIENT_NOTIFY_TIMEOUT   5
 
 #define IPMI_HEADER_CHECKSUM_POSITION      2
-#define IPMI_MSG_MAX_LENGTH     32
-#define IPMB_HEADER_LENGTH      6
+#define IPMI_MSG_MAX_LENGTH         32
+#define IPMB_REQ_HEADER_LENGTH      6
+/* Response header is 1 byte longer because it must include the completion code */
+#define IPMB_RESP_HEADER_LENGTH     7
+
 
 #define IPMB_NETFN_MASK         0xFC
 #define IPMB_DEST_LUN_MASK      0x3
@@ -53,6 +56,7 @@ uint8_t src_addr;
 uint8_t seq;
 uint8_t src_LUN;
 uint8_t cmd;
+uint8_t completion_code;
 /* Data field has 24 bytes:
  * 32 (Max IPMI msg len) - 7 header bytes - 1 final chksum byte */
 uint8_t data_len;
@@ -81,7 +85,7 @@ void IPMB_TXTask ( void *pvParameters );
 void IPMB_RXTask ( void *pvParameters );
 void ipmb_init ( void );
 ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8_t data_len );
-ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t * data, uint8_t data_len );
+ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t cc, uint8_t * data, uint8_t data_len );
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue );
 /* Maybe put these prototypes on the ipmb.c since they're "private" functions */
 ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg );
