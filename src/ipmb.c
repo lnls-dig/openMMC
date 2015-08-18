@@ -276,15 +276,19 @@ ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
 {
     configASSERT( msg );
     configASSERT( buffer );
+    /* Use this variable to address the buffer dynamically */
+    uint8_t i = 0;
 
-    buffer[0] = msg->dest_addr;
-    buffer[1] = ( ( ( msg->netfn << 2 ) & IPMB_NETFN_MASK ) | ( msg->dest_LUN & IPMB_DEST_LUN_MASK ) );
-    buffer[2] = ipmb_calculate_chksum( &buffer[0], IPMI_HEADER_CHECKSUM_POSITION );
-    buffer[3] = msg->src_addr;
-    buffer[4] = ( ( ( msg->seq << 2 ) & IPMB_SEQ_MASK ) | ( msg->src_LUN & IPMB_SRC_LUN_MASK ) );
-    buffer[5] = msg->cmd;
-    memcpy (&buffer[6], &msg->data[0], msg->data_len);
-    buffer[6+msg->data_len] = ipmb_calculate_chksum( &buffer[0], 6+msg->data_len );
+    buffer[i++] = msg->dest_addr;
+    buffer[i++] = ( ( ( msg->netfn << 2 ) & IPMB_NETFN_MASK ) | ( msg->dest_LUN & IPMB_DEST_LUN_MASK ) );
+    buffer[i++] = ipmb_calculate_chksum( &buffer[0], IPMI_HEADER_CHECKSUM_POSITION );
+    buffer[i++] = msg->src_addr;
+    buffer[i++] = ( ( ( msg->seq << 2 ) & IPMB_SEQ_MASK ) | ( msg->src_LUN & IPMB_SRC_LUN_MASK ) );
+    buffer[i++] = msg->cmd;
+    buffer[i++] = msg->completion_code;
+    memcpy (&buffer[i], &msg->data[0], msg->data_len);
+    i += msg->data_len;
+    buffer[i] = ipmb_calculate_chksum( &buffer[0], i );
 
     return ipmb_error_success;
 }
@@ -293,18 +297,22 @@ ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
 {
     configASSERT( msg );
     configASSERT( buffer );
+    /* Use this variable to address the buffer dynamically */
+    uint8_t i = 0;
 
-    msg->dest_addr = buffer[0];
-    msg->netfn = buffer[1] >> 2;
-    msg->dest_LUN = ( buffer[1] & IPMB_DEST_LUN_MASK );
-    msg->hdr_chksum = buffer[2];
-    msg->src_addr = buffer[3];
-    msg->seq = buffer[4] >> 2;
-    msg->src_LUN = ( buffer[4] & IPMB_SRC_LUN_MASK );
-    msg->cmd = buffer[5];
-    msg->data_len = len - 7;
-    memcpy( &msg->data[0], &buffer[6], msg->data_len);
+    msg->dest_addr = buffer[i++];
+    msg->netfn = buffer[i] >> 2;
+    msg->dest_LUN = ( buffer[i++] & IPMB_DEST_LUN_MASK );
+    msg->hdr_chksum = buffer[i++];
+    msg->src_addr = buffer[i++];
+    msg->seq = buffer[i] >> 2;
+    msg->src_LUN = ( buffer[i++] & IPMB_SRC_LUN_MASK );
+    msg->cmd = buffer[i++];
+    if ( IS_RESPONSE( (*msg) ) ) {
+        msg->completion_code = buffer[i++];
+    }
+    msg->data_len = len - i;
+    memcpy( &msg->data[0], &buffer[i], msg->data_len);
 
     return ipmb_error_success;
 }
-
