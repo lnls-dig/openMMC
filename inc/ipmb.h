@@ -48,36 +48,36 @@
 #define MCH_ADDRESS             0x20
 
 typedef struct ipmi_msg {
-uint8_t dest_addr;
-uint8_t netfn;
-uint8_t dest_LUN;
-uint8_t hdr_chksum;
-uint8_t src_addr;
-uint8_t seq;
-uint8_t src_LUN;
-uint8_t cmd;
-uint8_t completion_code;
+    uint8_t dest_addr;
+    uint8_t netfn;
+    uint8_t dest_LUN;
+    uint8_t hdr_chksum;
+    uint8_t src_addr;
+    uint8_t seq;
+    uint8_t src_LUN;
+    uint8_t cmd;
+    uint8_t completion_code;
 /* Data field has 24 bytes:
  * 32 (Max IPMI msg len) - 7 header bytes - 1 final chksum byte */
-uint8_t data_len;
-uint8_t data[IPMI_MSG_MAX_LENGTH];
-uint8_t msg_chksum;
+    uint8_t data_len;
+    uint8_t data[IPMI_MSG_MAX_LENGTH];
+    uint8_t msg_chksum;
 } ipmi_msg;
 
 typedef struct ipmi_msg_cfg {
-ipmi_msg buffer;
-TaskHandle_t caller_task;
-uint8_t retries;
+    ipmi_msg buffer;
+    TaskHandle_t caller_task;
+    uint8_t retries;
 uint32_t timestamp;
 } ipmi_msg_cfg;
 
 typedef enum ipmb_error {
-ipmb_error_success = 0,
-ipmb_error_failure,
-ipmb_error_timeout,
-ipmb_error_hdr_chksum,
-ipmb_error_msg_chksum,
-ipmb_error_queue_creation
+    ipmb_error_success = 0,
+    ipmb_error_failure,
+    ipmb_error_timeout,
+    ipmb_error_hdr_chksum,
+    ipmb_error_msg_chksum,
+    ipmb_error_queue_creation
 } ipmb_error;
 
 /* Function Prototypes */
