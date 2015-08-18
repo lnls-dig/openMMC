@@ -44,21 +44,22 @@
 #define mainLM75_4_ADDR                     ((uint32_t) 0x4F)
 #define mainREAD_TEMP_FREQUENCY_MS          200
 
-/* Debug flags
- * -> I2C0 = 0
- * -> I2C1 = 1
- * -> Both = 3
- */
-//#define DEBUG_I2C   2
-#define IPMB_DEBUG
+//#define DEBUG_I2C0
+//#define DEBUG_I2C1
+//#define DEBUG_IPMB
 
 /* Tasks function prototypes */
-#ifdef DEBUG_I2C
+#ifdef DEBUG_I2C1
 static void prvMasterTestTask( void *pvParameters );
+#endif
+
+#ifdef DEBUG_I2C0
 static void prvSlaveTestTask( void *pvParameters );
 #endif
-static void IPMBTestTask( void *pvParameters );
 
+#ifdef DEBUG_IPMB
+static void IPMBTestTask( void *pvParameters );
+#endif
 /* LED pins initialization */
 static void prvHardwareInit( void );
 
@@ -68,19 +69,18 @@ int main(void)
 {
     /* Configure LED pins */
     prvHardwareInit();
-#ifdef DEBUG_I2C
     /* Create project's tasks */
-#if ((DEBUG_I2C == 0) || (DEBUG_I2C == 3))
+#ifdef DEBUG_I2C0
     vI2CInit(I2C0, I2C_Mode_IPMB);
     xTaskCreate( prvSlaveTestTask, (const char*)"Slave Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainMASTERTEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
-
 #endif
-#if ((DEBUG_I2C == 1) || (DEBUG_I2C == 3))
+
+#ifdef DEBUG_I2C1
     vI2CInit(I2C1, I2C_Mode_Local_Master);
     xTaskCreate( prvMasterTestTask, (const char*)"Master Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainSLAVETEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
 #endif
-#endif
-#ifdef IPMB_DEBUG
+
+#ifdef DEBUG_IPMB
     ipmb_init();
     xTaskCreate ( IPMBTestTask, (const char*)"IPMB Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainIPMBTEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
 #endif
@@ -94,7 +94,7 @@ int main(void)
     for( ;; );
 }
 /*-----------------------------------------------------------*/
-#if ((DEBUG_I2C == 1) || (DEBUG_I2C == 3))
+#ifdef DEBUG_I2C1
 static void prvMasterTestTask( void *pvParameters )
 {
     uint8_t rx_data[i2cMAX_MSG_LENGTH];
@@ -121,8 +121,8 @@ static void prvMasterTestTask( void *pvParameters )
 
 /*-----------------------------------------------------------*/
 #endif
-#if ((DEBUG_I2C == 0) || (DEBUG_I2C == 3))
 
+#ifdef DEBUG_I2C0
 void prvSlaveTestTask( void *pvParameters )
 {
     uint8_t rx_buff[i2cMAX_MSG_LENGTH];
@@ -146,7 +146,7 @@ void prvSlaveTestTask( void *pvParameters )
 #endif
 
 /*-----------------------------------------------------------*/
-#ifdef IPMB_DEBUG
+#ifdef DEBUG_IPMB
 static void IPMBTestTask( void *pvParameters )
 {
     static ipmi_msg rx_msg;
