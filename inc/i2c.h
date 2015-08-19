@@ -96,11 +96,11 @@ typedef enum {
 typedef struct xI2C_msg
 {
     I2C_ID_T i2c_id;                        /* I2C interface number (0, 1 or 2) */
-    uint8_t addr;                          /* Slave address of I2C device */
-    uint8_t *tx_data;                      /* Pointer to bytes to transmit */
-    uint8_t tx_len;                        /* Number of bytes to transmit */
-    uint8_t *rx_data;                      /* Pointer to received bytes */
-    uint8_t rx_len;                        /* Number of bytes to receive */
+    uint8_t addr;                           /* Slave address of I2C device */
+    uint8_t tx_data[i2cMAX_MSG_LENGTH];     /* Pointer to bytes to transmit */
+    uint8_t tx_len;                         /* Number of bytes to transmit */
+    uint8_t rx_data[i2cMAX_MSG_LENGTH];     /* Pointer to received bytes */
+    uint8_t rx_len;                         /* Number of bytes to receive */
     i2c_err error;
 } xI2C_msg;
 
@@ -119,6 +119,8 @@ typedef struct xI2C_Config {
     IRQn_Type irq;
     I2C_Mode mode;
     TaskHandle_t caller_task;
+    uint8_t rx_cnt;
+    uint8_t tx_cnt;
     xI2C_msg msg;
 } xI2C_Config;
 

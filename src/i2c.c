@@ -56,6 +56,8 @@ xI2C_Config i2c_cfg[] = {
             .pin_func = I2C0_PIN_FUNC
         },
         .caller_task = NULL,
+        .rx_cnt = 0,
+        .tx_cnt = 0,
     },
     {
         .reg = LPC_I2C1,
@@ -69,6 +71,8 @@ xI2C_Config i2c_cfg[] = {
             .pin_func = I2C1_PIN_FUNC
         },
         .caller_task = NULL,
+        .rx_cnt = 0,
+        .tx_cnt = 0,
     },
     {
         .reg = LPC_I2C2,
@@ -82,6 +86,8 @@ xI2C_Config i2c_cfg[] = {
             .pin_func = I2C2_PIN_FUNC
         },
         .caller_task = NULL,
+        .rx_cnt = 0,
+        .tx_cnt = 0,
     }
 };
 
@@ -103,10 +109,6 @@ void I2C2_IRQHandler( void )
     vI2C_ISR( I2C2 );
 }
 
-static uint8_t rx_cnt;
-static uint8_t tx_cnt;
-static uint8_t rx_data[i2cMAX_MSG_LENGTH];
-
 /* I2C_ISR - I2C interrupt service routine */
 void vI2C_ISR( uint8_t i2c_id )
 {
@@ -120,8 +122,8 @@ void vI2C_ISR( uint8_t i2c_id )
     switch ( LPC_I2Cx( i2c_id )->STAT ){
     case I2C_STAT_START:
     case I2C_STAT_REPEATED_START:
-        rx_cnt = 0;
-        tx_cnt = 0;
+        i2c_cfg[i2c_id].rx_cnt = 0;
+        i2c_cfg[i2c_id].tx_cnt = 0;
         /* Write Slave Address in the I2C bus, if there's nothing
          * to transmit, the last bit (R/W) will be set to 1
          */
@@ -130,8 +132,8 @@ void vI2C_ISR( uint8_t i2c_id )
 
     case I2C_STAT_SLA_W_SENT_ACK:
         /* Send first data byte */
-        I2CDAT_WRITE( i2c_id, *( i2c_cfg[i2c_id].msg.tx_data+tx_cnt ) );
-        tx_cnt++;
+        I2CDAT_WRITE( i2c_id, i2c_cfg[i2c_id].msg.tx_data[i2c_cfg[i2c_id].tx_cnt] );
+        i2c_cfg[i2c_id].tx_cnt++;
         I2CCONCLR( i2c_id, I2C_STA );
         break;
 
@@ -144,9 +146,9 @@ void vI2C_ISR( uint8_t i2c_id )
 
     case I2C_STAT_DATA_SENT_ACK:
         /* Transmit the remaining bytes */
-        if ( i2c_cfg[i2c_id].msg.tx_len != tx_cnt ){
-            I2CDAT_WRITE( i2c_id, *( i2c_cfg[i2c_id].msg.tx_data+tx_cnt ) );
-            tx_cnt++;
+        if ( i2c_cfg[i2c_id].msg.tx_len != i2c_cfg[i2c_id].tx_cnt ){
+            I2CDAT_WRITE( i2c_id, i2c_cfg[i2c_id].msg.tx_data[i2c_cfg[i2c_id].tx_cnt] );
+            i2c_cfg[i2c_id].tx_cnt++;
             I2CCONCLR( i2c_id, I2C_STA );
         } else {
             /* If there's no more data to be transmitted,
@@ -166,7 +168,6 @@ void vI2C_ISR( uint8_t i2c_id )
     case I2C_STAT_SLA_R_SENT_ACK:
         /* SLA+R has been transmitted and ACK'd
          * If we want to receive only 1 byte, return NACK on the next byte */
-        i2c_cfg[i2c_id].msg.rx_data = rx_data;
         if ( i2c_cfg[i2c_id].msg.rx_len == 1 ){
             I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
         } else {
@@ -178,9 +179,9 @@ void vI2C_ISR( uint8_t i2c_id )
         break;
 
     case I2C_STAT_DATA_RECV_ACK:
-        *(i2c_cfg[i2c_id].msg.rx_data+rx_cnt) = I2CDAT_READ( i2c_id );
-        rx_cnt++;
-        if (rx_cnt != (i2c_cfg[i2c_id].msg.rx_len) - 1 ){
+        i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
+        i2c_cfg[i2c_id].rx_cnt++;
+        if (i2c_cfg[i2c_id].rx_cnt != (i2c_cfg[i2c_id].msg.rx_len) - 1 ){
             I2CCONCLR( i2c_id, I2C_STA );
             I2CCONSET( i2c_id, I2C_AA );
         } else {
@@ -189,8 +190,8 @@ void vI2C_ISR( uint8_t i2c_id )
         break;
 
     case I2C_STAT_DATA_RECV_NACK:
-        *(i2c_cfg[i2c_id].msg.rx_data+rx_cnt) = I2CDAT_READ( i2c_id );
-        rx_cnt++;
+        i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
+        i2c_cfg[i2c_id].rx_cnt++;
         I2CCONSET( i2c_id, I2C_STO );
         I2CCONCLR( i2c_id, I2C_STA );
         /* There's no more data to be received */
@@ -209,18 +210,17 @@ void vI2C_ISR( uint8_t i2c_id )
     case I2C_STAT_SLA_W_RECV_ACK:
     case I2C_STAT_ARB_LOST_SLA_W_RECV_ACK:
         i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
-        i2c_cfg[i2c_id].msg.rx_data = rx_data;
-        rx_cnt = 0;
+        i2c_cfg[i2c_id].rx_cnt = 0;
         if ( i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ){
-            i2c_cfg[i2c_id].msg.rx_data[rx_cnt] = I2CADDR_READ(i2c_id);
-            rx_cnt++;
+            i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CADDR_READ(i2c_id);
+            i2c_cfg[i2c_id].rx_cnt++;
         }
         I2CCONSET( i2c_id, I2C_AA );
         break;
 
     case I2C_STAT_SLA_DATA_RECV_ACK:
-        i2c_cfg[i2c_id].msg.rx_data[rx_cnt] = I2CDAT_READ( i2c_id );
-        rx_cnt++;
+        i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
+        i2c_cfg[i2c_id].rx_cnt++;
         I2CCONSET ( i2c_id, ( I2C_AA ) );
         break;
 
@@ -231,8 +231,8 @@ void vI2C_ISR( uint8_t i2c_id )
         break;
 
     case I2C_STAT_SLA_STOP_REP_START:
-        i2c_cfg[i2c_id].msg.rx_len = rx_cnt;
-        if (((rx_cnt > 0) && (i2c_cfg[i2c_id].mode == I2C_Mode_Local_Master )) || ((rx_cnt > 1) && (i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ))) {
+        i2c_cfg[i2c_id].msg.rx_len = i2c_cfg[i2c_id].rx_cnt;
+        if (((i2c_cfg[i2c_id].rx_cnt > 0) && (i2c_cfg[i2c_id].mode == I2C_Mode_Local_Master )) || ((i2c_cfg[i2c_id].rx_cnt > 1) && (i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ))) {
             vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
         }
         I2CCONCLR ( i2c_id, ( I2C_STA ) );
@@ -315,9 +315,8 @@ i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_
     /* Maybe use memcpy to pass the tx buffer to the global structure */
     i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
     i2c_cfg[i2c_id].msg.addr = addr;
-    i2c_cfg[i2c_id].msg.tx_data = tx_data;
+    memcpy(i2c_cfg[i2c_id].msg.tx_data, tx_data, tx_len);
     i2c_cfg[i2c_id].msg.tx_len = tx_len;
-    i2c_cfg[i2c_id].msg.rx_data = NULL;
     i2c_cfg[i2c_id].msg.rx_len = 0;
     i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
 
@@ -341,9 +340,7 @@ i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_l
     /* Maybe use memcpy to pass the tx buffer to the global structure */
     i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
     i2c_cfg[i2c_id].msg.addr = addr;
-    i2c_cfg[i2c_id].msg.tx_data = NULL;
     i2c_cfg[i2c_id].msg.tx_len = 0;
-    i2c_cfg[i2c_id].msg.rx_data = rx_data;
     i2c_cfg[i2c_id].msg.rx_len = rx_len;
     i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
 
@@ -357,7 +354,7 @@ i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_l
         configASSERT(rx_data);
         configASSERT(i2c_cfg[i2c_id].msg.rx_data);
         /* Copy the received message to the given pointer */
-        memcpy (rx_data, i2c_cfg[i2c_id].msg.rx_data, ( i2c_cfg[i2c_id].msg.rx_len * sizeof( uint32_t ) ) );
+        memcpy (rx_data, i2c_cfg[i2c_id].msg.rx_data, i2c_cfg[i2c_id].msg.rx_len );
     }
     return i2c_cfg[i2c_id].msg.error;
 }
