@@ -179,12 +179,17 @@ void vI2C_ISR( uint8_t i2c_id )
         break;
 
     case I2C_STAT_DATA_RECV_ACK:
-        i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
-        i2c_cfg[i2c_id].rx_cnt++;
-        if (i2c_cfg[i2c_id].rx_cnt != (i2c_cfg[i2c_id].msg.rx_len) - 1 ){
-            I2CCONCLR( i2c_id, I2C_STA );
-            I2CCONSET( i2c_id, I2C_AA );
+        if ( i2c_cfg[i2c_id].rx_cnt < i2cMAX_MSG_LENGTH - 1 ){
+            i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
+            i2c_cfg[i2c_id].rx_cnt++;
+            if (i2c_cfg[i2c_id].rx_cnt != (i2c_cfg[i2c_id].msg.rx_len) - 1 ){
+                I2CCONCLR( i2c_id, I2C_STA );
+                I2CCONSET( i2c_id, I2C_AA );
+            } else {
+                I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
+            }
         } else {
+            /* Our buffer just have one more space, so send NAK to retrieve the last byte */
             I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
         }
         break;
@@ -219,9 +224,14 @@ void vI2C_ISR( uint8_t i2c_id )
         break;
 
     case I2C_STAT_SLA_DATA_RECV_ACK:
-        i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
-        i2c_cfg[i2c_id].rx_cnt++;
-        I2CCONSET ( i2c_id, ( I2C_AA ) );
+        /* Checks if the buffer is full */
+        if ( i2c_cfg[i2c_id].rx_cnt < i2cMAX_MSG_LENGTH ){
+            i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
+            i2c_cfg[i2c_id].rx_cnt++;
+            I2CCONSET ( i2c_id, ( I2C_AA ) );
+        } else {
+            I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
+        }
         break;
 
     case I2C_STAT_SLA_DATA_RECV_NACK:
@@ -315,7 +325,11 @@ i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_
     /* Maybe use memcpy to pass the tx buffer to the global structure */
     i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
     i2c_cfg[i2c_id].msg.addr = addr;
-    memcpy(i2c_cfg[i2c_id].msg.tx_data, tx_data, tx_len);
+    if ( tx_len < i2cMAX_MSG_LENGTH ) {
+        memcpy(i2c_cfg[i2c_id].msg.tx_data, tx_data, tx_len);
+    } else {
+        return i2c_err_MAX_LENGTH;
+    }
     i2c_cfg[i2c_id].msg.tx_len = tx_len;
     i2c_cfg[i2c_id].msg.rx_len = 0;
     i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
