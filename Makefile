@@ -6,7 +6,7 @@ MAKEFILE = Makefile
 MAKE = make
 MCPU = cortex-m3
 
-#Used for program operation (LPCLink specific software) and newlib files
+#Used for program operation (LPCLink specific software)
 LPCXPRESSO_PATH=/usr/local/lpcxpresso_7.8.0_426/lpcxpresso
 
 DEFS = -DDEBUG -DCORE_M3 -D__CODE_RED -D__USE_LPCOPEN -DNO_BOARD_LIB -D__LPC17XX__ -D__NEWLIB__
@@ -17,6 +17,8 @@ LD_FLAGS = -T $(LD_SCRIPT) -Xlinker -Map=$(MAP)
 LD_FLAGS += -Xlinker --gc-sections
 LD_FLAGS += -mcpu=$(MCPU) -mthumb
 LD_FLAGS += --specs=nosys.specs
+
+LIBS += -lgcc -lc -lm
 
 LPCOPEN_PATH = ./chip
 LPCOPEN_SRCPATH = $(LPCOPEN_PATH)/src
@@ -40,10 +42,6 @@ CFLAGS += -mcpu=$(MCPU) -mthumb
 CFLAGS += -fno-builtin -ffunction-sections -fdata-sections -fno-strict-aliasing  -fmessage-length=0 -nostdlib
 CFLAGS += $(EXTRA_CFLAGS)
 
-#See if we can find these libraries in a standard path, not depending on LPCXpresso (libgcc.a, libc.a, libm.a, libcr_newlib_nohost.a)
-LIB_PATHS = -L$(LPCXPRESSO_PATH)/tools/lib/gcc/arm-none-eabi/4.9.3/thumb
-LIB_PATHS += -L$(LPCXPRESSO_PATH)/tools/arm-none-eabi/lib/thumb
-
 DEPS = -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)"
 
 PROJ_SRCDIR = src
@@ -63,7 +61,7 @@ all: $(PROJ).axf $(PROJ).bin
 #Linker
 %.axf: $(ALL_OBJS) $(MAKEFILE)
 	@echo 'Invoking MCU Linker'
-	$(CC) $(LIB_PATHS) $(LIBS) $(LD_FLAGS) -o $@ $(ALL_OBJS)
+	$(CC) $(LIBS) $(LD_FLAGS) -o $@ $(ALL_OBJS)
 	@echo '$< linked successfully!'
 
 #Sources Compile

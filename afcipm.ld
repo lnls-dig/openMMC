@@ -7,8 +7,7 @@
  * By LPCXpresso v7.8.0 [Build 426] [2015-05-28]  on Thu Jul 30 09:03:05 BRT 2015
  */
 
-
-INCLUDE "afcipm_lib.ld"
+/* Memory spaces definitions */
 INCLUDE "afcipm_mem.ld"
 
 ENTRY(ResetISR)
