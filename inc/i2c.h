@@ -85,6 +85,7 @@ typedef enum {
 typedef enum {
     i2c_err_SUCCESS = 0,
     i2c_err_FAILURE,
+    i2c_err_MAX_LENGTH,
     i2c_err_SLA_R_SENT_NACK,
     i2c_err_SLA_DATA_RECV_NACK,
     i2c_err_SLA_W_SENT_NACK,
