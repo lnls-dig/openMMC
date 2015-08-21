@@ -68,13 +68,14 @@ typedef struct ipmi_msg_cfg {
     ipmi_msg buffer;
     TaskHandle_t caller_task;
     uint8_t retries;
-uint32_t timestamp;
+    uint32_t timestamp;
 } ipmi_msg_cfg;
 
 typedef enum ipmb_error {
     ipmb_error_success = 0,
     ipmb_error_failure,
     ipmb_error_timeout,
+    ipmb_error_invalid_req,
     ipmb_error_hdr_chksum,
     ipmb_error_msg_chksum,
     ipmb_error_queue_creation
@@ -87,11 +88,5 @@ void ipmb_init ( void );
 ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8_t data_len );
 ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t cc, uint8_t * data, uint8_t data_len );
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue );
-/* Maybe put these prototypes on the ipmb.c since they're "private" functions */
-ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg );
-ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len );
-uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range );
-ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg );
-ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len );
 
 #endif
