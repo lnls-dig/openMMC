@@ -162,7 +162,7 @@ ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8
     req.buffer.dest_addr = MCH_ADDRESS;
     req.buffer.netfn = netfn;
     req.buffer.dest_LUN = 0;
-    req.buffer.src_addr = ulCFG_MMC_GA();
+    req.buffer.src_addr = get_ipmb_addr();
     req.buffer.seq = current_seq++;
     req.buffer.src_LUN = 0;
     req.buffer.cmd = cmd;

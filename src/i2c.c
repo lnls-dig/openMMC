@@ -307,7 +307,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
     if ( mode == I2C_Mode_IPMB )
     {
         /* Configure Slave Address */
-        uint8_t sla_addr = ulCFG_MMC_GA( );
+        uint8_t sla_addr = get_ipmb_addr( );
         I2CADDR_WRITE( i2c_id, sla_addr );
 
         /* Configure Slave Address Mask */
@@ -449,12 +449,12 @@ unsigned char IPMBL_TABLE[IPMBL_TABLE_SIZE] = {
     0x98, 0x9C, 0x9A, 0xA0, 0xA4, 0x88, 0x9E, 0x86, 0x84,
     0x78, 0x94, 0x7A, 0x96, 0x82, 0x80, 0x7C, 0x7E, 0xA2 };
 
-uint8_t ulCFG_MMC_GA( void )
+uint8_t get_ipmb_addr( void )
 {
     uint8_t ga0, ga1, ga2;
     uint8_t index;
 
-    /* Clar the test pin and read all GA pins */
+    /* Set the test pin and read all GA pins */
     Chip_GPIO_SetPinState(LPC_GPIO, GA_PORT, GA_TEST_PIN, 1);
     ga0 = Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA0_PIN);
     ga1 = Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA1_PIN);
