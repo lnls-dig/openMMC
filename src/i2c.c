@@ -34,6 +34,8 @@
 #include "board_defs.h"
 
 /* Project definitions */
+/* TODO: Move these definitions to a LPC17x specific header, so we have a more generic macro */
+#define I2CSTAT( id )               LPC_I2Cx(id)->STAT
 #define I2CCONSET( id, val )        LPC_I2Cx(id)->CONSET = val
 #define I2CCONCLR( id, val )        LPC_I2Cx(id)->CONCLR = val
 #define I2CDAT_WRITE( id, val )     LPC_I2Cx(id)->DAT = val
@@ -119,7 +121,7 @@ void vI2C_ISR( uint8_t i2c_id )
     xI2CSemaphoreWokeTask = pdFALSE;
 
     /* I2C status handling */
-    switch ( LPC_I2Cx( i2c_id )->STAT ){
+    switch ( I2CSTAT( i2c_id ) ){
     case I2C_STAT_START:
     case I2C_STAT_REPEATED_START:
         i2c_cfg[i2c_id].rx_cnt = 0;
@@ -278,10 +280,12 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
      * can access the API and manage the semaphore
      */
 
-    /* TODO: Maybe wrap these functions, or use some board-specific defines
+    /** @todo Maybe wrap these functions, or use some board-specific defines
      * so this code is generic enough to be applied on other hardware
      * Example: (if using LPC17xx and LPCOpen library)
+     * @code 
      * #define PIN_FUNC_CFG( port, pin, func ) Chip_IOCON_PinMux(...)
+     * @endcode
     */
     Chip_IOCON_PinMux( LPC_IOCON, i2c_cfg[i2c_id].pins.sda_port, i2c_cfg[i2c_id].pins.sda_pin, IOCON_MODE_INACT, i2c_cfg[i2c_id].pins.pin_func );
     Chip_IOCON_PinMux( LPC_IOCON, i2c_cfg[i2c_id].pins.scl_port, i2c_cfg[i2c_id].pins.scl_pin, IOCON_MODE_INACT, i2c_cfg[i2c_id].pins.pin_func );
@@ -451,7 +455,7 @@ uint8_t ulCFG_MMC_GA( void )
     ga1 = Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA1_PIN);
     ga2 = Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA2_PIN);
 
-    /* Set the test pin and see if any GA pin has changed is value,
+    /* Clear the test pin and see if any GA pin has changed is value,
      * meaning that it is unconnected */
     Chip_GPIO_SetPinState(LPC_GPIO, GA_PORT, GA_TEST_PIN, 0);
 

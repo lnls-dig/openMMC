@@ -82,6 +82,7 @@ typedef enum {
     I2C_Mode_IPMB
 } I2C_Mode;
 
+/* I2C driver error enumeration */
 typedef enum {
     i2c_err_SUCCESS = 0,
     i2c_err_FAILURE,
@@ -92,19 +93,21 @@ typedef enum {
     i2c_err_DATA_SENT_NACK
 } i2c_err;
 
-/* I2C transaction parameter structure
- */
+/* I2C transaction parameter structure */
 typedef struct xI2C_msg
 {
     I2C_ID_T i2c_id;                        /* I2C interface number (0, 1 or 2) */
     uint8_t addr;                           /* Slave address of I2C device */
-    uint8_t tx_data[i2cMAX_MSG_LENGTH];     /* Pointer to bytes to transmit */
+    uint8_t tx_data[i2cMAX_MSG_LENGTH];     /* Buffer cointaning bytes to transmit */
     uint8_t tx_len;                         /* Number of bytes to transmit */
-    uint8_t rx_data[i2cMAX_MSG_LENGTH];     /* Pointer to received bytes */
+    uint8_t rx_data[i2cMAX_MSG_LENGTH];     /* Buffer cointaning received bytes */
     uint8_t rx_len;                         /* Number of bytes to receive */
     i2c_err error;
 } xI2C_msg;
 
+/* Pin definition struct for I2C interface
+ * (Port number, Pin number, Pin Function)
+ * NOTE: We assume here that both SDA and SCL pins are on the same port in the microcontroller */
 typedef struct xI2C_pins {
     uint8_t sda_port;
     uint8_t sda_pin;
@@ -115,23 +118,32 @@ typedef struct xI2C_pins {
 
 /* I2C common interface structure */
 typedef struct xI2C_Config {
-    LPC_I2C_T *reg;      /* IP base address of the I2C device */
-    xI2C_pins_t pins;
-    IRQn_Type irq;
-    I2C_Mode mode;
-    TaskHandle_t caller_task;
-    uint8_t rx_cnt;
-    uint8_t tx_cnt;
-    xI2C_msg msg;
+    LPC_I2C_T *reg;                /* Control Register Address */
+    xI2C_pins_t pins;              /* Pin configuration struct */
+    IRQn_Type irq;                 /* Interruption table index */
+    I2C_Mode mode;                 /* Mode of operation*/
+    TaskHandle_t caller_task;      /* Handler of caller task 
+                                    * (this task will be notified
+                                    * after a full message is received
+                                    * (bytes from START to STOP) or 
+                                    * an error happens in the I2C
+                                    * interruption service )*/
+    uint8_t rx_cnt;                /* Received bytes counter */
+    uint8_t tx_cnt;                /* Transmitted bytes counter */
+    xI2C_msg msg;                  /* Message body (tx and rx buffers) */
 } xI2C_Config;
 
+/* Global I2C Configuration struct array (1 item for each interface) */
 extern struct xI2C_Config i2c_cfg[];
 
-/* Macro to obtain the I2C base address by its name */
+/* Macro to obtain the I2C base address by its number */
 #define LPC_I2Cx(x)      ((i2c_cfg[x].reg))
 
 /* Function Prototypes */
-void vI2CTask( void * pvParameters );
+/* I2C Interface Initialization
+ * @param i2c_id: Interface ID ( I2C0, I2C1, I2C2 )
+ * @param mode: Operating mode for the specified I2C 
+ */
 void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
 i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len );
 i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len );

@@ -103,7 +103,7 @@ void IPMB_RXTask ( void *pvParameters )
 
     for ( ;; ) {
         /* Checks if there's any incoming messages (the task remains blocked here) */
-        /* TODO: Discover why when we put the timeout here as portMAX_DELAY the firmware deadlocks */
+        /** @bug When we put the timeout here as portMAX_DELAY the firmware deadlocks */
         rx_len = xI2CSlaveTransfer( IPMB_I2C, &ipmb_buffer_rx[0], 50 );
         if ( rx_len > 0 ) {
             /* Perform a checksum test on the message, if it doesn't pass, just ignore it. We have no way to know if we're the one who should receive it */
@@ -137,10 +137,13 @@ void IPMB_RXTask ( void *pvParameters )
     }
 }
 
-/* Initializes the IPMB Layer:
- * -> Configures the I2C Driver
- * -> Creates the TX queue for the IPMB Task
- * -> Creates both IPMB RX and IPMB TX tasks
+/** @fn void ipmb_init ( void )
+ * @brief Initializes the IPMB Layer.
+ * - Configures the I2C Driver
+ * - Creates the TX queue for the IPMB Task
+ * - Creates both IPMB RX and IPMB TX tasks
+ * @param void
+ * @return void
  */
 void ipmb_init ( void )
 {
@@ -173,7 +176,6 @@ ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8
     }
 
     /* Use this notification to block the function while the response does not arrive */
-    /* TODO: We may use the notification value to receive an error number here */
     if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) != pdTRUE ){
         return ipmb_error_failure;
     }
@@ -206,13 +208,24 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t cc, uint8_t * data, uint
     }
 
     /* Use this notification to block the function while the response does not arrive */
-    /* TODO: We may use the notification value to receive an error number here */
     if ( ulTaskNotifyTake( pdTRUE, 1000 ) != pdTRUE ){
         return ipmb_error_failure;
     }
     return ipmb_error_success;
 }
 
+/** @fn ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
+ * @brief Notifies the client that a new request has arrived and copies the message to its queue.
+ * This function receives a message wrapped in a ipmi_msg_cfg struct and copies only the ipmi_msg
+ * field to the client queue. 
+ * Also, if a task has registered its handle in the caller_task field, notify it.
+ * 
+ * @param[in] msg_cfg The message that arrived, wrapped in the configuration struct ipmi_msg_cfg.
+ * 
+ * @return IPMB error code
+ * @retval ipmb_error_success The message was successfully copied.
+ * @retval ipmb_error_timeout The client_queue was full.
+ */
 ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
 {
     configASSERT( client_queue );
@@ -226,12 +239,23 @@ ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
     return ipmb_error_timeout;
 }
 
-/* Creates and returns a queue in which the client can block to receive the incoming requests */
+/** @fn ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
+ * @brief Creates and returns a queue in which the client can block to receive the incoming requests.
+ * The queue is created and its handler is written at the given pointer (queue). 
+ * Also keeps a copy of the handler to know where to write the incoming messages.
+ * 
+ * @param queue Pointer to a QueueHandle_t variable which will be written by this function.
+ * 
+ * @return IPMB error code
+ * @retval ipmb_error_success The queue was successfully created.
+ * @retval ipmb_error_queue_creation Queue creation failed due to lack of Heap space.
+ */
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
 {
     configASSERT( queue );
 
     *queue = xQueueCreate( IPMB_CLIENT_QUEUE_LEN, sizeof(ipmi_msg) );
+    
     /* Copies the queue handler so we know where to write */
     client_queue = *queue;
     if ( *queue ) {
@@ -241,7 +265,15 @@ ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
     }
 }
 
-/* Calculate the message checksum performing a simple 2's complement sum up to the specified 'range' byte */
+/** @fn uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
+ * @brief Calculate the IPMB message checksum byte.
+ * The cheksum byte is calculated by perfoming a simple 8bit 2's complement of the sum of all previous bytes.
+ * Since we're using a unsigned int to hold the checksum value, we only need to subtract all bytes from it.
+ * @param buffer Pointer to the message bytes.
+ * @param range How many bytes will be used in the calculation.
+ * 
+ * @return Checksum of the specified bytes of the buffer.
+ */
 uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
 {
     configASSERT( pkt );
@@ -253,10 +285,19 @@ uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
     return chksum;
 }
 
-/* Asserts the input message checksums by calculating them using our local functions */
+/** @fn ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
+ * @brief Asserts the input message checksums by comparing them with our calculated ones.
+ * 
+ * @param buffer Pointer to the message bytes.
+ * @param buffer_len Size of the message.
+ *
+ * @return IPMB error code
+ * @retval ipmb_error_success The message's checksum bytes are correct, therefore the message is valid.
+ * @retval ipmb_error_hdr_chksum The header checksum byte is invalid.
+ * @retval ipmb_error_hdr_chksum The final checksum byte is invalid.
+ */
 ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
 {
-    /* Debug assert */
     configASSERT( buffer );
 
     uint8_t header_chksum = buffer[2];
@@ -272,6 +313,38 @@ ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
     return ipmb_error_msg_chksum;
 }
 
+/** @fn ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
+ * @brief Encode IPMI /p msg struct to a byte formatted /p buffer which can be sent via I2C interface.
+ * This function formats the ipmi_msg struct fields into a byte array, following the specification:
+ *
+ *| IPMB Messages  |         |          |         |        |
+ *|----------------+---------+----------+---------+--------|
+ *|                | REQUEST | RESPONSE | Bit Len | Byte # |
+ *|----------------+---------+----------+---------+--------|
+ *| Connection     | rsSA    | rqSA     |       8 |      1 |
+ *| Header         | NetFN   | NetFN    |       6 |      2 |
+ *|                | rsLUN   | rqLUN    |       2 |      2 |
+ *|----------------+---------+----------+---------+--------|
+ *| Header Chksum  | Chksum  | Chksum   |       8 |      3 |
+ *|----------------+---------+----------+---------+--------|
+ *|                | rqSA    | rsSA     |       8 |      4 |
+ *| Callback Info  | rqSeq   | rqSeq    |       6 |      5 |
+ *|                | rqLUN   | rsLUN    |       2 |      5 |
+ *|----------------+---------+----------+---------+--------|
+ *| Command        | CMD     | CMD      |       8 |      6 |
+ *|----------------+---------+----------+---------+--------|
+ *| Data           |         | CC       |       8 |      7 |
+ *|                | Data    | Data     |     8*N |    7+N |
+ *|----------------+---------+----------+---------+--------|
+ *| Message Chksum | Chksum  | Checksum |       8 |  7+N+1 |
+ *|----------------+---------+----------+---------+--------|
+ *
+ * @param[out] buffer Byte buffer which will hold the formatted message
+ * @param[in] msg The message struct to be formatted
+ * 
+ * @return IPMB error code
+ * @retval ipmb_error_success The message was successfully formatted
+ */
 ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
 {
     configASSERT( msg );
@@ -293,6 +366,16 @@ ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
     return ipmb_error_success;
 }
 
+/** @fn ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
+ * @brief Decodes a \p buffer and copies to its specific fields in a ipmi_msg struct \p msg.
+ * 
+ * @param[out] msg Pointer to a ipmi_msg struct which will hold the decoded message
+ * @param[in] buffer Pointer to a byte array that will be decoded
+ * @param[in] len Length of \p buffer
+ * 
+ * @return IPMB error code
+ * @retval ipmb_error_success The message was successfully decoded
+ */
 ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
 {
     configASSERT( msg );
@@ -308,6 +391,7 @@ ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
     msg->seq = buffer[i] >> 2;
     msg->src_LUN = ( buffer[i++] & IPMB_SRC_LUN_MASK );
     msg->cmd = buffer[i++];
+    /* Checks if the message is a response and if so, fills the completion code field */
     if ( IS_RESPONSE( (*msg) ) ) {
         msg->completion_code = buffer[i++];
     }
