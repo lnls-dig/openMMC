@@ -148,6 +148,6 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
 i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len );
 i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len );
 uint8_t xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout );
-uint8_t ulCFG_MMC_GA( void );
+uint8_t get_ipmb_addr( void );
 
 #endif /*I2C_H_*/
