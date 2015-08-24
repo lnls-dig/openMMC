@@ -1,10 +1,14 @@
 TOOLCHAIN = arm-none-eabi-
 CC = $(TOOLCHAIN)gcc
+AR = $(TOOLCHAIN)ar
 OBJCOPY = $(TOOLCHAIN)objcopy
 PROJ = afcipm
 MAKEFILE = Makefile
 MAKE = make
 MCPU = cortex-m3
+
+LIBDIR = lib
+BUILDDIR = out
 
 #Used for program operation (LPCLink specific software)
 LPCXPRESSO_PATH=/usr/local/lpcxpresso_7.8.0_426/lpcxpresso
@@ -18,14 +22,16 @@ LD_FLAGS += -Xlinker --gc-sections
 LD_FLAGS += -mcpu=$(MCPU) -mthumb
 LD_FLAGS += --specs=nosys.specs
 
-LIBS += -lgcc -lc -lm
-
+LPCOPEN_LIBNAME = lpcopen
+LPCOPEN_LIBFILE = $(LIBDIR)/lib$(LPCOPEN_LIBNAME).a
 LPCOPEN_PATH = ./chip
 LPCOPEN_SRCPATH = $(LPCOPEN_PATH)/src
 LPCOPEN_SRC = $(shell find $(LPCOPEN_SRCPATH) -name '*.c')
 LPCOPEN_INCPATH = $(LPCOPEN_PATH)/inc
 LPCOPEN_OBJS = $(LPCOPEN_SRC:%.c=%.o)
 
+FREERTOS_LIBNAME = freertos
+FREERTOS_LIBFILE = $(LIBDIR)/lib$(FREERTOS_LIBNAME).a
 FREERTOS_PATH = ./FreeRTOS
 FREERTOS_SRCPATH = $(FREERTOS_PATH)
 FREERTOS_SRC = $(shell find $(FREERTOS_SRCPATH) -name '*.c')
@@ -42,27 +48,30 @@ CFLAGS += -mcpu=$(MCPU) -mthumb
 CFLAGS += -fno-builtin -ffunction-sections -fdata-sections -fno-strict-aliasing  -fmessage-length=0 -nostdlib
 CFLAGS += $(EXTRA_CFLAGS)
 
+LIBS += -lgcc -lc -lm -l$(FREERTOS_LIBNAME) -l$(LPCOPEN_LIBNAME)
+
 DEPS = -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)"
 
 PROJ_SRCDIR = src
 PROJ_SRC = $(shell find $(PROJ_SRCDIR) -name '*.c')
 PROJ_OBJS = $(PROJ_SRC:%.c=%.o)
 
-ALL_OBJS = $(PROJ_OBJS)
-ALL_OBJS += $(FREERTOS_OBJS)
-ALL_OBJS += $(LPCOPEN_OBJS)
+.PRECIOUS: %.axf %.bin
 
-all: $(PROJ).axf $(PROJ).bin
+all: $(PROJ).bin
 
-%.bin: %.axf
+%.bin: $(BUILDDIR)/%.axf
 	@echo 'Creating Binary file from .axf'
-	$(OBJCOPY) -O binary $< $@
+	$(OBJCOPY) -O binary $< $(BUILDDIR)/$@
+	@echo 'Binary file created succesfully!'
+	@echo ' '
 
 #Linker
-%.axf: $(ALL_OBJS) $(MAKEFILE)
+%.axf: folders $(FREERTOS_LIBFILE) $(LPCOPEN_LIBFILE) $(PROJ_OBJS)
 	@echo 'Invoking MCU Linker'
-	$(CC) $(LIBS) $(LD_FLAGS) -o $@ $(ALL_OBJS)
-	@echo '$< linked successfully!'
+	$(CC) $(LD_FLAGS) -o $(BUILDDIR)/$(notdir $@) $(PROJ_OBJS) -L$(LIBDIR) $(LIBS)
+	@echo '$@ linked successfully!'
+	@echo ' '
 
 #Sources Compile
 %.o: %.c
@@ -70,6 +79,20 @@ all: $(PROJ).axf $(PROJ).bin
 	$(CC) $(CFLAGS) $(DEPS) -o $@ -c $<
 -include $(@:%.o=%.d)
 	@echo ' $< built successfully!'
+	@echo ' '
+
+#Archiver for FreeRTOS objects
+$(FREERTOS_LIBFILE): $(FREERTOS_OBJS)
+	@echo 'Archiving $@ objs'
+	$(AR) -r $@ $(FREERTOS_OBJS)
+	@echo 'Library $@ successfully created'
+	@echo ' '
+
+#Archiver for LPCOpen objects
+$(LPCOPEN_LIBFILE): $(LPCOPEN_OBJS)
+	@echo 'Archiving $@ objs'
+	$(AR) -r $@ $(LPCOPEN_OBJS)
+	@echo 'Library $@ successfully created'
 	@echo ' '
 
 #Other targets
