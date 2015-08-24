@@ -397,9 +397,14 @@ uint8_t xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout
     return i2c_cfg[i2c_id].msg.rx_len;
 }
 
-/*==============================================================
+/* Based on coreipm/coreipm/mmc.c
+ * Author: Gokhan Sozmen
+
+ *==============================================================
  * MMC ADDRESSING
- *==============================================================*/
+ *==============================================================
+*/
+
 /*
    3.2.1 Geographic Address [2..0] (GA[2..0]) the state of each GA signal is
    represented by G (grounded), U (unconnected), or P (pulled up to Management Power).
