@@ -13,6 +13,7 @@ BUILDDIR = out
 #Used for program operation (LPCLink specific software)
 LPCXPRESSO_PATH=/usr/local/lpcxpresso_7.8.0_426/lpcxpresso
 
+#Flags to be passed on to gcc
 DEFS = -DDEBUG -DCORE_M3 -D__CODE_RED -D__USE_LPCOPEN -DNO_BOARD_LIB -D__LPC17XX__ -D__NEWLIB__
 
 LD_SCRIPT = afcipm.ld
@@ -60,6 +61,10 @@ PROJ_OBJS = $(PROJ_SRC:%.c=%.o)
 
 all: $(PROJ).bin
 
+folders:
+	@mkdir -p $(LIBDIR)
+	@mkdir -p $(BUILDDIR)
+
 %.bin: $(BUILDDIR)/%.axf
 	@echo 'Creating Binary file from .axf'
 	$(OBJCOPY) -O binary $< $(BUILDDIR)/$@
@@ -97,21 +102,29 @@ $(LPCOPEN_LIBFILE): $(LPCOPEN_OBJS)
 
 #Other targets
 clean:
-	rm -rf $(ALL_OBJS) *.bin *.axf
+	@rm -rf $(PROJ_OBJS) $(PROJ_OBJS:%.o=%.d) *.map
+	@rm -rf $(BUILDDIR)
+
+mrproper: clean
+	@rm -rf $(LPCOPEN_OBJS) $(LPCOPEN_OBJS:%.o=%.d)
+	@rm -rf $(FREERTOS_OBJS) $(FREERTOS_OBJS:%.o=%.d)
+	@rm -rf $(LIBDIR)
 
 boot:
 	@echo 'Booting LPCLink...'
 	$(LPCXPRESSO_PATH)/bin/dfu-util -d 0x471:0xdf55 -c 0 -t 2048 -R -D $(LPCXPRESSO_PATH)/bin/LPCXpressoWIN.enc
 	@echo 'LPCLink booted!'
+	@echo ' '
 
 program:
-	if [ ! -f $(PROJ).axf ]; then \
+	@if [ ! -f $(PROJ).axf ]; then \
 	$(MAKE) $(PROJ).axf; \
 	fi
-	$(MAKE) -i boot
+	@$(MAKE) -i boot
 	@echo 'Programing Flash...'
 #Program flash and reset chip
-	$(LPCXPRESSO_PATH)/bin/crt_emu_cm3_nxp -wire=winusb -pLPC1764 -flash-load-exec=$(PROJ).axf
+	$(LPCXPRESSO_PATH)/bin/crt_emu_cm3_nxp -wire=winusb -pLPC1764 -flash-load-exec=$(BUILDDIR)/$(PROJ).axf
 	@echo 'Programed Successfully!'
+	@echo ' '
 
-.PHONY: all clean boot program
+.PHONY: all clean mrproper boot program folders
