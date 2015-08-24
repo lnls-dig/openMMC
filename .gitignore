@@ -38,6 +38,7 @@ Debug/
 
 #Temporary files
 *.swp
+*.map
 
 #Dependency files
 *.d
