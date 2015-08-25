@@ -76,6 +76,9 @@ licensing and training services.
 #define configUSE_APPLICATION_TASK_TAG          1
 #define configUSE_TASK_NOTIFICATIONS            1
 
+#define configASSERT( x )     if( ( x ) == 0 ) { vAssertCalled( __FILE__, __LINE__ );}
+void vAssertCalled( char* file, uint32_t line);
+
 #if (configGENERATE_RUN_TIME_STATS == 1)
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vConfigureTimerForRunTimeStats()
 #define portGET_RUN_TIME_COUNTER_VALUE() LPC_TIMER0->TC

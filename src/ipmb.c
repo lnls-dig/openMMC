@@ -32,6 +32,7 @@
 #include "i2c.h"
 #include "ipmb.h"
 #include "board_defs.h"
+#include "led.h"
 
 ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg );
 ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len );
@@ -55,7 +56,7 @@ void IPMB_TXTask ( void * pvParameters )
   static uint8_t ipmb_buffer_tx[IPMI_MSG_MAX_LENGTH];
 
   for ( ;; ) {
-    configASSERT( current_msg_tx );
+    configASSERT( &current_msg_tx != NULL );
     xQueueReceive( ipmb_txqueue, &current_msg_tx, portMAX_DELAY);
 
 
@@ -144,8 +145,9 @@ void IPMB_RXTask ( void *pvParameters )
   for ( ;; ) {
     /* Checks if there's any incoming messages (the task remains blocked here) */
     /**bug: Discover why it halts when we put the timeout here as portMAX_DELAY */
-    rx_len = xI2CSlaveTransfer( IPMB_I2C, &ipmb_buffer_rx[0], 50 );
-	
+    configASSERT(ipmb_buffer_rx);
+    rx_len = xI2CSlaveTransfer( IPMB_I2C, &ipmb_buffer_rx[0], portMAX_DELAY );
+
     if ( rx_len > 0 ) {
 
       /* Perform a checksum test on the message, if it doesn't pass, just ignore it.
@@ -281,6 +283,7 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t cc, uint8_t * data, uint
 ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
 {
     configASSERT( client_queue );
+    configASSERT( msg_cfg != NULL )
     /* Sends only the ipmi msg, not the control struct */
     if ( xQueueSend( client_queue, &(msg_cfg->buffer), CLIENT_NOTIFY_TIMEOUT ) ) {
         if ( msg_cfg->caller_task ) {
@@ -304,10 +307,10 @@ ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
  */
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
 {
-    configASSERT( queue );
+    configASSERT( queue != NULL );
 
     *queue = xQueueCreate( IPMB_CLIENT_QUEUE_LEN, sizeof(ipmi_msg) );
-    
+
     /* Copies the queue handler so we know where to write */
     client_queue = *queue;
     if ( *queue ) {
@@ -323,12 +326,12 @@ ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
  * Since we're using a unsigned int to hold the checksum value, we only need to subtract all bytes from it.
  * @param buffer Pointer to the message bytes.
  * @param range How many bytes will be used in the calculation.
- * 
+ *
  * @return Checksum of the specified bytes of the buffer.
  */
 uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
 {
-    configASSERT( pkt );
+    configASSERT( buffer != NULL );
     uint8_t chksum = 0;
     uint8_t i;
     for ( i = 0; i < range; i++ ) {

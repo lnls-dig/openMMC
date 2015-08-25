@@ -268,3 +268,9 @@ void vConfigureTimerForRunTimeStats( void )
     LPC_TIMER0->TCR = TCR_COUNT_ENABLE;
 }
 #endif
+
+void vAssertCalled( char* file, uint32_t line) {
+    taskDISABLE_INTERRUPTS();
+    prvToggleLED(LED_RED);
+    for( ;; );
+}
