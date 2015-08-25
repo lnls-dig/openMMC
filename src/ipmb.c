@@ -66,13 +66,13 @@ void IPMB_TXTask ( void * pvParameters )
       /**********************************/
       /*       Error checking  	        */
       /**********************************/
-	  
+
       /* Match with previous request */
       if ( current_msg_tx.buffer.seq != last_received_req.buffer.seq ) {
 	xTaskNotify( current_msg_tx.caller_task, ipmb_error_invalid_req , eSetValueWithOverwrite);
 	continue;
       }
-	    
+
       /* Check if the response was built in time, comparing the timeout value with the matching request */
       if ((xTaskGetTickCount() - last_received_req.timestamp) >= IPMB_MSG_TIMEOUT ) {
 	xTaskNotify( current_msg_tx.caller_task ,ipmb_error_timeout , eSetValueWithOverwrite);
@@ -91,7 +91,7 @@ void IPMB_TXTask ( void * pvParameters )
 
       /* Encode the message buffer to the IPMB format */
       ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx.buffer );
-	
+
       if ( xI2CWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], current_msg_tx.buffer.data_len + IPMB_RESP_HEADER_LENGTH ) != i2c_err_SUCCESS ) {
 	/* Message couldn't be transmitted right now, increase retry counter and try again later */
 	current_msg_tx.retries++;
@@ -105,16 +105,16 @@ void IPMB_TXTask ( void * pvParameters )
       /***************************************/
       /* Sending new outgoing request	       */
       /***************************************/
-      
+
     }else{
 
       /* Get the time when the message is first sent */
       if ( current_msg_tx.retries == 0 ) {
 	current_msg_tx.timestamp = xTaskGetTickCount();
       }
-      
+
       ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx.buffer );
-      
+
       if ( xI2CWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], current_msg_tx.buffer.data_len + IPMB_REQ_HEADER_LENGTH ) != i2c_err_SUCCESS) {
 
 	current_msg_tx.retries++;
@@ -124,7 +124,7 @@ void IPMB_TXTask ( void * pvParameters )
 	}else{
 	  xQueueSendToFront( ipmb_txqueue, &current_msg_tx, 0 );
 	}
-	
+
       } else {
 	/* Request was successfully sent, keep a copy here for future comparison */
 	last_sent_req = current_msg_tx;
@@ -171,9 +171,9 @@ void IPMB_RXTask ( void *pvParameters )
 	  }
 	  /* If we received a response that doesn't match a previously sent request, just discard it */
 	}
-	
+
       }else {
-	
+
 	/* The received message is a request */
 	/* Check if this is a repeated request (same SEQ), in this case just ignore
 	   this message, since it'll be responded shortly (I hope) */
@@ -270,11 +270,11 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t cc, uint8_t * data, uint
 /** @fn ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
  * @brief Notifies the client that a new request has arrived and copies the message to its queue.
  * This function receives a message wrapped in a ipmi_msg_cfg struct and copies only the ipmi_msg
- * field to the client queue. 
+ * field to the client queue.
  * Also, if a task has registered its handle in the caller_task field, notify it.
- * 
+ *
  * @param[in] msg_cfg The message that arrived, wrapped in the configuration struct ipmi_msg_cfg.
- * 
+ *
  * @return IPMB error code
  * @retval ipmb_error_success The message was successfully copied.
  * @retval ipmb_error_timeout The client_queue was full.
@@ -295,11 +295,11 @@ ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
 
 /** @fn ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
  * @brief Creates and returns a queue in which the client can block to receive the incoming requests.
- * The queue is created and its handler is written at the given pointer (queue). 
+ * The queue is created and its handler is written at the given pointer (queue).
  * Also keeps a copy of the handler to know where to write the incoming messages.
- * 
+ *
  * @param queue Pointer to a QueueHandle_t variable which will be written by this function.
- * 
+ *
  * @return IPMB error code
  * @retval ipmb_error_success The queue was successfully created.
  * @retval ipmb_error_queue_creation Queue creation failed due to lack of Heap space.
@@ -341,7 +341,7 @@ uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
 
 /** @fn ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
  * @brief Asserts the input message checksums by comparing them with our calculated ones.
- * 
+ *
  * @param buffer Pointer to the message bytes.
  * @param buffer_len Size of the message.
  *
@@ -395,7 +395,7 @@ ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
  *
  * @param[out] buffer Byte buffer which will hold the formatted message
  * @param[in] msg The message struct to be formatted
- * 
+ *
  * @return IPMB error code
  * @retval ipmb_error_success The message was successfully formatted
  */
@@ -422,11 +422,11 @@ ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
 
 /** @fn ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
  * @brief Decodes a \p buffer and copies to its specific fields in a ipmi_msg struct \p msg.
- * 
+ *
  * @param[out] msg Pointer to a ipmi_msg struct which will hold the decoded message
  * @param[in] buffer Pointer to a byte array that will be decoded
  * @param[in] len Length of \p buffer
- * 
+ *
  * @return IPMB error code
  * @retval ipmb_error_success The message was successfully decoded
  */

@@ -25,7 +25,7 @@
 #include "queue.h"
 #include "semphr.h"
 
-/* C Standard includes */ 
+/* C Standard includes */
 #include "stdio.h"
 #include "string.h"
 
@@ -289,7 +289,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
     /** @todo Maybe wrap these functions, or use some board-specific defines
      * so this code is generic enough to be applied on other hardware
      * Example: (if using LPC17xx and LPCOpen library)
-     * @code 
+     * @code
      * #define PIN_FUNC_CFG( port, pin, func ) Chip_IOCON_PinMux(...)
      * @endcode
     */
@@ -305,7 +305,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 
     /* Make sure that the mutex is freed */
     xSemaphoreGive( I2C_Mutex[i2c_id] );
-    
+
     /* Set I2C operating mode */
     if( xSemaphoreTake( I2C_Mutex[i2c_id], 0 ) ) {
         i2c_cfg[i2c_id].mode = mode;
@@ -343,7 +343,7 @@ i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_
     if ( tx_len => i2cMAX_MSG_LENGTH ) {
         return i2c_err_MAX_LENGTH;
     }
-    
+
     /* Take the mutex to access the shared memory */
     xSemaphoreTake( I2C_Mutex[i2c_id], 10 );
 
