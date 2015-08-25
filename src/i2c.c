@@ -274,6 +274,7 @@ void vI2C_ISR( uint8_t i2c_id )
 void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 {
     char pcI2C_Tag[4];
+    uint8_t sla_addr;
 
     sprintf( pcI2C_Tag, "I2C%u", i2c_id );
     /* Initialize I2C corresponding pins with the following characteristics:
@@ -321,7 +322,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
     if ( mode == I2C_Mode_IPMB )
     {
         /* Configure Slave Address */
-        uint8_t sla_addr = get_ipmb_addr( );
+        sla_addr = get_ipmb_addr( );
         I2CADDR_WRITE( i2c_id, sla_addr );
 
         /* Configure Slave Address Mask */
