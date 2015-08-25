@@ -231,7 +231,7 @@ ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8
     }
 
     /* Use this notification to block the function while the response does not arrive */
-    return  ulTaskNotify( pdTRUE, portMAX_DELAY );
+    return ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
 }
 
 ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t cc, uint8_t * data, uint8_t data_len )
