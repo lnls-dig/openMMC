@@ -144,7 +144,6 @@ void IPMB_RXTask ( void *pvParameters )
 
   for ( ;; ) {
     /* Checks if there's any incoming messages (the task remains blocked here) */
-    /**bug: Discover why it halts when we put the timeout here as portMAX_DELAY */
     configASSERT(ipmb_buffer_rx);
     rx_len = xI2CSlaveTransfer( IPMB_I2C, &ipmb_buffer_rx[0], portMAX_DELAY );
 
