@@ -57,7 +57,8 @@ xI2C_Config i2c_cfg[] = {
             .scl_pin = I2C0_SCL_PIN,
             .pin_func = I2C0_PIN_FUNC
         },
-        .caller_task = NULL,
+        .master_task_id = NULL,
+        .slave_task_id = NULL,
         .rx_cnt = 0,
         .tx_cnt = 0,
     },
@@ -72,7 +73,8 @@ xI2C_Config i2c_cfg[] = {
             .scl_pin = I2C1_SCL_PIN,
             .pin_func = I2C1_PIN_FUNC
         },
-        .caller_task = NULL,
+        .master_task_id = NULL,
+        .slave_task_id = NULL,
         .rx_cnt = 0,
         .tx_cnt = 0,
     },
@@ -87,7 +89,8 @@ xI2C_Config i2c_cfg[] = {
             .scl_pin = I2C2_SCL_PIN,
             .pin_func = I2C2_PIN_FUNC
         },
-        .caller_task = NULL,
+        .master_task_id = NULL,
+        .slave_task_id = NULL,
         .rx_cnt = 0,
         .tx_cnt = 0,
     }
@@ -143,7 +146,7 @@ void vI2C_ISR( uint8_t i2c_id )
         I2CCONSET( i2c_id, I2C_STO );
         I2CCONCLR( i2c_id, I2C_STA );
         i2c_cfg[i2c_id].msg.error = i2c_err_SLA_W_SENT_NACK;
-        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
         break;
 
     case I2C_STAT_DATA_SENT_ACK:
@@ -157,7 +160,7 @@ void vI2C_ISR( uint8_t i2c_id )
              * finish the communication and notify the caller task */
             I2CCONSET( i2c_id, I2C_STO );
             I2CCONCLR( i2c_id, I2C_STA );
-            vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+            vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
         }
         break;
 
@@ -165,7 +168,7 @@ void vI2C_ISR( uint8_t i2c_id )
         I2CCONSET( i2c_id, I2C_STO );
         I2CCONCLR( i2c_id, I2C_STA );
         i2c_cfg[i2c_id].msg.error = i2c_err_DATA_SENT_NACK;
-        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
 
     case I2C_STAT_SLA_R_SENT_ACK:
         /* SLA+R has been transmitted and ACK'd
@@ -202,7 +205,7 @@ void vI2C_ISR( uint8_t i2c_id )
         I2CCONSET( i2c_id, I2C_STO );
         I2CCONCLR( i2c_id, I2C_STA );
         /* There's no more data to be received */
-        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
         break;
 
     case I2C_STAT_SLA_R_SENT_NACK:
@@ -210,7 +213,7 @@ void vI2C_ISR( uint8_t i2c_id )
         I2CCONCLR( i2c_id, I2C_STA );
         /* Notify the error */
         i2c_cfg[i2c_id].msg.error = i2c_err_SLA_R_SENT_NACK;
-        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
         break;
 
         /* Slave Mode */
@@ -245,7 +248,7 @@ void vI2C_ISR( uint8_t i2c_id )
     case I2C_STAT_SLA_STOP_REP_START:
         i2c_cfg[i2c_id].msg.rx_len = i2c_cfg[i2c_id].rx_cnt;
         if (((i2c_cfg[i2c_id].rx_cnt > 0) && (i2c_cfg[i2c_id].mode == I2C_Mode_Local_Master )) || ((i2c_cfg[i2c_id].rx_cnt > 1) && (i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ))) {
-            vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].caller_task, &xI2CSemaphoreWokeTask );
+            vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].slave_task_id, &xI2CSemaphoreWokeTask );
         }
         I2CCONCLR ( i2c_id, ( I2C_STA ) );
         I2CCONSET ( i2c_id, ( I2C_AA ) );
@@ -336,7 +339,7 @@ i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_
     }
     i2c_cfg[i2c_id].msg.tx_len = tx_len;
     i2c_cfg[i2c_id].msg.rx_len = 0;
-    i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
+    i2c_cfg[i2c_id].master_task_id = xTaskGetCurrentTaskHandle();
 
     /* Trigger the i2c interruption */
     /* Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
@@ -360,7 +363,7 @@ i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_l
     i2c_cfg[i2c_id].msg.addr = addr;
     i2c_cfg[i2c_id].msg.tx_len = 0;
     i2c_cfg[i2c_id].msg.rx_len = rx_len;
-    i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
+    i2c_cfg[i2c_id].master_task_id = xTaskGetCurrentTaskHandle();
 
     /* Trigger the i2c interruption */
     /* Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
@@ -380,7 +383,7 @@ i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_l
 uint8_t xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout )
 {
     /* Register this task as the one to be notified when a message comes */
-    i2c_cfg[i2c_id].caller_task = xTaskGetCurrentTaskHandle();
+    i2c_cfg[i2c_id].slave_task_id = xTaskGetCurrentTaskHandle();
 
     /* Function blocks here until a message is received */
     if ( ulTaskNotifyTake( pdTRUE, timeout ) == pdTRUE )

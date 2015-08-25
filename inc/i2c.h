@@ -122,10 +122,12 @@ typedef struct xI2C_Config {
     xI2C_pins_t pins;              /* Pin configuration struct */
     IRQn_Type irq;                 /* Interruption table index */
     I2C_Mode mode;                 /* Mode of operation*/
-    TaskHandle_t caller_task;      /* Handler of caller task 
-                                    * (this task will be notified
-                                    * after a full message is received
-                                    * (bytes from START to STOP) or 
+    TaskHandle_t master_task_id;   /* Handler of caller task in
+                                    * I2C master mode */
+    TaskHandle_t slave_task_id;    /* Handler of caller task in
+                                    * slave mode (will be notified
+                                    * when a full message is received
+                                    * (bytes from START to STOP) or
                                     * an error happens in the I2C
                                     * interruption service )*/
     uint8_t rx_cnt;                /* Received bytes counter */
@@ -142,7 +144,7 @@ extern struct xI2C_Config i2c_cfg[];
 /* Function Prototypes */
 /* I2C Interface Initialization
  * @param i2c_id: Interface ID ( I2C0, I2C1, I2C2 )
- * @param mode: Operating mode for the specified I2C 
+ * @param mode: Operating mode for the specified I2C
  */
 void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
 i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len );
