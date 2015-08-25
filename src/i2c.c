@@ -96,6 +96,8 @@ xI2C_Config i2c_cfg[] = {
     }
 };
 
+static SemaphoreHandle_t I2C_mutex[3];
+
 /* Function prototypes */
 void vI2C_ISR( uint8_t i2c_id );
 
@@ -297,8 +299,17 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
     NVIC_SetPriority(i2c_cfg[i2c_id].irq, configMAX_SYSCALL_INTERRUPT_PRIORITY);
     NVIC_EnableIRQ( i2c_cfg[i2c_id].irq );
 
+    /* Create mutex for accessing the shared memory (i2c_cfg) */
+    I2C_Mutex[i2c_id] = xSemaphoreCreateMutex();
+
+    /* Make sure that the mutex is freed */
+    xSemaphoreGive( I2C_Mutex[i2c_id] );
+    
     /* Set I2C operating mode */
-    i2c_cfg[i2c_id].mode = mode;
+    if( xSemaphoreTake( I2C_Mutex[i2c_id], 0 ) ) {
+        i2c_cfg[i2c_id].mode = mode;
+        xSemaphoreGive( I2C_Mutex[i2c_id] );
+    }
 
     /* Enable and configure I2C clock */
     Chip_I2C_Init( i2c_id );
@@ -327,19 +338,23 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 
 i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len )
 {
-    /* Copy the message to the i2c global struture */
-
-    /* Maybe use memcpy to pass the tx buffer to the global structure */
-    i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
-    i2c_cfg[i2c_id].msg.addr = addr;
-    if ( tx_len < i2cMAX_MSG_LENGTH ) {
-        memcpy(i2c_cfg[i2c_id].msg.tx_data, tx_data, tx_len);
-    } else {
+    /* Checks if the message will fit in our buffer */
+    if ( tx_len => i2cMAX_MSG_LENGTH ) {
         return i2c_err_MAX_LENGTH;
     }
+    
+    /* Take the mutex to access the shared memory */
+    xSemaphoreTake( I2C_Mutex[i2c_id], 10 );
+
+    /* Populate the i2c config struct */
+    i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
+    i2c_cfg[i2c_id].msg.addr = addr;
+    memcpy(i2c_cfg[i2c_id].msg.tx_data, tx_data, tx_len);
     i2c_cfg[i2c_id].msg.tx_len = tx_len;
     i2c_cfg[i2c_id].msg.rx_len = 0;
     i2c_cfg[i2c_id].master_task_id = xTaskGetCurrentTaskHandle();
+
+    xSemaphoreGive( I2C_Mutex[i2c_id] );
 
     /* Trigger the i2c interruption */
     /* Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
@@ -356,7 +371,8 @@ i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_
 
 i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len )
 {
-    /* Copy the message to the i2c global struture */
+    /* Take the semaphore to access shared memory */
+    xSemaphoreTake( I2C_Mutex[i2c_id], portMAX_DELAY );
 
     /* Maybe use memcpy to pass the tx buffer to the global structure */
     i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
@@ -364,6 +380,8 @@ i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_l
     i2c_cfg[i2c_id].msg.tx_len = 0;
     i2c_cfg[i2c_id].msg.rx_len = rx_len;
     i2c_cfg[i2c_id].master_task_id = xTaskGetCurrentTaskHandle();
+
+    xSemaphoreGive( I2C_Mutex[i2c_id] );
 
     /* Trigger the i2c interruption */
     /* Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
@@ -374,16 +392,23 @@ i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_l
         /* Debug asserts */
         configASSERT(rx_data);
         configASSERT(i2c_cfg[i2c_id].msg.rx_data);
-        /* Copy the received message to the given pointer */
+
+        xSemaphoreTake( I2C_Mutex[i2c_id], portMAX_DELAY );
+/* Copy the received message to the given pointer */
         memcpy (rx_data, i2c_cfg[i2c_id].msg.rx_data, i2c_cfg[i2c_id].msg.rx_len );
+        xSemaphoreGive( I2C_Mutex[i2c_id] );
     }
     return i2c_cfg[i2c_id].msg.error;
 }
 
 uint8_t xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout )
 {
+    xSemaphoreTake( I2C_Mutex[i2c_id], portMAX_DELAY );
+
     /* Register this task as the one to be notified when a message comes */
     i2c_cfg[i2c_id].slave_task_id = xTaskGetCurrentTaskHandle();
+
+    xSemaphoreGive( I2C_Mutex[i2c_id] );
 
     /* Function blocks here until a message is received */
     if ( ulTaskNotifyTake( pdTRUE, timeout ) == pdTRUE )
@@ -391,12 +416,15 @@ uint8_t xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout
             /* Debug asserts */
             configASSERT(rx_data);
             configASSERT(i2c_cfg[i2c_id].msg.rx_data);
+
+            xSemaphoreTake( I2C_Mutex[i2c_id], portMAX_DELAY );
             /* Copy the rx buffer to the pointer given */
             memcpy( rx_data, i2c_cfg[i2c_id].msg.rx_data, i2c_cfg[i2c_id].msg.rx_len );
+            xSemaphoreGive( I2C_Mutex[i2c_id] );
     } else {
         return 0;
     }
-    /* Return message lenght */
+    /* Return message length */
     return i2c_cfg[i2c_id].msg.rx_len;
 }
 
