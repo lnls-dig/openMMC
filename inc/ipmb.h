@@ -84,7 +84,7 @@ typedef enum ipmb_error {
 /* Function Prototypes */
 void IPMB_TXTask ( void *pvParameters );
 void IPMB_RXTask ( void *pvParameters );
-void ipmb_init ( void );
+void ipmi_init ( void );
 ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8_t data_len );
 ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t cc, uint8_t * data, uint8_t data_len );
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue );
