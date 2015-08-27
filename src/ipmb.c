@@ -237,7 +237,7 @@ ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8
 
 ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t cc, uint8_t * data, uint8_t data_len )
 {
-    static ipmi_msg_cfg resp;
+    ipmi_msg_cfg resp;
 
     /* Builds the message according to the IPMB specification */
     resp.buffer.dest_addr = req->src_addr;
