@@ -342,7 +342,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len )
 {
     /* Checks if the message will fit in our buffer */
-    if ( tx_len => i2cMAX_MSG_LENGTH ) {
+    if ( tx_len >= i2cMAX_MSG_LENGTH ) {
         return i2c_err_MAX_LENGTH;
     }
 
