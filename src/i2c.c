@@ -110,6 +110,8 @@ xI2C_Config i2c_cfg[] = {
  */
 static SemaphoreHandle_t I2C_mutex[3];
 
+void vI2C_ISR( uint8_t i2c_id );
+
 void I2C0_IRQHandler( void )
 {
     vI2C_ISR( I2C0 );
@@ -132,7 +134,6 @@ void I2C2_IRQHandler( void )
  * When a full message is trasmitted or received, the task whose handle is written to #i2c_cfg is notified, unblocking it. It also happens when an error occurs.
  * @warning Slave Transmitter mode states are not implemented in this driver and are just ignored.
  */
-void vI2C_ISR( uint8_t i2c_id );
 void vI2C_ISR( uint8_t i2c_id )
 {
     /* Declare local variables */
