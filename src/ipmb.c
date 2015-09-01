@@ -137,9 +137,8 @@ void IPMB_TXTask ( void * pvParameters )
 
 void IPMB_RXTask ( void *pvParameters )
 {
-  /* Declare these structs as static so they're zero-initialized */
-  static ipmi_msg_cfg current_msg_rx;
-  static uint8_t ipmb_buffer_rx[IPMI_MSG_MAX_LENGTH];
+  ipmi_msg_cfg current_msg_rx;
+  uint8_t ipmb_buffer_rx[IPMI_MSG_MAX_LENGTH];
   uint8_t rx_len;
 
   for ( ;; ) {
@@ -211,7 +210,7 @@ void ipmb_init ( void )
 
 ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8_t data_len )
 {
-    static ipmi_msg_cfg req;
+    ipmi_msg_cfg req_cfg;
 
     /* Builds the message according to the IPMB specification */
     req.buffer.dest_addr = MCH_ADDRESS;
