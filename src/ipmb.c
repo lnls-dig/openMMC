@@ -103,7 +103,7 @@ void IPMB_TXTask ( void * pvParameters )
       }
 
       /***************************************/
-      /* Sending new outgoing request	       */
+      /* Sending new outgoing request        */
       /***************************************/
 
     }else{
@@ -191,14 +191,6 @@ void IPMB_RXTask ( void *pvParameters )
   }
 }
 
-/** @fn void ipmb_init ( void )
- * @brief Initializes the IPMB Layer.
- * - Configures the I2C Driver
- * - Creates the TX queue for the IPMB Task
- * - Creates both IPMB RX and IPMB TX tasks
- * @param void
- * @return void
- */
 void ipmb_init ( void )
 {
     vI2CInit( IPMB_I2C, I2C_Mode_IPMB );
@@ -264,15 +256,13 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
     return ipmb_error_success;
 }
 
-/** @fn ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
- * @brief Notifies the client that a new request has arrived and copies the message to its queue.
+/*! @brief Notifies the client that a new request has arrived and copies the message to its queue.
  * This function receives a message wrapped in a ipmi_msg_cfg struct and copies only the ipmi_msg
  * field to the client queue.
  * Also, if a task has registered its handle in the caller_task field, notify it.
  *
  * @param[in] msg_cfg The message that arrived, wrapped in the configuration struct ipmi_msg_cfg.
  *
- * @return IPMB error code
  * @retval ipmb_error_success The message was successfully copied.
  * @retval ipmb_error_timeout The client_queue was full.
  */
@@ -290,17 +280,6 @@ ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
     return ipmb_error_timeout;
 }
 
-/** @fn ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
- * @brief Creates and returns a queue in which the client can block to receive the incoming requests.
- * The queue is created and its handler is written at the given pointer (queue).
- * Also keeps a copy of the handler to know where to write the incoming messages.
- *
- * @param queue Pointer to a QueueHandle_t variable which will be written by this function.
- *
- * @return IPMB error code
- * @retval ipmb_error_success The queue was successfully created.
- * @retval ipmb_error_queue_creation Queue creation failed due to lack of Heap space.
- */
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
 {
     configASSERT( queue != NULL );
@@ -316,8 +295,7 @@ ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
     }
 }
 
-/** @fn uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
- * @brief Calculate the IPMB message checksum byte.
+/*! @brief Calculate the IPMB message checksum byte.
  * The cheksum byte is calculated by perfoming a simple 8bit 2's complement of the sum of all previous bytes.
  * Since we're using a unsigned int to hold the checksum value, we only need to subtract all bytes from it.
  * @param buffer Pointer to the message bytes.
@@ -336,13 +314,11 @@ uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
     return chksum;
 }
 
-/** @fn ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
- * @brief Asserts the input message checksums by comparing them with our calculated ones.
+/*! @brief Asserts the input message checksums by comparing them with our calculated ones.
  *
  * @param buffer Pointer to the message bytes.
  * @param buffer_len Size of the message.
  *
- * @return IPMB error code
  * @retval ipmb_error_success The message's checksum bytes are correct, therefore the message is valid.
  * @retval ipmb_error_hdr_chksum The header checksum byte is invalid.
  * @retval ipmb_error_hdr_chksum The final checksum byte is invalid.
@@ -364,8 +340,8 @@ ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
     return ipmb_error_msg_chksum;
 }
 
-/** @fn ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
- * @brief Encode IPMI /p msg struct to a byte formatted /p buffer which can be sent via I2C interface.
+/*! @brief Encode IPMI msg struct to a byte formatted buffer
+ *
  * This function formats the ipmi_msg struct fields into a byte array, following the specification:
  *
  *| IPMB Messages  |         |          |         |        |
@@ -393,7 +369,6 @@ ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
  * @param[out] buffer Byte buffer which will hold the formatted message
  * @param[in] msg The message struct to be formatted
  *
- * @return IPMB error code
  * @retval ipmb_error_success The message was successfully formatted
  */
 ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
@@ -417,14 +392,12 @@ ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
     return ipmb_error_success;
 }
 
-/** @fn ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
- * @brief Decodes a \p buffer and copies to its specific fields in a ipmi_msg struct \p msg.
+/*! @brief Decodes a buffer and copies to its specific fields in a ipmi_msg struct
  *
  * @param[out] msg Pointer to a ipmi_msg struct which will hold the decoded message
  * @param[in] buffer Pointer to a byte array that will be decoded
  * @param[in] len Length of \p buffer
  *
- * @return IPMB error code
  * @retval ipmb_error_success The message was successfully decoded
  */
 ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
