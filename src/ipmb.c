@@ -208,25 +208,24 @@ void ipmb_init ( void )
     xTaskCreate( IPMB_RXTask, (const char*)"IPMB_RX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, IPMB_RXTASK_PRIORITY, ( TaskHandle_t * ) NULL );
 }
 
-ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8_t data_len )
+ipmb_error ipmb_send_request ( ipmi_msg * req )
 {
     ipmi_msg_cfg req_cfg;
 
     /* Builds the message according to the IPMB specification */
-    req.buffer.dest_addr = MCH_ADDRESS;
-    req.buffer.netfn = netfn;
-    req.buffer.dest_LUN = 0;
-    req.buffer.src_addr = get_ipmb_addr();
-    req.buffer.seq = current_seq++;
-    req.buffer.src_LUN = 0;
-    req.buffer.cmd = cmd;
-    req.buffer.data_len = data_len;
-    /* TODO: check memcpy errors and buffer*/
-    memcpy(req.buffer.data, data, data_len);
-    req.caller_task = xTaskGetCurrentTaskHandle();
+
+    /* Copies data from the msg struct passed by caller */
+    memcpy( &(req_cfg.buffer), req, sizeof(ipmi_msg));
+    /* Write necessary fields (should be garbage data by now) */
+    req_cfg.buffer.dest_addr = MCH_ADDRESS;
+    req_cfg.buffer.dest_LUN = 0;
+    req_cfg.buffer.src_addr = get_ipmb_addr();
+    req_cfg.buffer.src_LUN = 0;
+    req_cfg.buffer.seq = current_seq++;
+    req_cfg.caller_task = xTaskGetCurrentTaskHandle();
 
     /* Blocks here until is able put message in tx queue */
-    if (xQueueSend( ipmb_txqueue, &req, 1) != pdTRUE ){
+    if (xQueueSend( ipmb_txqueue, &req_cfg, 1) != pdTRUE ){
         return ipmb_error_failure;
     }
 
@@ -234,28 +233,27 @@ ipmb_error ipmb_send_request ( uint8_t netfn, uint8_t cmd, uint8_t * data, uint8
     return ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
 }
 
-ipmb_error ipmb_send_response ( ipmi_msg * req, uint8_t cc, uint8_t * data, uint8_t data_len )
+ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
 {
-    ipmi_msg_cfg resp;
+    ipmi_msg_cfg resp_cfg;
 
     /* Builds the message according to the IPMB specification */
-    resp.buffer.dest_addr = req->src_addr;
-    resp.buffer.netfn = req->netfn + 1;
-    resp.buffer.dest_LUN = req->src_LUN;
-    resp.buffer.src_addr = req->dest_addr;
-    resp.buffer.seq = req->seq;
-    resp.buffer.src_LUN = req->dest_LUN;
-    resp.buffer.cmd = req->cmd;
-    resp.buffer.completion_code = cc;
-    resp.buffer.data_len = data_len;
-    /* Perform this checking so this function does not break if a NULL pointer is passed as a parameter */
-    if ( data ){
-        memcpy(resp.buffer.data, data, data_len);
-    }
-    resp.caller_task = xTaskGetCurrentTaskHandle();
+
+    /* Copies data from the response msg struct passed by caller */
+    memcpy( &(resp_cfg.buffer), resp, sizeof(ipmi_msg));
+
+    /* Write necessary fields (should be garbage data by now) */
+    resp_cfg.buffer.dest_addr = req->src_addr;
+    resp_cfg.buffer.netfn = req->netfn + 1;
+    resp_cfg.buffer.dest_LUN = req->src_LUN;
+    resp_cfg.buffer.src_addr = req->dest_addr;
+    resp_cfg.buffer.seq = req->seq;
+    resp_cfg.buffer.src_LUN = req->dest_LUN;
+    resp_cfg.buffer.cmd = req->cmd;
+    resp_cfg.caller_task = xTaskGetCurrentTaskHandle();
 
     /* Blocks here until is able put message in tx queue */
-    if (xQueueSend( ipmb_txqueue, &resp, portMAX_DELAY) != pdTRUE ){
+    if (xQueueSend( ipmb_txqueue, &resp_cfg, portMAX_DELAY) != pdTRUE ){
         return ipmb_error_failure;
     }
 
