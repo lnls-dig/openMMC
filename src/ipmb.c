@@ -56,7 +56,6 @@ void IPMB_TXTask ( void * pvParameters )
   static uint8_t ipmb_buffer_tx[IPMI_MSG_MAX_LENGTH];
 
   for ( ;; ) {
-    configASSERT( &current_msg_tx != NULL );
     xQueueReceive( ipmb_txqueue, &current_msg_tx, portMAX_DELAY);
 
 
@@ -133,6 +132,7 @@ void IPMB_TXTask ( void * pvParameters )
     }
   }
 }
+
 
 
 void IPMB_RXTask ( void *pvParameters )
