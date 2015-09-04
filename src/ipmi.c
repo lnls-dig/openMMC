@@ -86,17 +86,17 @@ void IPMITask ( void * pvParameters )
     req_handler = ipmi_retrieve_handler(req_received.netfn, req_received.cmd);
 
     if (req_handler != 0){
-      
+
       /* TODO: create unique name for each created task, probably
 	 related to netfn and command */
       struct req_param_struct *req_param = pvPortMalloc(sizeof(struct req_param_struct));
       req_param->req_received = req_received;
       req_param->req_handler = req_handler;
-      
+
       if (xTaskCreate(IPMI_handler_task ,(const char*)"IPMB_handler_task", configMINIMAL_STACK_SIZE*2, req_param, IPMI_HANDLER_TASK_PRIORITY,  (TaskHandle_t *) NULL ) == pdFALSE ){
 	  /* TODO: handle this problem */
       }
-      
+
     }else{
       ipmb_error error_code;
       ipmi_msg response;
@@ -114,12 +114,12 @@ void IPMITask ( void * pvParameters )
 }
 
 
-/** 
+/*!
  * This task is created dynamically each time there is an IPMI request
  * demanding response. It receives a pointer to a struct contaning
  * both the function handler and the request to treated, and must free
  * this struct memory and itself before finishing.
- * 
+ *
  * @param pvParameters pointer to req_param_struct contaning
  * req_handler and req_received. This is dynamically allocated memory
  * and should be freed before quitting.
@@ -161,12 +161,12 @@ void ipmi_init ( void )
 }
 
 
-/** 
+/*!
  * @brief Finds a handler associated with a given netfunction and command.
- * 
+ *
  * @param netfn 8-bit network function code
  * @param cmd 8-bit command code
- * 
+ *
  * @return Pointer to the function which will handle this command, as defined in the netfn handler list.
  */
 t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd){
@@ -187,25 +187,24 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd){
   return handler;
 }
 
-/** 
- * Handler for GET Device ID command as in IPMI v2.0 section 20.1 for
+/*!
+ * @brief Handler for GET Device ID command as in IPMI v2.0 section 20.1 for
  * more information.
- * 
+ *
  * @param req pointer to request message
  *
  * @param rsp pointer to response message
- * 
- * @return 
+ *
+ * @return
  */
 void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp ){
   int len = rsp->data_len = 0;
 
   rsp->completion_code = IPMI_CC_OK;
 
+  /*! @todo: several bits of hardcoded information. Organize it so it
+    makes more sense and is easier to modify. */
 
-  /** \todo: several bits of hardcoded information. Organize it so it
-      makes more sense and is easier to modify. */
-  
   rsp->data[len++] = 0x0A; /* Dev ID */
   rsp->data[len++] = 0x02; /* Dev Rev */
   rsp->data[len++] = 0x05; /* Dev FW Rev UPPER */
@@ -222,8 +221,7 @@ void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp ){
 
 }
 
-/** @fn ipmi_msg ipmi_picmg_get_properties(ipmi_msg * request, ipmi_msg * response)
- * 
+/*!
  * @brief handler for GET Properties request. To be called by IPMI
  *  request handler, it must obey the predefined function signature
  *  and protocol. Check IPMI 2.0 table 3-11 for more information.
@@ -231,7 +229,7 @@ void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp ){
  * @param[in] request Request to be handled and answered. Unused in
  *  this particular function.
  *
- * @return ipmi_msg Message with data, data length and completion code. 
+ * @return ipmi_msg Message with data, data length and completion code.
  */
 void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp )
 {
@@ -246,37 +244,34 @@ void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp )
     rsp->data_len = len;
 }
 
-/** 
+/*!
  * @brief Handler for "Set Event Receiver" command, as on IPMIv2 1.1
  * section 29.1.
  *
  * This handler should set (or reset) the address to which IPMI events
  * will be sent. Also, disable sending events if command 0xFF is received.
- * 
- * @param req Incoming request to be handled and answered.
- * 
- * @return ipmi_msg response with data, data_lenght and completion
- * code. Other fields will be completed by the system.
+ *
+ * @param[in] req Incoming request to be handled and answered.
+ *
+ * @return void
  */
 void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp){
-    
-  /** \todo: actually enable/disable sending events*/
+
+  /** @todo: actually enable/disable sending events*/
   rsp->completion_code = IPMI_CC_OK;
   rsp->data_len = 0;
 }
 
-
-
-/** @fn ipmi_msg ipmi_picmg_set_led(ipmi_msg * request, ipmi_msg * response)
- * 
- * @brief handler for "Set FRU LED State"" request. Check IPMI 2.0
+/*!
+ * @brief Handler for "Set FRU LED State"" request. Check IPMI 2.0
  * table 3-31 for more information.
  *
- * @param[in] request Request to be handled and answered. Contains
+ * @param[in] req Pointer to request struct to be handled and answered. Contains
  * which LED should be set, how it should be set and other commands.
  *
- * @return ipmi_msg Response to be sent, must have data, data length
- * and completion code members filled.
+ * @param[out] rsp Pointer to response struct to be modified with the message
+ *
+ * @return void
  */
 void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
 {
@@ -288,4 +283,3 @@ void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
   rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 
 }
-
