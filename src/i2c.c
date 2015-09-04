@@ -127,6 +127,9 @@ void I2C2_IRQHandler( void )
     vI2C_ISR( I2C2 );
 }
 
+#define I2C_CON_FLAGS (I2C_AA | I2C_SI | I2C_STO | I2C_STA)
+
+
 /*! @brief I2C common interrupt service routine
  *
  * I2STAT register is handled inside this function, a state-machine-like implementation for I2C interface.
@@ -141,6 +144,7 @@ void vI2C_ISR( uint8_t i2c_id )
 
     /* Initialize variables */
     xI2CSemaphoreWokeTask = pdFALSE;
+    uint32_t cclr = I2C_CON_FLAGS;
 
     /* I2C status handling */
     switch ( I2CSTAT( i2c_id ) ){
@@ -157,12 +161,10 @@ void vI2C_ISR( uint8_t i2c_id )
         /* Send first data byte */
         I2CDAT_WRITE( i2c_id, i2c_cfg[i2c_id].msg.tx_data[i2c_cfg[i2c_id].tx_cnt] );
         i2c_cfg[i2c_id].tx_cnt++;
-        I2CCONCLR( i2c_id, I2C_STA );
         break;
 
     case I2C_STAT_SLA_W_SENT_NACK:
-        I2CCONSET( i2c_id, I2C_STO );
-        I2CCONCLR( i2c_id, I2C_STA );
+        cclr &= ~I2C_STO;
         i2c_cfg[i2c_id].msg.error = i2c_err_SLA_W_SENT_NACK;
         vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
         break;
@@ -172,32 +174,26 @@ void vI2C_ISR( uint8_t i2c_id )
         if ( i2c_cfg[i2c_id].msg.tx_len != i2c_cfg[i2c_id].tx_cnt ){
             I2CDAT_WRITE( i2c_id, i2c_cfg[i2c_id].msg.tx_data[i2c_cfg[i2c_id].tx_cnt] );
             i2c_cfg[i2c_id].tx_cnt++;
-            I2CCONCLR( i2c_id, I2C_STA );
         } else {
             /* If there's no more data to be transmitted,
              * finish the communication and notify the caller task */
-            I2CCONSET( i2c_id, I2C_STO );
-            I2CCONCLR( i2c_id, I2C_STA );
+            cclr &= ~I2C_STO;
             vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
         }
         break;
 
     case I2C_STAT_DATA_SENT_NACK:
-        I2CCONSET( i2c_id, I2C_STO );
-        I2CCONCLR( i2c_id, I2C_STA );
+        cclr &= ~I2C_STO;
         i2c_cfg[i2c_id].msg.error = i2c_err_DATA_SENT_NACK;
         vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
 
     case I2C_STAT_SLA_R_SENT_ACK:
         /* SLA+R has been transmitted and ACK'd
          * If we want to receive only 1 byte, return NACK on the next byte */
-        if ( i2c_cfg[i2c_id].msg.rx_len == 1 ){
-            I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
-        } else {
-            /* If we expect to receive more than 1 byte,
+        if ( i2c_cfg[i2c_id].msg.rx_len > 1 ){
+             /* If we expect to receive more than 1 byte,
              * return ACK on the next byte */
-            I2CCONSET( i2c_id, I2C_AA );
-            I2CCONCLR( i2c_id, I2C_STA );
+            cclr &= ~I2C_AA;
         }
         break;
 
@@ -206,29 +202,21 @@ void vI2C_ISR( uint8_t i2c_id )
             i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
             i2c_cfg[i2c_id].rx_cnt++;
             if (i2c_cfg[i2c_id].rx_cnt != (i2c_cfg[i2c_id].msg.rx_len) - 1 ){
-                I2CCONCLR( i2c_id, I2C_STA );
-                I2CCONSET( i2c_id, I2C_AA );
-            } else {
-                I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
+                cclr &= ~I2C_AA;
             }
-        } else {
-            /* Our buffer just have one more space, so send NAK to retrieve the last byte */
-            I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
         }
         break;
 
     case I2C_STAT_DATA_RECV_NACK:
         i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
         i2c_cfg[i2c_id].rx_cnt++;
-        I2CCONSET( i2c_id, I2C_STO );
-        I2CCONCLR( i2c_id, I2C_STA );
+        cclr &= ~I2C_STO;
         /* There's no more data to be received */
         vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
         break;
 
     case I2C_STAT_SLA_R_SENT_NACK:
-        I2CCONSET( i2c_id, I2C_STO );
-        I2CCONCLR( i2c_id, I2C_STA );
+	cclr &= ~I2C_STO;
         /* Notify the error */
         i2c_cfg[i2c_id].msg.error = i2c_err_SLA_R_SENT_NACK;
         vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
@@ -237,13 +225,16 @@ void vI2C_ISR( uint8_t i2c_id )
         /* Slave Mode */
     case I2C_STAT_SLA_W_RECV_ACK:
     case I2C_STAT_ARB_LOST_SLA_W_RECV_ACK:
-        i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
+
+	    i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
         i2c_cfg[i2c_id].rx_cnt = 0;
+
         if ( i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ){
-            i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CADDR_READ(i2c_id);
-            i2c_cfg[i2c_id].rx_cnt++;
+  	        i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CADDR_READ(i2c_id);
+		    cclr &= ~I2C_AA;
+		    i2c_cfg[i2c_id].rx_cnt++;
         }
-        I2CCONSET( i2c_id, I2C_AA );
+		
         break;
 
     case I2C_STAT_SLA_DATA_RECV_ACK:
@@ -251,32 +242,43 @@ void vI2C_ISR( uint8_t i2c_id )
         if ( i2c_cfg[i2c_id].rx_cnt < i2cMAX_MSG_LENGTH ){
             i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
             i2c_cfg[i2c_id].rx_cnt++;
-            I2CCONSET ( i2c_id, ( I2C_AA ) );
-        } else {
-            I2CCONCLR( i2c_id, ( I2C_STA | I2C_AA ) );
+            cclr &= ~I2C_AA;
         }
         break;
 
     case I2C_STAT_SLA_DATA_RECV_NACK:
-        I2CCONCLR ( i2c_id, ( I2C_STA ) );
-        I2CCONSET ( i2c_id, ( I2C_AA ) );
+        cclr &= ~I2C_AA;
         i2c_cfg[i2c_id].msg.error = i2c_err_SLA_DATA_RECV_NACK;
         break;
 
     case I2C_STAT_SLA_STOP_REP_START:
         i2c_cfg[i2c_id].msg.rx_len = i2c_cfg[i2c_id].rx_cnt;
-        if (((i2c_cfg[i2c_id].rx_cnt > 0) && (i2c_cfg[i2c_id].mode == I2C_Mode_Local_Master )) || ((i2c_cfg[i2c_id].rx_cnt > 1) && (i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ))) {
+        if (((i2c_cfg[i2c_id].rx_cnt > 0) && (i2c_cfg[i2c_id].mode == I2C_Mode_Local_Master ))) {
+        		vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].slave_task_id, &xI2CSemaphoreWokeTask );
+    	}
+        if (((i2c_cfg[i2c_id].rx_cnt > 1) && (i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ))) {
             vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].slave_task_id, &xI2CSemaphoreWokeTask );
         }
-        I2CCONCLR ( i2c_id, ( I2C_STA ) );
-        I2CCONSET ( i2c_id, ( I2C_AA ) );
+
+        cclr &= ~I2C_AA;
         break;
 
+    case I2C_STATUS_BUSERR:
+	    cclr &= ~I2C_STO;
+		break;
+	
     default:
-        break;
+	    break;
     }
-    I2CCONCLR( i2c_id, I2C_SI );
 
+	if (!(cclr & I2C_CON_STO)) {
+	    cclr &= ~I2C_CON_AA;
+
+	}
+	I2CCONSET(i2c_id, cclr ^ I2C_CON_FLAGS);
+	I2CCONCLR(i2c_id, cclr);
+	asm("nop");
+	
     if (xI2CSemaphoreWokeTask == pdTRUE) {
         portYIELD_FROM_ISR(pdTRUE);
     }
@@ -347,7 +349,7 @@ i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_
     }
 
     /* Take the mutex to access the shared memory */
-    xSemaphoreTake( I2C_mutex[i2c_id], 10 );
+    if (xSemaphoreTake( I2C_mutex[i2c_id], 10 ) == pdTRUE) {
 
     /* Populate the i2c config struct */
     i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
@@ -358,6 +360,9 @@ i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_
     i2c_cfg[i2c_id].master_task_id = xTaskGetCurrentTaskHandle();
 
     xSemaphoreGive( I2C_mutex[i2c_id] );
+    } else {
+    	return i2c_err_FAILURE;
+    }
 
     /* Trigger the i2c interruption */
     /* @bug Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */

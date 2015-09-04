@@ -139,7 +139,7 @@ void IPMI_handler_task( void * pvParameters){
   /* In case of error during IPMB response, the MMC may wait for a
      new command from the MCH. Check this for debugging purposes
      only. */
-  configASSERT((response_error == ipmb_error_success));
+  configASSERT( response_error == ipmb_error_success );
 
   vPortFree(req_param);
 

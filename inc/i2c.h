@@ -138,6 +138,9 @@
                                                       */
 #define I2C_STAT_SLA_STOP_REP_START      0xA0        /*!< @brief A STOP condition or repeated START condition received in Slave mode.
                                                       */
+
+#define I2C_STAT_BUSERR                  0x00        /*!< @brief General bus error. */
+
 /*@}*/
 
 /*! @name I2STAT values for Slave Transmitter Mode

@@ -176,7 +176,7 @@ void IPMB_RXTask ( void *pvParameters )
 	/* The received message is a request */
 	/* Check if this is a repeated request (same SEQ), in this case just ignore
 	   this message, since it'll be responded shortly (I hope) */
-	if ( current_msg_rx.buffer.seq != last_received_req.buffer.seq ) {
+	//if ( current_msg_rx.buffer.seq != last_received_req.buffer.seq ) {
 
 	  /* Start counting the time, so we know if our response will be built in time */
 	  current_msg_rx.timestamp = xTaskGetTickCount();
@@ -185,7 +185,7 @@ void IPMB_RXTask ( void *pvParameters )
 
 	  /* Notify the client about the new request */
 	  ipmb_notify_client ( &current_msg_rx );
-	}
+        //}
       }
     }
   }
@@ -252,7 +252,7 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
     }
 
     /* Use this notification to block the function while the response does not arrive */
-    return ulTaskNotifyTake( pdTRUE, portMAX_DELAY )
+    return ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
 }
 
 /*! @brief Notifies the client that a new request has arrived and copies the message to its queue.
