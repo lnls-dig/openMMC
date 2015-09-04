@@ -93,7 +93,9 @@ void IPMITask ( void * pvParameters )
       req_param->req_received = req_received;
       req_param->req_handler = req_handler;
       
-      xTaskCreate(IPMI_handler_task ,(const char*)"IPMB_handler_task", configMINIMAL_STACK_SIZE*2, req_param, IPMI_HANDLER_TASK_PRIORITY,  ( TaskHandle_t * ) NULL );
+      if (xTaskCreate(IPMI_handler_task ,(const char*)"IPMB_handler_task", configMINIMAL_STACK_SIZE*2, req_param, IPMI_HANDLER_TASK_PRIORITY,  (TaskHandle_t *) NULL ) == pdFALSE ){
+	  /* TODO: handle this problem */
+      }
       
     }else{
       ipmb_error error_code;
@@ -127,15 +129,19 @@ void IPMI_handler_task( void * pvParameters){
   ipmi_msg response;
   ipmb_error response_error;
 
+  ipmi_msg * test1 = &req_param->req_received;
+
+  response.completion_code = IPMI_CC_OUT_OF_SPACE;
+  response.data_len = 0;
   /* Call user-defined function, give request data and retrieve required response */
-  response = req_param->req_handler(req_param->req_received);
+  req_param->req_handler(&(req_param->req_received), &response);
 
   response_error = ipmb_send_response(&(req_param->req_received), &response);
 
   /* In case of error during IPMB response, the MMC may wait for a
      new command from the MCH. Check this for debugging purposes
      only. */
-  configASSERT(response_error);
+  configASSERT(!response_error);
 
   vPortFree(req_param);
 
@@ -185,35 +191,38 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd){
  * Handler for GET Device ID command as in IPMI v2.0 section 20.1 for
  * more information.
  * 
- * @param req 
+ * @param req pointer to request message
+ *
+ * @param rsp pointer to response message
  * 
  * @return 
  */
-ipmi_msg ipmi_app_get_device_id ( ipmi_msg req ){
-  ipmi_msg response;
+void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp ){
+  int len = rsp->data_len = 0;
 
-  response.completion_code = IPMI_CC_OK;
-  response.data_len = 0;
+  rsp->completion_code = IPMI_CC_OK;
+
 
   /** \todo: several bits of hardcoded information. Organize it so it
       makes more sense and is easier to modify. */
   
-  response.data[response.data_len++] = 0x0A; /* Dev ID */
-  response.data[response.data_len++] = 0x02; /* Dev Rev */
-  response.data[response.data_len++] = 0x05; /* Dev FW Rev UPPER */
-  response.data[response.data_len++] = 0x50; /* Dev FW Rev LOWER */
-  response.data[response.data_len++] = 0x02; /* IPMI Version 2.0 */
-  response.data[response.data_len++] = 0x1F; /* Dev Support */
-  response.data[response.data_len++] = 0x5A; /* Manufacturer ID LSB */
-  response.data[response.data_len++] = 0x31; /* Manufacturer ID MSB */
-  response.data[response.data_len++] = 0x00; /* ID MSB */
-  response.data[response.data_len++] = 0x01; /* Product ID LSB */
-  response.data[response.data_len++] = 0x01; /* Product ID MSB */
+  rsp->data[len++] = 0x0A; /* Dev ID */
+  rsp->data[len++] = 0x02; /* Dev Rev */
+  rsp->data[len++] = 0x05; /* Dev FW Rev UPPER */
+  rsp->data[len++] = 0x50; /* Dev FW Rev LOWER */
+  rsp->data[len++] = 0x02; /* IPMI Version 2.0 */
+  rsp->data[len++] = 0x1F; /* Dev Support */
+  rsp->data[len++] = 0x5A; /* Manufacturer ID LSB */
+  rsp->data[len++] = 0x31; /* Manufacturer ID MSB */
+  rsp->data[len++] = 0x00; /* ID MSB */
+  rsp->data[len++] = 0x01; /* Product ID LSB */
+  rsp->data[len++] = 0x01; /* Product ID MSB */
 
-  return response;
+  rsp->data_len = len;
+
 }
 
-/** @fn ipmi_msg ipmi_picmg_get_properties(ipmi_msg request)
+/** @fn ipmi_msg ipmi_picmg_get_properties(ipmi_msg * request, ipmi_msg * response)
  * 
  * @brief handler for GET Properties request. To be called by IPMI
  *  request handler, it must obey the predefined function signature
@@ -224,20 +233,17 @@ ipmi_msg ipmi_app_get_device_id ( ipmi_msg req ){
  *
  * @return ipmi_msg Message with data, data length and completion code. 
  */
-ipmi_msg ipmi_picmg_get_properties ( ipmi_msg req )
+void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp )
 {
-    ipmi_msg response;
+	int len = rsp->data_len = 0;
+	rsp->completion_code = IPMI_CC_OK;
 
-    response.completion_code = IPMI_CC_OK;
-
-    response.data_len = 0;
     /* Hardcoded response according to the  */
-    response.data[response.data_len++] = IPMI_PICMG_GRP_EXT;
-    response.data[response.data_len++] = IPMI_EXTENSION_VERSION;
-    response.data[response.data_len++] = MAX_FRU_ID;
-    response.data[response.data_len++] = FRU_DEVICE_ID;
-
-    return response;
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+    rsp->data[len++] = IPMI_EXTENSION_VERSION;
+    rsp->data[len++] = MAX_FRU_ID;
+    rsp->data[len++] = FRU_DEVICE_ID;
+    rsp->data_len = len;
 }
 
 /** 
@@ -252,21 +258,18 @@ ipmi_msg ipmi_picmg_get_properties ( ipmi_msg req )
  * @return ipmi_msg response with data, data_lenght and completion
  * code. Other fields will be completed by the system.
  */
-ipmi_msg ipmi_se_set_receiver ( ipmi_msg req ){
-  ipmi_msg response;
+void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp){
     
   /** \todo: actually enable/disable sending events*/
-  response.completion_code = IPMI_CC_OK;
-  response.data_len = 0;
-
-  return response; 
+  rsp->completion_code = IPMI_CC_OK;
+  rsp->data_len = 0;
 }
 
 
 
-/** @fn ipmi_msg ipmi_picmg_set_led(ipmi_msg request)
+/** @fn ipmi_msg ipmi_picmg_set_led(ipmi_msg * request, ipmi_msg * response)
  * 
- * @brief handler for "Set FRU LED State"" request. Check IPMI 3.0
+ * @brief handler for "Set FRU LED State"" request. Check IPMI 2.0
  * table 3-31 for more information.
  *
  * @param[in] request Request to be handled and answered. Contains
@@ -275,17 +278,14 @@ ipmi_msg ipmi_se_set_receiver ( ipmi_msg req ){
  * @return ipmi_msg Response to be sent, must have data, data length
  * and completion code members filled.
  */
-ipmi_msg ipmi_picmg_set_led ( ipmi_msg req )
+void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
 {
-  ipmi_msg response;
-  
   /* TODO: actually implement set led funtion */
 
-  response.completion_code = IPMI_CC_OK;
+  rsp->completion_code = IPMI_CC_OK;
 
-  response.data_len = 0;
-  response.data[response.data_len++] = IPMI_PICMG_GRP_EXT;
+  rsp->data_len = 0;
+  rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 
-  return response;
 }
 

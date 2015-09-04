@@ -361,6 +361,7 @@ i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_
 
     /* Trigger the i2c interruption */
     /* @bug Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
+    I2CCONCLR( i2c_id, ( I2C_SI | I2C_STO | I2C_STA | I2C_AA));
     I2CCONSET( i2c_id, ( I2C_I2EN | I2C_STA ) );
 
     if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) == pdTRUE ){

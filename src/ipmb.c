@@ -243,6 +243,7 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
     resp_cfg.buffer.src_LUN = req->dest_LUN;
     resp_cfg.buffer.cmd = req->cmd;
     resp_cfg.caller_task = xTaskGetCurrentTaskHandle();
+    resp_cfg.retries = 0;
 
     /* Blocks here until is able put message in tx queue */
     if (xQueueSend( ipmb_txqueue, &resp_cfg, portMAX_DELAY) != pdTRUE ){
@@ -250,6 +251,8 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
     }
 
     /* Use this notification to block the function while the response does not arrive */
+    /* BUG: if you are using ticks wait you can not notify with value = 0 (ipmb_error_success)
+     * you can not distinct between timeout and ipmb_error_success */
     if ( ulTaskNotifyTake( pdTRUE, 1000 ) != pdTRUE ){
         return ipmb_error_failure;
     }
