@@ -129,9 +129,7 @@ void IPMI_handler_task( void * pvParameters){
   ipmi_msg response;
   ipmb_error response_error;
 
-  ipmi_msg * test1 = &req_param->req_received;
-
-  response.completion_code = IPMI_CC_OUT_OF_SPACE;
+  response.completion_code = IPMI_CC_UNSPECIFIED_ERROR;
   response.data_len = 0;
   /* Call user-defined function, give request data and retrieve required response */
   req_param->req_handler(&(req_param->req_received), &response);
