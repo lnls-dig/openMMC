@@ -46,7 +46,10 @@
 #define I2C2_PIN_FUNC   2
 
 /* Geographic Address pin definitions */
-#define GA_PORT         1
+#define GA0_PORT         1
+#define GA1_PORT         1
+#define GA2_PORT         1
+#define GA_TEST_PORT    1
 #define GA0_PIN         0
 #define GA1_PIN         1
 #define GA2_PIN         4
