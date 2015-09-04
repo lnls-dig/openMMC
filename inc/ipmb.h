@@ -134,7 +134,8 @@ typedef struct ipmi_msg_cfg {
 
 /*! @brief IPMB errors enumeration */
 typedef enum ipmb_error {
-    ipmb_error_success = 0,             /*!< Generic no-error flag  */
+    ipmb_error_unknown = 0,
+    ipmb_error_success,                 /*!< Generic no-error flag  */
     ipmb_error_failure,                 /*!< Generic failure on IPMB */
     ipmb_error_timeout,                 /*!< Error raised when a message takes too long to be responded */
     ipmb_error_invalid_req,             /*!< A invalid request was received */
