@@ -485,37 +485,52 @@ unsigned char IPMBL_TABLE[IPMBL_TABLE_SIZE] = {
  *  | UUP | 221 | 25 | 0x7E |
  *  | UUU | 222 | 26 | 0xA2 |
  */
+#define GPIO_GA_DELAY 10
 uint8_t get_ipmb_addr( void )
 {
     uint8_t ga0, ga1, ga2;
     uint8_t index;
 
     /* Set the test pin and read all GA pins */
-    Chip_GPIO_SetPinState(LPC_GPIO, GA_PORT, GA_TEST_PIN, 1);
-    ga0 = Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA0_PIN);
-    ga1 = Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA1_PIN);
-    ga2 = Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA2_PIN);
+    Chip_GPIO_SetPinState(LPC_GPIO, GA_TEST_PORT, GA_TEST_PIN, 1);
+
+    /* when using NAMC-EXT-RTM at least 11 instruction cycles required
+     *  to have correct GA value after GA_TEST_PIN changes */
+    {
+		uint8_t i;
+		for (i = 0; i < GPIO_GA_DELAY; i++)
+			asm volatile ("nop");
+	}
+
+
+    ga0 = Chip_GPIO_GetPinState(LPC_GPIO, GA0_PORT, GA0_PIN);
+    ga1 = Chip_GPIO_GetPinState(LPC_GPIO, GA1_PORT, GA1_PIN);
+    ga2 = Chip_GPIO_GetPinState(LPC_GPIO, GA2_PORT, GA2_PIN);
 
     /* Clear the test pin and see if any GA pin has changed is value,
      * meaning that it is unconnected */
-    Chip_GPIO_SetPinState(LPC_GPIO, GA_PORT, GA_TEST_PIN, 0);
+    Chip_GPIO_SetPinState(LPC_GPIO, GA_TEST_PORT, GA_TEST_PIN, 0);
 
-    /*! @todo Add a delay before reading the pin, as some other users have reported
-     * that there's a 500ns "lag" in the Cortex-M3 IO, which could cause mistaken address readings.
-     * @see <https://groups.google.com/forum/#!topic/comp.arch.embedded/3r53OGmdCRQ>
-     */
+    /* when using NAMC-EXT-RTM at least 11 instruction cycles required
+     *  to have correct GA value after GA_TEST_PIN changes */
+    {
+		uint8_t i;
+		for (i = 0; i < GPIO_GA_DELAY; i++)
+			asm volatile ("nop");
+	}
 
-    if ( ga0 != Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA0_PIN) )
+
+    if ( ga0 != Chip_GPIO_GetPinState(LPC_GPIO, GA0_PORT, GA0_PIN) )
     {
         ga0 = UNCONNECTED;
     }
 
-    if ( ga1 != Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA1_PIN) )
+    if ( ga1 != Chip_GPIO_GetPinState(LPC_GPIO, GA1_PORT, GA1_PIN) )
     {
         ga1 = UNCONNECTED;
     }
 
-    if ( ga2 != Chip_GPIO_GetPinState(LPC_GPIO, GA_PORT, GA2_PIN) )
+    if ( ga2 != Chip_GPIO_GetPinState(LPC_GPIO, GA2_PORT, GA2_PIN) )
     {
         ga2 = UNCONNECTED;
     }
@@ -530,3 +545,5 @@ uint8_t get_ipmb_addr( void )
 
     return IPMBL_TABLE[index];
 }
+#undef GPIO_GA_DELAY
+

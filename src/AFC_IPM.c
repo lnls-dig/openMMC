@@ -233,7 +233,7 @@ static void prvHardwareInit ( void )
     Chip_GPIO_SetPinDIR(LPC_GPIO, ledGREEN_PORT, ledGREEN_PIN, true);
     Chip_GPIO_SetPinDIR(LPC_GPIO, ledRED_PORT, ledRED_PIN, true);
     /* Init GAddr test pin as output */
-    Chip_GPIO_SetPinDIR(LPC_GPIO, GA_PORT, GA_TEST_PIN, true);
+    Chip_GPIO_SetPinDIR(LPC_GPIO, GA_TEST_PORT, GA_TEST_PIN, true);
 }
 /*-----------------------------------------------------------*/
 /* FreeRTOS Debug Functions */
