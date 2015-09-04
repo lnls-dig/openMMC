@@ -215,6 +215,7 @@ ipmb_error ipmb_send_request ( ipmi_msg * req )
     req_cfg.buffer.src_LUN = 0;
     req_cfg.buffer.seq = current_seq++;
     req_cfg.caller_task = xTaskGetCurrentTaskHandle();
+    req_cfg.retries = 0;
 
     /* Blocks here until is able put message in tx queue */
     if (xQueueSend( ipmb_txqueue, &req_cfg, 1) != pdTRUE ){
