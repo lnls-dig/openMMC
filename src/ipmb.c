@@ -251,12 +251,7 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
     }
 
     /* Use this notification to block the function while the response does not arrive */
-    /* BUG: if you are using ticks wait you can not notify with value = 0 (ipmb_error_success)
-     * you can not distinct between timeout and ipmb_error_success */
-    if ( ulTaskNotifyTake( pdTRUE, 1000 ) != pdTRUE ){
-        return ipmb_error_failure;
-    }
-    return ipmb_error_success;
+    return ulTaskNotifyTake( pdTRUE, portMAX_DELAY )
 }
 
 /*! @brief Notifies the client that a new request has arrived and copies the message to its queue.
