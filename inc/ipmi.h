@@ -286,7 +286,7 @@
 #define IPMI_CC_ILLEGAL_COMMAND_DISABLED                        0xd6
 #define IPMI_CC_UNSPECIFIED_ERROR                               0xff
 
-typedef ipmi_msg (* t_req_handler)(ipmi_msg);
+typedef void (* t_req_handler)(ipmi_msg * req, ipmi_msg * resp);
 
 typedef struct{
   uint8_t netfn;
@@ -304,9 +304,9 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd);
 /* Handler functions */
 
 
-ipmi_msg ipmi_app_get_device_id ( ipmi_msg req );
-ipmi_msg ipmi_picmg_get_properties ( ipmi_msg req );
-ipmi_msg ipmi_se_set_receiver ( ipmi_msg req );
-ipmi_msg ipmi_picmg_set_led ( ipmi_msg req );
+void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg *rsp );
+void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp );
+void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp );
+void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp );
 
 #endif
