@@ -35,8 +35,9 @@
 #include "stdio.h"
 #include "string.h"
 
-/* Project includes */
-#include "i2c.h"
+/* Project includes */  
+//#include "i2c.h"
+#include "chip.h"
 #include "board_defs.h"
 
 /* Project definitions */
@@ -102,6 +103,79 @@ xI2C_Config i2c_cfg[] = {
     }
 };
 
+
+/* EEPROM SLAVE data */
+#define I2C_SLAVE_EEPROM_SIZE       64
+#define I2C_SLAVE_EEPROM_ADDR       0x3B
+#define I2C_SLAVE_IOX_ADDR          0x5B
+static I2C_XFER_T seep_xfer;
+static uint8_t seep_data[I2C_SLAVE_EEPROM_SIZE + 1];
+static uint8_t i2c_output_buffer[32 + 1];
+extern SemaphoreHandle_t ipmi_message_sent_sid;
+
+void IPMB_I2C_EventHandler(I2C_ID_T id, I2C_EVENT_T event)
+{
+    static BaseType_t xHigherPriorityTaskWoken;
+    if (event == I2C_EVENT_LOCK) {
+        return;
+    }
+
+    if (event == I2C_EVENT_DONE) {
+        xHigherPriorityTaskWoken = pdFALSE;
+        xSemaphoreGiveFromISR(ipmi_message_sent_sid, &xHigherPriorityTaskWoken);
+        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+    }
+}
+
+static void IPMB_events(I2C_ID_T id, I2C_EVENT_T event)
+{
+    uint8_t * ptr;
+    struct ipmi_msg_cfg p_ipmi_req;
+    switch(event) {
+    case I2C_EVENT_DONE:
+        seep_data[0] = seep_xfer.slaveAddr;
+
+        if (ipmb_decode(&p_ipmi_req, seep_data, seep_xfer.rxBuff - seep_data) == 0) {
+            if (p_ipmi_req.msg.netfn & 0x01) {
+                // handle response, not expecting any response
+                // @todo: event response handling for standard mmc code
+                //IPMI_free_fromISR(p_ipmi_req);
+                IPMI_put_event_response(p_ipmi_req);
+            } else {
+                // handle request
+                if (IPMI_req_queue_append_fromISR(p_ipmi_req)  != 0) {
+                    IPMI_free_fromISR(p_ipmi_req);
+                }
+            }
+        } else {
+            IPMI_free_fromISR(p_ipmi_req);
+        }
+
+        //DEBUGOUT_IPMB("CRC: %02x, %02x, %02x, %02x\r\n",ipmb_crc(seep_data, 3), ipmb_crc(seep_data, 2),ipmb_crc(seep_data, seep_xfer.rxBuff - seep_data ),ipmb_crc(seep_data, seep_xfer.rxBuff - seep_data -1 ));
+        seep_xfer.rxBuff = &seep_data[1];
+        seep_xfer.rxSz = 32;
+        break;
+
+    case I2C_EVENT_SLAVE_RX:
+        //if (seep_xfer.slaveAddr )
+        //DEBUGOUT_IPMB("%02X ", seep_xfer.rxBuff);
+        //pos++;
+        break;
+
+
+    case I2C_EVENT_SLAVE_TX:
+        // Tego nie obslugujemy w ipmb
+        seep_xfer.txSz = 0;
+        break;
+    default:
+        break;
+    }
+}
+
+
+
+
+#ifdef 0
 /*! @brief Array of mutexes to access #i2c_cfg global struct
  *
  * Each I2C interface has its own mutex and it must be taken
@@ -283,6 +357,7 @@ void vI2C_ISR( uint8_t i2c_id )
         portYIELD_FROM_ISR(pdTRUE);
     }
 }
+#endif
 
 void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 {
