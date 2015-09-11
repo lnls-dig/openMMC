@@ -58,10 +58,6 @@ xI2C_Config i2c_cfg[] = {
             .scl_pin = I2C0_SCL_PIN,
             .pin_func = I2C0_PIN_FUNC
         },
-        .master_task_id = NULL,
-        .slave_task_id = NULL,
-        .rx_cnt = 0,
-        .tx_cnt = 0,
     },
     {
         .reg = LPC_I2C1,
@@ -74,10 +70,6 @@ xI2C_Config i2c_cfg[] = {
             .scl_pin = I2C1_SCL_PIN,
             .pin_func = I2C1_PIN_FUNC
         },
-        .master_task_id = NULL,
-        .slave_task_id = NULL,
-        .rx_cnt = 0,
-        .tx_cnt = 0,
     },
     {
         .reg = LPC_I2C2,
@@ -90,10 +82,6 @@ xI2C_Config i2c_cfg[] = {
             .scl_pin = I2C2_SCL_PIN,
             .pin_func = I2C2_PIN_FUNC
         },
-        .master_task_id = NULL,
-        .slave_task_id = NULL,
-        .rx_cnt = 0,
-        .tx_cnt = 0,
     }
 };
 
