@@ -93,11 +93,11 @@ xI2C_Config i2c_cfg[] = {
  */
 static SemaphoreHandle_t I2C_mutex[3];
 
+uint8_t ipmb_addr;
 
 void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 {
     char pcI2C_Tag[4];
-    uint8_t sla_addr;
 
     sprintf( pcI2C_Tag, "I2C%u", i2c_id );
     /*! @todo Maybe wrap these functions, or use some board-specific defines
@@ -106,7 +106,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
      * @code
      * #define PIN_FUNC_CFG( port, pin, func ) Chip_IOCON_PinMux(...)
      * @endcode
-    */
+     */
     Chip_IOCON_PinMux( LPC_IOCON, i2c_cfg[i2c_id].pins.sda_port, i2c_cfg[i2c_id].pins.sda_pin, IOCON_MODE_INACT, i2c_cfg[i2c_id].pins.pin_func );
     Chip_IOCON_PinMux( LPC_IOCON, i2c_cfg[i2c_id].pins.scl_port, i2c_cfg[i2c_id].pins.scl_pin, IOCON_MODE_INACT, i2c_cfg[i2c_id].pins.pin_func );
     Chip_IOCON_EnableOD( LPC_IOCON, i2c_cfg[i2c_id].pins.sda_port, i2c_cfg[i2c_id].pins.sda_pin );
@@ -132,7 +132,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 
     if ( mode == I2C_Mode_IPMB ) {
         /* Configure Slave Address */
-        sla_addr = get_ipmb_addr( );
+        ipmb_addr = get_ipmb_addr( );
 
         port_I2C_Slave_Setup( i2c_id, ipmb_addr, i2c_cfg[i2c_id].msg.rx_data, i2cMAX_MSG_LENGTH );
 
@@ -144,7 +144,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
  *==============================================================
  * MMC ADDRESSING
  *==============================================================
-*/
+ */
 
 /*! @brief Table holding all possible address values in IPMB specification
  * @see get_ipmb_addr()
@@ -154,7 +154,7 @@ unsigned char IPMBL_TABLE[IPMBL_TABLE_SIZE] = {
     0x98, 0x9C, 0x9A, 0xA0, 0xA4, 0x88, 0x9E, 0x86, 0x84,
     0x78, 0x94, 0x7A, 0x96, 0x82, 0x80, 0x7C, 0x7E, 0xA2 };
 
-/*! The state of each GA signal is represented by G (grounded), U (unconnected), 
+/*! The state of each GA signal is represented by G (grounded), U (unconnected),
  *  or P (pulled up to Management Power).
  *
  *  The MMC drives P1 low and reads the GA lines. The MMC then drives P1 high and
@@ -194,6 +194,7 @@ unsigned char IPMBL_TABLE[IPMBL_TABLE_SIZE] = {
  *  | UUU | 222 | 26 | 0xA2 |
  */
 #define GPIO_GA_DELAY 10
+
 uint8_t get_ipmb_addr( void )
 {
     uint8_t ga0, ga1, ga2;
@@ -205,11 +206,11 @@ uint8_t get_ipmb_addr( void )
     /* when using NAMC-EXT-RTM at least 11 instruction cycles required
      *  to have correct GA value after GA_TEST_PIN changes */
     {
-		uint8_t i;
-		for (i = 0; i < GPIO_GA_DELAY; i++)
-			asm volatile ("nop");
-	}
-
+        uint8_t i;
+        for (i = 0; i < GPIO_GA_DELAY; i++){
+            __asm volatile ("nop");
+        }
+    }
 
     ga0 = Chip_GPIO_GetPinState(LPC_GPIO, GA0_PORT, GA0_PIN);
     ga1 = Chip_GPIO_GetPinState(LPC_GPIO, GA1_PORT, GA1_PIN);
@@ -222,36 +223,31 @@ uint8_t get_ipmb_addr( void )
     /* when using NAMC-EXT-RTM at least 11 instruction cycles required
      *  to have correct GA value after GA_TEST_PIN changes */
     {
-		uint8_t i;
-		for (i = 0; i < GPIO_GA_DELAY; i++)
-			asm volatile ("nop");
-	}
+        uint8_t i;
+        for (i = 0; i < GPIO_GA_DELAY; i++)
+            __asm volatile ("nop");
+    }
 
 
-    if ( ga0 != Chip_GPIO_GetPinState(LPC_GPIO, GA0_PORT, GA0_PIN) )
-    {
+    if ( ga0 != Chip_GPIO_GetPinState(LPC_GPIO, GA0_PORT, GA0_PIN) ){
         ga0 = UNCONNECTED;
     }
 
-    if ( ga1 != Chip_GPIO_GetPinState(LPC_GPIO, GA1_PORT, GA1_PIN) )
-    {
+    if ( ga1 != Chip_GPIO_GetPinState(LPC_GPIO, GA1_PORT, GA1_PIN) ){
         ga1 = UNCONNECTED;
     }
 
-    if ( ga2 != Chip_GPIO_GetPinState(LPC_GPIO, GA2_PORT, GA2_PIN) )
-    {
+    if ( ga2 != Chip_GPIO_GetPinState(LPC_GPIO, GA2_PORT, GA2_PIN) ){
         ga2 = UNCONNECTED;
     }
 
     /* Transform the 3-based code in a decimal number */
     index = (9 * ga2) + (3 * ga1) + (1 * ga0);
 
-    if ( index >= IPMBL_TABLE_SIZE )
-    {
+    if ( index >= IPMBL_TABLE_SIZE ){
         return 0;
     }
 
     return IPMBL_TABLE[index];
 }
 #undef GPIO_GA_DELAY
-

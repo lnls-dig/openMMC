@@ -110,6 +110,7 @@ typedef struct xI2C_Config {
 /*! Global I2C Configuration struct array (1 item for each interface) */
 extern struct xI2C_Config i2c_cfg[];
 
+extern uint8_t ipmb_addr;
 
 /***********************/
 /* Function Prototypes */
