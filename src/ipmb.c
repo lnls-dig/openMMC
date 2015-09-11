@@ -402,6 +402,7 @@ ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
     }
     msg->data_len = len - i;
     memcpy( &msg->data[0], &buffer[i], msg->data_len);
+    msg->msg_chksum = buffer[len-1];
 
     return ipmb_error_success;
 }
