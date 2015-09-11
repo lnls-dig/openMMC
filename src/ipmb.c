@@ -87,14 +87,14 @@ void IPMB_TXTask ( void * pvParameters )
       /**********************************/
       /* Try sending the message	*/
       /**********************************/
+            if ( xI2CMasterWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], current_msg_tx.buffer.data_len + IPMB_RESP_HEADER_LENGTH ) != i2c_err_SUCCESS ) {
+                /* Message couldn't be transmitted right now, increase retry counter and try again later */
+                current_msg_tx.retries++;
+                xQueueSendToFront( ipmb_txqueue, &current_msg_tx, 0 );
 
       /* Encode the message buffer to the IPMB format */
       ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx.buffer );
 
-      if ( xI2CWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], current_msg_tx.buffer.data_len + IPMB_RESP_HEADER_LENGTH ) != i2c_err_SUCCESS ) {
-	/* Message couldn't be transmitted right now, increase retry counter and try again later */
-	current_msg_tx.retries++;
-	xQueueSendToFront( ipmb_txqueue, &current_msg_tx, 0 );
 
       }else{
 	/* Success case*/
@@ -111,10 +111,15 @@ void IPMB_TXTask ( void * pvParameters )
       if ( current_msg_tx.retries == 0 ) {
 	current_msg_tx.timestamp = xTaskGetTickCount();
       }
+            if ( xI2CMasterWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], current_msg_tx.buffer.data_len + IPMB_REQ_HEADER_LENGTH ) != i2c_err_SUCCESS) {
 
-      ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx.buffer );
+                current_msg_tx.retries++;
 
-      if ( xI2CWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], current_msg_tx.buffer.data_len + IPMB_REQ_HEADER_LENGTH ) != i2c_err_SUCCESS) {
+                if ( current_msg_tx.retries > IPMB_MAX_RETRIES ){
+                    xTaskNotify ( current_msg_tx.caller_task, ipmb_error_failure, eSetValueWithOverwrite);
+                } else {
+                    xQueueSendToFront( ipmb_txqueue, &current_msg_tx, 0 );
+                }
 
 	current_msg_tx.retries++;
 

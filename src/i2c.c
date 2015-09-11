@@ -35,21 +35,15 @@
 #include "stdio.h"
 #include "string.h"
 
-/* Project includes */  
-//#include "i2c.h"
+/* Project includes */
+#include "i2c.h"
+#include "ipmb.h"
+#include "ipmi.h"
 #include "chip.h"
 #include "board_defs.h"
+#include "port.h"
 
 /* Project definitions */
-/*! @todo Move these definitions to a LPC17x specific header, so we have a more generic macro */
-#define I2CSTAT( id )               LPC_I2Cx(id)->STAT
-#define I2CCONSET( id, val )        LPC_I2Cx(id)->CONSET = val
-#define I2CCONCLR( id, val )        LPC_I2Cx(id)->CONCLR = val
-#define I2CDAT_WRITE( id, val )     LPC_I2Cx(id)->DAT = val
-#define I2CDAT_READ( id )           LPC_I2Cx(id)->DAT
-#define I2CADDR_WRITE( id, val )    LPC_I2Cx(id)->ADR0 = val
-#define I2CADDR_READ( id )          LPC_I2Cx(id)->ADR0
-#define I2CMASK( id, val )          LPC_I2Cx(id)->MASK[0] = val
 
 /*! @brief Configuration struct for each I2C interface */
 xI2C_Config i2c_cfg[] = {
@@ -103,79 +97,6 @@ xI2C_Config i2c_cfg[] = {
     }
 };
 
-
-/* EEPROM SLAVE data */
-#define I2C_SLAVE_EEPROM_SIZE       64
-#define I2C_SLAVE_EEPROM_ADDR       0x3B
-#define I2C_SLAVE_IOX_ADDR          0x5B
-static I2C_XFER_T seep_xfer;
-static uint8_t seep_data[I2C_SLAVE_EEPROM_SIZE + 1];
-static uint8_t i2c_output_buffer[32 + 1];
-extern SemaphoreHandle_t ipmi_message_sent_sid;
-
-void IPMB_I2C_EventHandler(I2C_ID_T id, I2C_EVENT_T event)
-{
-    static BaseType_t xHigherPriorityTaskWoken;
-    if (event == I2C_EVENT_LOCK) {
-        return;
-    }
-
-    if (event == I2C_EVENT_DONE) {
-        xHigherPriorityTaskWoken = pdFALSE;
-        xSemaphoreGiveFromISR(ipmi_message_sent_sid, &xHigherPriorityTaskWoken);
-        portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-    }
-}
-
-static void IPMB_events(I2C_ID_T id, I2C_EVENT_T event)
-{
-    uint8_t * ptr;
-    struct ipmi_msg_cfg p_ipmi_req;
-    switch(event) {
-    case I2C_EVENT_DONE:
-        seep_data[0] = seep_xfer.slaveAddr;
-
-        if (ipmb_decode(&p_ipmi_req, seep_data, seep_xfer.rxBuff - seep_data) == 0) {
-            if (p_ipmi_req.msg.netfn & 0x01) {
-                // handle response, not expecting any response
-                // @todo: event response handling for standard mmc code
-                //IPMI_free_fromISR(p_ipmi_req);
-                IPMI_put_event_response(p_ipmi_req);
-            } else {
-                // handle request
-                if (IPMI_req_queue_append_fromISR(p_ipmi_req)  != 0) {
-                    IPMI_free_fromISR(p_ipmi_req);
-                }
-            }
-        } else {
-            IPMI_free_fromISR(p_ipmi_req);
-        }
-
-        //DEBUGOUT_IPMB("CRC: %02x, %02x, %02x, %02x\r\n",ipmb_crc(seep_data, 3), ipmb_crc(seep_data, 2),ipmb_crc(seep_data, seep_xfer.rxBuff - seep_data ),ipmb_crc(seep_data, seep_xfer.rxBuff - seep_data -1 ));
-        seep_xfer.rxBuff = &seep_data[1];
-        seep_xfer.rxSz = 32;
-        break;
-
-    case I2C_EVENT_SLAVE_RX:
-        //if (seep_xfer.slaveAddr )
-        //DEBUGOUT_IPMB("%02X ", seep_xfer.rxBuff);
-        //pos++;
-        break;
-
-
-    case I2C_EVENT_SLAVE_TX:
-        // Tego nie obslugujemy w ipmb
-        seep_xfer.txSz = 0;
-        break;
-    default:
-        break;
-    }
-}
-
-
-
-
-#ifdef 0
 /*! @brief Array of mutexes to access #i2c_cfg global struct
  *
  * Each I2C interface has its own mutex and it must be taken
@@ -184,180 +105,6 @@ static void IPMB_events(I2C_ID_T id, I2C_EVENT_T event)
  */
 static SemaphoreHandle_t I2C_mutex[3];
 
-void vI2C_ISR( uint8_t i2c_id );
-
-void I2C0_IRQHandler( void )
-{
-    vI2C_ISR( I2C0 );
-}
-
-void I2C1_IRQHandler( void )
-{
-    vI2C_ISR( I2C1 );
-}
-
-void I2C2_IRQHandler( void )
-{
-    vI2C_ISR( I2C2 );
-}
-
-#define I2C_CON_FLAGS (I2C_AA | I2C_SI | I2C_STO | I2C_STA)
-
-
-/*! @brief I2C common interrupt service routine
- *
- * I2STAT register is handled inside this function, a state-machine-like implementation for I2C interface.
- *    
- * When a full message is trasmitted or received, the task whose handle is written to #i2c_cfg is notified, unblocking it. It also happens when an error occurs.
- * @warning Slave Transmitter mode states are not implemented in this driver and are just ignored.
- */
-void vI2C_ISR( uint8_t i2c_id )
-{
-    /* Declare local variables */
-    portBASE_TYPE xI2CSemaphoreWokeTask;
-
-    /* Initialize variables */
-    xI2CSemaphoreWokeTask = pdFALSE;
-    uint32_t cclr = I2C_CON_FLAGS;
-
-    /* I2C status handling */
-    switch ( I2CSTAT( i2c_id ) ){
-    case I2C_STAT_START:
-    case I2C_STAT_REPEATED_START:
-        i2c_cfg[i2c_id].rx_cnt = 0;
-        i2c_cfg[i2c_id].tx_cnt = 0;
-        /* Write Slave Address in the I2C bus, if there's nothing
-         * to transmit, the last bit (R/W) will be set to 1 */
-        I2CDAT_WRITE( i2c_id, ( i2c_cfg[i2c_id].msg.addr << 1 ) | ( i2c_cfg[i2c_id].msg.tx_len == 0 ) );
-        break;
-
-    case I2C_STAT_SLA_W_SENT_ACK:
-        /* Send first data byte */
-        I2CDAT_WRITE( i2c_id, i2c_cfg[i2c_id].msg.tx_data[i2c_cfg[i2c_id].tx_cnt] );
-        i2c_cfg[i2c_id].tx_cnt++;
-        break;
-
-    case I2C_STAT_SLA_W_SENT_NACK:
-        cclr &= ~I2C_STO;
-        i2c_cfg[i2c_id].msg.error = i2c_err_SLA_W_SENT_NACK;
-        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
-        break;
-
-    case I2C_STAT_DATA_SENT_ACK:
-        /* Transmit the remaining bytes */
-        if ( i2c_cfg[i2c_id].msg.tx_len != i2c_cfg[i2c_id].tx_cnt ){
-            I2CDAT_WRITE( i2c_id, i2c_cfg[i2c_id].msg.tx_data[i2c_cfg[i2c_id].tx_cnt] );
-            i2c_cfg[i2c_id].tx_cnt++;
-        } else {
-            /* If there's no more data to be transmitted,
-             * finish the communication and notify the caller task */
-            cclr &= ~I2C_STO;
-            vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
-        }
-        break;
-
-    case I2C_STAT_DATA_SENT_NACK:
-        cclr &= ~I2C_STO;
-        i2c_cfg[i2c_id].msg.error = i2c_err_DATA_SENT_NACK;
-        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
-
-    case I2C_STAT_SLA_R_SENT_ACK:
-        /* SLA+R has been transmitted and ACK'd
-         * If we want to receive only 1 byte, return NACK on the next byte */
-        if ( i2c_cfg[i2c_id].msg.rx_len > 1 ){
-             /* If we expect to receive more than 1 byte,
-             * return ACK on the next byte */
-            cclr &= ~I2C_AA;
-        }
-        break;
-
-    case I2C_STAT_DATA_RECV_ACK:
-        if ( i2c_cfg[i2c_id].rx_cnt < i2cMAX_MSG_LENGTH - 1 ){
-            i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
-            i2c_cfg[i2c_id].rx_cnt++;
-            if (i2c_cfg[i2c_id].rx_cnt != (i2c_cfg[i2c_id].msg.rx_len) - 1 ){
-                cclr &= ~I2C_AA;
-            }
-        }
-        break;
-
-    case I2C_STAT_DATA_RECV_NACK:
-        i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
-        i2c_cfg[i2c_id].rx_cnt++;
-        cclr &= ~I2C_STO;
-        /* There's no more data to be received */
-        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
-        break;
-
-    case I2C_STAT_SLA_R_SENT_NACK:
-	cclr &= ~I2C_STO;
-        /* Notify the error */
-        i2c_cfg[i2c_id].msg.error = i2c_err_SLA_R_SENT_NACK;
-        vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].master_task_id, &xI2CSemaphoreWokeTask );
-        break;
-
-        /* Slave Mode */
-    case I2C_STAT_SLA_W_RECV_ACK:
-    case I2C_STAT_ARB_LOST_SLA_W_RECV_ACK:
-
-	    i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
-        i2c_cfg[i2c_id].rx_cnt = 0;
-
-        if ( i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ){
-  	        i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CADDR_READ(i2c_id);
-		    cclr &= ~I2C_AA;
-		    i2c_cfg[i2c_id].rx_cnt++;
-        }
-		
-        break;
-
-    case I2C_STAT_SLA_DATA_RECV_ACK:
-        /* Checks if the buffer is full */
-        if ( i2c_cfg[i2c_id].rx_cnt < i2cMAX_MSG_LENGTH ){
-            i2c_cfg[i2c_id].msg.rx_data[i2c_cfg[i2c_id].rx_cnt] = I2CDAT_READ( i2c_id );
-            i2c_cfg[i2c_id].rx_cnt++;
-            cclr &= ~I2C_AA;
-        }
-        break;
-
-    case I2C_STAT_SLA_DATA_RECV_NACK:
-        cclr &= ~I2C_AA;
-        i2c_cfg[i2c_id].msg.error = i2c_err_SLA_DATA_RECV_NACK;
-        break;
-
-    case I2C_STAT_SLA_STOP_REP_START:
-        i2c_cfg[i2c_id].msg.rx_len = i2c_cfg[i2c_id].rx_cnt;
-        if (((i2c_cfg[i2c_id].rx_cnt > 0) && (i2c_cfg[i2c_id].mode == I2C_Mode_Local_Master ))) {
-        		vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].slave_task_id, &xI2CSemaphoreWokeTask );
-    	}
-        if (((i2c_cfg[i2c_id].rx_cnt > 1) && (i2c_cfg[i2c_id].mode == I2C_Mode_IPMB ))) {
-            vTaskNotifyGiveFromISR( i2c_cfg[i2c_id].slave_task_id, &xI2CSemaphoreWokeTask );
-        }
-
-        cclr &= ~I2C_AA;
-        break;
-
-    case I2C_STATUS_BUSERR:
-	    cclr &= ~I2C_STO;
-		break;
-	
-    default:
-	    break;
-    }
-
-	if (!(cclr & I2C_CON_STO)) {
-	    cclr &= ~I2C_CON_AA;
-
-	}
-	I2CCONSET(i2c_id, cclr ^ I2C_CON_FLAGS);
-	I2CCONCLR(i2c_id, cclr);
-	asm("nop");
-	
-    if (xI2CSemaphoreWokeTask == pdTRUE) {
-        portYIELD_FROM_ISR(pdTRUE);
-    }
-}
-#endif
 
 void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
 {
@@ -395,123 +142,15 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
     Chip_I2C_Init( i2c_id );
     Chip_I2C_SetClockRate( i2c_id, 100000 );
 
-    /* Enable I2C interface (Master Mode only) */
-    I2CCONSET( i2c_id, I2C_I2EN );
-
-    if ( mode == I2C_Mode_IPMB )
-    {
+    if ( mode == I2C_Mode_IPMB ) {
         /* Configure Slave Address */
         sla_addr = get_ipmb_addr( );
-        I2CADDR_WRITE( i2c_id, sla_addr );
 
-        /* Configure Slave Address Mask */
-        I2CMASK( i2c_id, 0xFE);
+        port_I2C_Slave_Setup( i2c_id, ipmb_addr, i2c_cfg[i2c_id].msg.rx_data, i2cMAX_MSG_LENGTH );
 
-        /* Enable slave mode */
-        I2CCONSET( i2c_id, I2C_AA );
     }
-
-    /* Clear I2C0 interrupt (just in case) */
-    I2CCONCLR( i2c_id, I2C_SI );
 
 } /* End of vI2C_Init */
-
-i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len )
-{
-    /* Checks if the message will fit in our buffer */
-    if ( tx_len >= i2cMAX_MSG_LENGTH ) {
-        return i2c_err_MAX_LENGTH;
-    }
-
-    /* Take the mutex to access the shared memory */
-    if (xSemaphoreTake( I2C_mutex[i2c_id], 10 ) == pdTRUE) {
-
-    /* Populate the i2c config struct */
-    i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
-    i2c_cfg[i2c_id].msg.addr = addr;
-    memcpy(i2c_cfg[i2c_id].msg.tx_data, tx_data, tx_len);
-    i2c_cfg[i2c_id].msg.tx_len = tx_len;
-    i2c_cfg[i2c_id].msg.rx_len = 0;
-    i2c_cfg[i2c_id].master_task_id = xTaskGetCurrentTaskHandle();
-
-    xSemaphoreGive( I2C_mutex[i2c_id] );
-    } else {
-    	return i2c_err_FAILURE;
-    }
-
-    /* Trigger the i2c interruption */
-    /* @bug Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
-    I2CCONCLR( i2c_id, ( I2C_SI | I2C_STO | I2C_STA | I2C_AA));
-    I2CCONSET( i2c_id, ( I2C_I2EN | I2C_STA ) );
-
-    if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) == pdTRUE ){
-        /* Include the error in i2c_cfg global structure */
-        return i2c_cfg[i2c_id].msg.error;
-    }
-
-    /* Should not get here, so return failure */
-    return i2c_err_FAILURE;
-}
-
-i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len )
-{
-    /* Take the mutex to access shared memory */
-    xSemaphoreTake( I2C_mutex[i2c_id], portMAX_DELAY );
-
-    i2c_cfg[i2c_id].msg.i2c_id = i2c_id;
-    i2c_cfg[i2c_id].msg.addr = addr;
-    i2c_cfg[i2c_id].msg.tx_len = 0;
-    i2c_cfg[i2c_id].msg.rx_len = rx_len;
-    i2c_cfg[i2c_id].master_task_id = xTaskGetCurrentTaskHandle();
-
-    xSemaphoreGive( I2C_mutex[i2c_id] );
-
-    /* Trigger the i2c interruption */
-    /* Is it safe to set the flag right now? Won't it stop another ongoing message that is being received for example? */
-    I2CCONSET( i2c_id, ( I2C_I2EN | I2C_STA ) );
-
-    /* Wait here until the message is received */
-    if ( ulTaskNotifyTake( pdTRUE, portMAX_DELAY ) == pdTRUE ){
-        /* Debug asserts */
-        configASSERT(rx_data);
-        configASSERT(i2c_cfg[i2c_id].msg.rx_data);
-
-        xSemaphoreTake( I2C_mutex[i2c_id], portMAX_DELAY );
-        /* Copy the received message to the given pointer */
-        memcpy (rx_data, i2c_cfg[i2c_id].msg.rx_data, i2c_cfg[i2c_id].msg.rx_len );
-        xSemaphoreGive( I2C_mutex[i2c_id] );
-    }
-    return i2c_cfg[i2c_id].msg.error;
-}
-
-uint8_t xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout )
-{
-    /* Take the mutex to access shared memory */
-    xSemaphoreTake( I2C_mutex[i2c_id], portMAX_DELAY );
-
-    /* Register this task as the one to be notified when a message comes */
-    i2c_cfg[i2c_id].slave_task_id = xTaskGetCurrentTaskHandle();
-
-    /* Relase mutex */
-    xSemaphoreGive( I2C_mutex[i2c_id] );
-
-    /* Function blocks here until a message is received */
-    if ( ulTaskNotifyTake( pdTRUE, timeout ) == pdTRUE )
-    {
-            /* Debug asserts */
-            configASSERT(rx_data);
-            configASSERT(i2c_cfg[i2c_id].msg.rx_data);
-
-            xSemaphoreTake( I2C_mutex[i2c_id], portMAX_DELAY );
-            /* Copy the rx buffer to the pointer given */
-            memcpy( rx_data, i2c_cfg[i2c_id].msg.rx_data, i2c_cfg[i2c_id].msg.rx_len );
-            xSemaphoreGive( I2C_mutex[i2c_id] );
-    } else {
-        return 0;
-    }
-    /* Return message length */
-    return i2c_cfg[i2c_id].msg.rx_len;
-}
 
 /*
  *==============================================================

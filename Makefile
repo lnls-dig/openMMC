@@ -40,6 +40,7 @@ FREERTOS_INCPATH = $(FREERTOS_PATH)/include
 FREERTOS_OBJS = $(FREERTOS_SRC:%.c=%.o)
 
 INCLUDES = -I./inc
+INCLUDES += -I./port/nxp/lpc17xx
 INCLUDES += -I$(LPCOPEN_INCPATH)
 INCLUDES += -I$(FREERTOS_INCPATH)
 
@@ -53,7 +54,7 @@ LIBS += -lgcc -lc -lm -l$(FREERTOS_LIBNAME) -l$(LPCOPEN_LIBNAME)
 
 DEPS = -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)"
 
-PROJ_SRCDIR = src
+PROJ_SRCDIR = src port
 PROJ_SRC = $(shell find $(PROJ_SRCDIR) -name '*.c')
 PROJ_OBJS = $(PROJ_SRC:%.c=%.o)
 
