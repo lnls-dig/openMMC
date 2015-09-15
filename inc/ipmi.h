@@ -309,4 +309,7 @@ void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp );
 void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp );
 void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp );
 
+void ipmi_storage_get_fru_inventory( ipmi_msg *req, ipmi_msg *rsp );
+void ipmi_storage_read_fru_data( ipmi_msg *req, ipmi_msg *rsp );
+
 #endif

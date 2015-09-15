@@ -44,26 +44,36 @@ struct req_param_struct{
 
 #define MAX_HANDLERS 20
 t_req_handler_record handlers[MAX_HANDLERS]={
-  {
-    .netfn	 = NETFN_GRPEXT,
-    .cmd	 = IPMI_PICMG_CMD_GET_PROPERTIES,
-    .req_handler = ipmi_picmg_get_properties
-  },
-  {
-    .netfn	 = NETFN_GRPEXT,
-    .cmd	 = IPMI_PICMG_CMD_SET_FRU_LED_STATE,
-    .req_handler = ipmi_picmg_set_led
-  },
-  {
-    .netfn	 = NETFN_SE,
-    .cmd	 = IPMI_SET_EVENT_RECEIVER_CMD,
-    .req_handler = ipmi_se_set_receiver
-  },
-  {
-    .netfn	 = NETFN_APP,
-    .cmd	 = IPMI_GET_DEVICE_ID_CMD,
-    .req_handler = ipmi_app_get_device_id
-  }
+    {
+        .netfn   = NETFN_GRPEXT,
+        .cmd     = IPMI_PICMG_CMD_GET_PROPERTIES,
+        .req_handler = ipmi_picmg_get_properties
+    },
+    {
+        .netfn   = NETFN_GRPEXT,
+        .cmd     = IPMI_PICMG_CMD_SET_FRU_LED_STATE,
+        .req_handler = ipmi_picmg_set_led
+    },
+    {
+        .netfn   = NETFN_SE,
+        .cmd     = IPMI_SET_EVENT_RECEIVER_CMD,
+        .req_handler = ipmi_se_set_receiver
+    },
+    {
+        .netfn   = NETFN_APP,
+        .cmd     = IPMI_GET_DEVICE_ID_CMD,
+        .req_handler = ipmi_app_get_device_id
+    },
+    {
+        .netfn   = NETFN_STORAGE,
+        .cmd     = IPMI_GET_FRU_INVENTORY_AREA_INFO_CMD,
+        .req_handler = ipmi_storage_get_fru_inventory
+    },
+    {
+        .netfn   = NETFN_STORAGE,
+        .cmd     = IPMI_READ_FRU_DATA_CMD,
+        .req_handler = ipmi_storage_read_fru_data
+    }
 };
 
 

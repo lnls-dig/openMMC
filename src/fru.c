@@ -44,8 +44,7 @@ const char default_fru[136]/* __attribute__ ((section (".FRU")))*/ = {
 void fru_read_to_buffer(char *buff, int offset, int length) {
     int i;
     int j = offset;
-    //char *write_buffer = buff;
-    //char *read_buffer = default_fru+offset;
+
     for (i = 0; i<length; i++, j++ ) {
         if (j < sizeof(default_fru)) {
             buff[i] = default_fru[j];
