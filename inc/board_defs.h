@@ -22,11 +22,9 @@
 #ifndef BOARD_DEFS_H_
 #define BOARD_DEFS_H_
 
-//#ifndef BOARD
-#define BOARD           MBED
-//#endif
+#define AFC_V3
 
-#if (BOARD == AFC_V3)
+#ifdef AFC_V3
 
 /* I2C Pins definitions */
 
@@ -46,23 +44,25 @@
 #define I2C2_PIN_FUNC   2
 
 /* Geographic Address pin definitions */
-#define GA0_PORT         1
-#define GA1_PORT         1
-#define GA2_PORT         1
+#define GA0_PORT        1
+#define GA1_PORT        1
+#define GA2_PORT        1
 #define GA_TEST_PORT    1
 #define GA0_PIN         0
 #define GA1_PIN         1
 #define GA2_PIN         4
 #define GA_TEST_PIN     8
 
-#define ledBLUE_PORT    1
-#define ledBLUE_PIN     9
-#define ledGREEN_PORT   1
-#define ledGREEN_PIN    10
-#define ledRED_PORT     1
-#define ledRED_PIN      25
+#define LEDBLUE_PORT    1
+#define LEDBLUE_PIN     9
+#define LEDGREEN_PORT   1
+#define LEDGREEN_PIN    10
+#define LEDRED_PORT     1
+#define LEDRED_PIN      25
+#define LED_PIN_FUNC    0
+#endif
 
-#elif (BOARD == MBED)
+#ifdef MBED
 
 /* I2C Pins definitions */
 
@@ -88,12 +88,12 @@
 #define GA2_PIN         4
 #define GA_TEST_PIN     8
 
-#define ledBLUE_PORT    1
-#define ledBLUE_PIN     18
-#define ledGREEN_PORT   1
-#define ledGREEN_PIN    20
-#define ledRED_PORT     1
-#define ledRED_PIN      21
+#define LEDBLUE_PORT    1
+#define LEDBLUE_PIN     18
+#define LEDGREEN_PORT   1
+#define LEDGREEN_PIN    20
+#define LEDRED_PORT     1
+#define LEDRED_PIN      21
 
 #endif
 

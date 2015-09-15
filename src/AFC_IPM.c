@@ -32,6 +32,7 @@
 #include "led.h"
 #include "ipmb.h"
 #include "ipmi.h"
+#include "port.h"
 
 /* Priorities at which the tasks are created. */
 #define mainIPMBTEST_TASK_PRIORITY          ( IPMB_RXTASK_PRIORITY - 1 )
@@ -48,6 +49,7 @@
 //#define DEBUG_I2C0
 //#define DEBUG_I2C1
 //#define DEBUG_IPMB
+#define DEBUG_LED
 #define DEBUG_IPMI
 
 /* Tasks function prototypes */
@@ -85,6 +87,10 @@ int main(void)
 #ifdef DEBUG_IPMB
     ipmb_init();
     xTaskCreate ( IPMBTestTask, (const char*)"IPMB Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainIPMBTEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
+#endif
+
+#ifdef DEBUG_LED
+    LED_init();
 #endif
 
 #ifdef DEBUG_IPMI
@@ -199,19 +205,19 @@ void prvToggleLED( LED_id led )
 
     switch( led ){
         case LED_BLUE:
-            ulLEDport = ledBLUE_PORT;
-            ulLEDpin = ledBLUE_PIN;
+            ulLEDport = LEDBLUE_PORT;
+            ulLEDpin = LEDBLUE_PIN;
             break;
 
-        case LED_GREEN:
-            ulLEDport = ledGREEN_PORT;
-            ulLEDpin = ledGREEN_PIN;
-            break;
+    case LED_GREEN:
+	ulLEDport = LEDGREEN_PORT;
+	ulLEDpin = LEDGREEN_PIN;
+	break;
 
-        case LED_RED:
-            ulLEDport = ledRED_PORT;
-            ulLEDpin = ledRED_PIN;
-            break;
+    case LED_RED:
+	ulLEDport = LEDRED_PORT;
+	ulLEDpin = LEDRED_PIN;
+	break;
     }
     /* Obtain the current P0 state. */
     ulLEDState = Chip_GPIO_GetPinState(LPC_GPIO, ulLEDport, ulLEDpin);
@@ -229,9 +235,9 @@ static void prvHardwareInit ( void )
     /* Init LED Pin */
     Chip_GPIO_Init(LPC_GPIO);
     /* Set pin as output */
-    Chip_GPIO_SetPinDIR(LPC_GPIO, ledBLUE_PORT, ledBLUE_PIN, true);
-    Chip_GPIO_SetPinDIR(LPC_GPIO, ledGREEN_PORT, ledGREEN_PIN, true);
-    Chip_GPIO_SetPinDIR(LPC_GPIO, ledRED_PORT, ledRED_PIN, true);
+    Chip_GPIO_SetPinDIR(LPC_GPIO, LEDBLUE_PORT, LEDBLUE_PIN, true);
+    Chip_GPIO_SetPinDIR(LPC_GPIO, LEDGREEN_PORT, LEDGREEN_PIN, true);
+    Chip_GPIO_SetPinDIR(LPC_GPIO, LEDRED_PORT, LEDRED_PIN, true);
     /* Init GAddr test pin as output */
     Chip_GPIO_SetPinDIR(LPC_GPIO, GA_TEST_PORT, GA_TEST_PIN, true);
 }
