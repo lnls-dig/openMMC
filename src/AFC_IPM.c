@@ -73,6 +73,12 @@ int main(void)
 {
     /* Configure LED pins */
     prvHardwareInit();
+//#define STOP_TEST
+#ifdef STOP_TEST
+    int test = 0;
+    while (test == 0)
+    {}
+#endif
     /* Create project's tasks */
 #ifdef DEBUG_I2C0
     vI2CInit(I2C0, I2C_Mode_IPMB);
