@@ -194,11 +194,8 @@ void LEDTask ( void * pvParameters )
 
 void LED_init (void)
 {
-    char ledmutex_str[10];
     for (int i = 0; i<LED_CNT; i++){
         LEDMutex[i] = xSemaphoreCreateMutex();
-        sprintf(ledmutex_str, "LEDMutex%u", i);
-        vQueueAddToRegistry(LEDMutex[i], ledmutex_str);
     }
     xTaskCreate( LEDTask, (const char *) "LED Task", configMINIMAL_STACK_SIZE*2, (void * ) NULL, LED_TASK_PRIORITY, ( TaskHandle_t * ) NULL);
     /*! @todo Handle task creation error */
