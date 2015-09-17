@@ -19,17 +19,10 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* FreeRTOS includes */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-
 /* C Standard includes */
 #include "string.h"
 
 /* Project includes */
-#include "ipmb.h"
 #include "ipmi.h"
 #include "board_defs.h"
 #include "led.h"
