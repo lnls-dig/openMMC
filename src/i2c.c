@@ -27,24 +27,16 @@
 
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
-#include "task.h"
+/*#include "task.h"
 #include "queue.h"
 #include "semphr.h"
-
-/* C Standard includes */
-#include "stdio.h"
-#include "string.h"
-
+*/
 /* Project includes */
 #include "i2c.h"
-#include "ipmb.h"
-#include "ipmi.h"
-#include "chip.h"
 #include "board_defs.h"
 #include "port.h"
 
 /* Project definitions */
-
 
 uint8_t ipmb_addr;
 
@@ -58,8 +50,7 @@ void vI2CInit( I2C_ID_T i2c_id, uint32_t speed, I2C_Mode mode )
         /* Configure Slave Address */
         ipmb_addr = get_ipmb_addr( );
 
-        port_I2C_Slave_Setup( i2c_id, ipmb_addr, i2c_cfg[i2c_id].msg.rx_data, i2cMAX_MSG_LENGTH );
-
+        vI2CSlaveSetup( i2c_id, ipmb_addr );
     }
 
 } /* End of vI2C_Init */
