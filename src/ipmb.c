@@ -132,7 +132,7 @@ void IPMB_RXTask ( void *pvParameters )
     for ( ;; ) {
         /* Checks if there's any incoming messages (the task remains blocked here) */
         configASSERT(ipmb_buffer_rx);
-        rx_len = xI2CSlaveReceive( IPMB_I2C, &ipmb_buffer_rx[1], portMAX_DELAY );
+        rx_len = xI2CSlaveReceive( IPMB_I2C, &ipmb_buffer_rx[1], (sizeof(ipmb_buffer_rx)/sizeof(ipmb_buffer_rx[0])), portMAX_DELAY );
 
         if ( rx_len > 0 ) {
 
@@ -176,7 +176,7 @@ void IPMB_RXTask ( void *pvParameters )
 
 void ipmb_init ( void )
 {
-    vI2CInit( IPMB_I2C, I2C_Mode_IPMB );
+    vI2CInit( IPMB_I2C, I2C_SPEED, I2C_Mode_IPMB );
     ipmb_txqueue = xQueueCreate( IPMB_TXQUEUE_LEN, sizeof(ipmi_msg_cfg) );
     vQueueAddToRegistry( ipmb_txqueue, "IPMB_TX_QUEUE");
     xTaskCreate( IPMB_TXTask, (const char*)"IPMB_TX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, IPMB_TXTASK_PRIORITY, ( TaskHandle_t * ) NULL );
