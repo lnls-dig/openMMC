@@ -366,7 +366,9 @@ ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
     buffer[i++] = msg->src_addr;
     buffer[i++] = ( ( ( msg->seq << 2 ) & IPMB_SEQ_MASK ) | ( msg->src_LUN & IPMB_SRC_LUN_MASK ) );
     buffer[i++] = msg->cmd;
-    buffer[i++] = msg->completion_code;
+    if (IS_RESPONSE((*msg))) {
+        buffer[i++] = msg->completion_code;
+    }
     memcpy (&buffer[i], &msg->data[0], msg->data_len);
     i += msg->data_len;
     buffer[i] = ipmb_calculate_chksum( &buffer[0], i );
