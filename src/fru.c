@@ -20,6 +20,7 @@
  */
 
 #include "fru.h"
+#include "ipmi.h"
 
 /*
  * fru generated with external tool
@@ -109,4 +110,36 @@ void fru_read_to_buffer(char *buff, int offset, int length) {
 
 void fru_read_common_header(fru_common_header_t * header) {
     fru_read_to_buffer( (char *) header, 0, sizeof(fru_common_header_t));
+}
+
+void ipmi_storage_get_fru_inventory( ipmi_msg * req, ipmi_msg * rsp )
+{
+    uint8_t len = rsp->data_len = 0;
+    rsp->data[len++] = FRU_AREA_SIZE & 0xFF;
+    rsp->data[len++] = FRU_AREA_SIZE & 0xFF00;
+    rsp->data[len++] = 0x00; /* Device accessed by bytes */
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}
+
+void ipmi_storage_read_fru_data( ipmi_msg * req, ipmi_msg * rsp )
+{
+    uint32_t offset;
+    uint8_t len = rsp->data_len = 0;
+
+    /* Count byte on the request is "1" based */
+    uint8_t count = req->data[3];
+
+    if ( (count-1) > IPMI_MSG_MAX_LENGTH ) {
+        rsp->completion_code = IPMI_CC_CANT_RET_NUM_REQ_BYTES;
+        return;
+    }
+
+    offset = (req->data[2] << 8) | (req->data[1]);
+
+    rsp->data[len++] = count;
+    fru_read_to_buffer( (char *) &(rsp->data[len]), offset, count );
+
+    rsp->data_len = len + count;
+    rsp->completion_code = IPMI_CC_OK;
 }

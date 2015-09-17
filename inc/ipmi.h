@@ -22,6 +22,8 @@
 #ifndef IPMI_H_
 #define IPMI_H_
 
+#include "ipmb.h"
+
 /* TODO: Join all priority defines in a single header so we can manage them in a easier way */
 #define IPMI_TASK_PRIORITY 3
 #define IPMI_HANDLER_TASK_PRIORITY 3
@@ -31,6 +33,8 @@
 #define IPMI_EXTENSION_VERSION 0x23
 #define MAX_FRU_ID             0x01
 #define FRU_DEVICE_ID          0x00
+
+#define MAX_HANDLERS 20
 
 /* Known NetFn codes (even request codes only) */
 #define NETFN_CHASSIS						0x00
@@ -303,13 +307,8 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd);
 
 /* Handler functions */
 
-
 void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg *rsp );
-void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp );
-void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp );
 void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp );
-
-void ipmi_storage_get_fru_inventory( ipmi_msg *req, ipmi_msg *rsp );
-void ipmi_storage_read_fru_data( ipmi_msg *req, ipmi_msg *rsp );
+void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp );
 
 #endif
