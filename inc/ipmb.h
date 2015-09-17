@@ -184,7 +184,7 @@ void IPMB_RXTask ( void *pvParameters );
  *
  * Configures the I2C Driver, creates the TX queue for the IPMB Task and both IPMB RX and IPMB TX tasks
  */
-void ipmi_init ( void );
+void ipmb_init ( void );
 
 /*! @brief Format and send a request via IPMB channel
  */
