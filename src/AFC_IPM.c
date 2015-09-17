@@ -32,12 +32,9 @@
 #include "led.h"
 #include "ipmb.h"
 #include "ipmi.h"
-#include "port.h"
-
-/* Priorities at which the tasks are created. */
-#define mainIPMBTEST_TASK_PRIORITY          ( IPMB_RXTASK_PRIORITY - 1 )
-#define mainMASTERTEST_TASK_PRIORITY        ( tskIDLE_PRIORITY + 1 )
-#define mainSLAVETEST_TASK_PRIORITY         ( tskIDLE_PRIORITY + 1 )
+#include "sdr.h"
+#include "payload.h"
+#include "board_version.h"
 
 /* LM75 Addresses */
 #define mainLM75_1_ADDR                     ((uint32_t) 0x4C)
@@ -46,24 +43,9 @@
 #define mainLM75_4_ADDR                     ((uint32_t) 0x4F)
 #define mainREAD_TEMP_FREQUENCY_MS          200
 
-//#define DEBUG_I2C0
-//#define DEBUG_I2C1
-//#define DEBUG_IPMB
 #define DEBUG_LED
-#define DEBUG_IPMI
+#define DEBUG_SDR
 
-/* Tasks function prototypes */
-#ifdef DEBUG_I2C1
-static void prvMasterTestTask( void *pvParameters );
-#endif
-
-#ifdef DEBUG_I2C0
-static void prvSlaveTestTask( void *pvParameters );
-#endif
-
-#ifdef DEBUG_IPMB
-static void IPMBTestTask( void *pvParameters );
-#endif
 /* LED pins initialization */
 static void prvHardwareInit( void );
 
@@ -71,6 +53,9 @@ static void prvHardwareInit( void );
 
 int main(void)
 {
+    /* Update clock register value */
+    SystemCoreClockUpdate();
+
     /* Configure LED pins */
     prvHardwareInit();
 //#define STOP_TEST
@@ -79,29 +64,10 @@ int main(void)
     while (test == 0)
     {}
 #endif
-    /* Create project's tasks */
-#ifdef DEBUG_I2C0
-    vI2CInit(I2C0, I2C_Mode_IPMB);
-    xTaskCreate( prvSlaveTestTask, (const char*)"Slave Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainMASTERTEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
-#endif
 
-#ifdef DEBUG_I2C1
-    vI2CInit(I2C1, I2C_Mode_Local_Master);
-    xTaskCreate( prvMasterTestTask, (const char*)"Master Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainSLAVETEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
-#endif
-
-#ifdef DEBUG_IPMB
-    ipmb_init();
-    xTaskCreate ( IPMBTestTask, (const char*)"IPMB Test", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, mainIPMBTEST_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
-#endif
-
-#ifdef DEBUG_LED
     LED_init();
-#endif
 
-#ifdef DEBUG_IPMI
     ipmi_init();
-#endif
     /* Start the tasks running. */
     vTaskStartScheduler();
 
@@ -111,97 +77,6 @@ int main(void)
     for( ;; );
 }
 /*-----------------------------------------------------------*/
-#ifdef DEBUG_I2C1
-static void prvMasterTestTask( void *pvParameters )
-{
-    uint8_t rx_data[i2cMAX_MSG_LENGTH];
-#if 0
-    /* Variable that stores the actual stack used by this task */
-    uint8_t stack = uxTaskGetStackHighWaterMark( xTaskGetCurrentTaskHandle() );
-#endif
-    for( ;; )
-    {
-        /* Place this task in the blocked state until it is time to run again.
-           The block state is specified in ticks, the constant used converts ticks
-           to ms.  While in the blocked state this task will not consume any CPU
-           time. */
-        vTaskDelay( 50 / portTICK_PERIOD_MS );
-
-        /* Send I2C message to the queue  */
-        xI2CRead( I2C1, mainLM75_1_ADDR, rx_data, 2 );
-
-        if (*rx_data < 40){
-            prvToggleLED( LED_GREEN );
-        }
-    }
-}
-
-/*-----------------------------------------------------------*/
-#endif
-
-#ifdef DEBUG_I2C0
-void prvSlaveTestTask( void *pvParameters )
-{
-    uint8_t rx_buff[i2cMAX_MSG_LENGTH];
-    static uint8_t mch_retries;
-    for( ;; )
-    {
-        /* Place this task in the blocked state until it is time to run again.
-           The block state is specified in ticks, the constant used converts ticks
-           to ms.  While in the blocked state this task will not consume any CPU
-           time. */
-        xI2CSlaveTransfer( I2C0, rx_buff, portMAX_DELAY );
-        if (rx_buff[2] == 32){
-            mch_retries++;
-            if ( mch_retries == 3 ){
-                prvToggleLED( LED_RED );
-                mch_retries = 0;
-            }
-        }
-    }
-}
-#endif
-
-/*-----------------------------------------------------------*/
-#ifdef DEBUG_IPMB
-static void IPMBTestTask( void *pvParameters )
-{
-    static ipmi_msg rx_msg;
-    static ipmi_msg diff_rx_msg;
-    QueueHandle_t rx_queue;
-    uint8_t txbuf[] = { 0x00, /* Completion Code */
-                        0x0A, /* Dev ID */
-                        0x02, /* Dev Rev */
-                        0x05, /* Dev FW Rev UPPER */
-                        0x50, /* Dev FW Rev LOWER */
-                        0x02, /* IPMI Version 2.0 */
-                        0x1F, /* Dev Support */
-                        0x5A, /* Manufacturer ID LSB */
-                        0x31,
-                        0x00, /* ID MSB */
-                        0x01, /* Product ID LSB */
-                        0x01  /* Product ID MSB */
-    };
-
-    ipmb_register_rxqueue( &rx_queue );
-    for( ;; ) {
-        configASSERT( rx_queue );
-        xQueueReceive( rx_queue, &rx_msg, portMAX_DELAY);
-        /* Respond only to the GET_DEVICE_ID command (the only one implemented so far ) */
-        if (rx_msg.cmd == 1 && rx_msg.netfn == 0x06) {
-            if (ipmb_send_response( &rx_msg, txbuf, sizeof(txbuf)/sizeof(txbuf[0]) ) == ipmb_error_success) {;
-                prvToggleLED( LED_GREEN );
-            } else {
-                prvToggleLED( LED_RED );
-            }
-        } else {
-            /* We received an unknown message, save here for debug reasons */
-            diff_rx_msg = rx_msg;
-            prvToggleLED( LED_BLUE );
-        }
-    }
-}
-#endif
 
 void prvToggleLED( LED_id led )
 {
@@ -235,9 +110,6 @@ void prvToggleLED( LED_id led )
 
 static void prvHardwareInit ( void )
 {
-    /* Update clock register value */
-    SystemCoreClockUpdate();
-
     /* Init LED Pin */
     Chip_GPIO_Init(LPC_GPIO);
     /* Set pin as output */
