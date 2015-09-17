@@ -34,7 +34,6 @@ void I2C2_IRQHandler(void)
     i2c_state_handling(I2C2);
 }
 
-i2c_err port_I2C_Master_Write( I2C_ID_T id, uint8_t addr, uint8_t * tx_buff, uint8_t tx_len )
 void Board_I2C_Init(I2C_ID_T id)
 {
     switch (id) {
@@ -97,6 +96,10 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed )
 
 }
 
+/*! @todo Change the I2C driver functions to expect the number of bytes sent/received instead of an error (follow gpio pattern)
+ * The exception of this would be xSlaveReceive, that is implemented differently from LPCOpen, so it would be defined in the .c file as is now. The other functions (master write/read/write&read) could just be aliased to LPCOpen ones */
+
+i2c_err xI2CMasterWrite( I2C_ID_T id, uint8_t addr, uint8_t * tx_buff, uint8_t tx_len )
 {
     uint8_t sent_bytes = 0;
 
@@ -108,7 +111,7 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed )
     }
 }
 
-i2c_err port_I2C_Master_Read( I2C_ID_T id, uint8_t addr, uint8_t * rx_buff, uint8_t rx_len )
+i2c_err xI2CMasterRead( I2C_ID_T id, uint8_t addr, uint8_t * rx_buff, uint8_t rx_len )
 {
     uint8_t recv_bytes = 0;
 
@@ -121,7 +124,7 @@ i2c_err port_I2C_Master_Read( I2C_ID_T id, uint8_t addr, uint8_t * rx_buff, uint
     }
 }
 
-i2c_err port_I2C_Master_Write_Read( I2C_ID_T id, uint8_t addr, uint8_t cmd, uint8_t* rx_buff, uint8_t rx_len )
+i2c_err xI2CMasterWriteRead( I2C_ID_T id, uint8_t addr, uint8_t cmd, uint8_t* rx_buff, uint8_t rx_len )
 {
     uint8_t recv_bytes = 0;
 
@@ -139,15 +142,21 @@ I2C_XFER_T slave_cfg;
 uint8_t recv_msg[i2cMAX_MSG_LENGTH];
 uint8_t recv_bytes;
 
-uint8_t port_I2C_Slave_Receive( I2C_ID_T id, uint8_t * rx_buff, uint8_t buff_len, TickType_t timeout )
+uint8_t xI2CSlaveReceive( I2C_ID_T id, uint8_t * rx_buff, uint8_t buff_len, TickType_t timeout )
 {
+    uint8_t bytes_to_copy = 0;
     slave_task_id = xTaskGetCurrentTaskHandle();
 
     if ( ulTaskNotifyTake( pdTRUE, timeout ) == pdTRUE )
     {
+	if (recv_bytes > buff_len) {
+	    bytes_to_copy = buff_len;
+	} else {
+	    bytes_to_copy = recv_bytes;
+	}
         /* Copy the rx buffer to the pointer given */
-        memcpy( rx_buff, &recv_msg[0], recv_bytes );
-        return recv_bytes;
+        memcpy( rx_buff, &recv_msg[0], bytes_to_copy );
+        return bytes_to_copy;
     } else {
         return 0;
     }
@@ -172,7 +181,7 @@ static void I2C_Slave_Event(I2C_ID_T id, I2C_EVENT_T event)
     }
 }
 
-void port_I2C_Slave_Setup ( I2C_ID_T id, uint8_t slave_addr)//, uint8_t * rx_buff, uint8_t buff_len )
+void vI2CSlaveSetup ( I2C_ID_T id, uint8_t slave_addr )
 {
     slave_cfg.slaveAddr = slave_addr;
     slave_cfg.txBuff = NULL; /* Not using Slave transmitter right now */

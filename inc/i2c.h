@@ -107,7 +107,10 @@ extern uint8_t ipmb_addr;
  * @param i2c_id: Interface ID ( I2C0, I2C1, I2C2 )
  * @param mode: Operating mode for the specified I2C interface
  */
-void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
+void vI2CInit( I2C_ID_T i2c_id, uint32_t speed, I2C_Mode mode );
+
+/*! @todo Document this function */
+void vI2CConfig( I2C_ID_T id, uint32_t speed );
 
 /*! @brief Enter Master Write mode and transmit a buffer
  *
@@ -139,7 +142,7 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
  * @see #xI2CRead
  * @see #xI2CSlaveTransfer
  */
-//i2c_err xI2CWrite( I2C_ID_T i2c_id, uint8_t addr, uint8_t * tx_data, uint8_t tx_len );
+i2c_err xI2CMasterWrite( I2C_ID_T id, uint8_t addr, uint8_t * tx_buff, uint8_t tx_len );
 
 /*! @brief Enter Master Read mode and receive a buffer from slave
  *
@@ -177,7 +180,10 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
  * @see #xI2CWrite
  * @see #xI2CSlaveTransfer
  */
-//i2c_err xI2CRead( I2C_ID_T i2c_id, uint8_t addr, uint8_t * rx_data, uint8_t rx_len );
+i2c_err xI2CMasterRead( I2C_ID_T id, uint8_t addr, uint8_t * rx_buff, uint8_t rx_len );
+
+/*! @todo Document this function */
+i2c_err xI2CMasterWriteRead( I2C_ID_T id, uint8_t addr, uint8_t cmd, uint8_t * rx_buff, uint8_t rx_len );
 
 /*! @brief Enter Slave Receiver mode and waits a data transmission
  *
@@ -210,7 +216,10 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
  * @see #xI2CWrite
  * @see #xI2CRead
  */
-//uint8_t xI2CSlaveTransfer ( I2C_ID_T i2c_id, uint8_t * rx_data, uint32_t timeout );
+uint8_t xI2CSlaveReceive( I2C_ID_T id, uint8_t * rx_buff, uint8_t buff_len, TickType_t timeout );
+
+/*! @todo Document this function */
+void vI2CSlaveSetup ( I2C_ID_T id, uint8_t slave_addr );
 
 /*! @brief Reads own I2C slave address using GA pins
  *
@@ -226,15 +235,5 @@ void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode );
  * and it takes some time to go through all this function.
  */
 uint8_t get_ipmb_addr( void );
-
-/*! Alias for I2C port functions
- * @{
- */
-#define xI2CMasterWrite( id, addr, tx_buff, tx_len )     port_I2C_Master_Write( id, addr, tx_buff, tx_len )
-#define xI2CMasterRead( id, addr, rx_buff, rx_len )      port_I2C_Master_Read( id, addr, rx_buff, rx_len )
-#define xI2CMasterWriteRead( id, addr, cmd, rx_buff, rx_len ) port_I2C_Master_Write_Read( id, addr, cmd, rx_buff, rx_len )
-#define xI2CSlaveReceive( id, rx_buff, timeout )    port_I2C_Slave_Receive( id, rx_buff, timeout )
-#define xI2CSlaveSetup( id, addr, rx_buff, buff_len ) port_I2C_Slave_Setup( id, addr, rx_buff, buff_len )
-/*! @} */
 
 #endif /*I2C_H_*/
