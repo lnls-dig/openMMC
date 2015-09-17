@@ -25,10 +25,10 @@
  * @brief Definitions of GPIO driver implementation for LPC17xx
  */
 
-#ifdef PORT_GPIO_H_
-#undef PORT_GPIO_H_
+#ifdef LPC17_GPIO_H_
+#undef LPC17_GPIO_H_
 #endif
-#define PORT_GPIO_H_
+#define LPC17_GPIO_H_
 
 #include "gpio_17xx_40xx.h"
 
@@ -39,4 +39,5 @@
 #define gpio_clr_pin( port, pin )              Chip_GPIO_SetPinOutLow( LPC_GPIO, port, pin )
 #define gpio_clr_port( port, mask )            Chip_GPIO_SetPortOutLow( LPC_GPIO, port, mask )
 #define gpio_pin_toggle( port, pin )           Chip_GPIO_SetPinToggle( LPC_GPIO, port, pin )
-#define gpio_set_pin_state( port, pin, state ) Chip_GPIO_SetPinState ( LPC_GPIO, port, pin, state )
+#define gpio_set_pin_state( port, pin, state ) Chip_GPIO_SetPinState( LPC_GPIO, port, pin, state )
+#define gpio_set_pin_dir( port, pin, dir )     Chip_GPIO_SetPinDIR( LPC_GPIO, port, pin, dir )
