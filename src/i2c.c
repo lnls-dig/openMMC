@@ -48,40 +48,11 @@
 
 uint8_t ipmb_addr;
 
-void vI2CInit( I2C_ID_T i2c_id, I2C_Mode mode )
+void vI2CInit( I2C_ID_T i2c_id, uint32_t speed, I2C_Mode mode )
 {
-    char pcI2C_Tag[4];
-
-    sprintf( pcI2C_Tag, "I2C%u", i2c_id );
-    /*! @todo Maybe wrap these functions, or use some board-specific defines
-     * so this code is generic enough to be applied on other hardware.
-     * Example: (if using LPC17xx and LPCOpen library)
-     * @code
-     * #define PIN_FUNC_CFG( port, pin, func ) Chip_IOCON_PinMux(...)
-     * @endcode
-     */
-    Chip_IOCON_PinMux( LPC_IOCON, i2c_cfg[i2c_id].pins.sda_port, i2c_cfg[i2c_id].pins.sda_pin, IOCON_MODE_INACT, i2c_cfg[i2c_id].pins.pin_func );
-    Chip_IOCON_PinMux( LPC_IOCON, i2c_cfg[i2c_id].pins.scl_port, i2c_cfg[i2c_id].pins.scl_pin, IOCON_MODE_INACT, i2c_cfg[i2c_id].pins.pin_func );
-    Chip_IOCON_EnableOD( LPC_IOCON, i2c_cfg[i2c_id].pins.sda_port, i2c_cfg[i2c_id].pins.sda_pin );
-    Chip_IOCON_EnableOD( LPC_IOCON, i2c_cfg[i2c_id].pins.scl_port, i2c_cfg[i2c_id].pins.scl_pin );
-    NVIC_SetPriority(i2c_cfg[i2c_id].irq, configMAX_SYSCALL_INTERRUPT_PRIORITY);
-    NVIC_EnableIRQ( i2c_cfg[i2c_id].irq );
-
-    /* Create mutex for accessing the shared memory (i2c_cfg) */
-    I2C_mutex[i2c_id] = xSemaphoreCreateMutex();
-
-    /* Make sure that the mutex is freed */
-    xSemaphoreGive( I2C_mutex[i2c_id] );
-
-    /* Set I2C operating mode */
-    if( xSemaphoreTake( I2C_mutex[i2c_id], 0 ) ) {
-        i2c_cfg[i2c_id].mode = mode;
-        xSemaphoreGive( I2C_mutex[i2c_id] );
-    }
 
     /* Enable and configure I2C clock */
-    Chip_I2C_Init( i2c_id );
-    Chip_I2C_SetClockRate( i2c_id, 100000 );
+    vI2CConfig( i2c_id, speed );
 
     if ( mode == I2C_Mode_IPMB ) {
         /* Configure Slave Address */
