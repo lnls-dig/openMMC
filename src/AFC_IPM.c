@@ -58,6 +58,7 @@ int main(void)
 
     /* Configure LED pins */
     prvHardwareInit();
+
 //#define STOP_TEST
 #ifdef STOP_TEST
     int test = 0;
@@ -67,7 +68,17 @@ int main(void)
 
     LED_init();
 
+    afc_board_i2c_init();
+    afc_board_discover();
+
+    /*  Init IPMI interface */
+    /* NOTE: ipmb_init() is called inside this function */
     ipmi_init();
+
+    sdr_init(ipmb_addr);
+    payload_init();
+    do_quiesced_init();
+
     /* Start the tasks running. */
     vTaskStartScheduler();
 
