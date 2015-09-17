@@ -28,6 +28,12 @@
 #ifndef IPMB_H_
 #define IPMB_H_
 
+/* FreeRTOS includes */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+#include "semphr.h"
+
 /*! @brief Default I2C interface to use in IPMB protocol */
 #define IPMB_I2C                I2C0
 
@@ -202,5 +208,8 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp );
  * @retval ipmb_error_queue_creation Queue creation failed due to lack of Heap space.
  */
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue );
+
+ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len );
+uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range );
 
 #endif

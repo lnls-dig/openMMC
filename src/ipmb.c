@@ -36,10 +36,11 @@
 #include "port.h"
 
 ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg );
-ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len );
-uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range );
+
 ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg );
 ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len );
+
+#define I2C_SPEED 100000
 
 /* Macro to check is the message is a response (odd netfn) */
 #define IS_RESPONSE(msg) (msg.netfn & 0x01)
