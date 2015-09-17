@@ -45,53 +45,6 @@
 
 /* Project definitions */
 
-/*! @brief Configuration struct for each I2C interface */
-xI2C_Config i2c_cfg[] = {
-    {
-        .reg = LPC_I2C0,
-        .irq = I2C0_IRQn,
-        .mode = I2C_Mode_IPMB,
-        .pins = {
-            .sda_port = I2C0_PORT,
-            .sda_pin = I2C0_SDA_PIN,
-            .scl_port = I2C0_PORT,
-            .scl_pin = I2C0_SCL_PIN,
-            .pin_func = I2C0_PIN_FUNC
-        },
-    },
-    {
-        .reg = LPC_I2C1,
-        .irq = I2C1_IRQn,
-        .mode = I2C_Mode_Local_Master,
-        .pins = {
-            .sda_port = I2C1_PORT,
-            .sda_pin = I2C1_SDA_PIN,
-            .scl_port = I2C1_PORT,
-            .scl_pin = I2C1_SCL_PIN,
-            .pin_func = I2C1_PIN_FUNC
-        },
-    },
-    {
-        .reg = LPC_I2C2,
-        .irq = I2C2_IRQn,
-        .mode = I2C_Mode_Local_Master,
-        .pins = {
-            .sda_port = I2C2_PORT,
-            .sda_pin = I2C2_SDA_PIN,
-            .scl_port = I2C2_PORT,
-            .scl_pin = I2C2_SCL_PIN,
-            .pin_func = I2C2_PIN_FUNC
-        },
-    }
-};
-
-/*! @brief Array of mutexes to access #i2c_cfg global struct
- *
- * Each I2C interface has its own mutex and it must be taken
- * before setting/reading any field from #i2c_cfg struct,
- * since it's used by multiple tasks simultaneously
- */
-static SemaphoreHandle_t I2C_mutex[3];
 
 uint8_t ipmb_addr;
 

@@ -101,6 +101,30 @@
 /*! Macro to obtain the I2C base address by its number */
 #define LPC_I2Cx(x)      ((i2c_cfg[x].reg))
 
+/*! @brief Pin definition struct for I2C interface
+ *
+ * (Port number, Pin number, Pin Function)
+ * @note It's assumed here that both SDA and SCL pins are on the same port in the microcontroller */
+typedef struct xI2C_pins {
+    uint8_t sda_port;
+    uint8_t sda_pin;
+    uint8_t scl_port;
+    uint8_t scl_pin;
+    uint8_t pin_func;
+} xI2C_pins_t;
+
+/*! @brief I2C common interface structure */
+typedef struct xI2C_Config {
+    void *reg;                     /*!< I2C Control Register Address */
+    xI2C_pins_t pins;              /*!< Pin configuration struct */
+    IRQn_Type irq;                 /*!< Interruption table index */
+    I2C_Mode mode;                 /*!< Mode of operation*/
+    xI2C_msg msg;                  /*!< Message body (tx and rx buffers) */
+} xI2C_Config;
+
+/*! Global I2C Configuration struct array (1 item for each interface) */
+extern struct xI2C_Config i2c_cfg[];
+
 
 #endif
 #endif
