@@ -219,23 +219,6 @@ void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp )
     rsp->data_len = len;
 }
 
-/*!
- * @brief Handler for "Set Event Receiver" command, as on IPMIv2 1.1
- * section 29.1.
- *
- * This handler should set (or reset) the address to which IPMI events
- * will be sent. Also, disable sending events if command 0xFF is received.
- *
- * @param[in] req Incoming request to be handled and answered.
- *
- * @return void
- */
-void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp){
-
-  /** @todo: actually enable/disable sending events*/
-  rsp->completion_code = IPMI_CC_OK;
-  rsp->data_len = 0;
-}
 
 /*!
  * @brief Handler for "Set FRU LED State"" request. Check IPMI 2.0
