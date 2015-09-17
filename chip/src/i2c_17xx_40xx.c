@@ -554,6 +554,12 @@ void Chip_I2C_Disable(I2C_ID_T id)
 	LPC_I2Cx(id)->CONCLR = I2C_I2CONCLR_I2ENC;
 }
 
+
+void Chip_I2C_Enable(I2C_ID_T id)
+{
+	LPC_I2Cx(id)->CONSET = I2C_I2CONSET_I2EN;
+}
+
 /* State change checking */
 int Chip_I2C_IsStateChanged(I2C_ID_T id)
 {

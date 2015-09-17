@@ -434,6 +434,8 @@ void Chip_I2C_MasterStateHandler(I2C_ID_T id);
  */
 void Chip_I2C_Disable(I2C_ID_T id);
 
+void Chip_I2C_Enable(I2C_ID_T id);
+
 /**
  * @brief	Checks if master xfer in progress
  * @param	id		: I2C peripheral ID (I2C0, I2C1 ... etc)
