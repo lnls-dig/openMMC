@@ -194,9 +194,9 @@ ipmb_error ipmb_send_request ( ipmi_msg * req )
     /* Write necessary fields (should be garbage data by now) */
     req_cfg.buffer.dest_addr = MCH_ADDRESS;
     req_cfg.buffer.dest_LUN = 0;
-    req_cfg.buffer.src_addr = get_ipmb_addr();
-    req_cfg.buffer.src_LUN = 0;
+    req_cfg.buffer.src_addr = ipmb_addr;
     req_cfg.buffer.seq = current_seq++;
+    req_cfg.buffer.src_LUN = 0;
     req_cfg.caller_task = xTaskGetCurrentTaskHandle();
     req_cfg.retries = 0;
 
