@@ -26,6 +26,7 @@
 
 #include "board_defs.h"
 #include "i2c.h"
+#include "port.h"
 #include "ipmi.h"
 #include "ipmb.h"
 #include "payload.h"
@@ -641,20 +642,6 @@ void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp) {
     rsp->data[len++] = 0x40;
     rsp->data[len++] = sensor_array[sensor_number].data->comparator_status;
 
-    rsp->data_len = len;
-    rsp->completion_code = IPMI_CC_OK;
-}
-
-void ipmi_se_get_sdr_info(ipmi_msg *req, ipmi_msg *rsp) {
-    int len = rsp->data_len;
-
-    if (req->data_len == 0 || req->data[0] == 0) {
-        rsp->data[len++] = NUM_SENSOR;
-    } else {
-        rsp->data[len++] = NUM_SDR;
-    }
-    /* Static Sensor population and LUN 0 has sensors */
-    rsp->data[len++] = 0x01; // if dynamic additional 4 bytes required (see Table 20-2 Get Device SDR INFO Command
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }
