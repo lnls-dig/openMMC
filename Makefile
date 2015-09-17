@@ -54,7 +54,7 @@ LIBS += -lgcc -lc -lm -l$(FREERTOS_LIBNAME) -l$(LPCOPEN_LIBNAME)
 
 DEPS = -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)"
 
-PROJ_SRCDIR = src port
+PROJ_SRCDIR = src port afc
 PROJ_SRC = $(shell find $(PROJ_SRCDIR) -name '*.c')
 PROJ_OBJS = $(PROJ_SRC:%.c=%.o)
 
