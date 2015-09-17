@@ -16,8 +16,8 @@ static void i2c_state_handling(I2C_ID_T id)
 }
 
 /**
- * @brief	I2C0 Interrupt handler
- * @return	None
+ * @brief       I2C0 Interrupt handler
+ * @return      None
  */
 void I2C0_IRQHandler(void)
 {
@@ -74,14 +74,14 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed )
 
     switch (id) {
     case I2C0:
-    irq = I2C0_IRQn;
-    break;
+	irq = I2C0_IRQn;
+	break;
     case I2C1:
-    irq = I2C1_IRQn;
-    break;
+	irq = I2C1_IRQn;
+	break;
     case I2C2:
-    irq = I2C2_IRQn;
-    break;
+	irq = I2C2_IRQn;
+	break;
     }
 
     Board_I2C_Init(id);

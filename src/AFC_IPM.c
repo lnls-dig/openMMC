@@ -96,20 +96,20 @@ void prvToggleLED( LED_id led )
     unsigned long ulLEDpin;
 
     switch( led ){
-        case LED_BLUE:
-            ulLEDport = LEDBLUE_PORT;
-            ulLEDpin = LEDBLUE_PIN;
-            break;
+    case LED_BLUE:
+        ulLEDport = LEDBLUE_PORT;
+        ulLEDpin = LEDBLUE_PIN;
+        break;
 
     case LED_GREEN:
-	ulLEDport = LEDGREEN_PORT;
-	ulLEDpin = LEDGREEN_PIN;
-	break;
+        ulLEDport = LEDGREEN_PORT;
+        ulLEDpin = LEDGREEN_PIN;
+        break;
 
     case LED_RED:
-	ulLEDport = LEDRED_PORT;
-	ulLEDpin = LEDRED_PIN;
-	break;
+        ulLEDport = LEDRED_PORT;
+        ulLEDpin = LEDRED_PIN;
+        break;
     }
     /* Obtain the current P0 state. */
     ulLEDState = Chip_GPIO_GetPinState(LPC_GPIO, ulLEDport, ulLEDpin);
