@@ -156,7 +156,7 @@ void afc_board_discover( void )
 
     xI2CMasterWrite(I2C1, 0x57, ee_write, 9);
 #endif
-    if (xI2CMasterWriteRead(I2C1, 0x57, cmd, (uint8_t *) &afc_board_info, sizeof(afc_board_info) ) == i2c_err_FAILURE) {
+    if (xI2CMasterWriteRead(I2C1, 0x57, cmd, (uint8_t *) &afc_board_info, sizeof(afc_board_info) ) != sizeof(afc_board_info) ) {
         return;
     }
 
@@ -287,7 +287,7 @@ Bool afc_i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t
         // this is mux inside MMC
     } else {
 	/* What'll happen if p_i2c_bus->mux_bus is '-1' ? I'm casting it as unsigned to prevent GCC pointer sign warning */
-        while (xI2CMasterWrite(i2c_chip_map[CHIP_ID_MUX].bus_id, i2c_chip_map[CHIP_ID_MUX].i2c_address, (uint8_t *)&p_i2c_bus->mux_bus, 1 ) != i2c_err_SUCCESS) { }
+        while (xI2CMasterWrite(i2c_chip_map[CHIP_ID_MUX].bus_id, i2c_chip_map[CHIP_ID_MUX].i2c_address, (uint8_t *)&p_i2c_bus->mux_bus, 1 ) < 1) { }
         p_i2c_mux->state = p_i2c_bus->mux_bus;
         *i2c_interface = p_i2c_mux->i2c_interface;
         return true;

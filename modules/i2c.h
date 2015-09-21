@@ -110,7 +110,7 @@ extern uint8_t ipmb_addr;
 void vI2CInit( I2C_ID_T i2c_id, uint32_t speed, I2C_Mode mode );
 
 /*! @todo Document this function */
-void vI2CConfig( I2C_ID_T id, uint32_t speed );
+//void vI2CConfig( I2C_ID_T id, uint32_t speed );
 
 /*! @brief Enter Master Write mode and transmit a buffer
  *
@@ -142,7 +142,7 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed );
  * @see #xI2CRead
  * @see #xI2CSlaveTransfer
  */
-i2c_err xI2CMasterWrite( I2C_ID_T id, uint8_t addr, uint8_t * tx_buff, uint8_t tx_len );
+//i2c_err xI2CMasterWrite( I2C_ID_T id, uint8_t addr, uint8_t * tx_buff, uint8_t tx_len );
 
 /*! @brief Enter Master Read mode and receive a buffer from slave
  *
@@ -180,10 +180,10 @@ i2c_err xI2CMasterWrite( I2C_ID_T id, uint8_t addr, uint8_t * tx_buff, uint8_t t
  * @see #xI2CWrite
  * @see #xI2CSlaveTransfer
  */
-i2c_err xI2CMasterRead( I2C_ID_T id, uint8_t addr, uint8_t * rx_buff, uint8_t rx_len );
+//i2c_err xI2CMasterRead( I2C_ID_T id, uint8_t addr, uint8_t * rx_buff, uint8_t rx_len );
 
 /*! @todo Document this function */
-i2c_err xI2CMasterWriteRead( I2C_ID_T id, uint8_t addr, uint8_t cmd, uint8_t * rx_buff, uint8_t rx_len );
+//i2c_err xI2CMasterWriteRead( I2C_ID_T id, uint8_t addr, uint8_t cmd, uint8_t * rx_buff, uint8_t rx_len );
 
 /*! @brief Enter Slave Receiver mode and waits a data transmission
  *
@@ -216,10 +216,10 @@ i2c_err xI2CMasterWriteRead( I2C_ID_T id, uint8_t addr, uint8_t cmd, uint8_t * r
  * @see #xI2CWrite
  * @see #xI2CRead
  */
-uint8_t xI2CSlaveReceive( I2C_ID_T id, uint8_t * rx_buff, uint8_t buff_len, TickType_t timeout );
+//uint8_t xI2CSlaveReceive( I2C_ID_T id, uint8_t * rx_buff, uint8_t buff_len, TickType_t timeout );
 
 /*! @todo Document this function */
-void vI2CSlaveSetup ( I2C_ID_T id, uint8_t slave_addr );
+//void vI2CSlaveSetup ( I2C_ID_T id, uint8_t slave_addr );
 
 /*! @brief Reads own I2C slave address using GA pins
  *

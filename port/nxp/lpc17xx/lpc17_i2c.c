@@ -92,18 +92,16 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed )
     Chip_I2C_Enable( id );
 
     Chip_I2C_SetMasterEventHandler(id, Chip_I2C_EventHandler);
-
-
 }
 
 /*! @todo Change the I2C driver functions to expect the number of bytes sent/received instead of an error (follow gpio pattern)
  * The exception of this would be xSlaveReceive, that is implemented differently from LPCOpen, so it would be defined in the .c file as is now. The other functions (master write/read/write&read) could just be aliased to LPCOpen ones */
-
+#ifdef macro_test
 i2c_err xI2CMasterWrite( I2C_ID_T id, uint8_t addr, uint8_t * tx_buff, uint8_t tx_len )
 {
     uint8_t sent_bytes = 0;
 
-    sent_bytes = Chip_I2C_MasterSend(id, addr, tx_buff, tx_len);
+    sent_bytes = 
     if ( sent_bytes == tx_len ) {
         return i2c_err_SUCCESS;
     } else {
@@ -115,7 +113,7 @@ i2c_err xI2CMasterRead( I2C_ID_T id, uint8_t addr, uint8_t * rx_buff, uint8_t rx
 {
     uint8_t recv_bytes = 0;
 
-    recv_bytes = Chip_I2C_MasterRead(id, addr, rx_buff, rx_len);
+    recv_bytes = 
 
     if ( recv_bytes == rx_len ) {
         return i2c_err_SUCCESS;
@@ -128,7 +126,7 @@ i2c_err xI2CMasterWriteRead( I2C_ID_T id, uint8_t addr, uint8_t cmd, uint8_t* rx
 {
     uint8_t recv_bytes = 0;
 
-    recv_bytes = Chip_I2C_MasterCmdRead(id, addr, cmd, rx_buff, rx_len);
+    recv_bytes = 
 
     if ( recv_bytes == rx_len ) {
         return i2c_err_SUCCESS;
@@ -136,7 +134,7 @@ i2c_err xI2CMasterWriteRead( I2C_ID_T id, uint8_t addr, uint8_t cmd, uint8_t* rx
         return i2c_err_FAILURE;
     }
 }
-
+#endif
 static TaskHandle_t slave_task_id;
 I2C_XFER_T slave_cfg;
 uint8_t recv_msg[i2cMAX_MSG_LENGTH];
