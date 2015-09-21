@@ -254,6 +254,6 @@ led_error LED_update( uint8_t led_num, LEDmode_t newLEDmode, LED_activity_desc_t
         xSemaphoreGive( LEDMutex[led_id] );
 
 	/* If all LEDs were programmed correctly, the error should still be led_success */
-	return error;
     }
+    return error;
 }
