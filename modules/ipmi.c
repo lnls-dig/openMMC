@@ -293,3 +293,15 @@ void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
     rsp->data_len = 0;
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
+
+void ipmi_picmg_set_amc_port( ipmi_msg *req, ipmi_msg *rsp)
+{
+    rsp->completion_code = IPMI_CC_OK;
+    rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
+}
+
+void ipmi_picmg_fru_control( ipmi_msg *req, ipmi_msg *rsp)
+{
+    rsp->completion_code = IPMI_CC_OK;
+    rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
+}

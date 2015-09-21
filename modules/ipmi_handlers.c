@@ -10,6 +10,8 @@ extern void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg *rsp );
 
 extern void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp );
 extern void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp );
+extern void ipmi_picmg_set_amc_port ( ipmi_msg *req, ipmi_msg *rsp );
+extern void ipmi_picmg_fru_control ( ipmi_msg *req, ipmi_msg *rsp );
 
 extern void ipmi_se_get_sdr_info( ipmi_msg *req, ipmi_msg* rsp);
 extern void ipmi_se_reserve_device_sdr( ipmi_msg *req, ipmi_msg* rsp);
@@ -26,6 +28,16 @@ t_req_handler_record handlers[MAX_HANDLERS]={
         .netfn   = NETFN_GRPEXT,
         .cmd     = IPMI_PICMG_CMD_SET_FRU_LED_STATE,
         .req_handler = ipmi_picmg_set_led
+    },
+    {
+        .netfn   = NETFN_GRPEXT,
+        .cmd     = IPMI_PICMG_CMD_SET_AMC_PORT_STATE,
+        .req_handler = ipmi_picmg_set_amc_port
+    },
+    {
+	.netfn   = NETFN_GRPEXT,
+	.cmd     = IPMI_PICMG_CMD_FRU_CONTROL,
+        .req_handler = ipmi_picmg_fru_control
     },
     {
         .netfn   = NETFN_SE,
