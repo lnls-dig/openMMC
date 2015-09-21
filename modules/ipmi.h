@@ -301,7 +301,7 @@ typedef struct{
 
 /* Function Prototypes */
 void IPMITask ( void *pvParameters );
-void ipmb_init ( void );
+void ipmi_init ( void );
 void IPMI_handler_task( void * pvParameters);
 t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd);
 

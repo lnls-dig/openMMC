@@ -8,7 +8,7 @@
  */
 
 /* Memory spaces definitions */
-INCLUDE "afcipm_mem.ld"
+INCLUDE "linker/lpc1764_mem.ld"
 
 ENTRY(ResetISR)
 

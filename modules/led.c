@@ -40,7 +40,7 @@
 #include "chip.h"
 #include "port.h"
 #include "led.h"
-#include "board_defs.h"
+#include "pin_mapping.h"
 
 #define LED_TASK_PRIORITY 2
 #define LED_UPDATE_RATE 10 /* in ms */

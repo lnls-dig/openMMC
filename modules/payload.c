@@ -25,11 +25,11 @@
 #include "queue.h"
 #include "semphr.h"
 
-#include "gpio.h"
+#include "port.h"
 #include "payload.h"
 #include "sdr.h"
 #include "board_version.h"
-#include "board_defs.h"
+#include "pin_mapping.h"
 
 /* payload states
  *   0 - no power

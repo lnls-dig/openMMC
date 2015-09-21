@@ -27,7 +27,7 @@
 
 /* Project includes */
 #include "chip.h"
-#include "board_defs.h"
+#include "pin_mapping.h"
 #include "i2c.h"
 #include "led.h"
 #include "ipmb.h"

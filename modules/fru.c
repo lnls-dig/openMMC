@@ -27,6 +27,7 @@
  * mainly it says x4 pci-express Gen1
  * without this MCH will not enable FCLK
  */
+#define FRU_AREA_SIZE 136
 
 const char default_fru[136]/* __attribute__ ((section (".FRU")))*/ = {
     /* Common Header */

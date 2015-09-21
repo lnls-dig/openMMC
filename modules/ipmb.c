@@ -31,7 +31,7 @@
 /* Project includes */
 #include "i2c.h"
 #include "ipmb.h"
-#include "board_defs.h"
+#include "pin_mapping.h"
 #include "led.h"
 #include "port.h"
 

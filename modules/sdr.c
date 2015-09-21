@@ -24,7 +24,7 @@
 #include "task.h"
 #include "semphr.h"
 
-#include "board_defs.h"
+#include "pin_mapping.h"
 #include "i2c.h"
 #include "port.h"
 #include "ipmi.h"

@@ -27,13 +27,10 @@
 
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
-/*#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-*/
+
 /* Project includes */
 #include "i2c.h"
-#include "board_defs.h"
+#include "pin_mapping.h"
 #include "port.h"
 
 /* Project definitions */

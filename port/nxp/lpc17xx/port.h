@@ -3,6 +3,7 @@
 
 /* List of all LPC17xx specific headers to be included */
 
-#include "gpio.h"
+#include "lpc17_gpio.h"
+#include "lpc17_i2c.h"
 
 #endif

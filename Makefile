@@ -16,8 +16,8 @@ LPCXPRESSO_PATH=/usr/local/lpcxpresso_7.8.0_426/lpcxpresso
 #Flags to be passed on to gcc
 DEFS = -DDEBUG -DCORE_M3 -D__CODE_RED -D__USE_LPCOPEN -DNO_BOARD_LIB -D__LPC17XX__ -D__NEWLIB__
 
-LD_SCRIPT = afcipm.ld
-MAP = afcipm.map
+LD_SCRIPT = linker/lpc1764.ld
+MAP = linker/afcipm.map
 LD_FLAGS = -T $(LD_SCRIPT) -Xlinker -Map=$(MAP)
 LD_FLAGS += -Xlinker --gc-sections
 LD_FLAGS += -mcpu=$(MCPU) -mthumb
@@ -25,7 +25,7 @@ LD_FLAGS += --specs=nosys.specs
 
 LPCOPEN_LIBNAME = lpcopen
 LPCOPEN_LIBFILE = $(LIBDIR)/lib$(LPCOPEN_LIBNAME).a
-LPCOPEN_PATH = ./chip
+LPCOPEN_PATH = ./port/nxp/lpc17xx/lpcopen
 LPCOPEN_SRCPATH = $(LPCOPEN_PATH)/src
 LPCOPEN_SRC = $(shell find $(LPCOPEN_SRCPATH) -name '*.c')
 LPCOPEN_INCPATH = $(LPCOPEN_PATH)/inc
@@ -39,8 +39,10 @@ FREERTOS_SRC = $(shell find $(FREERTOS_SRCPATH) -name '*.c')
 FREERTOS_INCPATH = $(FREERTOS_PATH)/include
 FREERTOS_OBJS = $(FREERTOS_SRC:%.c=%.o)
 
-INCLUDES = -I./inc
+INCLUDES = -I./
+INCLUDES += -I./board/afcv3
 INCLUDES += -I./port/nxp/lpc17xx
+INCLUDES += -I./modules
 INCLUDES += -I$(LPCOPEN_INCPATH)
 INCLUDES += -I$(FREERTOS_INCPATH)
 
@@ -54,8 +56,8 @@ LIBS += -lgcc -lc -lm -l$(FREERTOS_LIBNAME) -l$(LPCOPEN_LIBNAME)
 
 DEPS = -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)" -MT"$(@:%.o=%.d)"
 
-PROJ_SRCDIR = src port afc
-PROJ_SRC = $(shell find $(PROJ_SRCDIR) -name '*.c')
+PROJ_SRCDIR = ./
+PROJ_SRC = $(shell find $(PROJ_SRCDIR) -type d \( -path $(FREERTOS_PATH) -o -path $(LPCOPEN_PATH) \) -prune -o -name '*.c' -print)
 PROJ_OBJS = $(PROJ_SRC:%.c=%.o)
 
 .PRECIOUS: %.axf %.bin
@@ -127,5 +129,8 @@ program:
 	$(LPCXPRESSO_PATH)/bin/crt_emu_cm3_nxp -wire=winusb -pLPC1764 -flash-load-exec=$(BUILDDIR)/$(PROJ).axf
 	@echo 'Programed Successfully!'
 	@echo ' '
+
+#Debug print
+print-%: ; @echo $*=$($*)
 
 .PHONY: all clean mrproper boot program folders
