@@ -38,8 +38,6 @@ licensing and training services.
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#include "chip_lpc175x_6x.h"
-
 /*-----------------------------------------------------------
  * Application specific definitions.
  *
@@ -54,12 +52,12 @@ licensing and training services.
 #define configUSE_IDLE_HOOK                     0
 #define configMAX_PRIORITIES                    ( 5 )
 #define configUSE_TICK_HOOK                     0
-#define configCPU_CLOCK_HZ                      ( ( unsigned long ) SystemCoreClock )
+#define configCPU_CLOCK_HZ                      ( ( unsigned long ) 8000000)
 #define configTICK_RATE_HZ                      ( ( portTickType ) 1000 )
-#define configMINIMAL_STACK_SIZE                ( ( unsigned short ) 100 )
+#define configMINIMAL_STACK_SIZE                ( ( unsigned short ) 80 )
 #define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 10 * 1024 ) )
 #define configMAX_TASK_NAME_LEN                 ( 12 )
-#define configUSE_TRACE_FACILITY                1
+#define configUSE_TRACE_FACILITY                0
 #define configUSE_16_BIT_TICKS                  0
 #define configIDLE_SHOULD_YIELD                 0
 #define configUSE_CO_ROUTINES                   0
@@ -69,17 +67,18 @@ licensing and training services.
 #define configUSE_ALTERNATIVE_API               0
 #define configCHECK_FOR_STACK_OVERFLOW          1
 #define configUSE_RECURSIVE_MUTEXES             0
-#define configQUEUE_REGISTRY_SIZE               10
+#define configQUEUE_REGISTRY_SIZE               5
 #define configGENERATE_RUN_TIME_STATS           0
-#define configUSE_MALLOC_FAILED_HOOK            0
+#define configUSE_MALLOC_FAILED_HOOK            1
 #define configENABLE_BACKWARD_COMPATIBILITY     1
-#define configUSE_APPLICATION_TASK_TAG          1
+#define configUSE_APPLICATION_TASK_TAG          0
 #define configUSE_TASK_NOTIFICATIONS            1
+#define configUSE_STATS_FORMATTING_FUNCTIONS    0
 
 #define configASSERT( x )     if( ( x ) == 0 ) { vAssertCalled( __FILE__, __LINE__ );}
-void vAssertCalled( char* file, uint32_t line);
 
 #if (configGENERATE_RUN_TIME_STATS == 1)
+extern void vConfigureTimerForRunTimeStats( void );
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() vConfigureTimerForRunTimeStats()
 #define portGET_RUN_TIME_COUNTER_VALUE() LPC_TIMER0->TC
 #endif
