@@ -197,7 +197,7 @@ typedef struct sensor_ {
 } sensor_t;
 
 typedef struct {
-    I2C_ID_T i2c;
+    uint8_t i2c;
     uint8_t address;
 } INA220_params_t;
 

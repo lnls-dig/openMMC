@@ -75,7 +75,7 @@ typedef enum {
 /*! @brief I2C transaction parameter structure */
 typedef struct xI2C_msg
 {
-    I2C_ID_T i2c_id;                        /*!< I2C interface number (0, 1 or 2) */
+    uint8_t i2c_id;                        /*!< I2C interface number (0, 1 or 2) */
     uint8_t addr;                           /*!< Slave address of I2C device */
     uint8_t tx_data[i2cMAX_MSG_LENGTH];     /*!< Buffer cointaning bytes to transmit, limitted to #i2cMAX_MSG_LENGTH */
     uint8_t tx_len;                         /*!< Number of bytes to transmit */
@@ -107,7 +107,7 @@ extern uint8_t ipmb_addr;
  * @param i2c_id: Interface ID ( I2C0, I2C1, I2C2 )
  * @param mode: Operating mode for the specified I2C interface
  */
-void vI2CInit( I2C_ID_T i2c_id, uint32_t speed, I2C_Mode mode );
+void vI2CInit( uint8_t i2c_id, uint32_t speed, I2C_Mode mode );
 
 /*! @todo Document this function */
 //void vI2CConfig( I2C_ID_T id, uint32_t speed );
