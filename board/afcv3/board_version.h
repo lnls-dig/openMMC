@@ -24,6 +24,7 @@
 
 #include "stdint.h"
 #include "FreeRTOS.h"
+#include "port.h"
 
 #define CARRIER_TYPE_UNKNOWN	0xFF
 #define CARRIER_TYPE_AFC	0x01
