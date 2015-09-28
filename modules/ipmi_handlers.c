@@ -17,6 +17,7 @@ extern void ipmi_se_get_sdr_info( ipmi_msg *req, ipmi_msg* rsp);
 extern void ipmi_se_reserve_device_sdr( ipmi_msg *req, ipmi_msg* rsp);
 extern void ipmi_se_get_sdr( ipmi_msg *req, ipmi_msg* rsp);
 extern void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp);
+extern void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp);
 
 t_req_handler_record handlers[MAX_HANDLERS]={
     {
@@ -58,6 +59,11 @@ t_req_handler_record handlers[MAX_HANDLERS]={
         .netfn   = NETFN_SE,
         .cmd     = IPMI_GET_SENSOR_READING_CMD,
         .req_handler = ipmi_se_get_sensor_reading
+    },
+    {
+        .netfn   = NETFN_SE,
+        .cmd     = IPMI_SET_EVENT_RECEIVER_CMD,
+        .req_handler = ipmi_se_set_receiver
     },
     {
         .netfn   = NETFN_APP,

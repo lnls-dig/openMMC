@@ -549,7 +549,7 @@ void ipmi_se_get_sdr_info(ipmi_msg *req, ipmi_msg *rsp) {
  *
  * @return void
  */
-void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp){
+void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp) {
 
     /** @todo: actually enable/disable sending events*/
     rsp->completion_code = IPMI_CC_OK;
