@@ -120,7 +120,7 @@ boot:
 	@echo ' '
 
 program:
-	@if [ ! -f $(PROJ).axf ]; then \
+	@if [ ! -f $(BUILDDIR)/$(PROJ).axf ]; then \
 	$(MAKE) $(PROJ).axf; \
 	fi
 	@$(MAKE) -i boot
