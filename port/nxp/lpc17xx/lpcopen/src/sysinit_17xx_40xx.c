@@ -73,6 +73,22 @@ void Chip_SetupIrcClocking(void)
 	Chip_Clock_EnablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_CONNECT);
 }
 
+#define CLOCK_8MHZ
+#ifdef CLOCK_100MHZ
+#define PLL_M (25-1)
+#define PLL_N (2-1)
+#endif
+#ifdef CLOCK_8MHZ
+#define PLL_M (20-1)
+#define PLL_N (1-1)
+#define CLK_DIV (40-1)
+#endif
+#ifdef CLOCK_12MHZ
+#define PLL_M (20-1)
+#define PLL_N (1-1)
+#define CLK_DIV (40-1)
+#endif
+
 void Chip_SetupXtalClocking(void)
 {
 	/* Disconnect the Main PLL if it is connected already */
@@ -95,12 +111,13 @@ void Chip_SetupXtalClocking(void)
 	Chip_Clock_SetMainPLLSource(SYSCTL_PLLCLKSRC_MAINOSC);
 
 	/* FCCO = ((15+1) * 2 * 12MHz) / (0+1) = 384MHz */
-	Chip_Clock_SetupPLL(SYSCTL_MAIN_PLL, 15, 0);
-
+	//Chip_Clock_SetupPLL(SYSCTL_MAIN_PLL, 15, 0);
+	Chip_Clock_SetupPLL(SYSCTL_MAIN_PLL, PLL_M, PLL_N);
 	Chip_Clock_EnablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_ENABLE);
 
 	/* 384MHz / (3+1) = 96MHz */
-	Chip_Clock_SetCPUClockDiv(3);
+	//Chip_Clock_SetCPUClockDiv(3);
+	Chip_Clock_SetCPUClockDiv(CLK_DIV);
 	while (!Chip_Clock_IsMainPLLLocked()) {} /* Wait for the PLL to Lock */
 
 	Chip_Clock_EnablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_CONNECT);
@@ -173,6 +190,5 @@ void Chip_SetupXtalClocking(void)
 /* Set up and initialize hardware prior to call to main */
 void Chip_SystemInit(void)
 {
-	/* Setup Chip clocking */
-	Chip_SetupIrcClocking();
+    Chip_SetupXtalClocking();
 }
