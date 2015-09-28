@@ -48,12 +48,13 @@
 
 /* LED pins initialization */
 static void prvHardwareInit( void );
-
+void heap_test ( void* param);
 /*-----------------------------------------------------------*/
 
 int main(void)
 {
-    /* Update clock register value */
+
+    /* Update clock register value - LPC specific */
     SystemCoreClockUpdate();
 
     /* Configure LED pins */
@@ -79,15 +80,31 @@ int main(void)
     payload_init();
     do_quiesced_init();
 
-    /* Start the tasks running. */
+#ifdef HEAP_TEST
+    xTaskCreate( heap_test, "Heap Test", 50, (void *) NULL, tskIDLE_PRIORITY+1, (TaskHandle_t *) NULL );
+#endif
+/* Start the tasks running. */
     vTaskStartScheduler();
 
     /* If all is well we will never reach here as the scheduler will now be
        running.  If we do reach here then it is likely that there was insufficient
        heap available for the idle task to be created. */
     for( ;; );
+
 }
 /*-----------------------------------------------------------*/
+#ifdef HEAP_TEST
+void heap_test ( void* param)
+{
+    uint8_t water_mark = 0;
+    size_t used_heap = 0;
+    for (;;) {
+	vTaskDelay(1000);
+	water_mark = uxTaskGetStackHighWaterMark(NULL);
+	used_heap = configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize();
+    }
+}
+#endif
 
 void prvToggleLED( LED_id led )
 {
@@ -169,3 +186,10 @@ void vAssertCalled( char* file, uint32_t line) {
     prvToggleLED(LED_RED);
     for( ;; );
 }
+
+#if (configUSE_MALLOC_FAILED_HOOK == 1)
+void vApplicationMallocFailedHook( void ) {
+    for( ;; );
+}
+#endif
+
