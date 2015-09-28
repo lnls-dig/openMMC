@@ -3,8 +3,8 @@
 
 /* LEDs Pin and port definitions */
 
-#define LED_OFF_STATE		(0)
-#define LED_ON_STATE		(1)
+#define LED_OFF_STATE		(1)
+#define LED_ON_STATE		(0)
 
 /* PICMG-defined color codes for set/get LED state commands */
 #define LEDCOLOR_BLUE		(1)
@@ -30,11 +30,6 @@ typedef struct {
 } LEDPincfg_t;
 
 typedef enum {
-    Local_Control=0,
-    Override,
-} LEDmode_t;
-
-typedef enum {
     LED_ACTV_ON=0,
     LED_ACTV_OFF,
     LED_ACTV_BLINK
@@ -48,13 +43,13 @@ typedef struct {
 } LED_activity_desc_t;
 
 typedef struct {
-    LEDmode_t LEDmode;
-    const LED_activity_desc_t* pLocalDesc;
-    const LED_activity_desc_t* pOvrideDesc;
-    uint8_t LocalPscale;
-    uint8_t OvridePscale;
+    LED_activity_desc_t cur_cfg;
+    LED_activity_desc_t last_cfg;
+    LED_activity_desc_t const * local_ptr;
+    uint32_t counter;
     uint8_t Color;
     LEDPincfg_t pin_cfg;
+    QueueHandle_t queue;
 } LED_state_rec_t;
 
 typedef enum {
@@ -69,7 +64,7 @@ extern const LED_activity_desc_t LED_Short_Blink_Activity;
 extern const LED_activity_desc_t LED_Long_Blink_Activity;
 extern const LED_activity_desc_t LED_3sec_Lamp_Test_Activity;
 
-extern volatile LED_state_rec_t LEDstate[LED_CNT];
+extern LED_state_rec_t LEDstate[LED_CNT];
 
 #define LED_on(cfg)		       gpio_clr_pin(cfg.port, cfg.pin)
 #define LED_off(cfg)		       gpio_set_pin(cfg.port, cfg.pin)
@@ -80,6 +75,6 @@ extern volatile LED_state_rec_t LEDstate[LED_CNT];
 #define LED_set_state(cfg, state)      gpio_set_pin_state(cfg.port, cfg.pin, state)
 
 void LED_init(void);
-led_error LED_update( uint8_t led_id, LEDmode_t newLEDmode, LED_activity_desc_t * pLEDact );
+led_error LED_update( uint8_t led_num, const LED_activity_desc_t * pLEDact );
 
 #endif /* LED_H_ */
