@@ -26,6 +26,7 @@
 #include "ipmi.h"
 #include "pin_mapping.h"
 #include "led.h"
+#include "task_priorities.h"
 
 /* Local variables */
 QueueHandle_t ipmi_rxqueue = NULL;
@@ -36,7 +37,7 @@ struct req_param_struct{
 };
 
 extern t_req_handler_record handlers[MAX_HANDLERS];
-
+extern void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp);
 void IPMITask ( void * pvParameters )
 {
     ipmi_msg req_received;
@@ -131,7 +132,7 @@ void ipmi_init ( void )
 {
     ipmb_init();
     ipmb_register_rxqueue( &ipmi_rxqueue );
-    xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, IPMI_TASK_PRIORITY, ( TaskHandle_t * ) NULL );
+    xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", configMINIMAL_STACK_SIZE*4, ( void * ) NULL, tskIPMI_PRIORITY, ( TaskHandle_t * ) NULL );
 }
 
 
@@ -301,8 +302,10 @@ void ipmi_picmg_set_amc_port( ipmi_msg *req, ipmi_msg *rsp)
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
 
+#include "payload.h"
 void ipmi_picmg_fru_control( ipmi_msg *req, ipmi_msg *rsp)
 {
+    payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
     rsp->completion_code = IPMI_CC_OK;
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
