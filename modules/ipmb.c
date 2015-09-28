@@ -31,9 +31,11 @@
 /* Project includes */
 #include "i2c.h"
 #include "ipmb.h"
+#include "ipmi.h"
 #include "pin_mapping.h"
 #include "led.h"
 #include "port.h"
+#include "task_priorities.h"
 
 ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg );
 
@@ -178,8 +180,8 @@ void ipmb_init ( void )
     vI2CInit( IPMB_I2C, I2C_SPEED, I2C_Mode_IPMB );
     ipmb_txqueue = xQueueCreate( IPMB_TXQUEUE_LEN, sizeof(ipmi_msg_cfg) );
     vQueueAddToRegistry( ipmb_txqueue, "IPMB_TX_QUEUE");
-    xTaskCreate( IPMB_TXTask, (const char*)"IPMB_TX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, IPMB_TXTASK_PRIORITY, ( TaskHandle_t * ) NULL );
-    xTaskCreate( IPMB_RXTask, (const char*)"IPMB_RX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, IPMB_RXTASK_PRIORITY, ( TaskHandle_t * ) NULL );
+    xTaskCreate( IPMB_TXTask, (const char*)"IPMB_TX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, tskIPMB_TX_PRIORITY, ( TaskHandle_t * ) NULL );
+    xTaskCreate( IPMB_RXTask, (const char*)"IPMB_RX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, tskIPMB_RX_PRIORITY, ( TaskHandle_t * ) NULL );
 }
 
 ipmb_error ipmb_send_request ( ipmi_msg * req )

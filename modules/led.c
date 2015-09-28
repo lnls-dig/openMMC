@@ -41,9 +41,7 @@
 #include "port.h"
 #include "led.h"
 #include "pin_mapping.h"
-
-#define LED_TASK_PRIORITY 2
-#define LED_UPDATE_RATE 10 /* in ms */
+#include "task_priorities.h"
 
 const LED_activity_desc_t LED_Off_Activity = {LED_ACTV_OFF, LED_OFF_STATE, 0, 0};
 const LED_activity_desc_t LED_On_Activity = {LED_ACTV_ON, LED_ON_STATE, 0, 0};
@@ -197,7 +195,8 @@ void LED_init (void)
     for (int i = 0; i<LED_CNT; i++){
         LEDMutex[i] = xSemaphoreCreateMutex();
     }
-    xTaskCreate( LEDTask, (const char *) "LED Task", configMINIMAL_STACK_SIZE*2, (void * ) NULL, LED_TASK_PRIORITY, ( TaskHandle_t * ) NULL);
+
+    xTaskCreate( LEDTask, (const char *) "LED Task", configMINIMAL_STACK_SIZE*2, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
     /*! @todo Handle task creation error */
 }
 

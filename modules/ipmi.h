@@ -24,10 +24,6 @@
 
 #include "ipmb.h"
 
-/* TODO: Join all priority defines in a single header so we can manage them in a easier way */
-#define IPMI_TASK_PRIORITY 3
-#define IPMI_HANDLER_TASK_PRIORITY 3
-
 #define IPMI_MAX_DATA_LEN 24
 
 #define IPMI_EXTENSION_VERSION 0x23

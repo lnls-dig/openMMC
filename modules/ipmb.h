@@ -37,15 +37,6 @@
 /*! @brief Default I2C interface to use in IPMB protocol */
 #define IPMB_I2C                I2C0
 
-/*! @name IPMB Tasks Priorities
- * @todo Put all the priority definitions in one file so we can manage them easier
- * @{
- */
-#define IPMB_TXTASK_PRIORITY    3
-/*! @brief IPMB TX Task priority inside FreeRTOS */
-#define IPMB_RXTASK_PRIORITY    IPMB_TXTASK_PRIORITY
-/*@}*/
-
 /*! @brief Maximum count of messages to be sent */
 #define IPMB_TXQUEUE_LEN        5
 /*! @brief Maximum count if received messages to be delivered to client task  */

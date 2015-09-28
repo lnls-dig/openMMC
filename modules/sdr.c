@@ -32,6 +32,7 @@
 #include "payload.h"
 #include "board_version.h"
 #include "led.h"
+#include "task_priorities.h"
 
 uint16_t INA220_readVolt(I2C_ID_T i2c, uint8_t address, bool raw);
 
@@ -364,7 +365,7 @@ void sdr_init(uint8_t ipmiID) {
         sensor_array[i].data->readout_value = 0;
         //}
     }
-    xTaskCreate(vTaskSensor, "Sensor", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+1, (TaskHandle_t *) NULL );
+    xTaskCreate(vTaskSensor, "Sensor", configMINIMAL_STACK_SIZE, NULL, tskSENSOR_PRIORITY, (TaskHandle_t *) NULL );
 }
 
 

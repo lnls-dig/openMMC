@@ -30,6 +30,8 @@
 #include "sdr.h"
 #include "board_version.h"
 #include "pin_mapping.h"
+#include "ipmi.h"
+#include "task_priorities.h"
 
 /* payload states
  *   0 - no power
@@ -117,7 +119,7 @@ void payload_send_message(uint8_t msg){
 
 void payload_init( void )
 {
-    xTaskCreate(vTaskPayload, "Payload", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY+1, (TaskHandle_t *) NULL);
+    xTaskCreate(vTaskPayload, "Payload", configMINIMAL_STACK_SIZE, NULL, tskPAYLOAD_PRIORITY, (TaskHandle_t *) NULL);
     queue_payload_handle = xQueueCreate(16, sizeof(uint8_t));
 
     initializeDCDC();
