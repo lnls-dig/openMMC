@@ -60,10 +60,16 @@ void IPMITask ( void * pvParameters )
             /* TODO: create unique name for each created task, probably
                related to netfn and command */
             struct req_param_struct *req_param = pvPortMalloc(sizeof(struct req_param_struct));
-            req_param->req_received = req_received;
-            req_param->req_handler = req_handler;
 
-            if (xTaskCreate(IPMI_handler_task ,(const char*)"IPMB_handler_task", configMINIMAL_STACK_SIZE*2, req_param, IPMI_HANDLER_TASK_PRIORITY,  (TaskHandle_t *) NULL ) == pdFALSE ){
+            if (req_param != NULL) {
+                req_param->req_received = req_received;
+                req_param->req_handler = req_handler;
+            } else {
+                /* TODO: handle this problem */
+            }
+
+            if ( xTaskCreate(IPMI_handler_task ,(const char*)"IPMB_handler_task", configMINIMAL_STACK_SIZE*2, req_param, tskIPMI_HANDLERS_PRIORITY,  (TaskHandle_t *) NULL ) != pdTRUE ){
+                configASSERT(0);
                 /* TODO: handle this problem */
             }
 
@@ -228,38 +234,33 @@ void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp )
 void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
 {
     led_error error;
-    LEDmode_t mode;
+    const LED_activity_desc_t * pLEDact;
     LED_activity_desc_t LEDact;
-    LED_activity_desc_t * pLEDact;
+    pLEDact = &LEDact;
     /* We use this pointer assignment, so we can also set it to NULL if we need */
-    pLEDact = &(LEDact);
 
     switch (req->data[3]) {
     case 0x00:
-        /* ON override */
-        mode = Override;
-        pLEDact->action = LED_ACTV_OFF;
+        /* OFF override */
+        pLEDact = &LED_Off_Activity;
         break;
     case 0xFF:
-        /* OFF override */
-        mode = Override;
-        pLEDact->action = LED_ACTV_ON;
+        /* ON override */
+        pLEDact = &LED_On_Activity;
         break;
     case 0xFB:
         /* Lamp Test */
         /*! @todo Put the lamp test as a higher priority action, not a type of override */
-        mode = Override;
-        pLEDact->action = LED_ACTV_BLINK;
-        pLEDact->initstate = LED_ON_STATE;
+        LEDact.action = LED_ACTV_BLINK;
+        LEDact.initstate = LED_ON_STATE;
         /* On duration in 100ms units */
-        pLEDact->delay_init = req->data[4] * 100;
+        LEDact.delay_init = req->data[4] * 100;
         /* Set the toggle delay to 0, so we know its a "single-shot" descriptor, so the LED module should revert to its override/local_control state later */
-        pLEDact->delay_tog = 0;
+        LEDact.delay_tog = 0;
         break;
     case 0xFC:
         /* Local state */
-        mode = Local_Control;
-        pLEDact = NULL;
+	pLEDact = NULL;
         break;
     case 0xFD:
     case 0xFE:
@@ -267,17 +268,17 @@ void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
         break;
     default:
         /* Blink Override */
-        mode = Override;
-        pLEDact->action = LED_ACTV_BLINK;
-        pLEDact->initstate = LED_OFF_STATE;
-        /* Off duration in 10ms units */
-        pLEDact->delay_init = req->data[3] * 10;
-        /* On duration in 10ms units*/
-        pLEDact->delay_tog = req->data[4] * 10;
+        LEDact.action = LED_ACTV_BLINK;
+        LEDact.initstate = LED_ON_STATE;
+        /* On duration in 10ms units */
+        LEDact.delay_init = req->data[4] / 10;
+        /* Off duration in 10ms units*/
+        LEDact.delay_tog = req->data[3] / 10;
         break;
     }
+
     /* If this function does not block, we can't assure we have programmed the LED correctly, but if it does, there's the risk that this task won't kill itself and we'll run out of heap space */
-    error = LED_update( req->data[2], mode , pLEDact );
+    error = LED_update( req->data[2], pLEDact );
 
     switch (error) {
     case led_success:
