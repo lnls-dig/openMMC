@@ -31,26 +31,29 @@ typedef enum {
 	PAYLOAD_FPGA_WORKING = 6,
 	PAYLOAD_SWITCHING_OFF = 7,
 	PAYLOAD_QUIESCED = 8,
+	PAYLOAD_OFF = 9,
 	PAYLOAD_STATE_NO_CHANGE = 253,
 	PAYLOAD_STATE_UNKNOWN = 254,
 	PAYLOAD_POWER_FAIL = 255
 } payload_state;
 
 typedef enum {
-	PAYLOAD_MESSAGE_P12GOOD = 0,
-	PAYLOAD_MESSAGE_P12GOODn = 1,
-	PAYLOAD_MESSAGE_PGOOD = 2,
-	PAYLOAD_MESSAGE_PGOODn = 3,
-	PAYLOAD_MESSAGE_COLD_RST = 4,
-	PAYLOAD_MESSAGE_WARM_RST = 5,
-	PAYLOAD_MESSAGE_REBOOT   = 6,
-	PAYLOAD_MESSAGE_QUIESCED = 7,
+	PAYLOAD_MESSAGE_P12GOOD,
+	PAYLOAD_MESSAGE_P12GOODn,
+	PAYLOAD_MESSAGE_PGOOD,
+	PAYLOAD_MESSAGE_PGOODn,
+	PAYLOAD_MESSAGE_COLD_RST,
+	PAYLOAD_MESSAGE_WARM_RST,
+	PAYLOAD_MESSAGE_REBOOT,
+	PAYLOAD_MESSAGE_QUIESCED
 } payload_message;
 
 #define FRU_CTLCODE_COLD_RST          (0)       // FRU Control command cold reset code
 #define FRU_CTLCODE_WARM_RST          (1)       // FRU Control command warm reset code
 #define FRU_CTLCODE_REBOOT            (2)       // FRU Control command reboot code
 #define FRU_CTLCODE_QUIESCE           (4)       // FRU Control command quiesce code
+
+#define PAYLOAD_BASE_DELAY 10
 
 void payload_send_message(uint8_t msg);
 void vTaskPayload(void *pvParmeters);

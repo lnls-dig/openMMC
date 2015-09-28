@@ -123,22 +123,25 @@ void payload_init( void )
     queue_payload_handle = xQueueCreate(16, sizeof(uint8_t));
 
     initializeDCDC();
+    /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
+    gpio_set_pin_state( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, true);
 }
 
 extern I2C_Mutex i2c_mutex_array[2];
+extern const sensor_t const sensor_array[NUM_SDR];
 
 void vTaskPayload(void *pvParmeters)
 {
     payload_state state = PAYLOAD_NO_POWER;
     payload_state new_state = PAYLOAD_STATE_NO_CHANGE;
-    I2C_ID_T i2c_bus_id;
-
-    TickType_t xDelay = 10;
 
     uint8_t P12V_good = 0;
     uint8_t P1V0_good = 0;
     uint8_t FPGA_boot_DONE = 0;
     uint8_t QUIESCED_req = 0;
+
+    ipmi_msg pmsg;
+    int data_len = 0;
 
     uint8_t current_message;
 
@@ -149,26 +152,25 @@ void vTaskPayload(void *pvParmeters)
 
     for ( ;; ) {
         new_state = state;
-        xDelay = 10;
 
-	/* Read all messages from the queue */
+        /* Read all messages from the queue */
         while(xQueueReceive(queue_payload_handle, &current_message, (TickType_t) 0 )) {
-	    switch (current_message) {
-	    case PAYLOAD_MESSAGE_P12GOOD:
+            switch (current_message) {
+            case PAYLOAD_MESSAGE_P12GOOD:
                 P12V_good = 1;
-		break;
-	    case PAYLOAD_MESSAGE_P12GOODn:
-		P12V_good = 0;
-		break;
-	    case PAYLOAD_MESSAGE_PGOOD:
-		P1V0_good = 1;
-		break;
-	    case PAYLOAD_MESSAGE_PGOODn:
-		P1V0_good = 0;
-		break;
+                break;
+            case PAYLOAD_MESSAGE_P12GOODn:
+                P12V_good = 0;
+                break;
+            case PAYLOAD_MESSAGE_PGOOD:
+                P1V0_good = 1;
+                break;
+            case PAYLOAD_MESSAGE_PGOODn:
+                P1V0_good = 0;
+                break;
             case PAYLOAD_MESSAGE_QUIESCED:
                 QUIESCED_req = 1;
-		break;
+                break;
             }
         }
 
@@ -179,92 +181,80 @@ void vTaskPayload(void *pvParmeters)
         case PAYLOAD_NO_POWER:
             if (P12V_good == 1) {
                 new_state = PAYLOAD_SWITCHING_ON;
-                xDelay = 0;
-            }
+	    }
             QUIESCED_req = 0;
             break;
 
         case PAYLOAD_SWITCHING_ON:
-            xDelay = 10;
-            //gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, true);
             setDC_DC_ConvertersON(true);
             new_state = PAYLOAD_POWER_GOOD_WAIT;
-	    break;
+            break;
 
         case PAYLOAD_POWER_GOOD_WAIT:
-            if (P1V0_good == 1) {
-                xDelay = 1000;
+            if (QUIESCED_req) {
+                new_state = PAYLOAD_SWITCHING_OFF;
+            } else if (P1V0_good == 1) {
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
             }
             break;
 
-	case PAYLOAD_STATE_FPGA_SETUP:
-            // @todo: things like reconfiguring clock crossbar
-            //gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, false);
-
-            //vTaskDelayUntil( &xLastWakeTime, 1000 );
+        case PAYLOAD_STATE_FPGA_SETUP:
 #ifdef ADN_CFG
-	    if (afc_i2c_take_by_chipid(CHIP_ID_ADN, NULL, &i2c_bus_id, 100 ) == pdTRUE) {
+	    // @todo: things like reconfiguring clock crossbar
+	    I2C_ID_T i2c_bus_id;
+            if (afc_i2c_take_by_chipid(CHIP_ID_ADN, NULL, &i2c_bus_id, 100 ) == pdTRUE) {
                 adn4604_setup(i2c_bus_id);
                 afc_i2c_give(i2c_bus_id);
             }
 #endif
-            xDelay = 0;
-            //xDelay = 1000;
-	    // gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, true);
+	    /* Pulse PROGRAM_B pin low to reset the FPGA */
+	    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, false);
+            gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, true);
             new_state = PAYLOAD_FPGA_BOOTING;
             break;
 
         case PAYLOAD_FPGA_BOOTING:
             if (QUIESCED_req == 1) {
                 new_state = PAYLOAD_SWITCHING_OFF;
-                xDelay = 0;
             } else if (FPGA_boot_DONE) {
                 new_state = PAYLOAD_FPGA_WORKING;
-                xDelay = 0;
-            }
-            QUIESCED_req = 0;
-            break;
+	    }
+	    break;
 
-	case PAYLOAD_FPGA_WORKING:
+        case PAYLOAD_FPGA_WORKING:
             if (QUIESCED_req == 1) {
                 new_state = PAYLOAD_SWITCHING_OFF;
-                xDelay = 0;
             } else if (P12V_good == 0) {
-                new_state = PAYLOAD_POWER_FAIL;
-            }
-            QUIESCED_req = 0;
-            break;
-
-	case PAYLOAD_SWITCHING_OFF:
-            xDelay = 0;
-            QUIESCED_req = 0;
-            new_state = PAYLOAD_QUIESCED;
-
-            setDC_DC_ConvertersON(false);
-            do_quiesced(FRU_CTLCODE_QUIESCE);
-            // @todo: emit QUIESCED event
-            break;
-
-	case PAYLOAD_QUIESCED:
-            if (P12V_good == 0) {
+		QUIESCED_req = 0;
                 new_state = PAYLOAD_NO_POWER;
             }
-            QUIESCED_req = 0;
             break;
 
-	case PAYLOAD_POWER_FAIL:
-            QUIESCED_req = 0;
+        case PAYLOAD_SWITCHING_OFF:
+            setDC_DC_ConvertersON(false);
+	    sensor_array[HOT_SWAP_SENSOR].data->comparator_status |= HOT_SWAP_STATE_QUIESCED;
+            pmsg.dest_LUN = 0;
+            pmsg.netfn = NETFN_SE;
+            pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
+            pmsg.data[data_len++] = 0x04;
+            pmsg.data[data_len++] = 0xf2;
+            pmsg.data[data_len++] = HOT_SWAP_SENSOR;
+            pmsg.data[data_len++] = 0x6f;
+            pmsg.data[data_len++] = HOT_SWAP_QUIESCED; // hot swap state
+            pmsg.data_len = data_len;
+	    if ( ipmb_send_request( &pmsg ) == ipmb_error_success ) {
+		QUIESCED_req = 0;
+		new_state = PAYLOAD_NO_POWER;
+	    }
             break;
 
-	default:
+        default:
             break;
         }
 
-        // wait only if no
-        if (xDelay != 0) {
-            vTaskDelayUntil( &xLastWakeTime, xDelay );
-	}
         state = new_state;
+        vTaskDelayUntil( &xLastWakeTime, PAYLOAD_BASE_DELAY );
     }
 }
+
+

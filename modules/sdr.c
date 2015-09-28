@@ -400,7 +400,7 @@ uint16_t INA220_readVolt(I2C_ID_T i2c, uint8_t address, bool raw)
 {
     uint8_t ch[2];
     xI2CMasterWriteRead(i2c, address, INA220_BUS_REG, ch, 2);
-    uint16_t tmpVal = 0.0;
+    uint16_t tmpVal = 0;
     tmpVal = (0x1fE0 & (ch[0] << 5)) | (0x1f & (ch[1] >> 3));
     if (raw == false) {
         tmpVal = tmpVal * 4;
@@ -417,6 +417,7 @@ void vTaskSensor( void *pvParmeters )
 
     if (afc_i2c_take_by_chipid(CHIP_ID_INA_0, &i2c_address,&i2c_bus_id, (TickType_t) 0 ) == pdTRUE ) {
         INA220_init(i2c_bus_id, i2c_address);
+        gpio_set_pin_state( GPIO_EM_FMC2_P12V_PORT, GPIO_EM_FMC2_P12V_PIN, true);
         afc_i2c_give(i2c_bus_id);
     } else {
         // fatal error
@@ -425,28 +426,7 @@ void vTaskSensor( void *pvParmeters )
     uint8_t i;
     for( ;; )
     {
-        // @todo: move to payload task
-        if (xSemaphoreTake(semaphore_fru_control, SENSOR_DELAY_PERIOD) == pdTRUE) {
-            if (payload_ctrl_code == FRU_CTLCODE_QUIESCE) {
-                sensor_array[HOT_SWAP_SENSOR].data->comparator_status |= HOT_SWAP_STATE_QUIESCED;
-
-                ipmi_msg pmsg;
-                int data_len = 0;
-
-                pmsg.dest_LUN = 0;
-                pmsg.netfn = NETFN_SE;
-                pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
-                pmsg.data[data_len++] = 0x04;
-                pmsg.data[data_len++] = 0xf2;
-                pmsg.data[data_len++] = HOT_SWAP_SENSOR;
-                pmsg.data[data_len++] = 0x6f;
-                pmsg.data[data_len++] = HOT_SWAP_QUIESCED; // hot swap state
-                pmsg.data_len = data_len;
-                ipmb_send_request( &pmsg );
-
-            }
-            continue;
-        }
+        vTaskDelay(10);
         /* @todo: add real delay checking */
         if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdTRUE) {
 
@@ -461,22 +441,25 @@ void vTaskSensor( void *pvParmeters )
                 uint8_t new_flag = 0;
                 uint8_t old_flag = pDATA->comparator_status & 0x03;
 
+                LED_activity_desc_t LEDact;
+
                 if (tmp_val) {
                     // handle opened
                     new_flag = HOT_SWAP_STATE_HANDLE_OPENED;
+                    LEDact.action = LED_ACTV_OFF;
                 } else {
                     // handle closed
                     new_flag = HOT_SWAP_STATE_HANDLE_CLOSED;
+                    LEDact.action = LED_ACTV_ON;
                 }
+
+
 
                 if (new_flag != old_flag) {
                     ipmi_msg pmsg;
-		    int data_len = 0;
+                    int data_len = 0;
 
-		    LED_activity_desc_t LEDact;
-		    LEDact.action = LED_ACTV_ON;
-		    LED_update( LED_RED, Override, &LEDact );
-		    pmsg.dest_LUN = 0;
+                    pmsg.dest_LUN = 0;
                     pmsg.netfn = NETFN_SE;
                     pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
                     pmsg.data[data_len++] = 0x04;
@@ -485,6 +468,9 @@ void vTaskSensor( void *pvParmeters )
                     pmsg.data[data_len++] = 0x6f;
                     pmsg.data[data_len++] = (new_flag >> 1); // hot swap state
                     pmsg.data_len = data_len;
+
+                    LED_update( LED_RED, &LEDact );
+
 		    /* We must keep trying to send the hot-swap event message.
 		     * If it fails, we don't update the sensor record,
 		     * so it'll try again in the next unblock */
