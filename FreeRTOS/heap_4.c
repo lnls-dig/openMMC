@@ -100,7 +100,7 @@ task.h is included from an application file. */
 #if( configAPPLICATION_ALLOCATED_HEAP == 1 )
 	/* The application writer has already defined the array used for the RTOS
 	heap - probably so it can be placed in a special segment or address. */
-	extern uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+__attribute__ ((section(".noinit_RAM2"))) uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
 #else
         static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
 #endif /* configAPPLICATION_ALLOCATED_HEAP */
