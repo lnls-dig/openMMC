@@ -74,6 +74,8 @@ licensing and training services.
 #define configUSE_APPLICATION_TASK_TAG          0
 #define configUSE_TASK_NOTIFICATIONS            1
 #define configUSE_STATS_FORMATTING_FUNCTIONS    0
+#define configAPPLICATION_ALLOCATED_HEAP        1
+#define USE_HEAP_4
 
 #define configASSERT( x )     if( ( x ) == 0 ) { vAssertCalled( __FILE__, __LINE__ );}
 
