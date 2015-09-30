@@ -31,11 +31,22 @@
 #define NUM_SDR_FMC2_12V        2
 #define NUM_SDR_FMC2_VADJ       3
 #define NUM_SDR_FMC2_3V3        4
-#define NUM_SDR_FMC1_12V        5
-#define NUM_SDR_FMC1_VADJ       6
-#define NUM_SDR_FMC1_3V3        7
+//#define NUM_SDR_FMC1_12V        5
+//#define NUM_SDR_FMC1_VADJ       6
+//#define NUM_SDR_FMC1_3V3        7
+#define NUM_SDR_LM75_1          5
+#define NUM_SDR_LM75_2          6
+#define NUM_SDR_LM75_3          7
+#define NUM_SDR_LM75_4          8
 
-#define HOT_SWAP                                0xF2
+/* Sensor Types */
+#define SENSOR_TYPE_TEMPERATURE                 0x01
+#define SENSOR_TYPE_VOLTAGE                     0x02
+#define SENSOR_TYPE_CURRENT                     0x03
+#define SENSOR_TYPE_FAN                         0x04
+#define SENSOR_TYPE_WATCHDOG                    0x23
+#define SENSOR_TYPE_VERSION_CHANGE              0x2B
+#define SENSOR_TYPE_HOT_SWAP                    0xF2
 
 /* Module handle sensor status */
 #define HOT_SWAP_CLOSED                         0x00

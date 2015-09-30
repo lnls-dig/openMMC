@@ -24,8 +24,7 @@
 #include "semphr.h"
 
 #include "sdr.h"
-#include "ina220.h"
-#include "hotswap.h"
+#include "sensors.h"
 #include "pin_mapping.h"
 #include "i2c.h"
 #include "port.h"
@@ -47,12 +46,12 @@ static const SDR_type_12h_t  SDR0 = {
 /* record key bytes */
     .slaveaddr = 0x00, // owner ID??
     .chnum = 0x00,
-    .power_notification_global_init = NUM_SDR,
+    .power_notification_global_init = 0x04,
     .device_cap = 0x3b,
     .reserved[0] = 0x00,
     .reserved[1] = 0x00,
     .reserved[2] = 0x00,
-    .entityID = 0x60, //0x60 | ((0x76-0x70) >>1), // Entry ID?
+    .entityID = 0xC1,
     .entityinstance = 0x00,
     .OEM = 0x00,
     .IDtypelen = 0xc7, /* 8 bit ASCII, number of bytes */
@@ -72,31 +71,31 @@ static const SDR_type_02h_t SDR_HOT_SWAP = {
     .sensornum = HOT_SWAP_SENSOR, /* sensor number */
 
 /* record body bytes */
-    .entityID = 0x60, /* entity id: AMC Module */
+    .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
     .sensorinit = 0x03, /* init: event generation + scanning enabled */
     .sensorcap = 0xc1, /* capabilities: auto re-arm,*/
-    .sensortype = HOT_SWAP, /* sensor type: HOT SWAP*/
+    .sensortype = SENSOR_TYPE_HOT_SWAP, /* sensor type: HOT SWAP*/
     .event_reading_type = 0x6f, /* sensor reading*/
-    .assertion_event_mask = { 0x07, /* LSB assert event mask: 3 bit value */
+    .assertion_event_mask = { 0x00, /* LSB assert event mask: 3 bit value */
                               0x00 }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0x07, /* LSB deassert event mask: 3 bit value */
+    .deassertion_event_mask = { 0x00, /* LSB deassert event mask: 3 bit value */
                                 0x00 }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x00, /* LSB: readable Threshold mask: all thresholds are readable:  */
-    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: all thresholds are setable: */
-    .sensor_units_1 = 0xc0, /* sensor units 1 :*/
+    .readable_threshold_mask = 0x00, /* LSB: readable Threshold mask: no thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: no thresholds are setable: */
+    .sensor_units_1 = 0xc0, /* sensor units 1 : Does not return analog reading*/
     .sensor_units_2 = 0x00, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
-    .record_sharing[0] = 0x00, /* Linearization */
-    .record_sharing[1] = 0x00, /* Linearization */
+    .record_sharing[0] = 0x00,
+    .record_sharing[1] = 0x00,
     .pos_thr_hysteresis = 0x00, /* positive going Threshold hysteresis value */
     .neg_thr_hysteresis = 0x00, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .reserved3 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xcc, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F', 'R', 'U', ' ', 'H', 'O', 'T', '_', 'S', 'W', 'A', 'P' } /* sensor string */
+    .IDtypelen = 0xcF, /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'M', 'O', 'D', 'U', 'L', 'E', ' ', 'H', 'O', 'T', '_', 'S', 'W', 'A', 'P' } /* sensor string */
 };
 
 /* 12V sensor */
@@ -110,33 +109,33 @@ static const SDR_type_01h_t SDR_FMC2_12V = {
 
     .ownerID = 0x00, /* i2c address, -> SDR_Init */
     .ownerLUN = 0x00, /* sensor owner LUN */
-    .sensornum = NUM_SDR_FMC2_12V, /* sensor number */
+    .sensornum = 0x00, /* sensor number */
 
     /* record body bytes */
-    .entityID = 0x60, /* entity id: AMC Module */
+    .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
     .sensorinit = 0x7f, /* init: event generation + scanning enabled */
     .sensorcap = 0x58, /* capabilities: auto re-arm,*/
-    .sensortype = 0x02, /* sensor type: HOT SWAP*/
+    .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: Voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0x07, /* LSB assert event mask: 3 bit value */
-                              0x00 }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0x07, /* LSB deassert event mask: 3 bit value */
-                                0x00 }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x00, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x00, /* MSB: setabled Threshold mask: all thresholds are setabled: */
-    .sensor_units_1 = 0xc0, /* sensor units 1 :*/
-    .sensor_units_2 = 0x4, /* sensor units 2 :*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
     .linearization = 0x00, /* Linearization */
     .M = 63, /* M */
     .M_tol = 0x00, /* M - Tolerance */
     .B = 0x00, /* B */
     .B_accuracy = 0x00, /* B - Accuracy */
-    .acc_exp_sensor_dir = 0x00, /* Sensor direction */
-    .Rexp_Bexp = 0xD0, /* R-Exp , B-Exp */
-    .analog_flags = 0x00, /* Analogue characteristics flags */
-    .nominal_reading = 195, /* Nominal reading */
+    .acc_exp_sensor_dir = 0x02, /* Sensor direction */
+    .Rexp_Bexp = 0xD0, /* R-Exp = -3 , B-Exp = 0 */
+    .analog_flags = 0x03, /* Analogue characteristics flags */
+    .nominal_reading = 195, /* Nominal reading = 12.285V */
     .normal_max = 255, /* Normal maximum */
     .normal_min = 0x00, /* Normal minimum */
     .sensor_max_reading = 255, /* Sensor Maximum reading */
@@ -152,8 +151,8 @@ static const SDR_type_01h_t SDR_FMC2_12V = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 4, /* 8 bit ASCII, number of bytes */
-    .IDstring = { '+', '1', '2', 'V' } /* sensor string */
+    .IDtypelen = 0xc0 | 9 , /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'F','M','C','2',' ','+', '1', '2', 'V' } /* sensor string */
 };
 
 /* FMC2 PVADJ sensor */
@@ -167,14 +166,14 @@ static const SDR_type_01h_t SDR_FMC2_VADJ = {
 
     .ownerID = 0x00, /* i2c address, -> SDR_Init */
     .ownerLUN = 0x00, /* sensor owner LUN */
-    .sensornum = NUM_SDR_FMC2_VADJ, /* sensor number */
+    .sensornum = 0x00, /* sensor number */
 
     /* record body bytes */
-    .entityID = 0x60, /* entity id: AMC Module */
+    .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
     .sensorinit = 0x7f, /* init: event generation + scanning enabled */
     .sensorcap = 0x58, /* capabilities: auto re-arm,*/
-    .sensortype = 0x02, /* sensor type: HOT SWAP*/
+    .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0x07, /* LSB assert event mask: 3 bit value */
                               0x00 }, /* MSB assert event mask */
@@ -224,14 +223,14 @@ static const SDR_type_01h_t SDR_FMC2_P3V3 = {
 
     .ownerID = 0x00, /* i2c address, -> SDR_Init */
     .ownerLUN = 0x00, /* sensor owner LUN */
-    .sensornum = NUM_SDR_FMC2_3V3, /* sensor number */
+    .sensornum = 0x00, /* sensor number */
 
     /* record body bytes */
     .entityID = 0x60, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
     .sensorinit = 0x7f, /* init: event generation + scanning enabled */
     .sensorcap = 0x58, /* capabilities: auto re-arm,*/
-    .sensortype = 0x02, /* sensor type: HOT SWAP*/
+    .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: VOLTAGE*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0x07, /* LSB assert event mask: 3 bit value */
                               0x00 }, /* MSB assert event mask */
