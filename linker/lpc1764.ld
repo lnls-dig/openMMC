@@ -47,33 +47,32 @@ SECTIONS
         
     } >MFlash128
     
-    .text : ALIGN(4)    
+    .text : ALIGN(4)
     {
          *(.text*)
         *(.rodata .rodata.* .constdata .constdata.*)
         . = ALIGN(4);
-        
+
     } > MFlash128
 
     /*
      * for exception handling/unwind - some Newlib functions (in common
-     * with C++ and STDC++) use this. 
+     * with C++ and STDC++) use this.
      */
     .ARM.extab : ALIGN(4)
     {
     	*(.ARM.extab* .gnu.linkonce.armextab.*)
     } > MFlash128
     __exidx_start = .;
-    
+
     .ARM.exidx : ALIGN(4)
     {
     	*(.ARM.exidx* .gnu.linkonce.armexidx.*)
     } > MFlash128
     __exidx_end = .;
-    
+
     _etext = .;
-        
-    
+
     /* DATA section for RamAHB16 */
     .data_RAM2 : ALIGN(4)
     {
@@ -134,8 +133,8 @@ SECTIONS
     /* NOINIT section for RamAHB16 */
     .noinit_RAM2 (NOLOAD) : ALIGN(4)
     {
-    	*(.noinit.$RAM2*)
-    	*(.noinit.$RamAHB16*)
+    	*(.noinit_RAM2*)
+    	*(.noinit_RamAHB16*)
        . = ALIGN(4) ;
     } > RamAHB16 
     
