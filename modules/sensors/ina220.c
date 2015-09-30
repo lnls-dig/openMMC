@@ -22,7 +22,7 @@
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
  * @date September 2015
  *
- * @brief
+ * @brief DCDCs Voltage reading using INA220 sensor
  */
 
 #include "FreeRTOS.h"
@@ -30,9 +30,9 @@
 #include "port.h"
 #include "sdr.h"
 #include "task_priorities.h"
-#include "ina220.h"
 #include "board_version.h"
 #include "payload.h"
+#include "ina220.h"
 
 // INA220 7bit address
 // 0x40 - FMC2 P12V

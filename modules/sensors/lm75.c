@@ -24,8 +24,8 @@
 #include "port.h"
 #include "sdr.h"
 #include "task_priorities.h"
-#include "lm75.h"
 #include "board_version.h"
+#include "lm75.h"
 
 void vTaskLM75( void* Parameters )
 {
