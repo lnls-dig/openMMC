@@ -36,13 +36,6 @@
 #include "payload.h"
 #include "board_version.h"
 
-/* LM75 Addresses */
-#define mainLM75_1_ADDR                     ((uint32_t) 0x4C)
-#define mainLM75_2_ADDR                     ((uint32_t) 0x4D)
-#define mainLM75_3_ADDR                     ((uint32_t) 0x4E)
-#define mainLM75_4_ADDR                     ((uint32_t) 0x4F)
-#define mainREAD_TEMP_FREQUENCY_MS          200
-
 #define DEBUG_LED
 #define DEBUG_SDR
 
@@ -80,6 +73,7 @@ int main(void)
     sdr_init(ipmb_addr);
     payload_init();
     do_quiesced_init();
+    sensor_init();
 
 #ifdef HEAP_TEST
     xTaskCreate( heap_test, "Heap Test", 50, (void *) NULL, tskIDLE_PRIORITY+1, (TaskHandle_t *) NULL );

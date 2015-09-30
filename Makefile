@@ -43,6 +43,7 @@ INCLUDES = -I./
 INCLUDES += -I./board/afcv3
 INCLUDES += -I./port/nxp/lpc17xx
 INCLUDES += -I./modules
+INCLUDES += -I./modules/sensors
 INCLUDES += -I$(LPCOPEN_INCPATH)
 INCLUDES += -I$(FREERTOS_INCPATH)
 

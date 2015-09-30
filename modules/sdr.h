@@ -161,46 +161,21 @@ typedef struct {
     uint8_t ownerID;
     uint8_t entityID;
     uint8_t entityinstance;
-
     uint8_t readout_value;
     uint8_t comparator_status;
-
-    /*uint8_t event_msg_ctl;
-      uint16_t cur_masked_comp;
-      uint16_t prev_masked_comp;
-      uint8_t comparator_status;              // for IPMI comparator readout for get sensor reading command
-      uint8_t readout_value;
-      pGetReadoutVal readout_function;
-      uint8_t readout_func_arg;
-      uint8_t active_context_code;            // context code for when sensor is active*/
-
+    uint8_t address;
 } sensor_data_entry_t;
 
-typedef struct __attribute__((__packed__)) {
-    unsigned char reservation_id[2];
-    unsigned char record_id[2];
-    unsigned char offset;
-    unsigned char size;
-} ipmi_se_get_sdr_param_t;
-
-struct sensor_;
-
-typedef void (*sdr_callback_t)(const struct sensor_ * params);
-
-typedef struct sensor_ {
+typedef struct {
     SDR_TYPE type;
     void * sdr;
     uint8_t sdr_length;
     sensor_data_entry_t * data;
-    sdr_callback_t callback_function;
-    void * callback_params;
+    TaskHandle_t * task_handle;
 } sensor_t;
 
-typedef struct {
-    uint8_t i2c;
-    uint8_t address;
-} INA220_params_t;
-
+sensor_data_entry_t sdrData[NUM_SDR];
+const sensor_t const sensor_array[NUM_SDR];
 
 void ipmi_se_get_sdr( ipmi_msg *req, ipmi_msg* rsp);
 void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp);
@@ -208,18 +183,10 @@ void ipmi_se_get_sdr_info( ipmi_msg *req, ipmi_msg* rsp);
 void ipmi_se_reserve_device_sdr( ipmi_msg *req, ipmi_msg* rsp);
 //void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp );
 
-
 void initializeDCDC();
-
 void do_quiesced_init();
-
 void do_quiesced(unsigned char ctlcode);
-
 void sdr_init(uint8_t ipmiID);
-
-
-
-void vTaskSensor( void *pvParmeters );
-
+void sensor_init( void );
 
 #endif
