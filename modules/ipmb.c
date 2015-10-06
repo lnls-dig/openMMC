@@ -179,7 +179,7 @@ void ipmb_init ( void )
     vI2CInit( IPMB_I2C, I2C_SPEED, I2C_Mode_IPMB );
     ipmb_txqueue = xQueueCreate( IPMB_TXQUEUE_LEN, sizeof(ipmi_msg_cfg) );
     vQueueAddToRegistry( ipmb_txqueue, "IPMB_TX_QUEUE");
-    xTaskCreate( IPMB_TXTask, (const char*)"IPMB_TX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, tskIPMB_TX_PRIORITY, ( TaskHandle_t * ) NULL );
+    xTaskCreate( IPMB_TXTask, (const char*)"IPMB_TX", 150, ( void * ) NULL, tskIPMB_TX_PRIORITY, ( TaskHandle_t * ) NULL );
     xTaskCreate( IPMB_RXTask, (const char*)"IPMB_RX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, tskIPMB_RX_PRIORITY, ( TaskHandle_t * ) NULL );
 }
 
