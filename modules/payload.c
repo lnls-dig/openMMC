@@ -32,6 +32,7 @@
 #include "pin_mapping.h"
 #include "ipmi.h"
 #include "task_priorities.h"
+#include "adn4604.h"
 
 /* payload states
  *   0 - no power
@@ -117,18 +118,16 @@ void payload_send_message(uint8_t msg){
 
 }
 
+TaskHandle_t vTaskPayload_Handle;
 void payload_init( void )
 {
-    xTaskCreate(vTaskPayload, "Payload", configMINIMAL_STACK_SIZE, NULL, tskPAYLOAD_PRIORITY, (TaskHandle_t *) NULL);
+    xTaskCreate(vTaskPayload, "Payload", configMINIMAL_STACK_SIZE*2, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
     queue_payload_handle = xQueueCreate(16, sizeof(uint8_t));
 
     initializeDCDC();
     /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
     gpio_set_pin_state( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, true);
 }
-
-extern I2C_Mutex i2c_mutex_array[2];
-extern const sensor_t const sensor_array[NUM_SDR];
 
 void vTaskPayload(void *pvParmeters)
 {
@@ -199,14 +198,9 @@ void vTaskPayload(void *pvParmeters)
             break;
 
         case PAYLOAD_STATE_FPGA_SETUP:
-#ifdef ADN_CFG
-	    // @todo: things like reconfiguring clock crossbar
-	    I2C_ID_T i2c_bus_id;
-            if (afc_i2c_take_by_chipid(CHIP_ID_ADN, NULL, &i2c_bus_id, 100 ) == pdTRUE) {
-                adn4604_setup(i2c_bus_id);
-                afc_i2c_give(i2c_bus_id);
-            }
-#endif
+
+	    adn4604_setup();
+
 	    /* Pulse PROGRAM_B pin low to reset the FPGA */
 	    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, false);
             gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, true);
