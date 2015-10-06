@@ -122,6 +122,8 @@ void vTaskHotSwap( void *Parameters )
             if (ipmb_send_request( &pmsg ) == ipmb_error_success) {
                 /* Update the SDR */
                 pDATA->comparator_status = (pDATA->comparator_status & 0xFC) | new_flag;
+            } else {
+                xTaskNotifyGive(xTaskGetCurrentTaskHandle());
             }
             break;
         }
