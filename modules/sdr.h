@@ -24,7 +24,7 @@
 
 #include "ipmb.h"
 
-#define NUM_SENSOR              6       /* Number of sensors */
+#define NUM_SENSOR              4       /* Number of sensors */
 #define NUM_SDR                 (NUM_SENSOR+1)  /* Number of SDRs */
 
 #define HOT_SWAP_SENSOR         1
@@ -174,7 +174,6 @@ typedef struct {
     uint8_t entityinstance;
     uint8_t readout_value;
     uint8_t comparator_status;
-    uint8_t address;
 } sensor_data_entry_t;
 
 typedef struct {
@@ -183,6 +182,7 @@ typedef struct {
     uint8_t sdr_length;
     sensor_data_entry_t * data;
     TaskHandle_t * task_handle;
+    uint8_t slave_addr;
 } sensor_t;
 
 sensor_data_entry_t sdrData[NUM_SDR];

@@ -385,13 +385,21 @@ TaskHandle_t vTaskHotSwap_Handle;
 TaskHandle_t vTaskINA220_Handle;
 
 const sensor_t const sensor_array[NUM_SDR]  = {
-    { TYPE_12, (void *) &SDR0,          sizeof(SDR0),          &sdrData[0], (TaskHandle_t *) NULL},
-    { TYPE_02, (void *) &SDR_HOT_SWAP,  sizeof(SDR_HOT_SWAP),  &sdrData[1], (TaskHandle_t *) &vTaskHotSwap_Handle },
-    { TYPE_01, (void *) &SDR_FMC2_12V,  sizeof(SDR_FMC2_12V),  &sdrData[2], (TaskHandle_t *) &vTaskINA220_Handle },
-    { TYPE_01, (void *) &SDR_FMC2_VADJ, sizeof(SDR_FMC2_VADJ), &sdrData[3], (TaskHandle_t *) &vTaskINA220_Handle },
-    { TYPE_01, (void *) &SDR_FMC2_P3V3, sizeof(SDR_FMC2_P3V3), &sdrData[4], (TaskHandle_t *) &vTaskINA220_Handle },
-    { TYPE_01, (void *) &SDR_LM75_1,    sizeof(SDR_LM75_1),    &sdrData[5], (TaskHandle_t *) &vTaskLM75_Handle },
-    { TYPE_01, (void *) &SDR_LM75_2,    sizeof(SDR_LM75_2),    &sdrData[6], (TaskHandle_t *) &vTaskLM75_Handle }
+    /* Entry record */
+    { TYPE_12, (void *) &SDR0,          sizeof(SDR0),          &sdrData[0], (TaskHandle_t *) NULL,                 0 },
+    /* Hotswap Sensor */
+    { TYPE_02, (void *) &SDR_HOT_SWAP,  sizeof(SDR_HOT_SWAP),  &sdrData[1], (TaskHandle_t *) &vTaskHotSwap_Handle, 0 },
+    /* FMC1 Current/Voltage/Power Sensors */
+    { TYPE_01, (void *) &SDR_FMC2_12V,  sizeof(SDR_FMC2_12V),  &sdrData[2], (TaskHandle_t *) &vTaskINA220_Handle,  0x45 },
+    { TYPE_01, (void *) &SDR_FMC2_VADJ, sizeof(SDR_FMC2_VADJ), &sdrData[3], (TaskHandle_t *) &vTaskINA220_Handle,  0x42 },
+    { TYPE_01, (void *) &SDR_FMC2_P3V3, sizeof(SDR_FMC2_P3V3), &sdrData[4], (TaskHandle_t *) &vTaskINA220_Handle,  0x44 },
+    /* FMC2 Current/Voltage/Power Sensors */
+    /*{ TYPE_01, (void *) &SDR_FMC2_12V,  sizeof(SDR_FMC2_12V),  &sdrData[5], (TaskHandle_t *) &vTaskINA220_Handle,  0x40 },
+    { TYPE_01, (void *) &SDR_FMC2_VADJ, sizeof(SDR_FMC2_VADJ), &sdrData[6], (TaskHandle_t *) &vTaskINA220_Handle,  0x41 },
+    { TYPE_01, (void *) &SDR_FMC2_P3V3, sizeof(SDR_FMC2_P3V3), &sdrData[7], (TaskHandle_t *) &vTaskINA220_Handle,  0x43 },*/
+    /* Temperature Sensors */
+    /*{ TYPE_01, (void *) &SDR_LM75_1,    sizeof(SDR_LM75_1),    &sdrData[8], (TaskHandle_t *) &vTaskLM75_Handle,    0x4C },
+    { TYPE_01, (void *) &SDR_LM75_2,    sizeof(SDR_LM75_2),    &sdrData[9], (TaskHandle_t *) &vTaskLM75_Handle,    0x4D }*/
 };
 
 #define SDR_ARRAY_LENGTH (sizeof(sensor_array) / sizeof(sensor_array[0]))
@@ -420,7 +428,7 @@ void sensor_init( void )
 {
     hotswap_init();
     INA220_init();
-    LM75_init();
+    //LM75_init();
 }
 
 static uint16_t reservationID;
@@ -449,12 +457,12 @@ void sdr_init(uint8_t ipmiID)
         sensor_array[i].data->ownerID = ipmiID;
 
         // @todo: remove this HOT_SWAP_SENSOR case, to enable first event
-        if (i == HOT_SWAP_SENSOR) {
-            sensor_array[i].data->comparator_status = HOT_SWAP_STATE_HANDLE_OPENED;
-	} else {
+        //if (i == HOT_SWAP_SENSOR) {
+        //    sensor_array[i].data->comparator_status = HOT_SWAP_STATE_HANDLE_OPENED;
+	//} else {
 	    sensor_array[i].data->comparator_status = 0;
 	    sensor_array[i].data->readout_value = 0;
-        }
+      //  }
     }
 }
 
