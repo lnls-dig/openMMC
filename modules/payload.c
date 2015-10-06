@@ -230,6 +230,7 @@ void vTaskPayload(void *pvParmeters)
             pmsg.dest_LUN = 0;
             pmsg.netfn = NETFN_SE;
             pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
+            data_len = 0;
             pmsg.data[data_len++] = 0x04;
             pmsg.data[data_len++] = 0xf2;
             pmsg.data[data_len++] = HOT_SWAP_SENSOR;
