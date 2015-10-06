@@ -38,21 +38,24 @@
 
 #define DEBUG_LED
 #define DEBUG_SDR
+//#define HEAP_TEST
 
 /* LED pins initialization */
 static void prvHardwareInit( void );
 TickType_t getTickDifference(TickType_t current_time, TickType_t start_time);
 void heap_test ( void* param);
+TaskHandle_t heap_handle;
 /*-----------------------------------------------------------*/
 
 int main(void)
 {
-
     /* Update clock register value - LPC specific */
     SystemCoreClockUpdate();
 
     /* Configure LED pins */
     prvHardwareInit();
+
+    vConfigureTimerForRunTimeStats();
 
 //#define STOP_TEST
 #ifdef STOP_TEST
@@ -63,9 +66,11 @@ int main(void)
 
     LED_init();
 
+    portENABLE_INTERRUPTS();
+
     afc_board_i2c_init();
     afc_board_discover();
-
+    portDISABLE_INTERRUPTS();
     /*  Init IPMI interface */
     /* NOTE: ipmb_init() is called inside this function */
     ipmi_init();
@@ -76,7 +81,7 @@ int main(void)
     sensor_init();
 
 #ifdef HEAP_TEST
-    xTaskCreate( heap_test, "Heap Test", 50, (void *) NULL, tskIDLE_PRIORITY+1, (TaskHandle_t *) NULL );
+    xTaskCreate( heap_test, "Heap Test", 50, (void *) NULL, tskIDLE_PRIORITY+5, &heap_handle );
 #endif
 /* Start the tasks running. */
     vTaskStartScheduler();
@@ -102,14 +107,18 @@ TickType_t getTickDifference(TickType_t current_time, TickType_t start_time)
 }
 
 #ifdef HEAP_TEST
+static char stats[500];
 void heap_test ( void* param)
 {
     uint8_t water_mark = 0;
     size_t used_heap = 0;
+
     for (;;) {
-	vTaskDelay(1000);
-	water_mark = uxTaskGetStackHighWaterMark(NULL);
-	used_heap = configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize();
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+	        water_mark = uxTaskGetStackHighWaterMark(NULL);
+	        used_heap = configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize();
+	        vTaskGetRunTimeStats(stats);
+
     }
 }
 #endif
@@ -164,11 +173,15 @@ void vApplicationStackOverflowHook ( TaskHandle_t pxTask, signed char * pcTaskNa
     (void) pcTaskName;
     taskDISABLE_INTERRUPTS();
     /* Place a breakpoint here, so we know when there's a stack overflow */
-    for ( ; ; ) {}
+    for ( ; ; ) {
+        uint32_t watermark = uxTaskGetStackHighWaterMark(pxTask);
+    }
 }
 #endif
 
 #if (configGENERATE_RUN_TIME_STATS == 1)
+
+
 void vConfigureTimerForRunTimeStats( void )
 {
     const unsigned long CTCR_CTM_TIMER = 0x00, TCR_COUNT_ENABLE = 0x01;
@@ -197,7 +210,14 @@ void vAssertCalled( char* file, uint32_t line) {
 
 #if (configUSE_MALLOC_FAILED_HOOK == 1)
 void vApplicationMallocFailedHook( void ) {
-    for( ;; );
+    extern void prvCheckTasksWaitingTermination( void );
+    prvCheckTasksWaitingTermination();
 }
+
+
+void vApplicationIdleHook (void) {
+
+}
+
 #endif
 

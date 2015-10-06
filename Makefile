@@ -43,11 +43,12 @@ INCLUDES = -I./
 INCLUDES += -I./board/afcv3
 INCLUDES += -I./port/nxp/lpc17xx
 INCLUDES += -I./modules
+INCLUDES += -I./trace/Include
 INCLUDES += -I./modules/sensors
 INCLUDES += -I$(LPCOPEN_INCPATH)
 INCLUDES += -I$(FREERTOS_INCPATH)
 
-EXTRA_CFLAGS = -Wall -Og -g3 -std=gnu99
+EXTRA_CFLAGS = -Wall -O0 -g3 -std=gnu99
 CFLAGS = $(DEFS) $(INCLUDES)
 CFLAGS += -mcpu=$(MCPU) -mthumb
 CFLAGS += -fno-builtin -ffunction-sections -fdata-sections -fno-strict-aliasing  -fmessage-length=0 -nostdlib
