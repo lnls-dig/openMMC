@@ -27,6 +27,7 @@
 #include "pin_mapping.h"
 #include "led.h"
 #include "task_priorities.h"
+#include "led.h"
 
 /* Local variables */
 QueueHandle_t ipmi_rxqueue = NULL;
@@ -69,10 +70,16 @@ void IPMITask ( void * pvParameters )
                 /* TODO: handle this problem */
             }
 
-            if ( xTaskCreate(IPMI_handler_task ,(const char*)"IPMB_handler_task", configMINIMAL_STACK_SIZE*2, req_param, tskIPMI_HANDLERS_PRIORITY,  (TaskHandle_t *) NULL ) != pdTRUE ){
-                configASSERT(0);
+            while ( xTaskCreate(IPMI_handler_task ,(const char*)"IPMI_handler_task", configMINIMAL_STACK_SIZE, req_param, tskIPMI_HANDLERS_PRIORITY,  (TaskHandle_t *) NULL ) != pdTRUE ){
+                /* If the task couldn't be created, most likely we're out of heap, enter blocked state so that Idle task can run and free up some memory for us */
+                extern const LED_activity_desc_t LED_2Hz_Blink_Activity;
+
+                LED_update(LED_RED, &LED_On_Activity);
+                vTaskDelay(5);
                 /* TODO: handle this problem */
             }
+            extern const LED_activity_desc_t LED_Off_Activity;
+            LED_update(LED_RED, &LED_Off_Activity);
 
         }else{
             ipmb_error error_code;
@@ -121,6 +128,7 @@ void IPMI_handler_task( void * pvParameters){
     vPortFree(req_param);
 
     vTaskDelete(NULL);
+
 }
 
 /* Initializes the IPMI Dispatcher:
@@ -128,11 +136,13 @@ void IPMI_handler_task( void * pvParameters){
  * -> Registers the RX queue for incoming requests
  * -> Creates the IPMI task
  */
+TaskHandle_t TaskIPMI_Handle;
+
 void ipmi_init ( void )
 {
     ipmb_init();
     ipmb_register_rxqueue( &ipmi_rxqueue );
-    xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", configMINIMAL_STACK_SIZE*4, ( void * ) NULL, tskIPMI_PRIORITY, ( TaskHandle_t * ) NULL );
+    xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle );
 }
 
 
