@@ -132,7 +132,6 @@ void IPMB_RXTask ( void *pvParameters )
 
     for ( ;; ) {
         /* Checks if there's any incoming messages (the task remains blocked here) */
-        configASSERT(ipmb_buffer_rx);
         rx_len = xI2CSlaveReceive( IPMB_I2C, &ipmb_buffer_rx[1], (sizeof(ipmb_buffer_rx)/sizeof(ipmb_buffer_rx[0])), portMAX_DELAY );
 
         if ( rx_len > 0 ) {
@@ -254,13 +253,15 @@ ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
     configASSERT( client_queue );
     configASSERT( msg_cfg != NULL )
         /* Sends only the ipmi msg, not the control struct */
-        if ( xQueueSend( client_queue, &(msg_cfg->buffer), CLIENT_NOTIFY_TIMEOUT ) ) {
-            if ( msg_cfg->caller_task ) {
-                xTaskNotifyGive( msg_cfg->caller_task );
-            }
-            return ipmb_error_success;
+    if (!IS_RESPONSE(msg_cfg->buffer)) {
+        if ( xQueueSend( client_queue, &(msg_cfg->buffer), CLIENT_NOTIFY_TIMEOUT ) == pdFALSE ) {
+            return ipmb_error_timeout;
         }
-    return ipmb_error_timeout;
+    }
+    if ( msg_cfg->caller_task ) {
+        xTaskNotifyGive( msg_cfg->caller_task );
+    }
+    return ipmb_error_success;
 }
 
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
@@ -268,7 +269,7 @@ ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
     configASSERT( queue != NULL );
 
     *queue = xQueueCreate( IPMB_CLIENT_QUEUE_LEN, sizeof(ipmi_msg) );
-
+    vQueueAddToRegistry(*queue, "ipmi_rx_queue");
     /* Copies the queue handler so we know where to write */
     client_queue = *queue;
     if ( *queue ) {
