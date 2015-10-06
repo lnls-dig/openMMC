@@ -52,33 +52,16 @@ void vTaskINA220( void * Parameters )
     const TickType_t xFrequency = INA220_UPDATE_RATE / portTICK_PERIOD_MS;
 
     uint8_t i2c_bus_id;
-    uint8_t INA220_address[MAX_INA220_COUNT] = { 0x40, 0x41, 0x42, 0x43, 0x44, 0x45 };
-    uint8_t i, j;
+    uint8_t i;
     SDR_type_01h_t *pSDR;
     sensor_data_entry_t * pDATA;
-
-    /* Populate the table with the I2C addressess of the LM75 */
-    for ( j = 0, i = 0; i < NUM_SDR && j < MAX_INA220_COUNT; i++, j++ ) {
-        if (*(sensor_array[i].task_handle) != xTaskGetCurrentTaskHandle() ) {
-            continue;
-        }
-	if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t) 50) == pdFALSE) {
-	    continue;
-	}
-        pDATA = sensor_array[i].data;
-        pDATA->address = INA220_address[j];
-
-	uint8_t cmd[3] = {0x00, 0x01, 0x9F};
-	xI2CMasterWrite(i2c_bus_id, pDATA->address, cmd, 3);
-	afc_i2c_give( i2c_bus_id );
-    }
 
     /* Initialise the xLastWakeTime variable with the current time. */
     xLastWakeTime = xTaskGetTickCount();
 
     for ( ;; ) {
 
-        /* Update all temperature sensors readings */
+        /* Update all [voltage sensors readings */
         for ( i = 0; i < NUM_SDR; i++ ) {
 
             /* Check if the handle pointer is not NULL */
@@ -100,14 +83,24 @@ void vTaskINA220( void * Parameters )
             }
 
 	    /* Update sensor reading on SDR */
-	    pDATA->readout_value = INA220_readVolt( i2c_bus_id, pDATA->address, true );
+	    pDATA->readout_value = INA220_readVolt( i2c_bus_id, sensor_array[i].slave_addr, true );
 
-	    /* Compare reading with sensor threshold levels */
-	    if (pDATA->readout_value > pSDR->lower_noncritical_thr) {
-		payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
-	    } else if (pDATA->readout_value < pSDR->lower_critical_thr) {
-		payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
+	    /* Take different action for each sensor */
+	    switch ((pSDR->hdr.recID_MSB << 8)|(pSDR->hdr.recID_LSB)) {
+	    case NUM_SDR_FMC2_12V:
+		/* Compare reading with sensor threshold levels */
+	        if (pDATA->readout_value > pSDR->lower_noncritical_thr) {
+		    payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
+		} else if (pDATA->readout_value < pSDR->lower_critical_thr) {
+		    payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
+		}
+	        break;
+	    default:
+	        break;
 	    }
+
+
+
 
 	    afc_i2c_give( i2c_bus_id );
         }
@@ -117,7 +110,33 @@ void vTaskINA220( void * Parameters )
 
 void INA220_init( void )
 {
+#define INA_CFG
+    uint8_t i, j;
+    uint8_t i2c_bus_id;
+
     xTaskCreate( vTaskINA220, "INA220", configMINIMAL_STACK_SIZE, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
+#ifdef INA_CFG
+
+    for ( j = 0, i = 0; i < NUM_SDR && j < MAX_INA220_COUNT; i++, j++ ) {
+        if ( *(sensor_array[i].task_handle) != vTaskINA220_Handle ) {
+            continue;
+        }
+
+        if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t) 50) == pdFALSE) {
+            continue;
+        }
+
+        uint8_t cmd[3] = {0x00, 0x01, 0x9F};
+
+        portENABLE_INTERRUPTS();
+        xI2CMasterWrite(i2c_bus_id, sensor_array[i].slave_addr, cmd, sizeof(cmd));
+        portDISABLE_INTERRUPTS();
+
+        afc_i2c_give( i2c_bus_id );
+    }
+
+#endif
+
 }
 
 uint16_t INA220_readVolt(I2C_ID_T i2c, uint8_t address, bool raw)
