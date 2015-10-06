@@ -49,8 +49,8 @@ void Board_I2C_Init(I2C_ID_T id)
         Chip_IOCON_EnableOD(LPC_IOCON, 0,  0);
         Chip_IOCON_EnableOD(LPC_IOCON, 0,  1);
 /*
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 19, IOCON_MODE_INACT, IOCON_FUNC0);
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 20, IOCON_MODE_INACT, IOCON_FUNC0);
+        Chip_IOCON_PinMux(LPC_IOCON, 0, 19, IOCON_MODE_INACT, IOCON_FUNC2);
+        Chip_IOCON_PinMux(LPC_IOCON, 0, 20, IOCON_MODE_INACT, IOCON_FUNC2);
         Chip_IOCON_EnableOD(LPC_IOCON, 0, 19);
         Chip_IOCON_EnableOD(LPC_IOCON, 0, 20);
         */
