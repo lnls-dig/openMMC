@@ -53,7 +53,7 @@ typedef enum {
 #define FRU_CTLCODE_REBOOT            (2)       // FRU Control command reboot code
 #define FRU_CTLCODE_QUIESCE           (4)       // FRU Control command quiesce code
 
-#define PAYLOAD_BASE_DELAY 10
+#define PAYLOAD_BASE_DELAY 200
 
 void payload_send_message(uint8_t msg);
 void vTaskPayload(void *pvParmeters);
