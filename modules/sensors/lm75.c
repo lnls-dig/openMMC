@@ -36,29 +36,9 @@ void vTaskLM75( void* Parameters )
     uint8_t i2c_bus_id;
 
     /*! @bug LM75 is addressed randomly through the SDR */
-    uint8_t LM75_address[LM75_MAX_COUNT] = { 0x4C, 0x4D, 0x4E, 0x4F };
 
-    uint8_t i, j;
-    SDR_type_01h_t *pSDR;
+    uint8_t i;
     sensor_data_entry_t * pDATA;
-
-    /* Populate the table with the I2C addressess of the LM75 and configure the ICs */
-    for ( j = 0, i = 0; i < NUM_SDR && j < LM75_MAX_COUNT; i++, j++ ) {
-	if (*(sensor_array[i].task_handle) != xTaskGetCurrentTaskHandle() ) {
-	    continue;
-	}
-	if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t) 50) == pdFALSE) {
-	    continue;
-	}
-        pDATA = sensor_array[i].data;
-        pDATA->address = LM75_address[j];
-
-#ifdef LM75_CFG
-	uint8_t cmd[3] = {0x00, 0x01, 0x9F};
-	xI2CMasterWrite(i2c_id, pDATA->address, ch, 3);
-#endif
-	afc_i2c_give( i2c_bus_id );
-    }
 
     /* Initialise the xLastWakeTime variable with the current time. */
     xLastWakeTime = xTaskGetTickCount();
@@ -67,16 +47,15 @@ void vTaskLM75( void* Parameters )
 
         /* Update all temperature sensors readings */
         for ( i = 0; i < NUM_SDR; i++ ) {
-	    /* Check if the handle pointer is not NULL */
+            /* Check if the handle pointer is not NULL */
             if (sensor_array[i].task_handle == NULL) {
-		continue;
-	    }
-	    /* Check if this task should update the selected SDR */
-	    if ( *(sensor_array[i].task_handle) != xTaskGetCurrentTaskHandle() ) {
-		continue;
-	    }
+                continue;
+            }
+            /* Check if this task should update the selected SDR */
+            if ( *(sensor_array[i].task_handle) != xTaskGetCurrentTaskHandle() ) {
+                continue;
+            }
 
-            pSDR = (SDR_type_01h_t *) sensor_array[i].sdr;
             pDATA = sensor_array[i].data;
 
             /* Try to gain the I2C bus */
@@ -84,20 +63,34 @@ void vTaskLM75( void* Parameters )
                 continue;
             }
             /* Update the temperature reading */
-	    uint8_t temp[2] = {0};
+            uint8_t temp[2] = {0};
 
-            if (xI2CMasterWriteRead( i2c_bus_id, pDATA->address, 0x00, &temp[0], 2) == 2) {
-		/*! @todo Apply the conversion formula before writing the value to SDR */
+            if (xI2CMasterWriteRead( i2c_bus_id, sensor_array[i].slave_addr, 0x00, &temp[0], 2) == 2) {
+                /*! @todo Apply the conversion formula before writing the value to SDR */
                 pDATA->readout_value = temp[0];
             }
 
-	    afc_i2c_give(i2c_bus_id);
+            afc_i2c_give(i2c_bus_id);
         }
-	vTaskDelayUntil( &xLastWakeTime, xFrequency );
+        vTaskDelayUntil( &xLastWakeTime, xFrequency );
     }
 }
 
 void LM75_init( void )
 {
+#ifdef LM75_CFG
+    uint8_t i2c_bus_id;
+    uint8_t i, j;
+
+    for ( j = 0, i = 0; i < NUM_SDR && j < LM75_MAX_COUNT; i++, j++ ) {
+        if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t) 50) == pdFALSE) {
+            continue;
+        }
+        uint8_t cmd[3] = {0x00, 0x01, 0x9F};
+        xI2CMasterWrite(i2c_id, sensor_array[i].slave_addr, ch, 3);
+
+        afc_i2c_give( i2c_bus_id );
+    }
+#endif
     xTaskCreate( vTaskLM75, "LM75", configMINIMAL_STACK_SIZE, (void *) NULL, tskLM75SENSOR_PRIORITY, &vTaskLM75_Handle);
 }
