@@ -226,7 +226,7 @@ static const SDR_type_01h_t SDR_FMC2_P3V3 = {
     .sensornum = 0x00, /* sensor number */
 
     /* record body bytes */
-    .entityID = 0x60, /* entity id: AMC Module */
+    .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
     .sensorinit = 0x7f, /* init: event generation + scanning enabled */
     .sensorcap = 0x58, /* capabilities: auto re-arm,*/
@@ -404,7 +404,8 @@ const sensor_t const sensor_array[NUM_SDR]  = {
 
 #define SDR_ARRAY_LENGTH (sizeof(sensor_array) / sizeof(sensor_array[0]))
 
-size_t sdr_get_size_by_type(SDR_TYPE type){
+size_t sdr_get_size_by_type(SDR_TYPE type)
+{
     switch (type) {
     case TYPE_01:
         return sizeof(SDR_type_01h_t);
@@ -417,7 +418,8 @@ size_t sdr_get_size_by_type(SDR_TYPE type){
     }
 }
 
-size_t sdr_get_size_by_entry(int id){
+size_t sdr_get_size_by_entry(int id)
+{
     if (id >= SDR_ARRAY_LENGTH) {
         return 0;
     }
