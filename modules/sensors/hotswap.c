@@ -28,7 +28,7 @@
 #include "hotswap.h"
 #include "task_priorities.h"
 #include "ipmi.h"
-
+#include "led.h"
 
 extern const sensor_t const sensor_array[NUM_SDR];
 
@@ -50,7 +50,8 @@ void EINT3_IRQHandler( void )
 
     /* Checks if the interrupt occurred in Port2 */
     if (Chip_GPIOINT_IsIntPending(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT)) {
-        /*! @bug If any other GPIO interruption is enable in Port 2, it'll trigger the hotswap messaging */
+        /*! @bug If any other GPIO interruption is enabled in Port 2, it'll trigger the hotswap messaging */
+        asm("nop");
         if ( gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN) == 0 ) {
             hotswap_state = HOT_SWAP_STATE_HANDLE_CLOSED;
         } else {
@@ -89,6 +90,18 @@ void vTaskHotSwap( void *Parameters )
     sensor_data_entry_t * pDATA;
     uint8_t new_flag;
     uint8_t i;
+    uint8_t init_state;
+
+    /* Enable first event */
+    if ( gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN) == 0 ) {
+	init_state = HOT_SWAP_STATE_HANDLE_CLOSED;
+	LED_update( LED_BLUE, &LED_Off_Activity );
+    } else {
+	init_state = HOT_SWAP_STATE_HANDLE_OPENED;
+	LED_update( LED_BLUE, &LED_On_Activity );
+    }
+
+    xTaskNotify(xTaskGetCurrentTaskHandle(), init_state, eSetValueWithOverwrite);
 
     for ( ;; ) {
         new_flag = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
@@ -124,6 +137,7 @@ void vTaskHotSwap( void *Parameters )
                 pDATA->comparator_status = (pDATA->comparator_status & 0xFC) | new_flag;
             } else {
                 xTaskNotifyGive(xTaskGetCurrentTaskHandle());
+		vTaskDelay(20);
             }
             break;
         }
