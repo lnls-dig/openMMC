@@ -48,13 +48,11 @@ void Board_I2C_Init(I2C_ID_T id)
         Chip_IOCON_PinMux(LPC_IOCON, 0,  1, IOCON_MODE_INACT, IOCON_FUNC3);
         Chip_IOCON_EnableOD(LPC_IOCON, 0,  0);
         Chip_IOCON_EnableOD(LPC_IOCON, 0,  1);
-/*
+
         Chip_IOCON_PinMux(LPC_IOCON, 0, 19, IOCON_MODE_INACT, IOCON_FUNC2);
         Chip_IOCON_PinMux(LPC_IOCON, 0, 20, IOCON_MODE_INACT, IOCON_FUNC2);
         Chip_IOCON_EnableOD(LPC_IOCON, 0, 19);
         Chip_IOCON_EnableOD(LPC_IOCON, 0, 20);
-        */
-
         break;
 
     case I2C2:
@@ -94,47 +92,6 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed )
     Chip_I2C_SetMasterEventHandler(id, Chip_I2C_EventHandler);
 }
 
-/*! @todo Change the I2C driver functions to expect the number of bytes sent/received instead of an error (follow gpio pattern)
- * The exception of this would be xSlaveReceive, that is implemented differently from LPCOpen, so it would be defined in the .c file as is now. The other functions (master write/read/write&read) could just be aliased to LPCOpen ones */
-#ifdef macro_test
-i2c_err xI2CMasterWrite( I2C_ID_T id, uint8_t addr, uint8_t * tx_buff, uint8_t tx_len )
-{
-    uint8_t sent_bytes = 0;
-
-    sent_bytes = 
-    if ( sent_bytes == tx_len ) {
-        return i2c_err_SUCCESS;
-    } else {
-        return i2c_err_FAILURE;
-    }
-}
-
-i2c_err xI2CMasterRead( I2C_ID_T id, uint8_t addr, uint8_t * rx_buff, uint8_t rx_len )
-{
-    uint8_t recv_bytes = 0;
-
-    recv_bytes = 
-
-    if ( recv_bytes == rx_len ) {
-        return i2c_err_SUCCESS;
-    } else {
-        return i2c_err_FAILURE;
-    }
-}
-
-i2c_err xI2CMasterWriteRead( I2C_ID_T id, uint8_t addr, uint8_t cmd, uint8_t* rx_buff, uint8_t rx_len )
-{
-    uint8_t recv_bytes = 0;
-
-    recv_bytes = 
-
-    if ( recv_bytes == rx_len ) {
-        return i2c_err_SUCCESS;
-    } else {
-        return i2c_err_FAILURE;
-    }
-}
-#endif
 static TaskHandle_t slave_task_id;
 I2C_XFER_T slave_cfg;
 uint8_t recv_msg[i2cMAX_MSG_LENGTH];
