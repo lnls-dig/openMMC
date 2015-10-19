@@ -35,6 +35,7 @@
 #include "sdr.h"
 #include "payload.h"
 #include "board_version.h"
+#include "fru.h"
 
 #define DEBUG_LED
 #define DEBUG_SDR
@@ -66,6 +67,7 @@ int main(void)
 
     LED_init();
 
+    fru_init();
     portENABLE_INTERRUPTS();
 
     afc_board_i2c_init();
