@@ -177,6 +177,7 @@ extern const LED_activity_desc_t LED_On_Activity;
                 vTaskDelay(20);
             }
             break;
+
         }
 #endif
 #ifdef HOTSWAP_POLL

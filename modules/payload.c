@@ -106,6 +106,9 @@ void initializeDCDC() {
     gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, true);
     gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, true);
 
+    /* RTM TEST */
+    gpio_set_pin_dir( 1, 30, true);
+
     gpio_set_pin_dir( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, true);
 }
 
@@ -126,6 +129,10 @@ void payload_init( void )
     queue_payload_handle = xQueueCreate(16, sizeof(uint8_t));
 
     initializeDCDC();
+
+    /* Enable RTM */
+    gpio_set_pin_state( 1, 30, true);
+
     /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
     gpio_set_pin_state( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, true);
 }
