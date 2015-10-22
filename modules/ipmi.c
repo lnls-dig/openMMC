@@ -23,6 +23,7 @@
 #include "string.h"
 
 /* Project includes */
+#include "FreeRTOS.h"
 #include "ipmi.h"
 #include "pin_mapping.h"
 #include "led.h"
