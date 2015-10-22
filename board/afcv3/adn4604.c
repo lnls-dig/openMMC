@@ -34,7 +34,7 @@ void adn4604_setup(void) {
     //}
 
     /* Configure the interconnects */
-    con.out0 = 15;
+    con.out0 = 13;
     con.out1 = 14;
     con.out2 = 13;
     con.out3 = 12;
@@ -47,7 +47,7 @@ void adn4604_setup(void) {
     con.out10 = 14;
     con.out11 = 14;
     con.out12 = 14;
-    con.out13 = 5;
+    con.out13 = 8;
     con.out14 = 14;
     con.out15 = 14;
 
