@@ -51,6 +51,7 @@ INCLUDES += -I$(FREERTOS_INCPATH)
 EXTRA_CFLAGS = -Wall -O0 -g3 -std=gnu99
 CFLAGS = $(DEFS) $(INCLUDES)
 CFLAGS += -mcpu=$(MCPU) -mthumb
+CFLAGS += -Wno-packed-bitfield-compat
 CFLAGS += -fno-builtin -ffunction-sections -fdata-sections -fno-strict-aliasing  -fmessage-length=0 -nostdlib
 CFLAGS += $(EXTRA_CFLAGS)
 
