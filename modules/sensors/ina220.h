@@ -32,7 +32,8 @@
 #include "port.h"
 
 #define MAX_INA220_COUNT 6
-#define INA220_UPDATE_RATE 500
+#define INA220_UPDATE_RATE 100
+#define INA220_BUS_REG 0x02
 
 extern TaskHandle_t vTaskINA220_Handle;
 

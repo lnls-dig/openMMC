@@ -213,7 +213,10 @@ void vTaskPayload(void *pvParmeters)
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (FPGA_boot_DONE) {
                 new_state = PAYLOAD_FPGA_WORKING;
-	    }
+	        } else if (P12V_good == 0) {
+	            QUIESCED_req = 0;
+	            new_state = PAYLOAD_NO_POWER;
+	        }
 	    break;
 
         case PAYLOAD_FPGA_WORKING:

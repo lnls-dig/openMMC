@@ -43,8 +43,6 @@
 // 0x42 - FMC1 PVADJ
 // 0x44 - FMC1 P3V3
 
-#define INA220_BUS_REG 0x02
-
 void vTaskINA220( void * Parameters )
 {
     TickType_t xLastWakeTime;
