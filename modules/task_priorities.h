@@ -6,6 +6,7 @@
 #endif
 
 #define tskLED_PRIORITY			(tskIDLE_PRIORITY+1)
+#define tskFPGA_COMM_PRIORITY           (tskIDLE_PRIORITY+1)
 
 #define tskSENSOR_PRIORITY		(tskIDLE_PRIORITY+2)
 #define tskPAYLOAD_PRIORITY		(tskIDLE_PRIORITY+2)

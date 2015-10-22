@@ -34,6 +34,7 @@
 #include "board_version.h"
 #include "led.h"
 #include "task_priorities.h"
+#include "fpga_spi.h"
 
 /* Management Controller Device Locator Record 37.9 SDR Type 12h */
 static const SDR_type_12h_t  SDR0 = {

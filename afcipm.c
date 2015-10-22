@@ -36,9 +36,9 @@
 #include "payload.h"
 #include "board_version.h"
 #include "fru.h"
+#include "jtag.h"
+#include "fpga_spi.h"
 
-#define DEBUG_LED
-#define DEBUG_SDR
 //#define HEAP_TEST
 
 /* LED pins initialization */
@@ -81,6 +81,9 @@ int main(void)
     payload_init();
     do_quiesced_init();
     sensor_init();
+
+    init_scansta();
+    init_fpga_spi();
 
 #ifdef HEAP_TEST
     xTaskCreate( heap_test, "Heap Test", 50, (void *) NULL, tskIDLE_PRIORITY+5, &heap_handle );
@@ -146,6 +149,9 @@ void prvToggleLED( LED_id led )
         ulLEDport = LEDRED_PORT;
         ulLEDpin = LEDRED_PIN;
         break;
+
+    default:
+	break;
     }
     /* Obtain the current P0 state. */
     ulLEDState = Chip_GPIO_GetPinState(LPC_GPIO, ulLEDport, ulLEDpin);

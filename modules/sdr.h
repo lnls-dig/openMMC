@@ -183,6 +183,7 @@ typedef struct {
     sensor_data_entry_t * data;
     TaskHandle_t * task_handle;
     uint8_t slave_addr;
+    uint8_t diag_devID;
 } sensor_t;
 
 sensor_data_entry_t sdrData[NUM_SDR];

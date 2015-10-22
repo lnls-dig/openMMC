@@ -6,5 +6,6 @@
 #include "chip_lpc175x_6x.h"
 #include "lpc17_gpio.h"
 #include "lpc17_i2c.h"
+#include "lpc17_ssp.h"
 
 #endif
