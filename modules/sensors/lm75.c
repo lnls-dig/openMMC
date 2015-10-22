@@ -31,7 +31,7 @@ void vTaskLM75( void* Parameters )
 {
     TickType_t xLastWakeTime;
     /* Task will run every 100ms */
-    const TickType_t xFrequency = LM75_UPDATE_RATE / portTICK_PERIOD_MS;
+    const TickType_t xFrequency = LM75_UPDATE_RATE;
 
     uint8_t i2c_bus_id;
 
@@ -66,10 +66,9 @@ void vTaskLM75( void* Parameters )
             uint8_t temp[2] = {0};
 
             if (xI2CMasterWriteRead( i2c_bus_id, sensor_array[i].slave_addr, 0x00, &temp[0], 2) == 2) {
-                /*! @todo Apply the conversion formula before writing the value to SDR */
-                pDATA->readout_value = temp[0];
+		uint16_t converted_temp = ((temp[0]*10)+((temp[1]>>8)*10));
+		pDATA->readout_value = converted_temp;
             }
-
             afc_i2c_give(i2c_bus_id);
         }
         vTaskDelayUntil( &xLastWakeTime, xFrequency );
@@ -92,5 +91,5 @@ void LM75_init( void )
         afc_i2c_give( i2c_bus_id );
     }
 #endif
-    xTaskCreate( vTaskLM75, "LM75", configMINIMAL_STACK_SIZE, (void *) NULL, tskLM75SENSOR_PRIORITY, &vTaskLM75_Handle);
+    xTaskCreate( vTaskLM75, "LM75", configMINIMAL_STACK_SIZE*3, (void *) NULL, tskLM75SENSOR_PRIORITY, &vTaskLM75_Handle);
 }
