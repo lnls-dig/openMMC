@@ -24,20 +24,20 @@
 
 #include "ipmb.h"
 
-#define NUM_SENSOR              4       /* Number of sensors */
+#define NUM_SENSOR              9       /* Number of sensors */
 #define NUM_SDR                 (NUM_SENSOR+1)  /* Number of SDRs */
 
 #define HOT_SWAP_SENSOR         1
 #define NUM_SDR_FMC2_12V        2
 #define NUM_SDR_FMC2_VADJ       3
 #define NUM_SDR_FMC2_3V3        4
-//#define NUM_SDR_FMC1_12V        5
-//#define NUM_SDR_FMC1_VADJ       6
-//#define NUM_SDR_FMC1_3V3        7
-#define NUM_SDR_LM75_1          5
-#define NUM_SDR_LM75_2          6
-#define NUM_SDR_LM75_3          7
-#define NUM_SDR_LM75_4          8
+#define NUM_SDR_FMC1_12V        5
+#define NUM_SDR_FMC1_VADJ       6
+#define NUM_SDR_FMC1_3V3        7
+#define NUM_SDR_LM75_1          8
+#define NUM_SDR_LM75_2          9
+#define NUM_SDR_LM75_3          10
+#define NUM_SDR_LM75_4          11
 
 /* Sensor Types */
 #define SENSOR_TYPE_TEMPERATURE                 0x01
@@ -172,7 +172,7 @@ typedef struct {
     uint8_t ownerID;
     uint8_t entityID;
     uint8_t entityinstance;
-    uint8_t readout_value;
+    uint16_t readout_value;
     uint8_t comparator_status;
 } sensor_data_entry_t;
 
