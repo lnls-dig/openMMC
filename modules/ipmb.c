@@ -251,7 +251,7 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
 ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
 {
     configASSERT( client_queue );
-    configASSERT( msg_cfg != NULL )
+    configASSERT( msg_cfg != NULL );
         /* Sends only the ipmi msg, not the control struct */
     if (!IS_RESPONSE(msg_cfg->buffer)) {
         if ( xQueueSend( client_queue, &(msg_cfg->buffer), CLIENT_NOTIFY_TIMEOUT ) == pdFALSE ) {
