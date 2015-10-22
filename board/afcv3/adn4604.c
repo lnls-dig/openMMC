@@ -29,9 +29,9 @@ void adn4604_setup(void) {
     t_adn_connect_map con;
     t_adn_connect_cfg cfg;
 
-    //if (afc_i2c_take_by_chipid(CHIP_ID_ADN, &adn_slave_addr, &i2c_bus_id, 100 ) != pdTRUE) {
-    //    return;
-    //}
+    if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdFALSE) {
+        return;
+    }
 
     /* Configure the interconnects */
     con.out0 = 13;
@@ -63,7 +63,7 @@ void adn4604_setup(void) {
 
     /* Enable desired outputs */
     for (uint8_t i = 4; i <= 15; i++) {
-	adn4604_tx_enable(i2c_bus_id, adn_slave_addr, i);
+        adn4604_tx_enable(i2c_bus_id, adn_slave_addr, i);
     }
 
     adn4604_update( i2c_bus_id, adn_slave_addr );
