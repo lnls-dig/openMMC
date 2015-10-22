@@ -218,14 +218,11 @@ void vAssertCalled( char* file, uint32_t line) {
 
 #if (configUSE_MALLOC_FAILED_HOOK == 1)
 void vApplicationMallocFailedHook( void ) {
-    extern void prvCheckTasksWaitingTermination( void );
-    prvCheckTasksWaitingTermination();
-}
 
+}
+#endif
 
 void vApplicationIdleHook (void) {
 
 }
-
-#endif
 
