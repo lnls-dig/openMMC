@@ -1,4 +1,3 @@
-#include "FreeRTOS.h"
 #include "port.h"
 #include "i2c.h"
 #include "string.h"
@@ -79,6 +78,8 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed )
 	break;
     case I2C2:
 	irq = I2C2_IRQn;
+	break;
+    default:
 	break;
     }
 

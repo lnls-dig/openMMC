@@ -1,3 +1,4 @@
+#include "FreeRTOS.h"
 
 #define xI2CMasterWrite(id, addr, tx_buff, tx_len) Chip_I2C_MasterSend(id, addr, tx_buff, tx_len)
 #define xI2CMasterRead(id, addr, rx_buff, rx_len) Chip_I2C_MasterRead(id, addr, rx_buff, rx_len)
