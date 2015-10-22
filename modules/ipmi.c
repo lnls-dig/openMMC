@@ -73,13 +73,10 @@ void IPMITask ( void * pvParameters )
 
             while ( xTaskCreate(IPMI_handler_task ,(const char*)"IPMI_handler_task", configMINIMAL_STACK_SIZE, req_param, tskIPMI_HANDLERS_PRIORITY,  (TaskHandle_t *) NULL ) != pdTRUE ){
                 /* If the task couldn't be created, most likely we're out of heap, enter blocked state so that Idle task can run and free up some memory for us */
-                extern const LED_activity_desc_t LED_2Hz_Blink_Activity;
-
                 LED_update(LED_RED, &LED_On_Activity);
                 vTaskDelay(5);
                 /* TODO: handle this problem */
             }
-            extern const LED_activity_desc_t LED_Off_Activity;
             LED_update(LED_RED, &LED_Off_Activity);
 
         }else{
