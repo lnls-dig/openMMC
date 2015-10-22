@@ -33,10 +33,6 @@
 #include "pin_mapping.h"
 #include "port.h"
 
-/* Project definitions */
-
-uint8_t ipmb_addr;
-
 void vI2CInit( I2C_ID_T i2c_id, uint32_t speed, I2C_Mode mode )
 {
 
