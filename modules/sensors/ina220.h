@@ -31,14 +31,61 @@
 #include "FreeRTOS.h"
 #include "port.h"
 
-#define MAX_INA220_COUNT 6
-#define INA220_UPDATE_RATE 100
-#define INA220_BUS_REG 0x02
+#define MAX_INA220_COUNT        6
+#define INA220_UPDATE_RATE      100
+
+/* common register definitions */
+#define INA220_CONFIG                   0x00
+#define INA220_SHUNT_VOLTAGE            0x01 /* readonly */
+#define INA220_BUS_VOLTAGE              0x02 /* readonly */
+#define INA220_POWER                    0x03 /* readonly */
+#define INA220_CURRENT                  0x04 /* readonly */
+#define INA220_CALIBRATION              0x05
+
+/* register count */
+#define INA220_REGISTERS                6
+
+/* settings - depend on use case */
+#define INA220_CONFIG_DEFAULT           0x399F  /* PGA=8 */
+
+/* worst case is 68.10 ms (~14.6Hz, ina219) */
+#define INA220_CONVERSION_RATE          15
+#define INA220_MAX_DELAY                69 /* worst case delay in ms */
+
+#define INA220_RSHUNT_DEFAULT           10000
+
+typedef struct {
+    uint16_t config_default;
+    uint32_t calibration_factor;
+    uint8_t registers;
+    uint8_t shunt_div;
+    uint8_t bus_voltage_shift;
+    uint16_t bus_voltage_lsb;    /* uV */
+    uint16_t power_lsb;          /* uW */
+} t_ina220_config;
+
+typedef struct {
+    uint8_t i2c_id;
+    const t_ina220_config *config;
+    uint32_t rshunt;
+    uint16_t curr_config;
+    uint16_t regs[INA220_REGISTERS];
+} t_ina220_data;
 
 extern TaskHandle_t vTaskINA220_Handle;
 
+#ifdef OLD_INA220
 void INA220_init( void );
-void vTaskINA220( void* Parameters );
 uint16_t INA220_readVolt(uint8_t i2c, uint8_t address, bool raw);
+#else
+uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data);
+uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
+uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
+void ina220_readall( t_ina220_data * data );
+void ina220_sdr_init ( TaskHandle_t handle );
+void ina220_init( void );
+#endif
+
+void vTaskINA220( void* Parameters );
 
 #endif
