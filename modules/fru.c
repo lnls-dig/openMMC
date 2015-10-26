@@ -11,6 +11,8 @@
 #include "fru.h"
 #include "user_fru.h"
 
+uint8_t fru_data[FRU_SIZE];
+
 void fru_header_function( uint8_t * fru_buffer )
 {
     t_fru_common_header * hdr = (t_fru_common_header *) fru_buffer;

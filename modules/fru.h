@@ -541,7 +541,7 @@ typedef struct amc_clock_config_record {
 
 #define FRU_SIZE                                ( MULTIRECORD_AREA_OFFSET+MULTIRECORD_AREA_SIZE )
 
-static uint8_t fru_data[FRU_SIZE];
+extern uint8_t fru_data[FRU_SIZE];
 
 void module_current_record_function( uint8_t * fru_buffer );
 void board_info_area_function( uint8_t * fru_buffer );
