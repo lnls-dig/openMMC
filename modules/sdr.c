@@ -604,8 +604,13 @@ size_t sdr_get_size_by_entry(int id)
 void sensor_init( void )
 {
     hotswap_init();
-    INA220_init();
     LM75_init();
+#ifdef OLD_INA220
+    INA220_init();
+#else
+    ina220_init();
+#endif
+
 }
 
 static uint16_t reservationID;
