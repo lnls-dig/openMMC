@@ -133,8 +133,6 @@ void payload_init( void )
     /* Enable RTM */
     gpio_set_pin_state( 1, 30, true);
 
-    /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
-    gpio_set_pin_state( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, true);
 }
 
 void vTaskPayload(void *pvParmeters)
@@ -158,6 +156,9 @@ void vTaskPayload(void *pvParmeters)
     gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, true);
 
     for ( ;; ) {
+        /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
+        gpio_set_pin_state( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, true);
+
         new_state = state;
 
         /* Read all messages from the queue */
