@@ -30,8 +30,8 @@
 #include "ipmi.h"
 #include "led.h"
 
-//#define HOTSWAP_POLL
-#define HOTSWAP_INT
+#define HOTSWAP_POLL
+//#define HOTSWAP_INT
 
 #ifdef HOTSWAP_INT
 void EINT3_IRQHandler( void )
@@ -108,8 +108,6 @@ void vTaskHotSwap( void *Parameters )
     uint8_t i;
     SDR_type_01h_t *pSDR = NULL;
     sensor_data_entry_t * pDATA;
-extern const LED_activity_desc_t LED_Off_Activity;
-extern const LED_activity_desc_t LED_On_Activity;
 #ifdef HOTSWAP_INT
     uint8_t new_flag;
     uint8_t init_state;
