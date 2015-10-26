@@ -73,18 +73,19 @@ int main(void)
     afc_board_i2c_init();
     afc_board_discover();
     portDISABLE_INTERRUPTS();
-    /*  Init IPMI interface */
-    /* NOTE: ipmb_init() is called inside this function */
-    ipmi_init();
 
+    ipmb_addr = get_ipmb_addr( );
     sdr_init(ipmb_addr);
+    sensor_init();
     payload_init();
     do_quiesced_init();
-    sensor_init();
 
     init_scansta();
     init_fpga_spi();
 
+    /*  Init IPMI interface */
+    /* NOTE: ipmb_init() is called inside this function */
+    ipmi_init();
 #ifdef HEAP_TEST
     xTaskCreate( heap_test, "Heap Test", 50, (void *) NULL, tskIDLE_PRIORITY+5, &heap_handle );
 #endif
