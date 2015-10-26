@@ -83,7 +83,7 @@ void hotswap_init( void )
     NVIC_EnableIRQ( EINT3_IRQn );
 #endif
     /* Create Hot Swap task */
-    xTaskCreate( vTaskHotSwap, "Hot Swap", configMINIMAL_STACK_SIZE*2, (void *) NULL, tskHOTSWAP_PRIORITY, &vTaskHotSwap_Handle);
+    xTaskCreate( vTaskHotSwap, "Hot Swap", 200, (void *) NULL, tskHOTSWAP_PRIORITY, &vTaskHotSwap_Handle);
 
     for ( uint8_t i = 0; i < NUM_SDR; i++ ) {
 

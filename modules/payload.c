@@ -125,8 +125,8 @@ void payload_send_message(uint8_t msg){
 TaskHandle_t vTaskPayload_Handle;
 void payload_init( void )
 {
-    xTaskCreate(vTaskPayload, "Payload", configMINIMAL_STACK_SIZE*3, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
-    queue_payload_handle = xQueueCreate(16, sizeof(uint8_t));
+    xTaskCreate(vTaskPayload, "Payload", 450, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
+    queue_payload_handle = xQueueCreate(5, sizeof(uint8_t));
 
     initializeDCDC();
 

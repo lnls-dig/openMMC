@@ -180,7 +180,7 @@ void ipmb_init ( void )
     ipmb_txqueue = xQueueCreate( IPMB_TXQUEUE_LEN, sizeof(ipmi_msg_cfg) );
     vQueueAddToRegistry( ipmb_txqueue, "IPMB_TX_QUEUE");
     xTaskCreate( IPMB_TXTask, (const char*)"IPMB_TX", 150, ( void * ) NULL, tskIPMB_TX_PRIORITY, ( TaskHandle_t * ) NULL );
-    xTaskCreate( IPMB_RXTask, (const char*)"IPMB_RX", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, tskIPMB_RX_PRIORITY, ( TaskHandle_t * ) NULL );
+    xTaskCreate( IPMB_RXTask, (const char*)"IPMB_RX", 300, ( void * ) NULL, tskIPMB_RX_PRIORITY, ( TaskHandle_t * ) NULL );
 }
 
 ipmb_error ipmb_send_request ( ipmi_msg * req )

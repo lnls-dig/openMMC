@@ -91,5 +91,6 @@ void LM75_init( void )
         afc_i2c_give( i2c_bus_id );
     }
 #endif
-    xTaskCreate( vTaskLM75, "LM75", configMINIMAL_STACK_SIZE*3, (void *) NULL, tskLM75SENSOR_PRIORITY, &vTaskLM75_Handle);
+    /* Why does this Task's stack is so large? About 320 bytes */
+    xTaskCreate( vTaskLM75, "LM75", 330, (void *) NULL, tskLM75SENSOR_PRIORITY, &vTaskLM75_Handle);
 }

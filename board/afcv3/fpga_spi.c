@@ -118,7 +118,7 @@ void vTaskFPGA_COMM( void * Parameters )
 void init_fpga_spi( void )
 {
     ssp_config( FPGA_SPI, FPGA_BITRATE, 8, true, false );
-    xTaskCreate(vTaskFPGA_COMM, "FPGA_COMM", configMINIMAL_STACK_SIZE*5, NULL, tskFPGA_COMM_PRIORITY, (TaskHandle_t *) NULL);
+    xTaskCreate(vTaskFPGA_COMM, "FPGA_COMM", 450, NULL, tskFPGA_COMM_PRIORITY, (TaskHandle_t *) NULL);
 }
 
 void init_diag_struct( board_diagnostic * diag )

@@ -37,7 +37,7 @@ struct req_param_struct{
     ipmi_msg req_received;
     t_req_handler req_handler;
 };
-
+uint32_t handler_max_watermark = 0;
 extern t_req_handler_record handlers[MAX_HANDLERS];
 extern void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp);
 void IPMITask ( void * pvParameters )
@@ -71,7 +71,7 @@ void IPMITask ( void * pvParameters )
                 /* TODO: handle this problem */
             }
 
-            while ( xTaskCreate(IPMI_handler_task ,(const char*)"IPMI_handler_task", configMINIMAL_STACK_SIZE, req_param, tskIPMI_HANDLERS_PRIORITY,  (TaskHandle_t *) NULL ) != pdTRUE ){
+            while ( xTaskCreate(IPMI_handler_task ,(const char*)"IPMI_handler_task", 80, req_param, tskIPMI_HANDLERS_PRIORITY,  (TaskHandle_t *) NULL ) != pdTRUE ){
                 /* If the task couldn't be created, most likely we're out of heap, enter blocked state so that Idle task can run and free up some memory for us */
                 LED_update(LED_RED, &LED_On_Activity);
                 vTaskDelay(5);
@@ -122,6 +122,12 @@ void IPMI_handler_task( void * pvParameters){
        new command from the MCH. Check this for debugging purposes
        only. */
     configASSERT( response_error == ipmb_error_success );
+
+    /* Check how deep the handler task went in the stack */
+    uint32_t watermark = uxTaskGetStackHighWaterMark(NULL);
+    if (watermark > handler_max_watermark) {
+        handler_max_watermark = watermark;
+    }
 
     vPortFree(req_param);
 
