@@ -27,6 +27,8 @@
 #include "board_version.h"
 #include "lm75.h"
 
+TaskHandle_t vTaskLM75_Handle;
+
 void vTaskLM75( void* Parameters )
 {
     TickType_t xLastWakeTime;
@@ -34,40 +36,37 @@ void vTaskLM75( void* Parameters )
     const TickType_t xFrequency = LM75_UPDATE_RATE;
 
     uint8_t i2c_bus_id;
-
-    /*! @bug LM75 is addressed randomly through the SDR */
-
     uint8_t i;
     sensor_data_entry_t * pDATA;
+
+    uint8_t temp[2];
+    uint16_t converted_temp;
 
     /* Initialise the xLastWakeTime variable with the current time. */
     xLastWakeTime = xTaskGetTickCount();
 
     for ( ;; ) {
+        uint32_t watermark = uxTaskGetStackHighWaterMark(NULL);
+        /* Try to gain the I2C bus */
+        if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdTRUE) {
+            /* Update all temperature sensors readings */
+            for ( i = 0; i < NUM_SDR; i++ ) {
+                /* Check if the handle pointer is not NULL */
+                if (sensor_array[i].task_handle == NULL) {
+                    continue;
+                }
+                /* Check if this task should update the selected SDR */
+                if ( *(sensor_array[i].task_handle) != xTaskGetCurrentTaskHandle() ) {
+                    continue;
+                }
 
-        /* Update all temperature sensors readings */
-        for ( i = 0; i < NUM_SDR; i++ ) {
-            /* Check if the handle pointer is not NULL */
-            if (sensor_array[i].task_handle == NULL) {
-                continue;
-            }
-            /* Check if this task should update the selected SDR */
-            if ( *(sensor_array[i].task_handle) != xTaskGetCurrentTaskHandle() ) {
-                continue;
-            }
+                pDATA = sensor_array[i].data;
 
-            pDATA = sensor_array[i].data;
-
-            /* Try to gain the I2C bus */
-            if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdFALSE) {
-                continue;
-            }
-            /* Update the temperature reading */
-            uint8_t temp[2] = {0};
-
-            if (xI2CMasterWriteRead( i2c_bus_id, sensor_array[i].slave_addr, 0x00, &temp[0], 2) == 2) {
-		uint16_t converted_temp = ((temp[0]*10)+((temp[1]>>8)*10));
-		pDATA->readout_value = converted_temp;
+                /* Update the temperature reading */
+                if (xI2CMasterRead( i2c_bus_id, sensor_array[i].slave_addr, &temp[0], 2) == 2) {
+                    converted_temp = ((temp[0]*10)+((temp[1]>>8)*10));
+                    pDATA->readout_value = converted_temp;
+                }
             }
             afc_i2c_give(i2c_bus_id);
         }

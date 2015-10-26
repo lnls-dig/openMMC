@@ -31,7 +31,7 @@
 #define LM75_MAX_COUNT		4
 #define LM75_UPDATE_RATE	100
 
-TaskHandle_t vTaskLM75_Handle;
+extern TaskHandle_t vTaskLM75_Handle;
 
 void LM75_init( void );
 void vTaskLM75( void* Parameters );
