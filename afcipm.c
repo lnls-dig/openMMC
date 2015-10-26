@@ -55,9 +55,9 @@ int main(void)
 
     /* Configure LED pins */
     prvHardwareInit();
-
+#if (configGENERATE_RUN_TIME_STATS == 1)
     vConfigureTimerForRunTimeStats();
-
+#endif
 //#define STOP_TEST
 #ifdef STOP_TEST
     int test = 0;
