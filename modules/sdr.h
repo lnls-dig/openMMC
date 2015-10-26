@@ -174,6 +174,7 @@ typedef struct {
     uint8_t entityinstance;
     uint16_t readout_value;
     uint8_t comparator_status;
+    void * sensor_info;
 } sensor_data_entry_t;
 
 typedef struct {
@@ -186,8 +187,8 @@ typedef struct {
     uint8_t diag_devID;
 } sensor_t;
 
-sensor_data_entry_t sdrData[NUM_SDR];
-const sensor_t const sensor_array[NUM_SDR];
+extern sensor_data_entry_t sdrData[NUM_SDR];
+extern const sensor_t const sensor_array[NUM_SDR];
 
 void ipmi_se_get_sdr( ipmi_msg *req, ipmi_msg* rsp);
 void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp);
