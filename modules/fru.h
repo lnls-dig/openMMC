@@ -23,6 +23,7 @@
 #define NO_EXT                  (0x00)
 
 //PCIE ext
+/* SSC = Spread Spectrum Clock */
 #define GEN1_NO_SSC             (0x00)
 #define GEN1_SSC                (0x01)
 #define GEN2_NO_SSC             (0x02)
