@@ -455,7 +455,12 @@ int Chip_I2C_MasterSend(I2C_ID_T id, uint8_t slaveAddr, const uint8_t *buff, uin
 	xfer.slaveAddr = slaveAddr;
 	xfer.txBuff = buff;
 	xfer.txSz = len;
-	while (Chip_I2C_MasterTransfer(id, &xfer) == I2C_STATUS_ARBLOST) {}
+#include "led.h"
+	while (Chip_I2C_MasterTransfer(id, &xfer) == I2C_STATUS_ARBLOST)
+	{
+	    LED_update(LED_RED, &LED_On_Activity);
+	}
+	LED_update(LED_RED, &LED_Off_Activity);
 	return len - xfer.txSz;
 }
 

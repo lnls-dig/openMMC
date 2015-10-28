@@ -42,16 +42,6 @@ typedef struct {
     uint32_t delay_tog;        // period in opposite state in 10ms units, 0=skip
 } LED_activity_desc_t;
 
-typedef struct {
-    LED_activity_desc_t cur_cfg;
-    LED_activity_desc_t last_cfg;
-    LED_activity_desc_t const * local_ptr;
-    uint32_t counter;
-    uint8_t Color;
-    LEDPincfg_t pin_cfg;
-    QueueHandle_t queue;
-} LED_state_rec_t;
-
 typedef enum {
     led_success = 0,
     led_unspecified_error,
@@ -63,8 +53,6 @@ extern const LED_activity_desc_t LED_On_Activity;
 extern const LED_activity_desc_t LED_Short_Blink_Activity;
 extern const LED_activity_desc_t LED_Long_Blink_Activity;
 extern const LED_activity_desc_t LED_3sec_Lamp_Test_Activity;
-
-extern LED_state_rec_t LEDstate[LED_CNT];
 
 #define LED_on(cfg)		       gpio_clr_pin(cfg.port, cfg.pin)
 #define LED_off(cfg)		       gpio_set_pin(cfg.port, cfg.pin)
