@@ -23,7 +23,6 @@
 #define NO_EXT                  (0x00)
 
 //PCIE ext
-/* SSC = Spread Spectrum Clock */
 #define GEN1_NO_SSC             (0x00)
 #define GEN1_SSC                (0x01)
 #define GEN2_NO_SSC             (0x02)
@@ -101,8 +100,8 @@ uint8_t   :4,                     /* Common Header Format Version
                                              indicates that this area is not
                                              present. */
     uint8_t       board_info_offset;           /* Board Area Starting Offset (in
-                                             multiples of 8 bytes). 00h indicates
-                                             that this area is not present. */
+                                                  multiples of 8 bytes). 00h indicates
+                                                  that this area is not present. */
     uint8_t       product_info_offset;    /* Product Info Area Starting
                                              Offset (in multiples of 8 bytes).
                                              00h indicates that this area is not
@@ -162,8 +161,8 @@ uint8_t   :4,                     /* Internal Use Format Version
 
 typedef struct fru_chassis_info_area_hdr{
 #ifdef BF_MS_FIRST
-uint8_t   :4,                     /* Chassis Info Area Format Version
-                                     7:4 - reserved, write as 0000b */
+    uint8_t   :4,                     /* Chassis Info Area Format Version
+					 7:4 - reserved, write as 0000b */
         format_version:4;       /* 3:0 - format version number = 1h
                                    for this specification. */
 #else
@@ -361,6 +360,7 @@ typedef struct __attribute__ ((__packed__)) amc_link_descriptor {
         assymetric_match:2;
 } t_amc_link_descriptor;
 
+#ifdef CERN_FRU
 typedef struct amc_point_to_point_record {
     t_multirecord_area_header hdr;
     uint8_t oem_guid_cnt;
@@ -372,12 +372,12 @@ typedef struct amc_point_to_point_record {
 #endif
 #ifdef BF_MS_FIRST
     uint8_t connected_dev_id:4,
-            reserved:3,
-            record_type:1;
+        reserved:3,
+        record_type:1;
 #else
     uint8_t record_type:1,          /* [7] Record Type - 1 AMC-Module, 0 On-Carrier Device */
-            reserved:3,     /* [6:4] Reserved, write as 0h.*/
-            connected_dev_id:4;      /* [3:0] Connected Dev ID if Record-Type =0, reserved, otherwise */
+        reserved:3,     /* [6:4] Reserved, write as 0h.*/
+        connected_dev_id:4;      /* [3:0] Connected Dev ID if Record-Type =0, reserved, otherwise */
 #endif
     uint8_t amc_channel_descriptor_cnt;
 
@@ -388,18 +388,65 @@ typedef struct amc_point_to_point_record {
 } t_amc_point_to_point_record;
 
 #define AMC_POINT_TO_POINT_RECORD_BUILD
+#else
+
+typedef struct amc_point_to_point_record {
+/* AMC Table 3-16 AdvancedMC Point-to-Point Connectivity record */
+    uint8_t record_type_id; /* Record Type ID. For all records defined
+			       in this specification a value of C0h (OEM)
+			       shall be used. */
+    uint8_t version:4,
+	reserved:3,
+	eol:1;
+    uint8_t record_len;     /* Record Length. # of bytes following rec cksum */
+    uint8_t record_cksum;   /* Record Checksum. Holds the zero checksum of
+			       the record. */
+    uint8_t header_cksum;   /* Header Checksum. Holds the zero checksum of
+			       the header. */
+    uint8_t manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
+			       three byte ID assigned to PICMG�. For this
+			       specification, the value 12634 (00315Ah) shall
+			       be used. */
+    uint8_t picmg_rec_id;   /* PICMG Record ID. For the AMC Point-to-Point
+			       Connectivity record, the value 19h must be used  */
+    uint8_t rec_fmt_ver;    /* Record Format Version. For this specification,
+			       the value 0h shall be used. */
+    uint8_t oem_guid_count; /* OEM GUID Count. The number, n, of OEM GUIDs
+			       defined in this record. */
+//OEM_GUID oem_guid_list[n];
+/* A list 16*n bytes of OEM GUIDs. */
+    
+uint8_t conn_dev_id:4,
+    :3,
+    record_type:1;
+
+    uint8_t ch_descr_count; /* AMC Channel Descriptor Count. The number, m,
+			       of AMC Channel Descriptors defined in this record. */
+
+    uint8_t amc_ch_descr0[3];
+    uint8_t amc_ch_descr1[3];
+    uint8_t amc_ch_descr2[3];
+    uint8_t amc_link_descr0[5];
+    uint8_t amc_link_descr1[5];
+    uint8_t amc_link_descr2[5];
+    uint8_t amc_link_descr3[5];
+    uint8_t amc_link_descr4[5];
+    uint8_t amc_link_descr5[5];
+
+} t_amc_point_to_point_record;
+#endif
 
 typedef struct indirect_clock_descriptor {
 #ifdef BF_MS_FIRST
-    uint8_t reserved:6,
-        pll_connection:1,
-        clock_assymetric_match:1;
+uint8_t reserved:6,
+    pll_connection:1,
+    clock_assymetric_match:1;
 #else
-    uint8_t clock_assymetric_match:1,
-        pll_connection:1,
-        reserved:6;
+uint8_t clock_assymetric_match:1,
+    pll_connection:1,
+    reserved:6;
 #endif
-    uint8_t dependent_clock_id;
+uint8_t dependent_clock_id;
 } t_indirect_clock_descriptor;
 
 typedef struct direct_clock_descriptor {
@@ -447,34 +494,34 @@ typedef struct amc_clock_config_record {
 
 
 #define DIRECT_CLOCK_CONNECTION(id, activation_control, pll_use, clock_source_receiver, family, accuracy, freq_Hz, min_Hz, max_Hz) \
-    {	.clock_id = id,							\
-	.clock_activation_control = activation_control,			\
-	.indirect_clock_descriptor_cnt = 0,				\
-	.direct_clock_descriptor_cnt = 1,				\
-	.direct_descriptor = { .pll_connection = pll_use,		\
-			       .clock_assymetric_match = clock_source_receiver, \
-			       .clock_family = family,			\
-			       .accuracy_level = accuracy,		\
-			       .clock_frequency = { (uint8_t)(((uint32_t)freq_Hz) & 0xFF), (uint8_t)((((uint32_t)freq_Hz) & 0xFF00) >> 8), (uint8_t)((((uint32_t)freq_Hz) & 0xFF0000) >> 16), (uint8_t)((((uint32_t)freq_Hz) & 0xFF000000) >> 24) }, \
-			       .clock_minimum_frequency = { (uint8_t)(((uint32_t)min_Hz) & 0xFF), (uint8_t)((((uint32_t)min_Hz) & 0xFF00) >> 8), (uint8_t)((((uint32_t)min_Hz) & 0xFF0000) >> 16), (uint8_t)((((uint32_t)min_Hz) & 0xFF000000) >> 24) }, \
-			       .clock_maximum_frequency = { (uint8_t)(((uint32_t)max_Hz) & 0xFF), (uint8_t)((((uint32_t)max_Hz) & 0xFF00) >> 8), (uint8_t)((((uint32_t)max_Hz) & 0xFF0000) >> 16), (uint8_t)((((uint32_t)max_Hz) & 0xFF000000) >> 24) } } \
+    {   .clock_id = id,                                                 \
+            .clock_activation_control = activation_control,             \
+            .indirect_clock_descriptor_cnt = 0,                         \
+            .direct_clock_descriptor_cnt = 1,                           \
+            .direct_descriptor = { .pll_connection = pll_use,           \
+                                   .clock_assymetric_match = clock_source_receiver, \
+                                   .clock_family = family,              \
+                                   .accuracy_level = accuracy,          \
+                                   .clock_frequency = { (uint8_t)(((uint32_t)freq_Hz) & 0xFF), (uint8_t)((((uint32_t)freq_Hz) & 0xFF00) >> 8), (uint8_t)((((uint32_t)freq_Hz) & 0xFF0000) >> 16), (uint8_t)((((uint32_t)freq_Hz) & 0xFF000000) >> 24) }, \
+                                   .clock_minimum_frequency = { (uint8_t)(((uint32_t)min_Hz) & 0xFF), (uint8_t)((((uint32_t)min_Hz) & 0xFF00) >> 8), (uint8_t)((((uint32_t)min_Hz) & 0xFF0000) >> 16), (uint8_t)((((uint32_t)min_Hz) & 0xFF000000) >> 24) }, \
+                                   .clock_maximum_frequency = { (uint8_t)(((uint32_t)max_Hz) & 0xFF), (uint8_t)((((uint32_t)max_Hz) & 0xFF00) >> 8), (uint8_t)((((uint32_t)max_Hz) & 0xFF0000) >> 16), (uint8_t)((((uint32_t)max_Hz) & 0xFF000000) >> 24) } } \
     }
 
-#define AMC_CLOCK_CONFIGURATION_LIST_BUILD	\
+#define AMC_CLOCK_CONFIGURATION_LIST_BUILD                              \
     t_clock_config_descriptor clock_descriptor_list[] = { AMC_CLOCK_CONFIGURATION_LIST }
 
 #define GENERIC_POINT_TO_POINT_RECORD(id, port0, port1, port2, port3, protocol, extension, matches) \
-    p2p_record->amc_channel_descriptor_cnt++;				\
-    p2p_record->amc_channel_descriptor[id].lane0 = port0;		\
-    p2p_record->amc_channel_descriptor[id].lane1 = port1;		\
-    p2p_record->amc_channel_descriptor[id].lane2 = port2;		\
-    p2p_record->amc_channel_descriptor[id].lane3 = port3;		\
-    p2p_record->amc_channel_descriptor[id].reserved = 0xF;		\
-    p2p_record->amc_link_descriptor[id].amc_channel_id = id;    \
-    p2p_record->amc_link_descriptor[id].link_type = (protocol<<4)|0xF;       \
-    p2p_record->amc_link_descriptor[id].link_type_ext = extension;  \
-    p2p_record->amc_link_descriptor[id].link_grouping_id = 0;		\
-    p2p_record->amc_link_descriptor[id].assymetric_match = matches; \
+    p2p_record->amc_channel_descriptor_cnt++;                           \
+    p2p_record->amc_channel_descriptor[id].lane0 = port0;               \
+    p2p_record->amc_channel_descriptor[id].lane1 = port1;               \
+    p2p_record->amc_channel_descriptor[id].lane2 = port2;               \
+    p2p_record->amc_channel_descriptor[id].lane3 = port3;               \
+    p2p_record->amc_channel_descriptor[id].reserved = 0xF;              \
+    p2p_record->amc_link_descriptor[id].amc_channel_id = id;            \
+    p2p_record->amc_link_descriptor[id].link_type = (protocol<<4)|0xF;  \
+    p2p_record->amc_link_descriptor[id].link_type_ext = extension;      \
+    p2p_record->amc_link_descriptor[id].link_grouping_id = 0;           \
+    p2p_record->amc_link_descriptor[id].assymetric_match = matches;     \
     p2p_record->amc_link_descriptor[id].reserved = 0x3F
 
 
