@@ -21,6 +21,7 @@
 
 #include "FreeRTOS.h"
 #include "adn4604.h"
+#include "pin_mapping.h"
 #include "board_version.h"
 
 void adn4604_setup(void) {
@@ -28,6 +29,10 @@ void adn4604_setup(void) {
     uint8_t adn_slave_addr = 0x4B;
     t_adn_connect_map con;
     t_adn_connect_cfg cfg;
+
+    /* Disable UPDATE' pin by pulling it HIGH */
+    gpio_set_pin_dir( GPIO_DAC_VADJ_CSN_PORT, GPIO_DAC_VADJ_CSN_PIN, OUTPUT);
+    gpio_set_pin_state( GPIO_DAC_VADJ_RST_PORT, GPIO_DAC_VADJ_RST_PIN, LOW);
 
     if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdFALSE) {
         return;
