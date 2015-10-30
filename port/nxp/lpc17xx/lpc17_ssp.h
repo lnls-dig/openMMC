@@ -11,6 +11,11 @@
 #define ssp_flush_rx(id)	Chip_SSP_Int_FlushData(SSP(id))
 #define ssp_set_bitrate(id, bitrate) Chip_SSP_SetBitRate(SSP(id), bitrate)
 
+#define SLAVE_MODE        0
+#define MASTER_MODE       1
+#define INTERRUPT         0
+#define POLLING           1
+
 void ssp_config( uint8_t id, uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll );
 void ssp_pin_config( uint8_t id );
 uint32_t ssp_write( uint8_t id, void * buffer, uint32_t buffer_len);

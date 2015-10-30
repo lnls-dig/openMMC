@@ -130,6 +130,10 @@ void payload_init( void )
 
     initializeDCDC();
 
+    dac_vadj_init();
+    dac_vadj_config( 0, 25);
+    dac_vadj_config( 1, 25);
+
     /* Enable RTM */
     gpio_set_pin_state( 1, 30, true);
 

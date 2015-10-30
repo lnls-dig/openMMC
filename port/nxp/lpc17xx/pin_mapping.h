@@ -26,6 +26,10 @@
 
 #ifdef AFC_V3
 
+#define FPGA_SPI        0
+#define FLASH_SPI       1
+#define DAC_VADJ_SPI    2
+
 /* I2C Pins definitions */
 
 #define I2C0_PORT       0
@@ -100,6 +104,14 @@
 #define GPIO_DONE_B_PORT        0
 #define GPIO_PGOOD_P1V0_PIN	26
 #define GPIO_PGOOD_P1V0_PORT    3
+
+#define GPIO_DAC_VADJ_RST_PORT  0
+#define GPIO_DAC_VADJ_RST_PIN   21
+#define GPIO_DAC_VADJ_CSN_PORT  0
+#define GPIO_DAC_VADJ_CSN_PIN   16
+
+#define GPIO_ADN_UPDATE_PORT    1
+#define GPIO_ADN_UPDATE_PIN     26
 
 #endif
 

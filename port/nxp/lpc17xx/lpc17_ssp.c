@@ -1,4 +1,5 @@
 #include "port.h"
+#include "pin_mapping.h"
 
 /* Private Functions */
 void ssp_pin_config( uint8_t id );
@@ -45,45 +46,57 @@ void ssp_pin_config( uint8_t id )
 {
     /* Set up clock and muxing for SSP0/1 interface */
     switch( id ) {
-    case 0:
+    case FPGA_SPI:
         Chip_IOCON_PinMux(LPC_IOCON, 1, 20, IOCON_MODE_PULLDOWN, IOCON_FUNC3);
         Chip_IOCON_PinMux(LPC_IOCON, 1, 21, IOCON_MODE_PULLUP, IOCON_FUNC3);
         Chip_IOCON_PinMux(LPC_IOCON, 1, 23, IOCON_MODE_INACT, IOCON_FUNC3);
         Chip_IOCON_PinMux(LPC_IOCON, 1, 24, IOCON_MODE_INACT, IOCON_FUNC3);
         break;
 
-    case 1:
+    case FLASH_SPI:
         Chip_IOCON_PinMux(LPC_IOCON, 0, 6, IOCON_MODE_PULLDOWN, IOCON_FUNC3);
         Chip_IOCON_PinMux(LPC_IOCON, 0, 7, IOCON_MODE_PULLUP, IOCON_FUNC3);
         Chip_IOCON_PinMux(LPC_IOCON, 0, 8, IOCON_MODE_INACT, IOCON_FUNC3);
         Chip_IOCON_PinMux(LPC_IOCON, 0, 9, IOCON_MODE_INACT, IOCON_FUNC3);
         break;
+
+    case DAC_VADJ_SPI:
+	Chip_IOCON_PinMux(LPC_IOCON, 0, 15, IOCON_MODE_PULLDOWN, IOCON_FUNC3);
+        Chip_IOCON_PinMux(LPC_IOCON, 0, 16, IOCON_MODE_PULLUP, IOCON_FUNC3);
+	/* Pin 17 is used for PROGRAM_B, as we don't receive any data, the MISO pin is not used */
+        Chip_IOCON_PinMux(LPC_IOCON, 0, 18, IOCON_MODE_INACT, IOCON_FUNC3);
+	break;
     }
 }
 
+/* Buffer len in bytes */
 uint32_t ssp_write( uint8_t id, void * buffer, uint32_t buffer_len)
 {
     LPC_SSP_T* ssp_id;
 
-    if (id == 0) {
-        ssp_id = LPC_SSP0;
-    } else {
+    switch( id ) {
+    case FPGA_SPI:
+    case DAC_VADJ_SPI:
+	ssp_id = LPC_SSP0;
+	break;
+    case FLASH_SPI:
         ssp_id = LPC_SSP1;
+	break;
     }
 
     Chip_SSP_DATA_SETUP_T data_st = {0};
 
     if (ssp_polling) {
         return (Chip_SSP_WriteFrames_Blocking(ssp_id, (uint8_t *) buffer, buffer_len));
-    } else if ((!ssp_polling) && (frame_size == 8)) {
-        data_st.tx_data = buffer;
+    } else if ((!ssp_polling) && (frame_size <= 8)) {
+	data_st.tx_data = (uint8_t *)buffer;
         data_st.length = buffer_len;
         Chip_SSP_Int_RWFrames8Bits( ssp_id, &data_st );
         /* BUG: We're not verifying if the message was trasmitted */
         return buffer_len;
 
-    } else if ((!ssp_polling) && (frame_size == 16)) {
-        data_st.tx_data = buffer;
+    } else if ((!ssp_polling) && (frame_size <= 16)) {
+        data_st.tx_data = (uint16_t *)buffer;
         data_st.length = buffer_len;
         Chip_SSP_Int_RWFrames16Bits( ssp_id, &data_st );
         /* BUG: We're not verifying if the message was trasmitted */
