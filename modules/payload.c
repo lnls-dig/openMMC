@@ -65,6 +65,11 @@
  * 255 - power fail
  */
 
+static void reset_FPGA( void )
+{
+    gpio_set_pin_state( 2, 9, false);
+    gpio_set_pin_state( 2, 9, true);
+}
 
 void setDC_DC_ConvertersON(bool on) {
     bool _on = on;
@@ -214,7 +219,7 @@ void vTaskPayload(void *pvParmeters)
 
 	    adn4604_setup();
 
-	    /* Pulse PROGRAM_B pin low to reset the FPGA */
+	    /* Pulse PROGRAM_B pin low to clear the FPGA configuration */
 	    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, false);
             gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, true);
             new_state = PAYLOAD_FPGA_BOOTING;
@@ -224,6 +229,7 @@ void vTaskPayload(void *pvParmeters)
             if (QUIESCED_req == 1) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (FPGA_boot_DONE) {
+		reset_FPGA();
                 new_state = PAYLOAD_FPGA_WORKING;
 	        } else if (P12V_good == 0) {
 	            QUIESCED_req = 0;
