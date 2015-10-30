@@ -96,25 +96,25 @@ void setDC_DC_ConvertersON(bool on) {
 
 void initializeDCDC() {
     setDC_DC_ConvertersON(false);
-    gpio_set_pin_dir( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, true);
-    gpio_set_pin_dir( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, true);
+    gpio_set_pin_dir( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, OUTPUT);
 
-    gpio_set_pin_dir( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, true);
-    gpio_set_pin_dir( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, true);
-    gpio_set_pin_dir( GPIO_EM_FMC2_P12V_PORT, GPIO_EM_FMC2_P12V_PIN, true);
+    gpio_set_pin_dir( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EM_FMC2_P12V_PORT, GPIO_EM_FMC2_P12V_PIN, OUTPUT);
 
-    gpio_set_pin_dir( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, true);
-    gpio_set_pin_dir( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, true);
-    gpio_set_pin_dir( GPIO_EN_FMC1_PVADJ_PORT,  GPIO_EN_FMC1_PVADJ_PIN, true);
+    gpio_set_pin_dir( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_FMC1_PVADJ_PORT,  GPIO_EN_FMC1_PVADJ_PIN, OUTPUT);
 
-    gpio_set_pin_dir( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, true);
-    gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, true);
-    gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, true);
+    gpio_set_pin_dir( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, OUTPUT);
 
     /* RTM TEST */
-    gpio_set_pin_dir( 1, 30, true);
+    gpio_set_pin_dir( 1, 30, OUTPUT);
 
-    gpio_set_pin_dir( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, true);
+    gpio_set_pin_dir( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, OUTPUT);
 }
 
 
@@ -124,10 +124,10 @@ void payload_send_message(uint8_t msg){
     if (queue_payload_handle == 0)  return;
 
     xQueueSend(queue_payload_handle, &msg, (TickType_t) 0);
-
 }
 
 TaskHandle_t vTaskPayload_Handle;
+
 void payload_init( void )
 {
     xTaskCreate(vTaskPayload, "Payload", 450, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
