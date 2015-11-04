@@ -148,7 +148,7 @@ void afc_board_discover( void )
 
     //@todo: discover board revision
     uint8_t cmd = 0x00; // Protected eeprom address
-#define WRITE_EEPROM
+//#define WRITE_EEPROM
 #ifdef WRITE_EEPROM
     //write data to rtc eeprom
     uint8_t ee_write[9] = { 0x01, 0x03, 0x00, 0x9A, 0x65, 0x02, 0x1B, 0x1C, 0x00 };

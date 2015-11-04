@@ -7,5 +7,6 @@
 #include "lpc17_gpio.h"
 #include "lpc17_i2c.h"
 #include "lpc17_ssp.h"
+#include "lpc17_spi.h"
 
 #endif

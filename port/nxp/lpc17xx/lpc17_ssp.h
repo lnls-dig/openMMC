@@ -1,5 +1,5 @@
-#ifndef LPC17xx_SPI_H_
-#define LPC17xx_SPI_H_
+#ifndef LPC17xx_SSP_H_
+#define LPC17xx_SSP_H_
 
 #include "chip_lpc175x_6x.h"
 #include "ssp_17xx_40xx.h"
@@ -11,10 +11,10 @@
 #define ssp_flush_rx(id)	Chip_SSP_Int_FlushData(SSP(id))
 #define ssp_set_bitrate(id, bitrate) Chip_SSP_SetBitRate(SSP(id), bitrate)
 
-#define SLAVE_MODE        0
-#define MASTER_MODE       1
-#define INTERRUPT         0
-#define POLLING           1
+#define SSP_SLAVE        0
+#define SSP_MASTER       1
+#define SSP_INTERRUPT    0
+#define SSP_POLLING      1
 
 void ssp_config( uint8_t id, uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll );
 void ssp_pin_config( uint8_t id );
