@@ -15,6 +15,8 @@ void dac_vadj_init( void )
 
 void dac_vadj_config( uint8_t addr, uint8_t val )
 {
-    uint8_t data[2] = { val, addr };
-    spi_write( &data[0], sizeof(data)/sizeof(data[0]) );
+    uint8_t data[2] = { (val), (addr & 0x3) };
+	spi_assertSSEL();
+    spi_write( &data, sizeof(data) );
+	spi_deassertSSEL();
 }
