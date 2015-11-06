@@ -98,6 +98,8 @@ typedef struct  {
     I2C_ID_T i2c_bus;
 } I2C_Mutex;
 
+static manufacturing_info_raw afc_board_info;
+
 void afc_board_i2c_init( void );
 void afc_board_discover( void );
 void afc_get_manufacturing_info( manufacturing_info_raw *p_board_info );

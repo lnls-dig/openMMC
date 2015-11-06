@@ -27,8 +27,6 @@
 #include "ipmb.h"
 #include "i2c.h"
 
-static manufacturing_info_raw afc_board_info;
-
 /* Chip_ID
  * 0 <- LM75AIM
  * 1 <- LM75AIM
