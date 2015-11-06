@@ -144,17 +144,43 @@ void afc_board_discover( void )
 {
     portENABLE_INTERRUPTS();
 
-    //@todo: discover board revision
-    uint8_t cmd = 0x00; // Protected eeprom address
 //#define WRITE_EEPROM
 #ifdef WRITE_EEPROM
-    //write data to rtc eeprom
-    uint8_t ee_write[9] = { 0x01, 0x03, 0x00, 0x9A, 0x65, 0x02, 0x1B, 0x1C, 0x00 };
-    ee_write[8] = ipmb_calculate_chksum(ee_write, 8);
+    uint8_t unlock[2] = { 0x09, 0x00 };
 
-    xI2CMasterWrite(I2C1, 0x57, ee_write, 9);
+    /* Carrier type (1-byte):
+     * 01h: artix based (AFC)
+     * 02h: kintex based (AFCK)
+     * ....
+
+	Board version (1-byte):
+     * 00h: AFCv1
+     * 01h: AFCv2
+     * 02h: AFCv3
+     * 03h: AFCv3.1
+
+	Manufacturer Private Enterprise Numbers assigned by IANA (3-bytes big-endian)
+     * 00h 9Ah 65h (39525): Creotech
+     * .....
+
+	Manufacturing day since 1996-01-01 (2-bytes big-endian)
+     * 1Bh 1Ch (6940) : 2015-01-01
+
+	Checksum (1-byte) */
+
+    uint8_t ee_write[9] = { 0xF0, 0x01, 0x03, 0x00, 0x9A, 0x65, 0x1B, 0x1C, 0x00 };
+    ee_write[8] = ipmb_calculate_chksum(&ee_write[1], 8);
+
+    /* Unlock protected EEPROM */
+    unlock[1] = 0x55;
+    xI2CMasterWrite(I2C1, 0x6F, unlock, 2);
+    unlock[1] = 0xAA;
+    xI2CMasterWrite(I2C1, 0x6F, unlock, 2);
+    /* Write data */
+    xI2CMasterWrite(I2C1, 0x57, ee_write, sizeof(ee_write));
 #endif
-    if (xI2CMasterWriteRead(I2C1, 0x57, cmd, (uint8_t *) &afc_board_info, sizeof(afc_board_info) ) != sizeof(afc_board_info) ) {
+
+    if (xI2CMasterWriteRead(I2C1, 0x57, 0xF0, (uint8_t *) &afc_board_info, sizeof(afc_board_info) ) != sizeof(afc_board_info) ) {
         return;
     }
 
