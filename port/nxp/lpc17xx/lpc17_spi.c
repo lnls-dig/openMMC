@@ -8,6 +8,18 @@ void spi_pin_config( uint8_t id );
 static bool spi_polling = false;
 static uint8_t frame_size = 8;
 
+/* Assert SSEL pin */
+void spi_assertSSEL(void)
+{
+	Chip_GPIO_WritePortBit(LPC_GPIO, 0, 16, false);
+}
+
+/* De-Assert SSEL pin */
+void spi_deassertSSEL(void)
+{
+	Chip_GPIO_WritePortBit(LPC_GPIO, 0, 16, true);
+}
+
 void spi_config( uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll )
 {
     IRQn_Type irq;
@@ -17,16 +29,17 @@ void spi_config( uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll
     frame_size = frame_sz;
 
     /* Set up clock and muxing for SPI interface */
-    Chip_IOCON_PinMux(LPC_IOCON, 0, 15, IOCON_MODE_PULLDOWN, IOCON_FUNC2);
-    Chip_IOCON_PinMux(LPC_IOCON, 0, 16, IOCON_MODE_PULLUP, IOCON_FUNC2);
+    Chip_IOCON_PinMux(LPC_IOCON, 0, 15, IOCON_MODE_PULLDOWN, IOCON_FUNC3);
+    Chip_IOCON_PinMux(LPC_IOCON, 0, 16, IOCON_MODE_PULLUP, IOCON_FUNC0);
     /* Pin 17 is used for PROGRAM_B, as we don't receive any data, the MISO pin is not used */
-    Chip_IOCON_PinMux(LPC_IOCON, 0, 18, IOCON_MODE_INACT, IOCON_FUNC2);
+    Chip_IOCON_PinMux(LPC_IOCON, 0, 18, IOCON_MODE_INACT, IOCON_FUNC3);
+    spi_deassertSSEL();
 
     spi_init(LPC_SPI);
 
-    cfg.bits = frame_sz;
+    cfg.bits = SPI_CR_BITS(10);
     cfg.clockMode = SPI_CLOCK_CPHA0_CPOL0;
-    cfg.dataOrder = SPI_DATA_LSB_FIRST;
+    cfg.dataOrder = SPI_DATA_MSB_FIRST;
 
     Chip_SPI_SetFormat(LPC_SPI, &cfg);
     spi_set_bitrate(LPC_SPI, bitrate);
