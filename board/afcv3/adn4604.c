@@ -31,8 +31,7 @@ void adn4604_setup(void) {
     t_adn_connect_cfg cfg;
 
     /* Disable UPDATE' pin by pulling it HIGH */
-    gpio_set_pin_dir( GPIO_DAC_VADJ_CSN_PORT, GPIO_DAC_VADJ_CSN_PIN, OUTPUT);
-    gpio_set_pin_state( GPIO_DAC_VADJ_RST_PORT, GPIO_DAC_VADJ_RST_PIN, LOW);
+    gpio_set_pin_state( GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, HIGH);
 
     if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdFALSE) {
         return;
