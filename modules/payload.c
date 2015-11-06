@@ -34,6 +34,7 @@
 #include "task_priorities.h"
 #include "adn4604.h"
 #include "led.h"
+#include "ad84xx.h"
 
 /* payload states
  *   0 - no power
@@ -216,20 +217,14 @@ void vTaskPayload(void *pvParmeters)
             break;
 
         case PAYLOAD_STATE_FPGA_SETUP:
-
-	    adn4604_setup();
-
-	    /* Pulse PROGRAM_B pin low to clear the FPGA configuration */
-	    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, false);
-            gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, true);
-            new_state = PAYLOAD_FPGA_BOOTING;
+        	adn4604_setup();
+	    	new_state = PAYLOAD_FPGA_BOOTING;
             break;
 
         case PAYLOAD_FPGA_BOOTING:
             if (QUIESCED_req == 1) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (FPGA_boot_DONE) {
-		reset_FPGA();
                 new_state = PAYLOAD_FPGA_WORKING;
 	        } else if (P12V_good == 0) {
 	            QUIESCED_req = 0;
