@@ -11,7 +11,7 @@ LIBDIR = lib
 BUILDDIR = out
 
 #Used for program operation (LPCLink specific software)
-LPCXPRESSO_PATH=/usr/local/lpcxpresso_7.8.0_426/lpcxpresso
+LPCXPRESSO_PATH=/usr/local/lpcxpresso*/lpcxpresso
 
 #Flags to be passed on to gcc
 DEFS = -DDEBUG -DCORE_M3 -D__CODE_RED -D__USE_LPCOPEN -DNO_BOARD_LIB -D__LPC17XX__ -D__NEWLIB__
