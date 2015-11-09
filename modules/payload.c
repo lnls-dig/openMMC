@@ -140,9 +140,22 @@ void payload_init( void )
     dac_vadj_config( 0, 25);
     dac_vadj_config( 1, 25);
 
+    if (afc_board_info.board_version = BOARD_VERSION_AFC_V3_1) {
+    	/* Flash CS Mux */
+    	/* 0 = FPGA reads bitstream from Program memory
+    	 * 1 = FPGA reads bitstream from User memory
+    	 */
+    	gpio_set_pin_dir(0, 19, OUTPUT);
+    	gpio_set_pin_state(0, 19, LOW);
+
+    	/* Init_B */
+    	/* TODO: Check Init_b pin for error on initialization, then use it as output control */
+
+    	gpio_set_pin_dir(0, 20, OUTPUT);
+    	gpio_set_pin_state(0, 20, HIGH);
+    }
     /* Enable RTM */
     gpio_set_pin_state( 1, 30, true);
-
 }
 
 void vTaskPayload(void *pvParmeters)
