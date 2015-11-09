@@ -42,7 +42,7 @@ void adn4604_setup(void) {
     con.out1 = 14;
     con.out2 = 13;
     con.out3 = 12;
-    con.out4 = 14;
+    con.out4 = 13;
     con.out5 = 8;
     con.out6 = 8;
     con.out7 = 8;
