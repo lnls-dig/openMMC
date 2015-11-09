@@ -140,7 +140,7 @@ void payload_init( void )
     dac_vadj_config( 0, 25);
     dac_vadj_config( 1, 25);
 
-    if (afc_board_info.board_version = BOARD_VERSION_AFC_V3_1) {
+    if (afc_board_info.board_version == BOARD_VERSION_AFC_V3_1) {
     	/* Flash CS Mux */
     	/* 0 = FPGA reads bitstream from Program memory
     	 * 1 = FPGA reads bitstream from User memory
