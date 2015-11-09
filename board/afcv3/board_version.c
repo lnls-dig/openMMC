@@ -199,7 +199,7 @@ void afc_board_discover( void )
             p_i2c_busmap = i2c_bus_map_afc_v3;
             i2c_chip_map[CHIP_ID_MUX].bus_id = I2C_BUS_CPU_ID;
             i2c_chip_map[CHIP_ID_MUX].i2c_address = 0x70;
-        } else if ((afc_board_info.carrier_type == CARRIER_TYPE_AFC && afc_board_info.board_version == 0x02)) {
+        } else if ((afc_board_info.carrier_type == CARRIER_TYPE_AFC && afc_board_info.board_version == 0x03)) {
             p_i2c_busmap = i2c_bus_map_afc_v3_1;
             i2c_chip_map[CHIP_ID_MUX].bus_id = I2C_BUS_FPGA_ID;
             i2c_chip_map[CHIP_ID_MUX].i2c_address = 0x70;
