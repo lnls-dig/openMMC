@@ -1,6 +1,7 @@
 #include "port.h"
 #include "i2c.h"
 #include "string.h"
+#include "board_version.h"
 
 #define SLAVE_MASK 0xFF
 
@@ -48,10 +49,12 @@ void Board_I2C_Init(I2C_ID_T id)
         Chip_IOCON_EnableOD(LPC_IOCON, 0,  0);
         Chip_IOCON_EnableOD(LPC_IOCON, 0,  1);
 
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 19, IOCON_MODE_INACT, IOCON_FUNC2);
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 20, IOCON_MODE_INACT, IOCON_FUNC2);
-        Chip_IOCON_EnableOD(LPC_IOCON, 0, 19);
-        Chip_IOCON_EnableOD(LPC_IOCON, 0, 20);
+        if (afc_board_info.board_version == BOARD_VERSION_AFC_V3_1) {
+	    Chip_IOCON_PinMux(LPC_IOCON, 0, 19, IOCON_MODE_INACT, IOCON_FUNC2);
+	    Chip_IOCON_PinMux(LPC_IOCON, 0, 20, IOCON_MODE_INACT, IOCON_FUNC2);
+	    Chip_IOCON_EnableOD(LPC_IOCON, 0, 19);
+	    Chip_IOCON_EnableOD(LPC_IOCON, 0, 20);
+	}
         break;
 
     case I2C2:
