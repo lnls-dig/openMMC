@@ -257,7 +257,7 @@ uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg )
     uint8_t val[2];
 
     /*! @todo: Change to 'afc_i2c_take_by_chipid', which is more generic */
-    if( afc_i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 100) == pdFALSE ) {
+    if( afc_i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
         return -1;
     }
 

@@ -42,11 +42,7 @@ void vTaskLM75( void* Parameters )
     uint8_t temp[2];
     uint16_t converted_temp;
 
-    /* Initialise the xLastWakeTime variable with the current time. */
-    xLastWakeTime = xTaskGetTickCount();
-
     for ( ;; ) {
-        uint32_t watermark = uxTaskGetStackHighWaterMark(NULL);
         /* Try to gain the I2C bus */
         if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdTRUE) {
             /* Update all temperature sensors readings */
@@ -70,7 +66,7 @@ void vTaskLM75( void* Parameters )
             }
             afc_i2c_give(i2c_bus_id);
         }
-        vTaskDelayUntil( &xLastWakeTime, xFrequency );
+        vTaskDelay(xFrequency);
     }
 }
 
