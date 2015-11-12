@@ -1,23 +1,19 @@
 #include "port.h"
 #include "pin_mapping.h"
 
-/* Private Functions */
-void spi_pin_config( uint8_t id );
-/*********************/
-
 static bool spi_polling = false;
 static uint8_t frame_size = 8;
 
 /* Assert SSEL pin */
 void spi_assertSSEL(void)
 {
-	Chip_GPIO_WritePortBit(LPC_GPIO, 0, 16, false);
+    Chip_GPIO_WritePortBit(LPC_GPIO, 0, 16, false);
 }
 
 /* De-Assert SSEL pin */
 void spi_deassertSSEL(void)
 {
-	Chip_GPIO_WritePortBit(LPC_GPIO, 0, 16, true);
+    Chip_GPIO_WritePortBit(LPC_GPIO, 0, 16, true);
 }
 
 void spi_config( uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll )
@@ -52,7 +48,6 @@ void spi_config( uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll
     }
 
     spi_flush_rx(LPC_SPI);
-
 }
 
 /* Buffer len in bytes */

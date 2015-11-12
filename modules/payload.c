@@ -66,12 +66,6 @@
  * 255 - power fail
  */
 
-static void reset_FPGA( void )
-{
-    gpio_set_pin_state( 2, 9, false);
-    gpio_set_pin_state( 2, 9, true);
-}
-
 void setDC_DC_ConvertersON(bool on) {
     bool _on = on;
 
@@ -121,10 +115,11 @@ void initializeDCDC() {
 
 QueueHandle_t queue_payload_handle = 0;
 
-void payload_send_message(uint8_t msg){
-    if (queue_payload_handle == 0)  return;
-
-    xQueueSend(queue_payload_handle, &msg, (TickType_t) 0);
+void payload_send_message(uint8_t msg)
+{
+    if (queue_payload_handle) {
+	xQueueSend(queue_payload_handle, &msg, (TickType_t) 0);
+    }
 }
 
 TaskHandle_t vTaskPayload_Handle;
@@ -137,22 +132,22 @@ void payload_init( void )
     initializeDCDC();
 
     dac_vadj_init();
-    dac_vadj_config( 0, 25);
-    dac_vadj_config( 1, 25);
+    dac_vadj_config( 0, 25 );
+    dac_vadj_config( 1, 25 );
 
     if (afc_board_info.board_version == BOARD_VERSION_AFC_V3_1) {
-    	/* Flash CS Mux */
-    	/* 0 = FPGA reads bitstream from Program memory
-    	 * 1 = FPGA reads bitstream from User memory
-    	 */
-    	gpio_set_pin_dir(0, 19, OUTPUT);
-    	gpio_set_pin_state(0, 19, LOW);
+        /* Flash CS Mux */
+        /* 0 = FPGA reads bitstream from Program memory
+         * 1 = FPGA reads bitstream from User memory
+         */
+        gpio_set_pin_dir(0, 19, OUTPUT);
+        gpio_set_pin_state(0, 19, LOW);
 
-    	/* Init_B */
-    	/* TODO: Check Init_b pin for error on initialization, then use it as output control */
+        /* Init_B */
+        /* TODO: Check Init_b pin for error on initialization, then use it as output control */
 
-    	gpio_set_pin_dir(0, 20, OUTPUT);
-    	gpio_set_pin_state(0, 20, HIGH);
+        gpio_set_pin_dir(0, 20, OUTPUT);
+        gpio_set_pin_state(0, 20, HIGH);
     }
     /* Enable RTM */
     gpio_set_pin_state( 1, 30, true);
@@ -212,7 +207,7 @@ void vTaskPayload(void *pvParmeters)
         case PAYLOAD_NO_POWER:
             if (P12V_good == 1) {
                 new_state = PAYLOAD_SWITCHING_ON;
-	    }
+            }
             QUIESCED_req = 0;
             break;
 
@@ -230,8 +225,8 @@ void vTaskPayload(void *pvParmeters)
             break;
 
         case PAYLOAD_STATE_FPGA_SETUP:
-        	adn4604_setup();
-	    	new_state = PAYLOAD_FPGA_BOOTING;
+            adn4604_setup();
+            new_state = PAYLOAD_FPGA_BOOTING;
             break;
 
         case PAYLOAD_FPGA_BOOTING:
@@ -239,17 +234,17 @@ void vTaskPayload(void *pvParmeters)
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (FPGA_boot_DONE) {
                 new_state = PAYLOAD_FPGA_WORKING;
-	        } else if (P12V_good == 0) {
-	            QUIESCED_req = 0;
-	            new_state = PAYLOAD_NO_POWER;
-	        }
-	    break;
+            } else if (P12V_good == 0) {
+                QUIESCED_req = 0;
+                new_state = PAYLOAD_NO_POWER;
+            }
+            break;
 
         case PAYLOAD_FPGA_WORKING:
             if (QUIESCED_req == 1) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (P12V_good == 0) {
-		QUIESCED_req = 0;
+                QUIESCED_req = 0;
                 new_state = PAYLOAD_NO_POWER;
             }
             break;
@@ -267,10 +262,10 @@ void vTaskPayload(void *pvParmeters)
             pmsg.data[data_len++] = 0x6f;
             pmsg.data[data_len++] = HOT_SWAP_QUIESCED; // hot swap state
             pmsg.data_len = data_len;
-	    if ( ipmb_send_request( &pmsg ) == ipmb_error_success ) {
-		QUIESCED_req = 0;
-		new_state = PAYLOAD_NO_POWER;
-	    }
+            if ( ipmb_send_request( &pmsg ) == ipmb_error_success ) {
+                QUIESCED_req = 0;
+                new_state = PAYLOAD_NO_POWER;
+            }
             break;
 
         default:

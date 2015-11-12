@@ -74,7 +74,7 @@ int main(void)
     afc_board_discover();
     portDISABLE_INTERRUPTS();
 
-    ipmb_addr = get_ipmb_addr( );
+    ipmb_addr = get_ipmb_addr();
     sdr_init(ipmb_addr);
     sensor_init();
     payload_init();

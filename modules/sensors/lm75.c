@@ -31,7 +31,6 @@ TaskHandle_t vTaskLM75_Handle;
 
 void vTaskLM75( void* Parameters )
 {
-    TickType_t xLastWakeTime;
     /* Task will run every 100ms */
     const TickType_t xFrequency = LM75_UPDATE_RATE;
 

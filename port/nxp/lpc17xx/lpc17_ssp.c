@@ -1,9 +1,6 @@
 #include "port.h"
 #include "pin_mapping.h"
 
-/* Private Functions */
-void ssp_pin_config( uint8_t id );
-/*********************/
 
 static bool ssp_polling = false;
 static uint8_t frame_size = 8;
