@@ -33,16 +33,16 @@ void adn4604_setup(void) {
     /* Disable UPDATE' pin by pulling it HIGH */
     gpio_set_pin_state( GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, HIGH);
 
-    if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdFALSE) {
+    if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)10) == pdFALSE) {
         return;
     }
 
     /* Configure the interconnects */
-    con.out0 = 13;
-    con.out1 = 14;
-    con.out2 = 13;
-    con.out3 = 12;
-    con.out4 = 14;
+    con.out0 = 0;
+    con.out1 = 0;
+    con.out2 = 0;
+    con.out3 = 0;
+    con.out4 = 13;
     con.out5 = 8;
     con.out6 = 8;
     con.out7 = 8;
@@ -51,7 +51,7 @@ void adn4604_setup(void) {
     con.out10 = 14;
     con.out11 = 14;
     con.out12 = 14;
-    con.out13 = 8;
+    con.out13 = 5;
     con.out14 = 14;
     con.out15 = 14;
 
@@ -66,8 +66,8 @@ void adn4604_setup(void) {
     xI2CMasterWrite( i2c_bus_id, adn_slave_addr, map_sel, sizeof(map_sel) );
 
     /* Enable desired outputs */
-    for (uint8_t i = 4; i <= 15; i++) {
-        adn4604_tx_enable(i2c_bus_id, adn_slave_addr, i);
+    for (uint8_t i = 0; i < 16; i++) {
+    	adn4604_tx_enable(i2c_bus_id, adn_slave_addr, i);
     }
 
     adn4604_update( i2c_bus_id, adn_slave_addr );
