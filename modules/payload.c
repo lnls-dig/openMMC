@@ -35,6 +35,7 @@
 #include "adn4604.h"
 #include "led.h"
 #include "ad84xx.h"
+#include "hotswap.h"
 
 /* payload states
  *   0 - no power
@@ -171,11 +172,11 @@ void vTaskPayload(void *pvParmeters)
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
 
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, true);
+    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH);
 
     for ( ;; ) {
         /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
-        gpio_set_pin_state( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, true);
+        gpio_set_pin_state( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, HIGH);
 
         new_state = state;
 
@@ -251,7 +252,7 @@ void vTaskPayload(void *pvParmeters)
 
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON(false);
-	    sensor_array[HOT_SWAP_SENSOR].data->comparator_status |= HOT_SWAP_STATE_QUIESCED;
+            sensor_array[HOT_SWAP_SENSOR].data->comparator_status = HOTSWAP_QUIESCED_MASK;
             pmsg.dest_LUN = 0;
             pmsg.netfn = NETFN_SE;
             pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
@@ -260,7 +261,7 @@ void vTaskPayload(void *pvParmeters)
             pmsg.data[data_len++] = 0xf2;
             pmsg.data[data_len++] = HOT_SWAP_SENSOR;
             pmsg.data[data_len++] = 0x6f;
-            pmsg.data[data_len++] = HOT_SWAP_QUIESCED; // hot swap state
+            pmsg.data[data_len++] = (HOTSWAP_QUIESCED_MASK >> 1); // hot swap state
             pmsg.data_len = data_len;
             if ( ipmb_send_request( &pmsg ) == ipmb_error_success ) {
                 QUIESCED_req = 0;
@@ -276,5 +277,3 @@ void vTaskPayload(void *pvParmeters)
         vTaskDelayUntil( &xLastWakeTime, PAYLOAD_BASE_DELAY );
     }
 }
-
-
