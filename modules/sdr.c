@@ -637,14 +637,8 @@ void sdr_init(uint8_t ipmiID)
     for (i = 0; i < NUM_SDR; i++) {
         sensor_array[i].data->entityinstance =  0x60 | ((ipmiID - 0x70) >> 1);
         sensor_array[i].data->ownerID = ipmiID;
-
-        // @todo: remove this HOT_SWAP_SENSOR case, to enable first event
-        if (i == HOT_SWAP_SENSOR) {
-            sensor_array[i].data->comparator_status = HOT_SWAP_STATE_HANDLE_OPENED;
-        } else {
-            sensor_array[i].data->comparator_status = 0;
+        sensor_array[i].data->comparator_status = 0;
 	    sensor_array[i].data->readout_value = 0;
-        }
     }
 }
 
