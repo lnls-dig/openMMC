@@ -1,8 +1,6 @@
 #ifndef FPGA_SPI_H_
 #define FPGA_SPI_H_
 
-#define FPGA_SPI		0
-#define FPGA_BITRATE		10000000
 #define FPGA_UPDATE_RATE	5000	// in ms
 #define FPGA_MEM_ADDR_MAX	0xFF
 
@@ -78,6 +76,5 @@ typedef union {
 uint8_t cmpBuffs(uint32_t *buf_a, uint32_t len_a, uint32_t *bufb, uint32_t len_b);
 void vTaskFPGA_COMM( void * Parameters );
 void init_fpga_spi( void );
-void init_diag_struct( board_diagnostic * diag );
 
 #endif
