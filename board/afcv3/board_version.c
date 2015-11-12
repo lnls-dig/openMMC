@@ -130,6 +130,8 @@ struct i2c_chip_mapping i2c_chip_map[] = {
 
 #define I2C_CHIP_MAP_COUNT (sizeof(i2c_chip_map)/sizeof(struct i2c_chip_mapping))
 
+manufacturing_info_raw afc_board_info = {0};
+
 void afc_board_i2c_init( void )
 {
     int i;
