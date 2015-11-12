@@ -48,21 +48,6 @@
 #define SENSOR_TYPE_VERSION_CHANGE              0x2B
 #define SENSOR_TYPE_HOT_SWAP                    0xF2
 
-/* Module handle sensor status */
-#define HOT_SWAP_CLOSED                         0x00
-#define HOT_SWAP_OPENED                         0x01
-#define HOT_SWAP_QUIESCED                       0x02
-
-#define HOT_SWAP_STATE_HANDLE_CLOSED            (1 << 0)
-#define HOT_SWAP_STATE_HANDLE_OPENED            (1 << 1)
-#define HOT_SWAP_STATE_QUIESCED                 (1 << 2)
-#define HOT_SWAP_STATE_BP_SDOWN                 (1 << 3)
-#define HOT_SWAP_STATE_BP_FAIL                  (1 << 4)
-#define HOT_SWAP_STATE_URTM_PRSENT              (1 << 5)
-#define HOT_SWAP_STATE_URTM_ABSENT              (1 << 6)
-#define HOT_SWAP_STATE_URTM_COMPATIBLE          (1 << 7)
-#define HOT_SWAP_STATE_URTM_INCOMPATIBLE        (1 << 0)
-
 typedef enum {
     TYPE_01 = 0x1,
     TYPE_02 = 0x2,

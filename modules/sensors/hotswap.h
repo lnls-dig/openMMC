@@ -21,6 +21,24 @@
 
 #define DEBOUNCE_TIME 250
 
+
+/* Module handle sensor status */
+#define HOT_SWAP_STATE_HANDLE_CLOSED            0x00
+#define HOT_SWAP_STATE_HANDLE_OPENED            0x01
+#define HOT_SWAP_STATE_QUIESCED                 0x02
+#define HOT_SWAP_STATE_BP_FAIL                  0x03
+#define HOT_SWAP_STATE_BP_SDOWN                 0x04
+#define HOT_SWAP_STATE_URTM_PRSENT              0x05
+#define HOT_SWAP_STATE_URTM_ABSENT              0x06
+#define HOT_SWAP_STATE_URTM_COMPATIBLE          0x07
+#define HOT_SWAP_STATE_URTM_INCOMPATIBLE        0x08
+
+#define HOTSWAP_MODULE_HANDLE_CLOSED_MASK       0x01
+#define HOTSWAP_MODULE_HANDLE_OPEN_MASK         0x02
+#define HOTSWAP_QUIESCED_MASK                   0x04
+#define HOTSWAP_BACKEND_PWR_FAILURE_MASK        0x08
+#define HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK       0x10
+
 extern TaskHandle_t vTaskHotSwap_Handle;
 
 extern TickType_t getTickDifference(TickType_t current_time, TickType_t start_time);
