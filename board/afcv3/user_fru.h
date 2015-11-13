@@ -33,8 +33,8 @@
  *********************************************/
 #define AMC_POINT_TO_POINT_RECORD_CNT           2
 #define AMC_POINT_TO_POINT_RECORD_LIST                                  \
-    GENERIC_POINT_TO_POINT_RECORD(0, PORT(4), PORT(5), PORT(6), PORT(7), PCIE, GEN1_NO_SSC, MATCHES_10); \
-    GENERIC_POINT_TO_POINT_RECORD(1, PORT(8), PORT(9), PORT(10), PORT(11), PCIE, GEN1_NO_SSC, MATCHES_10);
+    GENERIC_POINT_TO_POINT_RECORD(0, PORT(4), PORT(5), PORT(6), PORT(7), PCIE, GEN1_NO_SSC, MATCHES_01); \
+    GENERIC_POINT_TO_POINT_RECORD(1, PORT(8), PORT(9), PORT(10), PORT(11), PCIE, GEN1_NO_SSC, MATCHES_01);
 
 /*********************************************
  * AMC: Point to point clock record
