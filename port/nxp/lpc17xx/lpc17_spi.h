@@ -15,5 +15,6 @@
 
 void spi_config( uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll );
 uint32_t spi_write( void * buffer, uint32_t buffer_len );
-
+void spi_assertSSEL(void);
+void spi_deassertSSEL(void);
 #endif

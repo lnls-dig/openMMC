@@ -160,7 +160,6 @@ void LEDTask( void * Parameters )
                          */
                         pLED->counter = cycle;
 			memcpy(&(pLED->cur_cfg), &(pLED->last_cfg), sizeof(LED_activity_desc_t));
-			//pLED->cur_cfg = pLED->last_cfg;
                     }
                 } else {
                     (pLED->counter)--;
@@ -175,7 +174,6 @@ void LEDTask( void * Parameters )
             cycle--;
         }
         vTaskDelayUntil( &xLastWakeTime, xFrequency );
-        //vTaskDelay(90);
     }
 
 }

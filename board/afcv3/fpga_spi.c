@@ -112,7 +112,6 @@ void vTaskFPGA_COMM( void * Parameters )
     t_board_diagnostic diag_struct;
     board_diagnostic * diag = &(diag_struct.info);
     uint32_t rx_trace[FPGA_MEM_ADDR_MAX] = {0};
-    uint32_t data;
 
     /* Zero fill the diag struct */
     memset( &(diag_struct.buffer[0]), 0, sizeof(diag_struct.buffer));
@@ -162,7 +161,9 @@ void vTaskFPGA_COMM( void * Parameters )
          * being returned correctly */
 
 #if SSP_TESTS
-        if( cmpBuffs( &(diag_struct.buffer[0]), sizeof(diag_struct.buffer)/sizeof(diag_struct.buffer[0]), &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) != 0 ) ) {
+	uint32_t data;
+
+	if( cmpBuffs( &(diag_struct.buffer[0]), sizeof(diag_struct.buffer)/sizeof(diag_struct.buffer[0]), &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) != 0 ) ) {
             data = 0xAAAAAAAA;
             extern const LED_activity_desc_t LED_2Hz_Blink_Activity;
             LED_update(LED_RED, &LED_2Hz_Blink_Activity);
