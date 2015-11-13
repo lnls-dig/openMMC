@@ -39,7 +39,7 @@
 #define HOTSWAP_BACKEND_PWR_FAILURE_MASK        0x08
 #define HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK       0x10
 
-extern TaskHandle_t vTaskHotSwap_Handle;
+TaskHandle_t vTaskHotSwap_Handle;
 
 extern TickType_t getTickDifference(TickType_t current_time, TickType_t start_time);
 void vTaskHotSwap( void *Parameters );

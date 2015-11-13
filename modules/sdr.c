@@ -553,7 +553,6 @@ static const SDR_type_01h_t SDR_LM75_2 = {
     .IDstring = { 'T','E','M','P',' ', '2' } /*  sensor string */
 };
 
-TaskHandle_t vTaskHotSwap_Handle;
 TaskHandle_t vTaskINA220_Handle;
 
 sensor_data_entry_t sdrData[NUM_SDR];
