@@ -48,6 +48,10 @@
 #define SENSOR_TYPE_VERSION_CHANGE              0x2B
 #define SENSOR_TYPE_HOT_SWAP                    0xF2
 
+/* Assertion Event Codes */
+#define ASSERTION_EVENT			        0x00
+#define DEASSERTION_EVENT		        0x80
+
 typedef enum {
     TYPE_01 = 0x1,
     TYPE_02 = 0x2,
@@ -175,11 +179,14 @@ typedef struct {
 extern sensor_data_entry_t sdrData[NUM_SDR];
 extern const sensor_t const sensor_array[NUM_SDR];
 
+#define GET_SENSOR_TYPE(n)      ((SDR_type_01h_t *)sensor_array[n].sdr)->sensortype
+#define GET_SENSOR_NUMBER(n)    ((SDR_type_01h_t *)sensor_array[n].sdr)->sensornum
+#define GET_EVENT_TYPE_CODE(n)  ((SDR_type_01h_t *)sensor_array[n].sdr)->event_reading_type
+
 void ipmi_se_get_sdr( ipmi_msg *req, ipmi_msg* rsp);
 void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp);
 void ipmi_se_get_sdr_info( ipmi_msg *req, ipmi_msg* rsp);
 void ipmi_se_reserve_device_sdr( ipmi_msg *req, ipmi_msg* rsp);
-//void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp );
 
 void initializeDCDC();
 void do_quiesced_init();

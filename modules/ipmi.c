@@ -29,17 +29,18 @@
 #include "led.h"
 #include "task_priorities.h"
 #include "led.h"
+#include "sdr.h"
 
 /* Local variables */
 QueueHandle_t ipmi_rxqueue = NULL;
 
-struct req_param_struct{
+struct req_param_struct {
     ipmi_msg req_received;
     t_req_handler req_handler;
 };
-uint32_t handler_max_watermark = 0;
+
 extern t_req_handler_record handlers[MAX_HANDLERS];
-extern void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp);
+
 void IPMITask ( void * pvParameters )
 {
     ipmi_msg req_received;
@@ -123,12 +124,6 @@ void IPMI_handler_task( void * pvParameters){
        only. */
     configASSERT( response_error == ipmb_error_success );
 
-    /* Check how deep the handler task went in the stack */
-    uint32_t watermark = uxTaskGetStackHighWaterMark(NULL);
-    if (watermark > handler_max_watermark) {
-        handler_max_watermark = watermark;
-    }
-
     vPortFree(req_param);
 
     vTaskDelete(NULL);
@@ -175,6 +170,29 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd){
 
     return handler;
 }
+
+ipmb_error ipmi_event_send( uint8_t sensor_index, uint8_t assert_deassert, uint8_t *evData, uint8_t length)
+{
+    ipmi_msg evt;
+    uint8_t data_len = 0;
+
+    evt.dest_LUN = 0;
+    evt.netfn = NETFN_SE;
+    evt.cmd = IPMI_PLATFORM_EVENT_CMD;
+
+    evt.data[data_len++] = IPMI_EVENT_MESSAGE_REV;
+    evt.data[data_len++] = GET_SENSOR_TYPE(sensor_index);
+    evt.data[data_len++] = GET_SENSOR_NUMBER(sensor_index);
+    evt.data[data_len++] = assert_deassert | (GET_EVENT_TYPE_CODE(sensor_index) & 0x7F);
+    evt.data[data_len++] = (length >= 1)? evData[0] : 0xFF;
+    evt.data[data_len++] = (length >= 2)? evData[1] : 0xFF;
+    evt.data[data_len++] = (length >= 3)? evData[2] : 0xFF;
+
+    evt.data_len = data_len;
+
+    return (ipmb_send_request( &evt ));
+}
+
 
 /*!
  * @brief Handler for GET Device ID command as in IPMI v2.0 section 20.1 for
@@ -275,7 +293,7 @@ void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
         break;
     case 0xFC:
         /* Local state */
-	pLEDact = NULL;
+        pLEDact = NULL;
         break;
     case 0xFD:
     case 0xFE:

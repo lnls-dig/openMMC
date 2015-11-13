@@ -259,6 +259,8 @@
 #define IPMI_PICMG_CMD_SHELF_POWER_ALLOCATION                   0x22
 #define IPMI_PICMG_CMD_GET_TELCO_ALARM_CAPABILITY               0x29
 
+#define IPMI_EVENT_MESSAGE_REV                                  0x04
+
 /* Completion Codes */
 #define IPMI_CC_OK                                              0x00
 #define IPMI_CC_NODE_BUSY                                       0xc0
@@ -300,9 +302,9 @@ void IPMITask ( void *pvParameters );
 void ipmi_init ( void );
 void IPMI_handler_task( void * pvParameters);
 t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd);
+ipmb_error ipmi_event_send( uint8_t sensor_index, uint8_t assert_deassert, uint8_t *evData, uint8_t length);
 
 /* Handler functions */
-
 void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg *rsp );
 void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp );
 void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp );

@@ -125,6 +125,7 @@ void vTaskHotSwap( void *Parameters )
 {
     ipmi_msg pmsg;
     uint8_t data_len = 0;
+    uint8_t evt_msg;
 
 #ifdef HOTSWAP_INT
     uint8_t new_flag;
@@ -168,18 +169,9 @@ void vTaskHotSwap( void *Parameters )
 #ifdef HOTSWAP_INT
         new_flag = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        data_len = 0;
-        pmsg.dest_LUN = 0;
-        pmsg.netfn = NETFN_SE;
-        pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
-        pmsg.data[data_len++] = 0x04;
-        pmsg.data[data_len++] = 0xf2;
-        pmsg.data[data_len++] = hotswap_pSDR->sensornum;
-        pmsg.data[data_len++] = 0x6f;
-        pmsg.data[data_len++] = new_flag;
-        pmsg.data_len = data_len;
+        evt_msg = new_flag >> 1;
 
-        if (ipmb_send_request( &pmsg ) == ipmb_error_success) {
+        if ( ipmi_event_send(HOT_SWAP_SENSOR, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
             /* Update the SDR */
             hotswap_pDATA->comparator_status = (hotswap_pDATA->comparator_status & 0xFC) | new_flag;
         } else {
@@ -197,18 +189,9 @@ void vTaskHotSwap( void *Parameters )
             continue;
         }
 
-        data_len = 0;
-        pmsg.dest_LUN = 0;
-        pmsg.netfn = NETFN_SE;
-        pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
-        pmsg.data[data_len++] = 0x04;
-        pmsg.data[data_len++] = 0xf2;
-        pmsg.data[data_len++] = hotswap_pSDR->sensornum;
-        pmsg.data[data_len++] = 0x6f;
-        pmsg.data[data_len++] = new_state >> 1;
-        pmsg.data_len = data_len;
+        evt_msg = new_state >> 1;
 
-        if (ipmb_send_request( &pmsg ) == ipmb_error_success) {
+        if ( ipmi_event_send(HOT_SWAP_SENSOR, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
             /* Update the SDR */
             hotswap_pDATA->readout_value = new_state;
             old_state = new_state;
