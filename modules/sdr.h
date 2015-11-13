@@ -19,8 +19,8 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IPMI_SDR_H_
-#define IPMI_SDR_H_
+#ifndef SDR_H_
+#define SDR_H_
 
 #include "ipmb.h"
 
