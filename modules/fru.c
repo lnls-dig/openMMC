@@ -15,191 +15,189 @@ uint8_t fru_data[FRU_SIZE];
 
 void fru_header_function( uint8_t * fru_buffer )
 {
-t_fru_common_header * hdr = (t_fru_common_header *) fru_buffer;
+    t_fru_common_header * hdr = (t_fru_common_header *) fru_buffer;
 
-hdr->format_version = 0x01;
+    hdr->format_version = 0x01;
 #ifdef INTERNAL_USE_AREA_ENABLE
-hdr->int_use_offset = INTERNAL_USE_AREA_OFFSET/8;
+    hdr->int_use_offset = INTERNAL_USE_AREA_OFFSET/8;
 #endif
 #ifdef CHASSIS_INFO_AREA_ENABLE
-hdr->chassis_info_offset = CHASSIS_INFO_AREA_OFFSET/8;
+    hdr->chassis_info_offset = CHASSIS_INFO_AREA_OFFSET/8;
 #endif
 #ifdef BOARD_INFO_AREA_ENABLE
-hdr->board_info_offset = BOARD_INFO_AREA_OFFSET/8;
+    hdr->board_info_offset = BOARD_INFO_AREA_OFFSET/8;
 #endif
 #ifdef PRODUCT_INFO_AREA_ENABLE
-hdr->product_info_offset = PRODUCT_INFO_AREA_OFFSET/8;
+    hdr->product_info_offset = PRODUCT_INFO_AREA_OFFSET/8;
 #endif
 #ifdef MULTIRECORD_AREA_ENABLE
-hdr->multirecord_offset = MULTIRECORD_AREA_OFFSET/8;
+    hdr->multirecord_offset = MULTIRECORD_AREA_OFFSET/8;
 #endif
-hdr->checksum = ipmb_calculate_chksum((uint8_t *) hdr, sizeof(t_fru_common_header));
+    hdr->checksum = ipmb_calculate_chksum((uint8_t *) hdr, sizeof(t_fru_common_header));
 }
 
 void board_info_area_function( uint8_t * fru_buffer )
 {
 #ifdef BOARD_INFO_AREA_ENABLE
-t_board_area_format_hdr * board_ptr = (t_board_area_format_hdr *) fru_buffer;
-board_area_format_hdr * board_info = &(board_ptr->data);
-/* Record Format version */
-board_info->format_version = 0x01;
+    t_board_area_format_hdr * board_ptr = (t_board_area_format_hdr *) fru_buffer;
+    board_area_format_hdr * board_info = &(board_ptr->data);
+    /* Record Format version */
+    board_info->format_version = 0x01;
 
-/* Record Length */
-board_info->len = BOARD_INFO_AREA_SIZE/8;
+    /* Record Length */
+    board_info->len = BOARD_INFO_AREA_SIZE/8;
 
-/* Language Code */
-board_info->lang_code = LANG_CODE;
+    /* Language Code */
+    board_info->lang_code = LANG_CODE;
 
-/* Manufacturing date/time - LS Byte first */
-board_info->mfg_time[0] = 0x00;
-board_info->mfg_time[1] = 0x00;
-board_info->mfg_time[2] = 0x00;
+    /* Manufacturing date/time - LS Byte first */
+    board_info->mfg_time[0] = 0x00;
+    board_info->mfg_time[1] = 0x00;
+    board_info->mfg_time[2] = 0x00;
 
-/* Board Manufacturer */
-board_info->manuf_type = 0x03;
-board_info->manuf_len = (strlen(BOARD_MANUFACTURER) & 0x3F);
+    /* Board Manufacturer */
+    board_info->manuf_type = 0x03;
+    board_info->manuf_len = (strlen(BOARD_MANUFACTURER) & 0x3F);
 #ifdef BOARD_MANUFACTURER
-strncpy((char*)&(board_info->manuf), BOARD_MANUFACTURER, strlen(BOARD_MANUFACTURER));
+    strncpy((char*)&(board_info->manuf), BOARD_MANUFACTURER, strlen(BOARD_MANUFACTURER));
 #endif
 
-/* Board Product Name */
-board_info->prod_name_type = 0x03;
-board_info->prod_name_len = (strlen(BOARD_NAME) & 0x3F);
+    /* Board Product Name */
+    board_info->prod_name_type = 0x03;
+    board_info->prod_name_len = (strlen(BOARD_NAME) & 0x3F);
 #ifdef BOARD_NAME
-strncpy((char*) &(board_info->prod_name), BOARD_NAME, strlen(BOARD_NAME));
+    strncpy((char*) &(board_info->prod_name), BOARD_NAME, strlen(BOARD_NAME));
 #endif
 
-/* Board Serial Number */
-board_info->ser_num_type = 0x03;
-board_info->ser_num_len = (strlen(BOARD_SN) & 0x3F);
+    /* Board Serial Number */
+    board_info->ser_num_type = 0x03;
+    board_info->ser_num_len = (strlen(BOARD_SN) & 0x3F);
 #ifdef BOARD_SN
-strncpy((char*) &(board_info->ser_num), BOARD_SN, strlen(BOARD_SN));
+    strncpy((char*) &(board_info->ser_num), BOARD_SN, strlen(BOARD_SN));
 #endif
 
-/* Board Part Number */
-board_info->part_num_type = 0x03;
-board_info->part_num_len = (strlen(BOARD_PN) & 0x3F);
+    /* Board Part Number */
+    board_info->part_num_type = 0x03;
+    board_info->part_num_len = (strlen(BOARD_PN) & 0x3F);
 #ifdef BOARD_PN
-strncpy((char*) &(board_info->part_num), BOARD_PN, strlen(BOARD_PN));
+    strncpy((char*) &(board_info->part_num), BOARD_PN, strlen(BOARD_PN));
 #endif
 
-/* FRU File ID */
-board_info->fru_file_id_type = 0x03;
-board_info->fru_file_id_len = (strlen(FRU_FILE_ID) & 0x3F);
+    /* FRU File ID */
+    board_info->fru_file_id_type = 0x03;
+    board_info->fru_file_id_len = (strlen(FRU_FILE_ID) & 0x3F);
 #ifdef FRU_FILE_ID
-strncpy((char*) &(board_info->fru_file_id), FRU_FILE_ID, strlen(FRU_FILE_ID));
+    strncpy((char*) &(board_info->fru_file_id), FRU_FILE_ID, strlen(FRU_FILE_ID));
 #endif
 
-/* No more info fields (End of record) */
-board_info->end_of_record = 0xC1;
+    /* No more info fields (End of record) */
+    board_info->end_of_record = 0xC1;
 
-/* Checksum */
-board_ptr->checksum = ipmb_calculate_chksum((uint8_t *)board_info, BOARD_INFO_AREA_SIZE);
+    /* Checksum */
+    board_ptr->checksum = ipmb_calculate_chksum((uint8_t *)board_info, BOARD_INFO_AREA_SIZE);
 #endif
 }
 
 void product_info_area_function( uint8_t * fru_buffer )
 {
 #ifdef PRODUCT_INFO_AREA_ENABLE
-t_product_area_format_hdr * product_ptr = (t_product_area_format_hdr *) fru_buffer;
-product_area_format_hdr * product_info = &(product_ptr->data);
+    t_product_area_format_hdr * product_ptr = (t_product_area_format_hdr *) fru_buffer;
+    product_area_format_hdr * product_info = &(product_ptr->data);
 
 /* Format Version */
-product_info->format_version = 1;
+    product_info->format_version = 1;
 
 /* Record size in 8 bytes */
-product_info->len = PRODUCT_INFO_AREA_SIZE/8;
+    product_info->len = PRODUCT_INFO_AREA_SIZE/8;
 
 /* Language code */
-product_info->lang_code = LANG_CODE;
+    product_info->lang_code = LANG_CODE;
 
 /* Product Manufacturer */
-product_info->manuf_name_type = 0x3;
-product_info->manuf_name_len = (strlen(PRODUCT_MANUFACTURER) & 0x3F);
+    product_info->manuf_name_type = 0x3;
+    product_info->manuf_name_len = (strlen(PRODUCT_MANUFACTURER) & 0x3F);
 #ifdef PRODUCT_MANUFACTURER
-strncpy((char*) &(product_info->manuf_name), PRODUCT_MANUFACTURER, strlen(PRODUCT_MANUFACTURER));
+    strncpy((char*) &(product_info->manuf_name), PRODUCT_MANUFACTURER, strlen(PRODUCT_MANUFACTURER));
 #endif
 
 /* Product Name */
-product_info->prod_name_type = 0x03;
-product_info->prod_name_len = (strlen(PRODUCT_NAME) & 0x3F);
+    product_info->prod_name_type = 0x03;
+    product_info->prod_name_len = (strlen(PRODUCT_NAME) & 0x3F);
 #ifdef PRODUCT_NAME
-strncpy((char*) &(product_info->prod_name), PRODUCT_NAME, strlen(PRODUCT_NAME));
+    strncpy((char*) &(product_info->prod_name), PRODUCT_NAME, strlen(PRODUCT_NAME));
 #endif
 
 /* Product Part/Model Number type/length */
-product_info->prod_part_model_num_type = 0x03;
-product_info->prod_part_model_num_len = (strlen(PRODUCT_PN) & 0x3F);
+    product_info->prod_part_model_num_type = 0x03;
+    product_info->prod_part_model_num_len = (strlen(PRODUCT_PN) & 0x3F);
 #ifdef PRODUCT_PN
-strncpy((char*) &(product_info->prod_part_model), PRODUCT_PN, strlen(PRODUCT_PN));
+    strncpy((char*) &(product_info->prod_part_model), PRODUCT_PN, strlen(PRODUCT_PN));
 #endif
 
 /* Product Version */
-product_info->prod_version_type = 0x03;
-product_info->prod_version_len = (strlen(PRODUCT_VERSION) & 0x3F);
+    product_info->prod_version_type = 0x03;
+    product_info->prod_version_len = (strlen(PRODUCT_VERSION) & 0x3F);
 #ifdef PRODUCT_VERSION
-strncpy((char*) &(product_info->prod_version), PRODUCT_VERSION, strlen(PRODUCT_VERSION));
+    strncpy((char*) &(product_info->prod_version), PRODUCT_VERSION, strlen(PRODUCT_VERSION));
 #endif
 
 /* Product Serial Num */
-product_info->prod_serial_num_type = 0x03;
-product_info->prod_serial_num_len = (strlen(PRODUCT_SN) & 0x3F);
+    product_info->prod_serial_num_type = 0x03;
+    product_info->prod_serial_num_len = (strlen(PRODUCT_SN) & 0x3F);
 #ifdef PRODUCT_SN
-strncpy((char*) &(product_info->prod_serial_num), PRODUCT_SN, strlen(PRODUCT_SN));
+    strncpy((char*) &(product_info->prod_serial_num), PRODUCT_SN, strlen(PRODUCT_SN));
 #endif
 
 /* Product Serial Num */
-product_info->asset_tag_type = 0x03;
-product_info->asset_tag_len = (strlen(PRODUCT_ASSET_TAG) & 0x3F);
+    product_info->asset_tag_type = 0x03;
+    product_info->asset_tag_len = (strlen(PRODUCT_ASSET_TAG) & 0x3F);
 #ifdef PRODUCT_ASSET_TAG
-strncpy((char*) &(product_info->asset_tag), PRODUCT_ASSET_TAG, strlen(PRODUCT_ASSET_TAG));
+    strncpy((char*) &(product_info->asset_tag), PRODUCT_ASSET_TAG, strlen(PRODUCT_ASSET_TAG));
 #endif
 
 /* FRU File ID */
-product_info->fru_file_id_type = 0x03;
-product_info->fru_file_id_len = (strlen(FRU_FILE_ID) & 0x3F);
+    product_info->fru_file_id_type = 0x03;
+    product_info->fru_file_id_len = (strlen(FRU_FILE_ID) & 0x3F);
 #ifdef FRU_FILE_ID
-strncpy((char*) &(product_info->fru_file_id), FRU_FILE_ID, strlen(FRU_FILE_ID));
+    strncpy((char*) &(product_info->fru_file_id), FRU_FILE_ID, strlen(FRU_FILE_ID));
 #endif
 
-product_info->end_of_record = 0xC1;
+    product_info->end_of_record = 0xC1;
 
-product_ptr->checksum = ipmb_calculate_chksum((uint8_t *)product_info, PRODUCT_INFO_AREA_SIZE);
+    product_ptr->checksum = ipmb_calculate_chksum((uint8_t *)product_info, PRODUCT_INFO_AREA_SIZE);
 #endif
 }
 
 void module_current_record_function( uint8_t * fru_buffer )
 {
-
 #ifdef MODULE_CURRENT_RECORD
 
-t_module_current_record * module_current_record = (t_module_current_record *) fru_buffer;
+    t_module_current_record * module_current_record = (t_module_current_record *) fru_buffer;
 
-/* Record Type ID */
-module_current_record->hdr.record_type_id = 0xC0;    //OEM Record
-module_current_record->hdr.eol = 0x01;    //Last Record
-module_current_record->hdr.version = 0x02;    //Record format version
-module_current_record->hdr.record_len = 0x06;        //Record length
-module_current_record->hdr.manuf_id[0] = 0x5A;
-module_current_record->hdr.manuf_id[1] = 0x31;
-module_current_record->hdr.manuf_id[2] = 0x00;   //Manufacturer ID (PICMG)
-module_current_record->hdr.picmg_rec_id = 0x16;    //PICMG Record ID (19h - AMC Point to point connectivity)
-module_current_record->hdr.rec_fmt_ver = 0x00;    //Record format version (0x00 for this version)
-/* Current Draw */
-module_current_record->current = MODULE_CURRENT_RECORD;
-/* Checksums */
+    /* Record Type ID */
+    module_current_record->hdr.record_type_id = 0xC0;    //OEM Record
+    module_current_record->hdr.eol = 0x01;    //Last Record
+    module_current_record->hdr.version = 0x02;    //Record format version
+    module_current_record->hdr.record_len = sizeof(t_module_current_record)-sizeof(t_multirecord_area_header);        //Record length
+    module_current_record->manuf_id[0] = 0x5A;
+    module_current_record->manuf_id[1] = 0x31;
+    module_current_record->manuf_id[2] = 0x00;   //Manufacturer ID (PICMG)
+    module_current_record->picmg_rec_id = 0x16;    //PICMG Record ID (19h - AMC Point to point connectivity)
+    module_current_record->rec_fmt_ver = 0x00;    //Record format version (0x00 for this version)
+    /* Current Draw */
+    module_current_record->current = MODULE_CURRENT_RECORD;
+    /* Checksums */
 
-/* Record Checksum */
-module_current_record->hdr.record_cksum = ipmb_calculate_chksum(&(module_current_record->hdr.manuf_id[0]), 6);
-/* Header Checksum */
-module_current_record->hdr.header_cksum = ipmb_calculate_chksum( (uint8_t *)&(module_current_record->hdr), 5);
+    /* Record Checksum */
+    module_current_record->hdr.record_cksum = ipmb_calculate_chksum((uint8_t*)(module_current_record+sizeof(t_multirecord_area_header)), module_current_record->hdr.record_len);
+    /* Header Checksum */
+    module_current_record->hdr.header_cksum = ipmb_calculate_chksum( (uint8_t *)&(module_current_record->hdr), sizeof(t_multirecord_area_header));
 #endif
 }
 
 void AMC_POINT_TO_POINT_RECORD_func( uint8_t * fru_buffer )
 {
 
-#ifdef CERN_FRU
 #ifdef AMC_POINT_TO_POINT_RECORD_LIST
 
 #ifndef POINT_TO_POINT_OEM_GUID_CNT
@@ -211,16 +209,17 @@ void AMC_POINT_TO_POINT_RECORD_func( uint8_t * fru_buffer )
     p2p_record->hdr.record_type_id = 0xC0;    //OEM Record
     p2p_record->hdr.eol = 0x00;    //Record format version
     p2p_record->hdr.version = 0x02;    //Record format version
+    p2p_record->hdr.record_len = sizeof(t_amc_point_to_point_record)-sizeof(t_multirecord_area_header);
 
-    p2p_record->hdr.manuf_id[0] = 0x5A;
-    p2p_record->hdr.manuf_id[1] = 0x31;
-    p2p_record->hdr.manuf_id[2] = 0x00;   //Manufacturer ID (PICMG)
-    p2p_record->hdr.picmg_rec_id = 0x19;    //PICMG Record ID (19h - AMC Point to point connectivity)
-    p2p_record->hdr.rec_fmt_ver = 0x00;    //Record format version (0x00 for this version)
+    p2p_record->manuf_id[0] = 0x5A;
+    p2p_record->manuf_id[1] = 0x31;
+    p2p_record->manuf_id[2] = 0x00;   //Manufacturer ID (PICMG)
+    p2p_record->picmg_rec_id = 0x19;    //PICMG Record ID (19h - AMC Point to point connectivity)
+    p2p_record->rec_fmt_ver = 0x00;    //Record format version (0x00 for this version)
     p2p_record->oem_guid_cnt = POINT_TO_POINT_OEM_GUID_CNT;     //OEM Guid cnt
 
 #ifdef POINT_TO_POINT_OEM_GUID_LIST
-/* TODO: find a way to populate this list */
+    /* TODO: find a way to populate this list */
     POINT_TO_POINT_OEM_GUID_LIST;
 #endif
 
@@ -228,82 +227,9 @@ void AMC_POINT_TO_POINT_RECORD_func( uint8_t * fru_buffer )
 
     AMC_POINT_TO_POINT_RECORD_LIST;
 
-    p2p_record->hdr.record_len = sizeof(t_amc_point_to_point_record)-5;
-    p2p_record->hdr.record_cksum = ipmb_calculate_chksum(&(p2p_record->hdr.manuf_id[0]), (sizeof(t_amc_point_to_point_record)-5)); //record checksum
-    p2p_record->hdr.header_cksum = ipmb_calculate_chksum( ( uint8_t *)&(p2p_record->hdr), 5); //Header checksum
+    p2p_record->hdr.record_cksum = ipmb_calculate_chksum( (uint8_t *) (p2p_record+sizeof(t_multirecord_area_header)), p2p_record->hdr.record_len); //record checksum
+    p2p_record->hdr.header_cksum = ipmb_calculate_chksum( (uint8_t *)&(p2p_record->hdr), sizeof(t_multirecord_area_header)); //Header checksum
 
-#endif
-#else
-
-    t_amc_point_to_point_record *pP2PCon = (t_amc_point_to_point_record *) fru_buffer;
-
-    pP2PCon->record_type_id = 0xC0;     /* For all records a value of C0h (OEM) shall be used. */
-    pP2PCon->eol = 0;                   /* [7:7] End of list. Set to one for the last record */
-    pP2PCon->reserved = 0;              /* Reserved, write as 0h.*/
-    pP2PCon->version = 2;               /* record format version (2h for this definition) */
-    pP2PCon->record_len = 47;           /* Record Length. */
-
-    /* Manufacturer ID - For the AMC specification the value 12634 (00315Ah) must be used. */
-    pP2PCon->manuf_id[0] = 0x5A;
-    pP2PCon->manuf_id[1] = 0x31;
-    pP2PCon->manuf_id[2] = 0x00;
-    pP2PCon->picmg_rec_id = 0x19;       /* 0x19 for AMC Point-to-Point Connectivity record */
-    pP2PCon->rec_fmt_ver = 0;   /* Record Format Version, = 0 for this specification */
-    pP2PCon->oem_guid_count = 0;        /* OEM GUID Count */
-    pP2PCon->record_type = 1;   /* 1 = AMC Module */
-    pP2PCon->conn_dev_id = 0;   /* Connected-device ID if Record Type = 0, Reserved, otherwise. */
-    pP2PCon->ch_descr_count = 3;        /* AMC Channel Descriptor Count */
-    // AMC Link configuration for PCIe GEN1
-    pP2PCon->amc_ch_descr0[0] = 0x00;
-    pP2PCon->amc_ch_descr0[1] = 0x00;
-    pP2PCon->amc_ch_descr0[2] = 0x00;
-
-    pP2PCon->amc_ch_descr1[0] = 0xA4;
-    pP2PCon->amc_ch_descr1[1] = 0x98;
-    pP2PCon->amc_ch_descr1[2] = 0xF3;
-
-    pP2PCon->amc_ch_descr2[0] = 0xA4;
-    pP2PCon->amc_ch_descr2[1] = 0x98;
-    pP2PCon->amc_ch_descr2[2] = 0xF3;
-
-    pP2PCon->amc_link_descr0[0] = 0x00;
-    pP2PCon->amc_link_descr0[1] = 0x2F;
-    pP2PCon->amc_link_descr0[2] = 0x00;
-    pP2PCon->amc_link_descr0[3] = 0x00;
-    pP2PCon->amc_link_descr0[4] = 0xFD;
-
-    pP2PCon->amc_link_descr1[0] = 0x00;
-    pP2PCon->amc_link_descr1[1] = 0x2F;
-    pP2PCon->amc_link_descr1[2] = 0x10;
-    pP2PCon->amc_link_descr1[3] = 0x00;
-    pP2PCon->amc_link_descr1[4] = 0xFD;
-
-    pP2PCon->amc_link_descr2[0] = 0x00;
-    pP2PCon->amc_link_descr2[1] = 0x23;
-    pP2PCon->amc_link_descr2[2] = 0x00;
-    pP2PCon->amc_link_descr2[3] = 0x00;
-    pP2PCon->amc_link_descr2[4] = 0xFD;
-
-    pP2PCon->amc_link_descr3[0] = 0x00;
-    pP2PCon->amc_link_descr3[1] = 0x23;
-    pP2PCon->amc_link_descr3[2] = 0x10;
-    pP2PCon->amc_link_descr3[3] = 0x00;
-    pP2PCon->amc_link_descr3[4] = 0xFD;
-
-    pP2PCon->amc_link_descr4[0] = 0x01;
-    pP2PCon->amc_link_descr4[1] = 0x21;
-    pP2PCon->amc_link_descr4[2] = 0x00;
-    pP2PCon->amc_link_descr4[3] = 0x00;
-    pP2PCon->amc_link_descr4[4] = 0xFD;
-
-    pP2PCon->amc_link_descr5[0] = 0x01;
-    pP2PCon->amc_link_descr5[1] = 0x21;
-    pP2PCon->amc_link_descr5[2] = 0x10;
-    pP2PCon->amc_link_descr5[3] = 0x00;
-    pP2PCon->amc_link_descr5[4] = 0xFD;
-
-    pP2PCon->record_cksum = ipmb_calculate_chksum( ( uint8_t * )&( pP2PCon->manuf_id[0] ), 47 );
-    pP2PCon->header_cksum = ipmb_calculate_chksum( ( uint8_t * )&( pP2PCon->record_type_id ), 4 );
 #endif
 }
 
@@ -316,12 +242,12 @@ void point_to_point_clock( uint8_t * fru_buffer )
     clock_cfg->hdr.record_type_id = 0xC0;
     clock_cfg->hdr.eol = 0x00;
     clock_cfg->hdr.version = 0x02;
-    clock_cfg->hdr.record_len = sizeof(t_amc_clock_config_record)-5;
-    clock_cfg->hdr.manuf_id[0] = 0x5A;
-    clock_cfg->hdr.manuf_id[1] = 0x31;
-    clock_cfg->hdr.manuf_id[2] = 0x00;
-    clock_cfg->hdr.picmg_rec_id = 0x2D;
-    clock_cfg->hdr.rec_fmt_ver = 0x00;
+    clock_cfg->hdr.record_len = sizeof(t_amc_clock_config_record)-sizeof(t_multirecord_area_header);
+    clock_cfg->manuf_id[0] = 0x5A;
+    clock_cfg->manuf_id[1] = 0x31;
+    clock_cfg->manuf_id[2] = 0x00;
+    clock_cfg->picmg_rec_id = 0x2D;
+    clock_cfg->rec_fmt_ver = 0x00;
 
     clock_cfg->resource_id = 0xFF;
 
@@ -331,8 +257,8 @@ void point_to_point_clock( uint8_t * fru_buffer )
 
     memcpy(clock_cfg->descriptor, &clock_descriptor_list, sizeof(clock_cfg->descriptor));
 
-    clock_cfg->hdr.record_cksum = ipmb_calculate_chksum((uint8_t*)&(clock_cfg->hdr.manuf_id[0]), clock_cfg->hdr.record_len);
-    clock_cfg->hdr.header_cksum = ipmb_calculate_chksum((uint8_t*)&(clock_cfg->hdr), 5);
+    clock_cfg->hdr.record_cksum = ipmb_calculate_chksum((uint8_t*)(clock_cfg+sizeof(t_multirecord_area_header)), clock_cfg->hdr.record_len);
+    clock_cfg->hdr.header_cksum = ipmb_calculate_chksum((uint8_t*)&(clock_cfg->hdr), sizeof(t_multirecord_area_header));
 #endif
 }
 
@@ -356,12 +282,12 @@ void fru_read_to_buffer(char *buff, int offset, int length)
     uint8_t j = offset;
 
     for (i = 0; i<length; i++, j++ ) {
-    if (j < (sizeof(fru_data)/sizeof(fru_data[0]))) {
-    buff[i] = fru_data[j];
-} else {
-    buff[i] = 0xFF;
-}
-}
+        if (j < (sizeof(fru_data)/sizeof(fru_data[0]))) {
+            buff[i] = fru_data[j];
+        } else {
+            buff[i] = 0xFF;
+        }
+    }
 }
 
 void fru_read_common_header(t_fru_common_header * header) {
@@ -387,9 +313,9 @@ void ipmi_storage_read_fru_data( ipmi_msg * req, ipmi_msg * rsp )
     uint8_t count = req->data[3];
 
     if ( (count-1) > IPMI_MSG_MAX_LENGTH ) {
-    rsp->completion_code = IPMI_CC_CANT_RET_NUM_REQ_BYTES;
-    return;
-}
+        rsp->completion_code = IPMI_CC_CANT_RET_NUM_REQ_BYTES;
+        return;
+    }
 
     offset = (req->data[2] << 8) | (req->data[1]);
 

@@ -133,13 +133,6 @@ typedef struct multirecord_area_header {
                                      the record. */
     uint8_t       header_cksum;   /* Header Checksum. Holds the zero checksum of
                                      the header. */
-    uint8_t       manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
-                                     three byte ID assigned to PICMG®. For this
-                                     specification, the value 12634 (00315Ah) shall
-                                     be used. */
-    uint8_t       picmg_rec_id;   /* PICMG Record ID. */
-    uint8_t       rec_fmt_ver;    /* Record Format Version. For this specification,
-                                     the value 0h shall be used. */
 } t_multirecord_area_header;
 
 
@@ -335,34 +328,63 @@ typedef struct t_product_area_format_hdr {
     uint8_t checksum;               // Product Info Area Checksum (zero checksum)
 } t_product_area_format_hdr;
 
-
 typedef struct module_current_record {
     t_multirecord_area_header hdr;
+    uint8_t manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
+                                     three byte ID assigned to PICMG®. For this
+                                     specification, the value 12634 (00315Ah) shall
+                                     be used. */
+    uint8_t picmg_rec_id;   /* PICMG Record ID. */
+    uint8_t rec_fmt_ver;    /* Record Format Version. For this specification,
+                                     the value 0h shall be used. */
     uint8_t current;
 } t_module_current_record;
 
 typedef struct __attribute__ ((__packed__)) amc_channel_descriptor {
-    /* LSB First */
+#ifdef BF_MS_FIRST
+    uint8_t reserved:4;
+    uint8_t lane3:5;
+    uint8_t lane2:5;
+    uint8_t lane1:5;
+    uint8_t lane0:5;
+#else
     uint8_t lane0:5;
     uint8_t lane1:5;
     uint8_t lane2:5;
     uint8_t lane3:5;
     uint8_t reserved:4;
+#endif
 } t_amc_channel_descriptor;
 
 typedef struct __attribute__ ((__packed__)) amc_link_descriptor {
     /* LSB First */
+#ifdef BF_MS_FIRST
+    uint8_t reserved:6,
+	assymetric_match:2;
+    uint8_t link_grouping_id;
+    uint16_t link_type_ext:4,
+	link_type:12;
+    uint8_t amc_channel_id;
+#else
     uint8_t amc_channel_id;
     uint16_t link_type:12,
         link_type_ext:4;
     uint8_t link_grouping_id;
-    uint8_t reserved:6,
-        assymetric_match:2;
+    uint8_t assymetric_match:2,
+	reserved:6;
+#endif
 } t_amc_link_descriptor;
 
-#ifdef CERN_FRU
+
 typedef struct amc_point_to_point_record {
     t_multirecord_area_header hdr;
+    uint8_t manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
+                                     three byte ID assigned to PICMG®. For this
+                                     specification, the value 12634 (00315Ah) shall
+                                     be used. */
+    uint8_t picmg_rec_id;   /* PICMG Record ID. */
+    uint8_t rec_fmt_ver;    /* Record Format Version. For this specification,
+                                     the value 0h shall be used. */
     uint8_t oem_guid_cnt;
 #ifdef POINT_TO_POINT_OEM_GUID_LIST
 #if (POINT_TO_POINT_OEM_GUID_CNT == 0)
@@ -388,53 +410,6 @@ typedef struct amc_point_to_point_record {
 } t_amc_point_to_point_record;
 
 #define AMC_POINT_TO_POINT_RECORD_BUILD
-#else
-
-typedef struct amc_point_to_point_record {
-/* AMC Table 3-16 AdvancedMC Point-to-Point Connectivity record */
-    uint8_t record_type_id; /* Record Type ID. For all records defined
-			       in this specification a value of C0h (OEM)
-			       shall be used. */
-    uint8_t version:4,
-	reserved:3,
-	eol:1;
-    uint8_t record_len;     /* Record Length. # of bytes following rec cksum */
-    uint8_t record_cksum;   /* Record Checksum. Holds the zero checksum of
-			       the record. */
-    uint8_t header_cksum;   /* Header Checksum. Holds the zero checksum of
-			       the header. */
-    uint8_t manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
-			       three byte ID assigned to PICMG�. For this
-			       specification, the value 12634 (00315Ah) shall
-			       be used. */
-    uint8_t picmg_rec_id;   /* PICMG Record ID. For the AMC Point-to-Point
-			       Connectivity record, the value 19h must be used  */
-    uint8_t rec_fmt_ver;    /* Record Format Version. For this specification,
-			       the value 0h shall be used. */
-    uint8_t oem_guid_count; /* OEM GUID Count. The number, n, of OEM GUIDs
-			       defined in this record. */
-//OEM_GUID oem_guid_list[n];
-/* A list 16*n bytes of OEM GUIDs. */
-    
-uint8_t conn_dev_id:4,
-    :3,
-    record_type:1;
-
-    uint8_t ch_descr_count; /* AMC Channel Descriptor Count. The number, m,
-			       of AMC Channel Descriptors defined in this record. */
-
-    uint8_t amc_ch_descr0[3];
-    uint8_t amc_ch_descr1[3];
-    uint8_t amc_ch_descr2[3];
-    uint8_t amc_link_descr0[5];
-    uint8_t amc_link_descr1[5];
-    uint8_t amc_link_descr2[5];
-    uint8_t amc_link_descr3[5];
-    uint8_t amc_link_descr4[5];
-    uint8_t amc_link_descr5[5];
-
-} t_amc_point_to_point_record;
-#endif
 
 typedef struct indirect_clock_descriptor {
 #ifdef BF_MS_FIRST
@@ -466,7 +441,6 @@ typedef struct direct_clock_descriptor {
     uint8_t clock_maximum_frequency[4];
 } t_direct_clock_descriptor;
 
-
 typedef struct clock_config_descriptor {
     uint8_t clock_id;
 #ifdef BF_MS_FIRST
@@ -485,6 +459,13 @@ typedef struct clock_config_descriptor {
 
 typedef struct amc_clock_config_record {
     t_multirecord_area_header hdr;
+    uint8_t manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
+                                     three byte ID assigned to PICMG®. For this
+                                     specification, the value 12634 (00315Ah) shall
+                                     be used. */
+    uint8_t picmg_rec_id;   /* PICMG Record ID. */
+    uint8_t rec_fmt_ver;    /* Record Format Version. For this specification,
+                                     the value 0h shall be used. */
     uint8_t resource_id;
     uint8_t descriptor_cnt;
 #ifdef AMC_CLOCK_CONFIGURATION_DESCRIPTORS_CNT
