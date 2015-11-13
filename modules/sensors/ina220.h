@@ -66,25 +66,22 @@ typedef struct {
 
 typedef struct {
     uint8_t i2c_id;
-    const t_ina220_config *config;
+    SDR_type_01h_t * pSDR;
+    sensor_data_entry_t * pDATA;
+    const t_ina220_config * config;
     uint32_t rshunt;
     uint16_t curr_config;
     uint16_t regs[INA220_REGISTERS];
 } t_ina220_data;
 
-extern TaskHandle_t vTaskINA220_Handle;
+TaskHandle_t vTaskINA220_Handle;
 
-#ifdef OLD_INA220
-void INA220_init( void );
-uint16_t INA220_readVolt(uint8_t i2c, uint8_t address, bool raw);
-#else
 uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data);
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
 void ina220_readall( t_ina220_data * data );
 void ina220_sdr_init ( TaskHandle_t handle );
 void ina220_init( void );
-#endif
 
 void vTaskINA220( void* Parameters );
 

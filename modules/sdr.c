@@ -553,7 +553,6 @@ static const SDR_type_01h_t SDR_LM75_2 = {
     .IDstring = { 'T','E','M','P',' ', '2' } /*  sensor string */
 };
 
-TaskHandle_t vTaskINA220_Handle;
 
 sensor_data_entry_t sdrData[NUM_SDR];
 const sensor_t const sensor_array[NUM_SDR];
@@ -604,12 +603,7 @@ void sensor_init( void )
 {
     hotswap_init();
     LM75_init();
-#ifdef OLD_INA220
-    INA220_init();
-#else
     ina220_init();
-#endif
-
 }
 
 static uint16_t reservationID;
