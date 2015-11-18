@@ -35,13 +35,17 @@
 #include "ina220.h"
 
 const t_ina220_config ina220_cfg = {
-    .config_default = INA220_CONFIG_DEFAULT,
+    .config_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
+				   .pga_gain = INA220_PGA_GAIN_320MV,
+				   .bus_adc_resolution = INA220_RES_SAMPLES_12BIT,
+				   .shunt_adc_resolution = INA220_RES_SAMPLES_12BIT,
+				   .mode = INA220_MODE_SHUNT_BUS_CONT },
     .calibration_factor = 40960000,
     .registers = INA220_REGISTERS,
     .shunt_div = 100,
     .bus_voltage_shift = 3,
-    .bus_voltage_lsb = 4000,
-    .power_lsb = 20000,
+    .bus_voltage_lsb = 4, /* in mV */
+    .power_lsb = 20
 };
 
 static t_ina220_data ina220_data[MAX_INA220_COUNT];
@@ -121,7 +125,7 @@ uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
         return -1;
     }
 
-    uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_config >> 8 ), ( data->curr_config & 0xFFFF ) };
+    uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_config.cfg_word >> 8) , ( data->curr_config.cfg_word & 0xFFFF) };
 
     portENABLE_INTERRUPTS();
     xI2CMasterWrite( i2c_bus, data->i2c_id, cfg_buff, sizeof(cfg_buff)/sizeof(cfg_buff[0]) );
