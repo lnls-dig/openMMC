@@ -405,9 +405,9 @@ static SDR_type_01h_t SDR_FMC2_P3V3 = {
     .IDstring = { 'F','M','C','2',' ', '+', '3', 'V', '3' } /* sensor string */
 };
 
-static SDR_type_01h_t SDR_LM75_1 = {
+static SDR_type_01h_t SDR_LM75_uC = {
 
-    .hdr.recID_LSB = NUM_SDR_LM75_1,
+    .hdr.recID_LSB = NUM_SDR_LM75_uC,
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
     .hdr.rectype = TYPE_01,
@@ -415,7 +415,7 @@ static SDR_type_01h_t SDR_LM75_1 = {
 
     .ownerID = 0x00, /* i2c address, -> SDR_Init */
     .ownerLUN = 0x00, /* sensor owner LUN */
-    .sensornum = NUM_SDR_LM75_1, /* sensor number */
+    .sensornum = NUM_SDR_LM75_uC, /* sensor number */
 
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
@@ -457,13 +457,13 @@ static SDR_type_01h_t SDR_LM75_1 = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 6, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'T','E','M','P',' ', '1' } /*  sensor string */
+    .IDtypelen = 0xc0 | 7, /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'T','e','m','p',' ', 'u', 'C' } /*  sensor string */
 };
 
-static SDR_type_01h_t SDR_LM75_2 = {
+static SDR_type_01h_t SDR_LM75_CLOCK_SWITCH = {
 
-    .hdr.recID_LSB = NUM_SDR_LM75_2,
+    .hdr.recID_LSB = NUM_SDR_LM75_CLOCK_SWITCH,
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
     .hdr.rectype = TYPE_01,
@@ -471,7 +471,7 @@ static SDR_type_01h_t SDR_LM75_2 = {
 
     .ownerID = 0x00, /* i2c address, -> SDR_Init */
     .ownerLUN = 0x00, /* sensor owner LUN */
-    .sensornum = NUM_SDR_LM75_2, /* sensor number */
+    .sensornum = NUM_SDR_LM75_CLOCK_SWITCH, /* sensor number */
 
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
@@ -513,13 +513,13 @@ static SDR_type_01h_t SDR_LM75_2 = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 6, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'T','E','M','P',' ', '2' } /*  sensor string */
+    .IDtypelen = 0xc0 | 0xF, /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'T','e','m','p',' ', 'C','l','k',' ', 'S','w','i','t','c','h' } /*  sensor string */
 };
 
-static SDR_type_01h_t SDR_LM75_3 = {
+static SDR_type_01h_t SDR_LM75_DCDC = {
 
-    .hdr.recID_LSB = NUM_SDR_LM75_3,
+    .hdr.recID_LSB = NUM_SDR_LM75_DCDC,
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
     .hdr.rectype = TYPE_01,
@@ -527,7 +527,7 @@ static SDR_type_01h_t SDR_LM75_3 = {
 
     .ownerID = 0x00, /* i2c address, -> SDR_Init */
     .ownerLUN = 0x00, /* sensor owner LUN */
-    .sensornum = NUM_SDR_LM75_3, /* sensor number */
+    .sensornum = NUM_SDR_LM75_DCDC, /* sensor number */
 
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
@@ -569,13 +569,13 @@ static SDR_type_01h_t SDR_LM75_3 = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 6, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'T','E','M','P',' ', '3' } /*  sensor string */
+    .IDtypelen = 0xc0 | 9, /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'T','e','m','p',' ', 'D','C','D','C' } /*  sensor string */
 };
 
-static SDR_type_01h_t SDR_LM75_4 = {
+static SDR_type_01h_t SDR_LM75_RAM = {
 
-    .hdr.recID_LSB = NUM_SDR_LM75_4,
+    .hdr.recID_LSB = NUM_SDR_LM75_RAM,
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
     .hdr.rectype = TYPE_01,
@@ -583,7 +583,7 @@ static SDR_type_01h_t SDR_LM75_4 = {
 
     .ownerID = 0x00, /* i2c address, -> SDR_Init */
     .ownerLUN = 0x00, /* sensor owner LUN */
-    .sensornum = NUM_SDR_LM75_4, /* sensor number */
+    .sensornum = NUM_SDR_LM75_RAM, /* sensor number */
 
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
@@ -625,8 +625,8 @@ static SDR_type_01h_t SDR_LM75_4 = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 6, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'T','E','M','P',' ', '4' } /*  sensor string */
+    .IDtypelen = 0xc0 | 8, /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'T','e','m','p',' ', 'R','A','M' } /*  sensor string */
 };
 
 sensor_t sensor_array[NUM_SDR]  = {
@@ -643,10 +643,10 @@ sensor_t sensor_array[NUM_SDR]  = {
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_VADJ, .sdr_length = sizeof(SDR_FMC2_VADJ), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_VADJ_DEVID, .slave_addr = 0x42 },
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_P3V3, .sdr_length = sizeof(SDR_FMC2_P3V3), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_P3V3_DEVID, .slave_addr = 0x44 },
     /* Temperature Sensors */
-    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_1,    .sdr_length = sizeof(SDR_LM75_1),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4C },
-    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_2,    .sdr_length = sizeof(SDR_LM75_2),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4D },
-    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_3,    .sdr_length = sizeof(SDR_LM75_3),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4E },
-    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_4,    .sdr_length = sizeof(SDR_LM75_4),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4F }
+    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_uC,    .sdr_length = sizeof(SDR_LM75_uC),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4C },
+    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_CLOCK_SWITCH,    .sdr_length = sizeof(SDR_LM75_CLOCK_SWITCH),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4D },
+    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_DCDC,    .sdr_length = sizeof(SDR_LM75_DCDC),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4E },
+    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_RAM,    .sdr_length = sizeof(SDR_LM75_RAM),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4F }
 };
 
 

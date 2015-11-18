@@ -34,10 +34,10 @@
 #define NUM_SDR_FMC1_12V		5
 #define NUM_SDR_FMC1_VADJ		6
 #define NUM_SDR_FMC1_3V3		7
-#define NUM_SDR_LM75_1			8
-#define NUM_SDR_LM75_2			9
-#define NUM_SDR_LM75_3			10
-#define NUM_SDR_LM75_4			11
+#define NUM_SDR_LM75_uC			8
+#define NUM_SDR_LM75_CLOCK_SWITCH	9
+#define NUM_SDR_LM75_DCDC		10
+#define NUM_SDR_LM75_RAM		11
 
 /* Sensor Types */
 #define SENSOR_TYPE_TEMPERATURE         0x01
