@@ -66,8 +66,8 @@ typedef struct {
 
 typedef struct {
     uint8_t i2c_id;
+    sensor_t * sensor;
     SDR_type_01h_t * pSDR;
-    sensor_data_entry_t * pDATA;
     const t_ina220_config * config;
     uint32_t rshunt;
     uint16_t curr_config;

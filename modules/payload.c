@@ -251,7 +251,7 @@ void vTaskPayload(void *pvParmeters)
 
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON(false);
-            sensor_array[HOT_SWAP_SENSOR].data->comparator_status = HOTSWAP_QUIESCED_MASK;
+            sensor_array[HOT_SWAP_SENSOR].readout_value = HOTSWAP_QUIESCED_MASK;
 
 	    evt_msg = HOTSWAP_QUIESCED_MASK >> 1;
 

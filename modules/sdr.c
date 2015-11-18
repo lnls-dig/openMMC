@@ -195,10 +195,12 @@ void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp) {
         return;
     }
 
-    rsp->data[len++] = sensor_array[sensor_number].data->readout_value;
+    rsp->data[len++] = sensor_array[sensor_number].readout_value;
     /* Sensor scanning disabled */
     rsp->data[len++] = 0x40;
-    rsp->data[len++] = sensor_array[sensor_number].data->comparator_status;
+    /* Present threshold status */
+    /* TODO: Implement threshold reading */
+    rsp->data[len++] = 0xC0;
 
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;

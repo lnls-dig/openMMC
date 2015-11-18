@@ -158,22 +158,30 @@ typedef struct {
 } SDR_type_12h_t;
 
 typedef struct {
-    uint8_t ownerID;
-    uint8_t entityID;
-    uint8_t entityinstance;
-    uint16_t readout_value;
-    uint8_t comparator_status;
-    void * sensor_info;
-} sensor_data_entry_t;
-
-typedef struct {
     SDR_TYPE type;
     void * sdr;
     uint8_t sdr_length;
-    sensor_data_entry_t * data;
-    TaskHandle_t * task_handle;
-    uint8_t slave_addr;
     uint8_t diag_devID;
+    uint8_t state;
+    uint8_t old_state;
+    uint16_t readout_value;
+    uint8_t slave_addr;
+    uint8_t signed_flag;
+    TaskHandle_t * task_handle;
+    struct {
+        uint16_t upper_non_recoverable_go_high:1;
+        uint16_t upper_non_recoverable_go_low:1;
+        uint16_t upper_critical_go_high:1;
+        uint16_t upper_critical_go_low:1;
+        uint16_t upper_non_critical_go_high:1;
+        uint16_t upper_non_critical_go_low:1;
+        uint16_t lower_non_recorverable_go_high:1;
+        uint16_t lower_non_recoverable_go_low:1;
+        uint16_t lower_critical_go_high:1;
+        uint16_t lower_critical_go_low:1;
+        uint16_t lower_non_critical_go_high:1;
+        uint16_t lower_non_critical_go_low:1;
+    } asserted_event;
 } sensor_t;
 
 extern sensor_data_entry_t sdrData[NUM_SDR];

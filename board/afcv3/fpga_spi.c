@@ -93,7 +93,7 @@ static void init_diag_struct( board_diagnostic * diag )
     for (i = 0, j = 0; i <= NUM_SENSOR; i++) {
         if (sensor_array[i].diag_devID != NO_DIAG) {
             diag->sensor[j].dev_id = sensor_array[i].diag_devID;
-            diag->sensor[j].measure = sensor_array[i].data->readout_value;
+            diag->sensor[j].measure = sensor_array[i].readout_value;
             j++;
         }
     }
@@ -141,7 +141,7 @@ void vTaskFPGA_COMM( void * Parameters )
         for (uint8_t i = 0, j = 0; i <= NUM_SENSOR; i++) {
             if (sensor_array[i].diag_devID != NO_DIAG) {
                 diag->sensor[j].dev_id = sensor_array[i].diag_devID;
-                diag->sensor[j].measure = sensor_array[i].data->readout_value;
+                diag->sensor[j].measure = sensor_array[i].readout_value;
                 j++;
             }
         }

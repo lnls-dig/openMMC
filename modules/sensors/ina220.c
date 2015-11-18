@@ -54,8 +54,8 @@ void vTaskINA220( void *Parameters )
     /* Task will run every 100ms */
     const TickType_t xFrequency = INA220_UPDATE_RATE / portTICK_PERIOD_MS;
 
-    SDR_type_01h_t *pSDR;
-    sensor_data_entry_t * pDATA;
+    sensor_t * ina220_sensor;
+    SDR_type_01h_t * pSDR;
     t_ina220_data * data_ptr;
 
     /* Initialise the xLastWakeTime variable with the current time. */
@@ -67,16 +67,16 @@ void vTaskINA220( void *Parameters )
             ina220_readall( &ina220_data[i] );
 
             pSDR = ina220_data[i].pSDR;
-            pDATA = ina220_data[i].pDATA;
-            data_ptr = pDATA->sensor_info;
+            ina220_sensor = ina220_data[i].sensor;
+            data_ptr = &ina220_data[i];
 
             switch (pSDR->sensortype) {
             case SENSOR_TYPE_VOLTAGE:
-                pDATA->readout_value = ((data_ptr->regs[INA220_BUS_VOLTAGE] >> data_ptr->config->bus_voltage_shift) * data_ptr->config->bus_voltage_lsb) / 100000;
+                ina220_sensor->readout_value = ((data_ptr->regs[INA220_BUS_VOLTAGE] >> data_ptr->config->bus_voltage_shift) * data_ptr->config->bus_voltage_lsb) / 100000;
                 break;
             case SENSOR_TYPE_CURRENT:
                 /* Current in mA */
-                pDATA->readout_value = data_ptr->regs[INA220_CURRENT];
+                ina220_sensor->readout_value = data_ptr->regs[INA220_CURRENT];
                 break;
             default:
                 /* Shunt voltage and power not implemented */
@@ -174,9 +174,8 @@ void ina220_sdr_init ( TaskHandle_t handle )
             }
 
             ina220_data[i].pSDR = (SDR_type_01h_t *) sensor_array[j].sdr;
-            ina220_data[i].pDATA = sensor_array[j].data;
+            ina220_data[i].sensor = &sensor_array[j];
 
-            sensor_array[j].data->sensor_info = &ina220_data[i];
             ina220_data[i].i2c_id = sensor_array[j].slave_addr;
             ina220_config( ina220_data[i].i2c_id, &ina220_data[i] );
             i++;
