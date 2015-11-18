@@ -36,8 +36,8 @@ void vTaskLM75( void* Parameters )
 
     uint8_t i2c_bus_id;
     uint8_t i;
-    sensor_data_entry_t * pDATA;
 
+    sensor_t * lm75_sensor;
     uint8_t temp[2];
     uint16_t converted_temp;
 
@@ -55,12 +55,12 @@ void vTaskLM75( void* Parameters )
                     continue;
                 }
 
-                pDATA = sensor_array[i].data;
+		lm75_sensor = &sensor_array[i];
 
                 /* Update the temperature reading */
                 if (xI2CMasterRead( i2c_bus_id, sensor_array[i].slave_addr, &temp[0], 2) == 2) {
-                    converted_temp = ((temp[0]*10)+((temp[1]>>8)*10));
-                    pDATA->readout_value = converted_temp;
+                    converted_temp = ((temp[0] << 1) | ((temp[1]>>8)));
+                    lm75_sensor->readout_value = converted_temp;
                 }
             }
             afc_i2c_give(i2c_bus_id);
