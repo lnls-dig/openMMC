@@ -8,5 +8,6 @@
 #include "lpc17_i2c.h"
 #include "lpc17_ssp.h"
 #include "lpc17_spi.h"
+#include "lpc17_interruptions.h"
 
 #endif
