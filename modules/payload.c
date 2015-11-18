@@ -150,6 +150,7 @@ void payload_init( void )
     dac_vadj_config( 1, 25 );
 
     /* Configure FPGA reset button interruption on front panel */
+    Chip_IOCON_PinMux(LPC_IOCON, GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, IOCON_MODE_INACT, IOCON_FUNC1);
     irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1);
     irq_enable( EINT2_IRQn );
 
