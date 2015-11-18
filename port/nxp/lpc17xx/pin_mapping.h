@@ -98,12 +98,14 @@
 #define GPIO_EN_P1V0_PORT       3
 #define GPIO_EN_P1V0_PIN	25
 
-#define GPIO_PROGRAM_B_PIN	17
 #define GPIO_PROGRAM_B_PORT     0
-#define GPIO_DONE_B_PIN		22
+#define GPIO_PROGRAM_B_PIN	17
 #define GPIO_DONE_B_PORT        0
-#define GPIO_PGOOD_P1V0_PIN	26
+#define GPIO_DONE_B_PIN		22
+#define GPIO_FPGA_RESET_PORT    2
+#define GPIO_FPGA_RESET_PIN     9
 #define GPIO_PGOOD_P1V0_PORT    3
+#define GPIO_PGOOD_P1V0_PIN	26
 
 #define GPIO_DAC_VADJ_RST_PORT  0
 #define GPIO_DAC_VADJ_RST_PIN   21
