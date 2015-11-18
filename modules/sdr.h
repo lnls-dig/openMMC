@@ -184,8 +184,9 @@ typedef struct {
     } asserted_event;
 } sensor_t;
 
-extern sensor_data_entry_t sdrData[NUM_SDR];
-extern const sensor_t const sensor_array[NUM_SDR];
+extern sensor_t sensor_array[NUM_SDR];
+
+#define SDR_ARRAY_LENGTH (sizeof(sensor_array) / sizeof(sensor_array[0]))
 
 #define GET_SENSOR_TYPE(n)      ((SDR_type_01h_t *)sensor_array[n].sdr)->sensortype
 #define GET_SENSOR_NUMBER(n)    ((SDR_type_01h_t *)sensor_array[n].sdr)->sensornum

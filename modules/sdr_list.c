@@ -1,10 +1,9 @@
 #include "sdr.h"
 #include "fpga_spi.h"
-#include "sdr_list.h"
 #include "sensors.h"
 
 /* Management Controller Device Locator Record 37.9 SDR Type 12h */
-static const SDR_type_12h_t  SDR0 = {
+static SDR_type_12h_t  SDR0 = {
     .hdr.recID_LSB = 0x00, /* record number, LSB - filled by sdr_init() */
     .hdr.recID_MSB = 0x00, /* record number, MSB - filled by sdr_init() */
     .hdr.SDRversion = 0x51, /* IPMI protocol version */
@@ -27,7 +26,7 @@ static const SDR_type_12h_t  SDR0 = {
 };
 
 /* Hot-Swap sensor */
-static const SDR_type_02h_t SDR_HOT_SWAP = {
+static SDR_type_02h_t SDR_HOT_SWAP = {
     .hdr.recID_LSB = HOT_SWAP_SENSOR,
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -67,7 +66,7 @@ static const SDR_type_02h_t SDR_HOT_SWAP = {
 };
 
 /* 12V sensor */
-static const SDR_type_01h_t SDR_FMC1_12V = {
+static SDR_type_01h_t SDR_FMC1_12V = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_12V,
     .hdr.recID_MSB = 0x00,
@@ -124,7 +123,7 @@ static const SDR_type_01h_t SDR_FMC1_12V = {
 };
 
 /* FMC2 PVADJ sensor */
-static const SDR_type_01h_t SDR_FMC1_VADJ = {
+static SDR_type_01h_t SDR_FMC1_VADJ = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_VADJ,
     .hdr.recID_MSB = 0x00,
@@ -181,7 +180,7 @@ static const SDR_type_01h_t SDR_FMC1_VADJ = {
 };
 
 /* FMC2 PVADJ sensor */
-static const SDR_type_01h_t SDR_FMC1_P3V3 = {
+static SDR_type_01h_t SDR_FMC1_P3V3 = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_3V3,
     .hdr.recID_MSB = 0x00,
@@ -238,7 +237,7 @@ static const SDR_type_01h_t SDR_FMC1_P3V3 = {
 };
 
 /* 12V sensor */
-static const SDR_type_01h_t SDR_FMC2_12V = {
+static SDR_type_01h_t SDR_FMC2_12V = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_12V,
     .hdr.recID_MSB = 0x00,
@@ -295,7 +294,7 @@ static const SDR_type_01h_t SDR_FMC2_12V = {
 };
 
 /* FMC2 PVADJ sensor */
-static const SDR_type_01h_t SDR_FMC2_VADJ = {
+static SDR_type_01h_t SDR_FMC2_VADJ = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_VADJ,
     .hdr.recID_MSB = 0x00,
@@ -352,7 +351,7 @@ static const SDR_type_01h_t SDR_FMC2_VADJ = {
 };
 
 /* FMC2 PVADJ sensor */
-static const SDR_type_01h_t SDR_FMC2_P3V3 = {
+static SDR_type_01h_t SDR_FMC2_P3V3 = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_3V3,
     .hdr.recID_MSB = 0x00,
@@ -408,7 +407,7 @@ static const SDR_type_01h_t SDR_FMC2_P3V3 = {
     .IDstring = { 'F','M','C','2',' ', '+', '3', 'V', '3' } /* sensor string */
 };
 
-static const SDR_type_01h_t SDR_LM75_1 = {
+static SDR_type_01h_t SDR_LM75_1 = {
 
     .hdr.recID_LSB = NUM_SDR_LM75_1,
     .hdr.recID_MSB = 0x00,
@@ -464,7 +463,7 @@ static const SDR_type_01h_t SDR_LM75_1 = {
     .IDstring = { 'T','E','M','P',' ', '1' } /*  sensor string */
 };
 
-static const SDR_type_01h_t SDR_LM75_2 = {
+static SDR_type_01h_t SDR_LM75_2 = {
 
     .hdr.recID_LSB = NUM_SDR_LM75_2,
     .hdr.recID_MSB = 0x00,
@@ -520,21 +519,29 @@ static const SDR_type_01h_t SDR_LM75_2 = {
     .IDstring = { 'T','E','M','P',' ', '2' } /*  sensor string */
 };
 
-const sensor_t const sensor_array[NUM_SDR]  = {
+sensor_t sensor_array[NUM_SDR]  = {
     /* Entry record */
-    { TYPE_12, (void *) &SDR0,          sizeof(SDR0),          &sdrData[0], (TaskHandle_t *) NULL,                 0   , NO_DIAG },
-    /* Hotswap Sensor */
-    { TYPE_02, (void *) &SDR_HOT_SWAP,  sizeof(SDR_HOT_SWAP),  &sdrData[1], (TaskHandle_t *) &vTaskHotSwap_Handle, 0   , NO_DIAG },
-    /* FMC1 Current/Voltage/Power Sensors */
-    { TYPE_01, (void *) &SDR_FMC1_12V,  sizeof(SDR_FMC1_12V),  &sdrData[2], (TaskHandle_t *) &vTaskINA220_Handle,  0x40, FMC1_12V_DEVID },
-    { TYPE_01, (void *) &SDR_FMC1_VADJ, sizeof(SDR_FMC1_VADJ), &sdrData[3], (TaskHandle_t *) &vTaskINA220_Handle,  0x41, FMC1_VADJ_DEVID },
-    { TYPE_01, (void *) &SDR_FMC1_P3V3, sizeof(SDR_FMC1_P3V3), &sdrData[4], (TaskHandle_t *) &vTaskINA220_Handle,  0x43, FMC1_P3V3_DEVID },
-    /* FMC2 Current/Voltage/Power Sensors */
-    { TYPE_01, (void *) &SDR_FMC2_12V,  sizeof(SDR_FMC2_12V),  &sdrData[5], (TaskHandle_t *) &vTaskINA220_Handle,  0x45, FMC2_12V_DEVID },
-    { TYPE_01, (void *) &SDR_FMC2_VADJ, sizeof(SDR_FMC2_VADJ), &sdrData[6], (TaskHandle_t *) &vTaskINA220_Handle,  0x42, FMC2_VADJ_DEVID },
-    { TYPE_01, (void *) &SDR_FMC2_P3V3, sizeof(SDR_FMC2_P3V3), &sdrData[7], (TaskHandle_t *) &vTaskINA220_Handle,  0x44, FMC2_P3V3_DEVID },
-    /* Temperature Sensors */
-    { TYPE_01, (void *) &SDR_LM75_1,    sizeof(SDR_LM75_1),    &sdrData[8], (TaskHandle_t *) &vTaskLM75_Handle,    0x4C, NO_DIAG },
-    { TYPE_01, (void *) &SDR_LM75_2,    sizeof(SDR_LM75_2),    &sdrData[9], (TaskHandle_t *) &vTaskLM75_Handle,    0x4D, NO_DIAG }
+    { .type = TYPE_12, .sdr = (void *) &SDR0,          .sdr_length = sizeof(SDR0),          .task_handle = NULL,                 .diag_devID = NO_DIAG },
+    { .type = TYPE_02, .sdr = (void *) &SDR_HOT_SWAP,  .sdr_length = sizeof(SDR_HOT_SWAP),  .task_handle = &vTaskHotSwap_Handle, .diag_devID = NO_DIAG },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_12V,  .sdr_length = sizeof(SDR_FMC1_12V),  .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_12V_DEVID,  .slave_addr = 0x40 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_VADJ, .sdr_length = sizeof(SDR_FMC1_VADJ), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_VADJ_DEVID, .slave_addr = 0x41 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_P3V3, .sdr_length = sizeof(SDR_FMC1_P3V3), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_P3V3_DEVID, .slave_addr = 0x43 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_12V,  .sdr_length = sizeof(SDR_FMC2_12V),  .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_12V_DEVID,  .slave_addr = 0x45 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_VADJ, .sdr_length = sizeof(SDR_FMC2_VADJ), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_VADJ_DEVID, .slave_addr = 0x42 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_P3V3, .sdr_length = sizeof(SDR_FMC2_P3V3), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_P3V3_DEVID, .slave_addr = 0x44 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_1,    .sdr_length = sizeof(SDR_LM75_1),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,        .slave_addr = 0x4C },
+    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_2,    .sdr_length = sizeof(SDR_LM75_2),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,        .slave_addr = 0x4D }
 };
+
+    /* Hotswap Sensor */
+    /* FMC1 Current/Voltage/Power Sensors */
+    /* FMC2 Current/Voltage/Power Sensors */
+    /* Temperature Sensors */
+
+
+
+
+
+
+
 
