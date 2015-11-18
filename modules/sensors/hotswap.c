@@ -82,7 +82,7 @@ static uint8_t hotswap_get_handle_status( void )
 }
 
 static SDR_type_02h_t * hotswap_pSDR;
-static sensor_data_entry_t * hotswap_pDATA;
+static sensor_t * hotswap_sensor;
 
 void hotswap_init( void )
 {
@@ -113,11 +113,10 @@ void hotswap_init( void )
             continue;
         }
 
+	hotswap_sensor = &sensor_array[i];
         hotswap_pSDR = (SDR_type_02h_t *) sensor_array[i].sdr;
-        hotswap_pDATA = sensor_array[i].data;
 
-        hotswap_pDATA->comparator_status = hotswap_get_handle_status();
-        hotswap_pDATA->readout_value = hotswap_get_handle_status();
+        hotswap_sensor->readout_value = hotswap_get_handle_status();
     }
 }
 
@@ -125,6 +124,7 @@ void vTaskHotSwap( void *Parameters )
 {
     ipmi_msg pmsg;
     uint8_t data_len = 0;
+    uint8_t evt_msg;
 
 #ifdef HOTSWAP_INT
     uint8_t new_flag;
@@ -162,26 +162,14 @@ void vTaskHotSwap( void *Parameters )
 #endif
 
     for ( ;; ) {
-        configASSERT(hotswap_pSDR);
-        configASSERT(hotswap_pDATA);
-
 #ifdef HOTSWAP_INT
         new_flag = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        data_len = 0;
-        pmsg.dest_LUN = 0;
-        pmsg.netfn = NETFN_SE;
-        pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
-        pmsg.data[data_len++] = 0x04;
-        pmsg.data[data_len++] = 0xf2;
-        pmsg.data[data_len++] = hotswap_pSDR->sensornum;
-        pmsg.data[data_len++] = 0x6f;
-        pmsg.data[data_len++] = new_flag;
-        pmsg.data_len = data_len;
+        evt_msg = new_flag >> 1;
 
-        if (ipmb_send_request( &pmsg ) == ipmb_error_success) {
+        if ( ipmi_event_send(HOT_SWAP_SENSOR, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
             /* Update the SDR */
-            hotswap_pDATA->comparator_status = (hotswap_pDATA->comparator_status & 0xFC) | new_flag;
+            hotswap_sensor->readout_value = (hotswap_sensor->readout_value & 0xFC) | new_flag;
         } else {
             /* If the message fails to be sent, unblock itself to try again */
             xTaskNotifyGive(xTaskGetCurrentTaskHandle());
@@ -197,20 +185,11 @@ void vTaskHotSwap( void *Parameters )
             continue;
         }
 
-        data_len = 0;
-        pmsg.dest_LUN = 0;
-        pmsg.netfn = NETFN_SE;
-        pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
-        pmsg.data[data_len++] = 0x04;
-        pmsg.data[data_len++] = 0xf2;
-        pmsg.data[data_len++] = hotswap_pSDR->sensornum;
-        pmsg.data[data_len++] = 0x6f;
-        pmsg.data[data_len++] = new_state >> 1;
-        pmsg.data_len = data_len;
+        evt_msg = new_state >> 1;
 
-        if (ipmb_send_request( &pmsg ) == ipmb_error_success) {
+        if ( ipmi_event_send(HOT_SWAP_SENSOR, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
             /* Update the SDR */
-            hotswap_pDATA->readout_value = new_state;
+            hotswap_sensor->readout_value = new_state;
             old_state = new_state;
         }
 #endif

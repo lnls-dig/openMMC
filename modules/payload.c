@@ -164,8 +164,7 @@ void vTaskPayload(void *pvParmeters)
     uint8_t FPGA_boot_DONE = 0;
     uint8_t QUIESCED_req = 0;
 
-    ipmi_msg pmsg;
-    int data_len = 0;
+    uint8_t evt_msg;
 
     uint8_t current_message;
 
@@ -252,18 +251,11 @@ void vTaskPayload(void *pvParmeters)
 
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON(false);
-            sensor_array[HOT_SWAP_SENSOR].data->comparator_status = HOTSWAP_QUIESCED_MASK;
-            pmsg.dest_LUN = 0;
-            pmsg.netfn = NETFN_SE;
-            pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
-            data_len = 0;
-            pmsg.data[data_len++] = 0x04;
-            pmsg.data[data_len++] = 0xf2;
-            pmsg.data[data_len++] = HOT_SWAP_SENSOR;
-            pmsg.data[data_len++] = 0x6f;
-            pmsg.data[data_len++] = (HOTSWAP_QUIESCED_MASK >> 1); // hot swap state
-            pmsg.data_len = data_len;
-            if ( ipmb_send_request( &pmsg ) == ipmb_error_success ) {
+            sensor_array[HOT_SWAP_SENSOR].readout_value = HOTSWAP_QUIESCED_MASK;
+
+	    evt_msg = HOTSWAP_QUIESCED_MASK >> 1;
+
+	    if ( ipmi_event_send(HOT_SWAP_SENSOR, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
                 QUIESCED_req = 0;
                 new_state = PAYLOAD_NO_POWER;
             }
