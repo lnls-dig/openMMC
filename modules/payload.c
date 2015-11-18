@@ -107,10 +107,6 @@ void initializeDCDC() {
     gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, OUTPUT);
 
-    /* RTM TEST */
-    gpio_set_pin_dir( 1, 30, OUTPUT);
-
-    gpio_set_pin_dir( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, OUTPUT);
 }
 
 
@@ -150,8 +146,6 @@ void payload_init( void )
         gpio_set_pin_dir(0, 20, OUTPUT);
         gpio_set_pin_state(0, 20, HIGH);
     }
-    /* Enable RTM */
-    gpio_set_pin_state( 1, 30, true);
 }
 
 void vTaskPayload(void *pvParmeters)
