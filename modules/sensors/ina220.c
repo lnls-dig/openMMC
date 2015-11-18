@@ -156,9 +156,11 @@ void ina220_readall( t_ina220_data * data )
     }
 }
 
-void ina220_sdr_init ( TaskHandle_t handle )
+void ina220_init( void )
 {
     uint8_t i, j;
+
+    xTaskCreate( vTaskINA220, "INA220", 400, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
 
     while (i < MAX_INA220_COUNT) {
         for ( j = 0; j < NUM_SDR; j++ ) {
@@ -169,7 +171,7 @@ void ina220_sdr_init ( TaskHandle_t handle )
             }
 
             /* Check if this task should update the selected SDR */
-            if ( *(sensor_array[j].task_handle) != handle ) {
+            if ( *(sensor_array[j].task_handle) != vTaskINA220_Handle ) {
                 continue;
             }
 
@@ -181,13 +183,4 @@ void ina220_sdr_init ( TaskHandle_t handle )
             i++;
         }
     }
-}
-
-void ina220_init( void )
-{
-    xTaskCreate( vTaskINA220, "INA220", 400, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
-
-    configASSERT(vTaskINA220_Handle);
-
-    ina220_sdr_init(vTaskINA220_Handle);
 }
