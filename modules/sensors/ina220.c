@@ -83,20 +83,21 @@ void vTaskINA220( void *Parameters )
                 break;
             }
 
-            /* Maybe implement a callback function for each sensor type, and assign on initialization, in a more generic way for all sensors */
-            switch ((pSDR->hdr.recID_MSB << 8)|(pSDR->hdr.recID_LSB)) {
+	    /* Check for threshold events */
+	    check_sensor_event(pSDR->sensornum);
+
+	    switch (pSDR->sensornum) {
             case NUM_SDR_FMC2_12V:
                 /* Compare reading with sensor threshold levels */
-                if (pDATA->readout_value > pSDR->lower_noncritical_thr) {
+		if (ina220_sensor->state == SENSOR_STATE_NORMAL ) {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
-                } else if (pDATA->readout_value < pSDR->lower_critical_thr) {
+                } else {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
                 }
                 break;
             default:
                 break;
             }
-
             vTaskDelayUntil( &xLastWakeTime, xFrequency );
         }
     }
