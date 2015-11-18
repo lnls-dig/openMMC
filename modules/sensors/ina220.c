@@ -76,7 +76,7 @@ void vTaskINA220( void *Parameters )
 
             switch (pSDR->sensortype) {
             case SENSOR_TYPE_VOLTAGE:
-                ina220_sensor->readout_value = ((data_ptr->regs[INA220_BUS_VOLTAGE] >> data_ptr->config->bus_voltage_shift) * data_ptr->config->bus_voltage_lsb) / 100000;
+                ina220_sensor->readout_value = (data_ptr->regs[INA220_BUS_VOLTAGE] >> data_ptr->config->bus_voltage_shift)/16;
                 break;
             case SENSOR_TYPE_CURRENT:
                 /* Current in mA */
