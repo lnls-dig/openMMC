@@ -572,16 +572,17 @@ typedef struct amc_clock_config_record {
 
 extern uint8_t fru_data[FRU_SIZE];
 
-void module_current_record_function( uint8_t * fru_buffer );
-void board_info_area_function( uint8_t * fru_buffer );
-void product_info_area_function( uint8_t * fru_buffer );
-void point_to_point_clock( uint8_t * fru_buffer );
-void fru_header_function( uint8_t * fru_buffer );
 void fru_init( void );
+void fru_header_build( uint8_t * fru_buffer );
+void board_info_area_build( uint8_t * fru_buffer );
+void product_info_area_build( uint8_t * fru_buffer );
+void amc_point_to_point_record_build( uint8_t * fru_buffer );
+void point_to_point_clock_build( uint8_t * fru_buffer );
+void module_current_record_build( uint8_t * fru_buffer );
 
 /* IPMI Handlers */
 #include "ipmi.h"
-void fru_read_to_buffer(char *buff, int offset, int length);
+void fru_read_to_buffer(char *buff, uint8_t offset, uint8_t length);
 void fru_read_common_header(t_fru_common_header * header);
 void ipmi_storage_get_fru_info ( ipmi_msg * req, ipmi_msg * rsp);
 void ipmi_storage_read_fru_data_cmd ( ipmi_msg * req, ipmi_msg * rsp);

@@ -13,7 +13,7 @@
 
 uint8_t fru_data[FRU_SIZE];
 
-void fru_header_function( uint8_t * fru_buffer )
+void fru_header_build( uint8_t * fru_buffer )
 {
     t_fru_common_header * hdr = (t_fru_common_header *) fru_buffer;
 
@@ -36,7 +36,7 @@ void fru_header_function( uint8_t * fru_buffer )
     hdr->checksum = ipmb_calculate_chksum((uint8_t *) hdr, sizeof(t_fru_common_header));
 }
 
-void board_info_area_function( uint8_t * fru_buffer )
+void board_info_area_build( uint8_t * fru_buffer )
 {
 #ifdef BOARD_INFO_AREA_ENABLE
     t_board_area_format_hdr * board_ptr = (t_board_area_format_hdr *) fru_buffer;
@@ -98,7 +98,7 @@ void board_info_area_function( uint8_t * fru_buffer )
 #endif
 }
 
-void product_info_area_function( uint8_t * fru_buffer )
+void product_info_area_build( uint8_t * fru_buffer )
 {
 #ifdef PRODUCT_INFO_AREA_ENABLE
     t_product_area_format_hdr * product_ptr = (t_product_area_format_hdr *) fru_buffer;
@@ -168,7 +168,7 @@ void product_info_area_function( uint8_t * fru_buffer )
 #endif
 }
 
-void module_current_record_function( uint8_t * fru_buffer )
+void module_current_record_build( uint8_t * fru_buffer )
 {
 #ifdef MODULE_CURRENT_RECORD
 
@@ -195,7 +195,7 @@ void module_current_record_function( uint8_t * fru_buffer )
 #endif
 }
 
-void AMC_POINT_TO_POINT_RECORD_func( uint8_t * fru_buffer )
+void amc_point_to_point_record_build( uint8_t * fru_buffer )
 {
 
 #ifdef AMC_POINT_TO_POINT_RECORD_LIST
@@ -233,7 +233,7 @@ void AMC_POINT_TO_POINT_RECORD_func( uint8_t * fru_buffer )
 #endif
 }
 
-void point_to_point_clock( uint8_t * fru_buffer )
+void point_to_point_clock_build( uint8_t * fru_buffer )
 {
 #ifdef AMC_CLOCK_CONFIGURATION_LIST
 
@@ -268,15 +268,15 @@ void fru_init( void )
     memset(&fru_data[0], 0, (sizeof(fru_data)/sizeof(fru_data[0])));
 
     /* Populate the fru_buffer */
-    fru_header_function(&fru_data[COMMON_HEADER_OFFSET]);
-    board_info_area_function(&fru_data[BOARD_INFO_AREA_OFFSET]);
-    product_info_area_function(&fru_data[PRODUCT_INFO_AREA_OFFSET]);
-    AMC_POINT_TO_POINT_RECORD_func(&fru_data[AMC_POINT_TO_POINT_RECORD_OFFSET]);
-    point_to_point_clock(&fru_data[AMC_CLOCK_CONFIG_RECORD_OFFSET]);
-    module_current_record_function(&fru_data[MODULE_CURRENT_RECORD_OFFSET]);
+    fru_header_build(&fru_data[COMMON_HEADER_OFFSET]);
+    board_info_area_build(&fru_data[BOARD_INFO_AREA_OFFSET]);
+    product_info_area_build(&fru_data[PRODUCT_INFO_AREA_OFFSET]);
+    amc_point_to_point_record_build(&fru_data[AMC_POINT_TO_POINT_RECORD_OFFSET]);
+    point_to_point_clock_build(&fru_data[AMC_CLOCK_CONFIG_RECORD_OFFSET]);
+    module_current_record_build(&fru_data[MODULE_CURRENT_RECORD_OFFSET]);
 }
 
-void fru_read_to_buffer(char *buff, int offset, int length)
+void fru_read_to_buffer(char *buff, uint8_t offset, uint8_t length)
 {
     uint8_t i;
     uint8_t j = offset;
