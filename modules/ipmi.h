@@ -294,13 +294,11 @@ typedef struct{
   uint8_t netfn;
   uint8_t cmd;
   t_req_handler req_handler;
-}t_req_handler_record;
-
+} t_req_handler_record;
 
 /* Function Prototypes */
 void IPMITask ( void *pvParameters );
 void ipmi_init ( void );
-void IPMI_handler_task( void * pvParameters);
 t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd);
 ipmb_error ipmi_event_send( uint8_t sensor_index, uint8_t assert_deassert, uint8_t *evData, uint8_t length);
 

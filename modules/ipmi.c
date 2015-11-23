@@ -34,24 +34,22 @@
 /* Local variables */
 QueueHandle_t ipmi_rxqueue = NULL;
 
-struct req_param_struct {
-    ipmi_msg req_received;
-    t_req_handler req_handler;
-};
-
 extern t_req_handler_record handlers[MAX_HANDLERS];
 
-void IPMITask ( void * pvParameters )
+void IPMITask( void * pvParameters )
 {
     ipmi_msg req_received;
+    ipmi_msg response;
+    ipmb_error error_code;
     t_req_handler req_handler = (t_req_handler) 0;
 
-    for ( ;; ){
+    for ( ;; ) {
         /* Received request and handler function must be allocated
            dynamically so they can be passed to the dynamically-created
            handler tasks. These tasks must also free the memory after use */
 
-        if( xQueueReceive( ipmi_rxqueue, &req_received , portMAX_DELAY ) == pdFALSE){
+        if( xQueueReceive( ipmi_rxqueue, &req_received , portMAX_DELAY ) == pdFALSE) {
+	    /* Should no return pdFALSE */
             configASSERT(pdFALSE);
             continue;
         }
@@ -59,30 +57,25 @@ void IPMITask ( void * pvParameters )
         req_handler = (t_req_handler) 0;
         req_handler = ipmi_retrieve_handler(req_received.netfn, req_received.cmd);
 
-        if (req_handler != 0){
+        if (req_handler != 0) {
 
             /* TODO: create unique name for each created task, probably
                related to netfn and command */
-            struct req_param_struct *req_param = pvPortMalloc(sizeof(struct req_param_struct));
+            response.completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+            response.data_len = 0;
 
-            if (req_param != NULL) {
-                req_param->req_received = req_received;
-                req_param->req_handler = req_handler;
-            } else {
-                /* TODO: handle this problem */
-            }
+            /* Call user-defined function, give request data and retrieve required response */
+	    /* WARNING: Since IPMI task have a high priority, this handler function should not wait other tasks to unblock */
+            req_handler(&req_received, &response);
 
-            while ( xTaskCreate(IPMI_handler_task ,(const char*)"IPMI_handler_task", 80, req_param, tskIPMI_HANDLERS_PRIORITY,  (TaskHandle_t *) NULL ) != pdTRUE ){
-                /* If the task couldn't be created, most likely we're out of heap, enter blocked state so that Idle task can run and free up some memory for us */
-                LED_update(LED_RED, &LED_On_Activity);
-                vTaskDelay(5);
-                /* TODO: handle this problem */
-            }
-            LED_update(LED_RED, &LED_Off_Activity);
+            error_code = ipmb_send_response(&req_received, &response);
 
-        }else{
-            ipmb_error error_code;
-            ipmi_msg response;
+            /* In case of error during IPMB response, the MMC may wait for a
+               new command from the MCH. Check this for debugging purposes
+               only. */
+            configASSERT( (error_code == ipmb_error_success) );
+
+        } else {
             /* If there is no function handler, use data from received
                message to send "invalid command" response (IPMI table 5-2,
                page 44). */
@@ -94,40 +87,6 @@ void IPMITask ( void * pvParameters )
             configASSERT((error_code == ipmb_error_success));
         }
     }
-}
-
-
-/*!
- * This task is created dynamically each time there is an IPMI request
- * demanding response. It receives a pointer to a struct contaning
- * both the function handler and the request to treated, and must free
- * this struct memory and itself before finishing.
- *
- * @param pvParameters pointer to req_param_struct contaning
- * req_handler and req_received. This is dynamically allocated memory
- * and should be freed before quitting.
- */
-void IPMI_handler_task( void * pvParameters){
-    struct req_param_struct * req_param = (struct req_param_struct *) pvParameters;
-    ipmi_msg response;
-    ipmb_error response_error;
-
-    response.completion_code = IPMI_CC_UNSPECIFIED_ERROR;
-    response.data_len = 0;
-    /* Call user-defined function, give request data and retrieve required response */
-    req_param->req_handler(&(req_param->req_received), &response);
-
-    response_error = ipmb_send_response(&(req_param->req_received), &response);
-
-    /* In case of error during IPMB response, the MMC may wait for a
-       new command from the MCH. Check this for debugging purposes
-       only. */
-    configASSERT( response_error == ipmb_error_success );
-
-    vPortFree(req_param);
-
-    vTaskDelete(NULL);
-
 }
 
 /* Initializes the IPMI Dispatcher:
@@ -144,7 +103,6 @@ void ipmi_init ( void )
     xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle );
 }
 
-
 /*!
  * @brief Finds a handler associated with a given netfunction and command.
  *
@@ -153,16 +111,14 @@ void ipmi_init ( void )
  *
  * @return Pointer to the function which will handle this command, as defined in the netfn handler list.
  */
-t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd){
+t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd)
+{
     uint8_t cur_handler;
     t_req_handler handler = 0;
 
-    for(cur_handler = 0; cur_handler < MAX_HANDLERS; cur_handler++)
-    {
-
-        if( (handlers[cur_handler].netfn == netfn) && \
-            (handlers[cur_handler].cmd == cmd))
-        {
+    for(cur_handler = 0; cur_handler < MAX_HANDLERS; cur_handler++) {
+        if( (handlers[cur_handler].netfn == netfn) &&   \
+            (handlers[cur_handler].cmd == cmd)) {
             handler = handlers[cur_handler].req_handler;
             break;
         }
@@ -204,7 +160,8 @@ ipmb_error ipmi_event_send( uint8_t sensor_index, uint8_t assert_deassert, uint8
  *
  * @return
  */
-void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp ){
+void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp )
+{
     int len = rsp->data_len = 0;
 
     rsp->completion_code = IPMI_CC_OK;
@@ -225,7 +182,6 @@ void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp ){
     rsp->data[len++] = 0x01; /* Product ID MSB */
 
     rsp->data_len = len;
-
 }
 
 /*!
