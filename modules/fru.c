@@ -189,7 +189,7 @@ void module_current_record_build( uint8_t * fru_buffer )
     /* Checksums */
 
     /* Record Checksum */
-    module_current_record->hdr.record_cksum = ipmb_calculate_chksum((uint8_t*)(module_current_record+sizeof(t_multirecord_area_header)), module_current_record->hdr.record_len);
+    module_current_record->hdr.record_cksum = ipmb_calculate_chksum( ((uint8_t *)module_current_record)+sizeof(t_multirecord_area_header), module_current_record->hdr.record_len);
     /* Header Checksum */
     module_current_record->hdr.header_cksum = ipmb_calculate_chksum( (uint8_t *)&(module_current_record->hdr), sizeof(t_multirecord_area_header));
 #endif
@@ -227,7 +227,7 @@ void amc_point_to_point_record_build( uint8_t * fru_buffer )
 
     AMC_POINT_TO_POINT_RECORD_LIST;
 
-    p2p_record->hdr.record_cksum = ipmb_calculate_chksum( (uint8_t *) (p2p_record+sizeof(t_multirecord_area_header)), p2p_record->hdr.record_len); //record checksum
+    p2p_record->hdr.record_cksum = ipmb_calculate_chksum( ((uint8_t *)p2p_record)+sizeof(t_multirecord_area_header), p2p_record->hdr.record_len); //record checksum
     p2p_record->hdr.header_cksum = ipmb_calculate_chksum( (uint8_t *)&(p2p_record->hdr), sizeof(t_multirecord_area_header)); //Header checksum
 
 #endif
@@ -257,8 +257,8 @@ void point_to_point_clock_build( uint8_t * fru_buffer )
 
     memcpy(clock_cfg->descriptor, &clock_descriptor_list, sizeof(clock_cfg->descriptor));
 
-    clock_cfg->hdr.record_cksum = ipmb_calculate_chksum((uint8_t*)(clock_cfg+sizeof(t_multirecord_area_header)), clock_cfg->hdr.record_len);
-    clock_cfg->hdr.header_cksum = ipmb_calculate_chksum((uint8_t*)&(clock_cfg->hdr), sizeof(t_multirecord_area_header));
+    clock_cfg->hdr.record_cksum = ipmb_calculate_chksum( ((uint8_t *)clock_cfg)+sizeof(t_multirecord_area_header), clock_cfg->hdr.record_len );
+    clock_cfg->hdr.header_cksum = ipmb_calculate_chksum( (uint8_t *)&(clock_cfg->hdr), sizeof(t_multirecord_area_header) );
 #endif
 }
 
