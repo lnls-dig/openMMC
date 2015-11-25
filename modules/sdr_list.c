@@ -1000,10 +1000,10 @@ sensor_t sensor_array[NUM_SDR]  = {
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_P3V3_CURR, .sdr_length = sizeof(SDR_FMC2_P3V3_CURR), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_P3V3_CURR_DEVID, .slave_addr = 0x44 },
 
     /* Temperature Sensors */
-    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_uC,    .sdr_length = sizeof(SDR_LM75_uC),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4C },
-    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_CLOCK_SWITCH,    .sdr_length = sizeof(SDR_LM75_CLOCK_SWITCH),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4D },
-    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_DCDC,    .sdr_length = sizeof(SDR_LM75_DCDC),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4E },
-    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_RAM,    .sdr_length = sizeof(SDR_LM75_RAM),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4F }
+    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_uC,           .sdr_length = sizeof(SDR_LM75_uC),           .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4C },
+    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_CLOCK_SWITCH, .sdr_length = sizeof(SDR_LM75_CLOCK_SWITCH), .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4D },
+    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_DCDC,         .sdr_length = sizeof(SDR_LM75_DCDC),         .task_handle = &vTaskLM75_Handle,    .diag_devID = DCDC_TEMP_DEVID, .slave_addr = 0x4E },
+    { .type = TYPE_01, .sdr = (void *) &SDR_LM75_RAM,          .sdr_length = sizeof(SDR_LM75_RAM),          .task_handle = &vTaskLM75_Handle,    .diag_devID = RAM_TEMP_DEVID,  .slave_addr = 0x4F }
 };
 
 
