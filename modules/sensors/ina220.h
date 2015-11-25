@@ -109,8 +109,9 @@ typedef union {
 } t_ina220_config_reg;
 
 typedef struct {
-    t_ina220_config_reg config_default;
+    t_ina220_config_reg config_reg_default;
     uint32_t calibration_factor;
+    uint16_t calibration_reg;
     uint8_t registers;
     uint8_t shunt_div;
     uint8_t bus_voltage_shift;
@@ -124,13 +125,14 @@ typedef struct {
     SDR_type_01h_t * pSDR;
     const t_ina220_config * config;
     uint32_t rshunt;
-    t_ina220_config_reg curr_config;
+    t_ina220_config_reg curr_reg_config;
     uint16_t regs[INA220_REGISTERS];
 } t_ina220_data;
 
 TaskHandle_t vTaskINA220_Handle;
 
 uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data);
+Bool ina220_calibrate( t_ina220_data * data );
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
 void ina220_readall( t_ina220_data * data );

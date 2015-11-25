@@ -35,12 +35,13 @@
 #include "ina220.h"
 
 const t_ina220_config ina220_cfg = {
-    .config_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
-				   .pga_gain = INA220_PGA_GAIN_320MV,
-				   .bus_adc_resolution = INA220_RES_SAMPLES_12BIT,
-				   .shunt_adc_resolution = INA220_RES_SAMPLES_12BIT,
-				   .mode = INA220_MODE_SHUNT_BUS_CONT },
+    .config_reg_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
+                                       .pga_gain = INA220_PGA_GAIN_320MV,
+                                       .bus_adc_resolution = INA220_RES_SAMPLES_12BIT,
+                                       .shunt_adc_resolution = INA220_RES_SAMPLES_12BIT,
+                                       .mode = INA220_MODE_SHUNT_BUS_CONT },
     .calibration_factor = 40960000,
+    .calibration_reg = 0x51, /* Calculated using INA220EVM software from Texas Instruments */
     .registers = INA220_REGISTERS,
     .shunt_div = 100,
     .bus_voltage_shift = 3,
@@ -87,13 +88,13 @@ void vTaskINA220( void *Parameters )
                 break;
             }
 
-	    /* Check for threshold events */
-	    check_sensor_event(pSDR->sensornum);
+            /* Check for threshold events */
+            check_sensor_event(pSDR->sensornum);
 
-	    switch (pSDR->sensornum) {
+            switch (pSDR->sensornum) {
             case NUM_SDR_FMC2_12V:
                 /* Compare reading with sensor threshold levels */
-		if (ina220_sensor->state == SENSOR_STATE_NORMAL ) {
+                if (ina220_sensor->state == SENSOR_STATE_NORMAL ) {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
                 } else {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
@@ -118,14 +119,14 @@ uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
     } else {
         return -1;
     }
-    data->curr_config = data->config->config_default;
+    data->curr_reg_config = data->config->config_reg_default;
 
     /* Change to 'afc_i2c_take_by_chipid', which is more generic */
     if( afc_i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 100) == pdFALSE ) {
         return -1;
     }
 
-    uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_config.cfg_word >> 8) , ( data->curr_config.cfg_word & 0xFFFF) };
+    uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_reg_config.cfg_word >> 8) , ( data->curr_reg_config.cfg_word & 0xFFFF) };
 
     portENABLE_INTERRUPTS();
     xI2CMasterWrite( i2c_bus, data->i2c_id, cfg_buff, sizeof(cfg_buff)/sizeof(cfg_buff[0]) );
@@ -161,6 +162,26 @@ void ina220_readall( t_ina220_data * data )
     }
 }
 
+Bool ina220_calibrate( t_ina220_data * data )
+{
+    uint8_t i2c_bus;
+    uint16_t cal = data->config->calibration_reg;
+    uint8_t cal_reg[3] = { INA220_CALIBRATION, (cal >> 8), (cal & 0xFFFF) };
+
+    /*! @todo: Change to 'afc_i2c_take_by_chipid', which is more generic */
+    if( afc_i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
+        return false;
+    }
+
+    portENABLE_INTERRUPTS();
+    xI2CMasterWrite( i2c_bus, data->i2c_id, &cal_reg[0], sizeof(cal_reg)/sizeof(cal_reg[0]) );
+    portDISABLE_INTERRUPTS();
+
+    afc_i2c_give( i2c_bus );
+
+    return true;
+}
+
 void ina220_init( void )
 {
     uint8_t i, j;
@@ -185,6 +206,7 @@ void ina220_init( void )
 
             ina220_data[i].i2c_id = sensor_array[j].slave_addr;
             ina220_config( ina220_data[i].i2c_id, &ina220_data[i] );
+            ina220_calibrate( &ina220_data[i] );
             i++;
         }
     }

@@ -25,7 +25,7 @@ static SDR_type_12h_t  SDR0 = {
     .IDstring = {'A', 'F', 'C', ' ', 'I', 'P', 'M' }
 };
 
-/* Hot-Swap sensor */
+/* AMC Hot-Swap sensor */
 static SDR_type_02h_t SDR_HOT_SWAP = {
     .hdr.recID_LSB = HOT_SWAP_SENSOR,
     .hdr.recID_MSB = 0x00,
@@ -65,7 +65,7 @@ static SDR_type_02h_t SDR_HOT_SWAP = {
     .IDstring = { 'M', 'O', 'D', 'U', 'L', 'E', ' ', 'H', 'O', 'T', '_', 'S', 'W', 'A', 'P' } /* sensor string */
 };
 
-/* 12V sensor */
+/* FMC1 12V */
 static SDR_type_01h_t SDR_FMC1_12V = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_12V,
@@ -122,7 +122,7 @@ static SDR_type_01h_t SDR_FMC1_12V = {
     .IDstring = { 'F','M','C','1',' ','+', '1', '2', 'V' } /* sensor string */
 };
 
-/* FMC2 PVADJ sensor */
+/* FMC1 PVADJ */
 static SDR_type_01h_t SDR_FMC1_VADJ = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_VADJ,
@@ -179,7 +179,7 @@ static SDR_type_01h_t SDR_FMC1_VADJ = {
     .IDstring = { 'F','M','C','1',' ', 'V', 'A', 'D', 'J' } /* sensor string */
 };
 
-/* FMC2 PVADJ sensor */
+/* FMC1 P3V3 */
 static SDR_type_01h_t SDR_FMC1_P3V3 = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_3V3,
@@ -235,7 +235,177 @@ static SDR_type_01h_t SDR_FMC1_P3V3 = {
     .IDstring = { 'F','M','C','1',' ', '+', '3', 'V', '3' } /* sensor string */
 };
 
-/* 12V sensor */
+/* FMC1 12V Current */
+static SDR_type_01h_t SDR_FMC1_12V_CURR = {
+
+    .hdr.recID_LSB = NUM_SDR_FMC1_12V_CURR,
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_01,
+    .hdr.reclength = sizeof(SDR_type_01h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = NUM_SDR_FMC1_12V_CURR, /* sensor number */
+
+    /* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
+    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: Voltage*/
+    .event_reading_type = 0x01, /* sensor reading*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x04, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .linearization = 0x00, /* Linearization */
+    .M = 64, /* M */
+    .M_tol = 0x00, /* M - Tolerance */
+    .B = 0x00, /* B */
+    .B_accuracy = 0x00, /* B - Accuracy */
+    .acc_exp_sensor_dir = 0x02, /* Sensor direction */
+    .Rexp_Bexp = 0xD0, /* R-Exp = -3 , B-Exp = 0 */
+    .analog_flags = 0x03, /* Analogue characteristics flags */
+    .nominal_reading = 190, /* Nominal reading = 12.285V */
+    .normal_max = 200, /* Normal maximum */
+    .normal_min = 0, /* Normal minimum */
+    .sensor_max_reading = 0xFF, /* Sensor Maximum reading */
+    .sensor_min_reading = 0x00, /* Sensor Minimum reading */
+    .upper_nonrecover_thr = 205, /* Upper non-recoverable Threshold */
+    .upper_critical_thr = 200, /* Upper critical Threshold */
+    .upper_noncritical_thr = 195, /* Upper non critical Threshold */
+    .lower_nonrecover_thr = 175, /* Lower non-recoverable Threshold */
+    .lower_critical_thr = 180, /* Lower critical Threshold */
+    .lower_noncritical_thr = 185, /* Lower non-critical Threshold */
+    .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | 14 , /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'F','M','C','1',' ','+', '1', '2', 'V',' ','C','u','r','r' } /* sensor string */
+};
+
+/* FMC1 PVADJ Current */
+static SDR_type_01h_t SDR_FMC1_VADJ_CURR = {
+
+    .hdr.recID_LSB = NUM_SDR_FMC1_VADJ_CURR,
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_01,
+    .hdr.reclength = sizeof(SDR_type_01h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = NUM_SDR_FMC1_VADJ_CURR, /* sensor number */
+
+    /* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
+    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: voltage*/
+    .event_reading_type = 0x01, /* sensor reading*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x04, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .linearization = 0x00, /* Linearization */
+    .M = 64, /* M */
+    .M_tol = 0x00, /* M - Tolerance */
+    .B = 0x00, /* B */
+    .B_accuracy = 0x00, /* B - Accuracy */
+    .acc_exp_sensor_dir = 0x00, /* Sensor direction */
+    .Rexp_Bexp = 0xD0, /* R-Exp , B-Exp */
+    .analog_flags = 0x00, /* Analogue characteristics flags */
+    .nominal_reading = 39, /* Nominal reading */
+    .normal_max = 47, /* Normal maximum */
+    .normal_min = 0, /* Normal minimum */
+    .sensor_max_reading = 0xFF, /* Sensor Maximum reading */
+    .sensor_min_reading = 0x00, /* Sensor Minimum reading */
+    .upper_nonrecover_thr = 51, /* Upper non-recoverable Threshold */
+    .upper_critical_thr = 46, /* Upper critical Threshold */
+    .upper_noncritical_thr = 43, /* Upper non critical Threshold */
+    .lower_nonrecover_thr = 28, /* Lower non-recoverable Threshold */
+    .lower_critical_thr = 32, /* Lower critical Threshold */
+    .lower_noncritical_thr = 36, /* Lower non-critical Threshold */
+    .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | 14, /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'F','M','C','1',' ', 'V', 'A', 'D', 'J',' ','C','u','r','r' } /* sensor string */
+};
+
+/* FMC1 P3V3 Current */
+static SDR_type_01h_t SDR_FMC1_P3V3_CURR = {
+
+    .hdr.recID_LSB = NUM_SDR_FMC1_3V3_CURR,
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_01,
+    .hdr.reclength = sizeof(SDR_type_01h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = NUM_SDR_FMC1_3V3_CURR, /* sensor number */
+
+    /* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
+    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: VOLTAGE*/
+    .event_reading_type = 0x01, /* sensor reading*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x04, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .M = 64, /* M */
+    .M_tol = 0x00, /* M - Tolerance */
+    .B = 0x00, /* B */
+    .B_accuracy = 0x00, /* B - Accuracy */
+    .acc_exp_sensor_dir = 0x00, /* Sensor direction */
+    .Rexp_Bexp = 0xD0, /* R-Exp , B-Exp */
+    .analog_flags = 0x00, /* Analogue characteristics flags */
+    .nominal_reading = 52, /* Nominal reading */
+    .normal_max = 59, /* Normal maximum */
+    .normal_min = 45, /* Normal minimum */
+    .sensor_max_reading = 0xFF, /* Sensor Maximum reading */
+    .sensor_min_reading = 0x00, /* Sensor Minimum reading */
+    .upper_nonrecover_thr = 62, /* Upper non-recoverable Threshold */
+    .upper_critical_thr = 59, /* Upper critical Threshold */
+    .upper_noncritical_thr = 55, /* Upper non critical Threshold */
+    .lower_nonrecover_thr = 42, /* Lower non-recoverable Threshold */
+    .lower_critical_thr = 45, /* Lower critical Threshold */
+    .lower_noncritical_thr = 48, /* Lower non-critical Threshold */
+    .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | 14, /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'F','M','C','1',' ','+','3','V', '3',' ','C','u','r','r'} /* sensor string */
+};
+
+/* FMC2 12V */
 static SDR_type_01h_t SDR_FMC2_12V = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_12V,
@@ -291,7 +461,7 @@ static SDR_type_01h_t SDR_FMC2_12V = {
     .IDstring = { 'F','M','C','2',' ','+', '1', '2', 'V' } /* sensor string */
 };
 
-/* FMC2 PVADJ sensor */
+/* FMC2 PVADJ */
 static SDR_type_01h_t SDR_FMC2_VADJ = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_VADJ,
@@ -348,7 +518,7 @@ static SDR_type_01h_t SDR_FMC2_VADJ = {
     .IDstring = { 'F','M','C','2',' ', 'V', 'A', 'D', 'J' } /* sensor string */
 };
 
-/* FMC2 PVADJ sensor */
+/* FMC2 P3V3 */
 static SDR_type_01h_t SDR_FMC2_P3V3 = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_3V3,
@@ -403,6 +573,176 @@ static SDR_type_01h_t SDR_FMC2_P3V3 = {
     .OEM = 0x00, /* OEM reserved */
     .IDtypelen = 0xc0 | 9, /* 8 bit ASCII, number of bytes */
     .IDstring = { 'F','M','C','2',' ', '+', '3', 'V', '3' } /* sensor string */
+};
+
+/* FMC2 12V Current */
+static SDR_type_01h_t SDR_FMC2_12V_CURR = {
+
+    .hdr.recID_LSB = NUM_SDR_FMC2_12V_CURR,
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_01,
+    .hdr.reclength = sizeof(SDR_type_01h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = NUM_SDR_FMC2_12V_CURR, /* sensor number */
+
+    /* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
+    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: Voltage*/
+    .event_reading_type = 0x01, /* sensor reading*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x04, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .linearization = 0x00, /* Linearization */
+    .M = 64, /* M */
+    .M_tol = 0x00, /* M - Tolerance */
+    .B = 0x00, /* B */
+    .B_accuracy = 0x00, /* B - Accuracy */
+    .acc_exp_sensor_dir = 0x02, /* Sensor direction */
+    .Rexp_Bexp = 0xD0, /* R-Exp = -3 , B-Exp = 0 */
+    .analog_flags = 0x03, /* Analogue characteristics flags */
+    .nominal_reading = 190, /* Nominal reading = 12.285V */
+    .normal_max = 200, /* Normal maximum */
+    .normal_min = 0, /* Normal minimum */
+    .sensor_max_reading = 0xFF, /* Sensor Maximum reading */
+    .sensor_min_reading = 0x00, /* Sensor Minimum reading */
+    .upper_nonrecover_thr = 205, /* Upper non-recoverable Threshold */
+    .upper_critical_thr = 200, /* Upper critical Threshold */
+    .upper_noncritical_thr = 195, /* Upper non critical Threshold */
+    .lower_nonrecover_thr = 175, /* Lower non-recoverable Threshold */
+    .lower_critical_thr = 180, /* Lower critical Threshold */
+    .lower_noncritical_thr = 185, /* Lower non-critical Threshold */
+    .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | 14 , /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'F','M','C','2',' ','+', '1', '2', 'V',' ','C','u','r','r' } /* sensor string */
+};
+
+/* FMC2 PVADJ Current */
+static SDR_type_01h_t SDR_FMC2_VADJ_CURR = {
+
+    .hdr.recID_LSB = NUM_SDR_FMC2_VADJ_CURR,
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_01,
+    .hdr.reclength = sizeof(SDR_type_01h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = NUM_SDR_FMC2_VADJ_CURR, /* sensor number */
+
+    /* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
+    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: voltage*/
+    .event_reading_type = 0x01, /* sensor reading*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x04, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .linearization = 0x00, /* Linearization */
+    .M = 64, /* M */
+    .M_tol = 0x00, /* M - Tolerance */
+    .B = 0x00, /* B */
+    .B_accuracy = 0x00, /* B - Accuracy */
+    .acc_exp_sensor_dir = 0x00, /* Sensor direction */
+    .Rexp_Bexp = 0xD0, /* R-Exp , B-Exp */
+    .analog_flags = 0x00, /* Analogue characteristics flags */
+    .nominal_reading = 39, /* Nominal reading */
+    .normal_max = 47, /* Normal maximum */
+    .normal_min = 0, /* Normal minimum */
+    .sensor_max_reading = 0xFF, /* Sensor Maximum reading */
+    .sensor_min_reading = 0x00, /* Sensor Minimum reading */
+    .upper_nonrecover_thr = 51, /* Upper non-recoverable Threshold */
+    .upper_critical_thr = 46, /* Upper critical Threshold */
+    .upper_noncritical_thr = 43, /* Upper non critical Threshold */
+    .lower_nonrecover_thr = 28, /* Lower non-recoverable Threshold */
+    .lower_critical_thr = 32, /* Lower critical Threshold */
+    .lower_noncritical_thr = 36, /* Lower non-critical Threshold */
+    .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | 14, /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'F','M','C','2',' ', 'V', 'A', 'D', 'J',' ','C','u','r','r' } /* sensor string */
+};
+
+/* FMC2 P3V3 Current */
+static SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
+
+    .hdr.recID_LSB = NUM_SDR_FMC2_3V3_CURR,
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_01,
+    .hdr.reclength = sizeof(SDR_type_01h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = NUM_SDR_FMC2_3V3_CURR, /* sensor number */
+
+    /* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
+    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: VOLTAGE*/
+    .event_reading_type = 0x01, /* sensor reading*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x04, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .M = 64, /* M */
+    .M_tol = 0x00, /* M - Tolerance */
+    .B = 0x00, /* B */
+    .B_accuracy = 0x00, /* B - Accuracy */
+    .acc_exp_sensor_dir = 0x00, /* Sensor direction */
+    .Rexp_Bexp = 0xD0, /* R-Exp , B-Exp */
+    .analog_flags = 0x00, /* Analogue characteristics flags */
+    .nominal_reading = 52, /* Nominal reading */
+    .normal_max = 59, /* Normal maximum */
+    .normal_min = 45, /* Normal minimum */
+    .sensor_max_reading = 0xFF, /* Sensor Maximum reading */
+    .sensor_min_reading = 0x00, /* Sensor Minimum reading */
+    .upper_nonrecover_thr = 62, /* Upper non-recoverable Threshold */
+    .upper_critical_thr = 59, /* Upper critical Threshold */
+    .upper_noncritical_thr = 55, /* Upper non critical Threshold */
+    .lower_nonrecover_thr = 42, /* Lower non-recoverable Threshold */
+    .lower_critical_thr = 45, /* Lower critical Threshold */
+    .lower_noncritical_thr = 48, /* Lower non-critical Threshold */
+    .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | 14, /* 8 bit ASCII, number of bytes */
+    .IDstring = { 'F','M','C','2',' ','+','3','V', '3',' ','C','u','r','r'} /* sensor string */
 };
 
 static SDR_type_01h_t SDR_LM75_uC = {
@@ -631,17 +971,34 @@ static SDR_type_01h_t SDR_LM75_RAM = {
 
 sensor_t sensor_array[NUM_SDR]  = {
     /* Entry record */
-    { .type = TYPE_12, .sdr = (void *) &SDR0,          .sdr_length = sizeof(SDR0),          .task_handle = NULL,                 .diag_devID = NO_DIAG },
-    /* Hotswap Sensor */
+    { .type = TYPE_12, .sdr = (void *) &SDR0, .sdr_length = sizeof(SDR0), .task_handle = NULL, .diag_devID = NO_DIAG },
+
+    /* AMC Hotswap */
     { .type = TYPE_02, .sdr = (void *) &SDR_HOT_SWAP,  .sdr_length = sizeof(SDR_HOT_SWAP),  .task_handle = &vTaskHotSwap_Handle, .diag_devID = NO_DIAG },
-    /* FMC1 Current/Voltage/Power Sensors */
+#ifdef RTM_PRESENT
+    { .type = TYPE_02, .sdr = (void *) &SDR_HOT_SWAP,  .sdr_length = sizeof(SDR_HOT_SWAP),  .task_handle = &vTaskHotSwap_Handle, .diag_devID = NO_DIAG },
+#endif
+
+    /* FMC1 Voltage */
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_12V,  .sdr_length = sizeof(SDR_FMC1_12V),  .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_12V_DEVID,  .slave_addr = 0x40 },
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_VADJ, .sdr_length = sizeof(SDR_FMC1_VADJ), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_VADJ_DEVID, .slave_addr = 0x41 },
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_P3V3, .sdr_length = sizeof(SDR_FMC1_P3V3), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_P3V3_DEVID, .slave_addr = 0x43 },
-    /* FMC2 Current/Voltage/Power Sensors */
+
+    /* FMC1 Current */
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_12V,  .sdr_length = sizeof(SDR_FMC1_12V_CURR),  .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_12V_CURR_DEVID,  .slave_addr = 0x40 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_VADJ, .sdr_length = sizeof(SDR_FMC1_VADJ_CURR), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_VADJ_CURR_DEVID, .slave_addr = 0x41 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_P3V3, .sdr_length = sizeof(SDR_FMC1_P3V3_CURR), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_P3V3_CURR_DEVID, .slave_addr = 0x43 },
+
+    /* FMC2 Voltage */
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_12V,  .sdr_length = sizeof(SDR_FMC2_12V),  .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_12V_DEVID,  .slave_addr = 0x45 },
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_VADJ, .sdr_length = sizeof(SDR_FMC2_VADJ), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_VADJ_DEVID, .slave_addr = 0x42 },
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_P3V3, .sdr_length = sizeof(SDR_FMC2_P3V3), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_P3V3_DEVID, .slave_addr = 0x44 },
+
+    /* FMC2 Current  */
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_12V_CURR,  .sdr_length = sizeof(SDR_FMC2_12V_CURR),  .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_12V_CURR_DEVID,  .slave_addr = 0x45 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_VADJ_CURR, .sdr_length = sizeof(SDR_FMC2_VADJ_CURR), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_VADJ_CURR_DEVID, .slave_addr = 0x42 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_P3V3_CURR, .sdr_length = sizeof(SDR_FMC2_P3V3_CURR), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_P3V3_CURR_DEVID, .slave_addr = 0x44 },
+
     /* Temperature Sensors */
     { .type = TYPE_01, .sdr = (void *) &SDR_LM75_uC,    .sdr_length = sizeof(SDR_LM75_uC),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4C },
     { .type = TYPE_01, .sdr = (void *) &SDR_LM75_CLOCK_SWITCH,    .sdr_length = sizeof(SDR_LM75_CLOCK_SWITCH),    .task_handle = &vTaskLM75_Handle,    .diag_devID = NO_DIAG,         .slave_addr = 0x4D },
