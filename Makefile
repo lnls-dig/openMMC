@@ -122,10 +122,7 @@ boot:
 	@echo 'LPCLink booted!'
 	@echo ' '
 
-program:
-	@if [ ! -f $(BUILDDIR)/$(PROJ).axf ]; then \
-	$(MAKE) $(PROJ).axf; \
-	fi
+program: $(BUILDDIR)/$(PROJ).axf
 	@$(MAKE) -i boot
 	@echo 'Programing Flash...'
 #Program flash and reset chip
