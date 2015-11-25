@@ -88,16 +88,16 @@ void sdr_init(uint8_t ipmiID)
 {
     uint8_t i;
     for (i = 0; i < NUM_SDR; i++) {
-    	if( i == 0) {
-    		SDR_type_12h_t * sdr = (SDR_type_12h_t *) sensor_array[i].sdr;
-    		sdr->slaveaddr = ipmiID;
-    		sdr->entityinstance =  0x60 | ((ipmiID - 0x70) >> 1);
-    	} else {
-    		SDR_type_01h_t * sdr = (SDR_type_01h_t *) sensor_array[i].sdr;
-    		sdr->entityinstance =  0x60 | ((ipmiID - 0x70) >> 1);
-    		sdr->ownerID = ipmiID;
-    		sensor_array[i].readout_value = 0;
-    	}
+        if( i == 0) {
+            SDR_type_12h_t * sdr = (SDR_type_12h_t *) sensor_array[i].sdr;
+            sdr->slaveaddr = ipmiID;
+            sdr->entityinstance =  0x60 | ((ipmiID - 0x70) >> 1);
+        } else {
+            SDR_type_01h_t * sdr = (SDR_type_01h_t *) sensor_array[i].sdr;
+            sdr->entityinstance =  0x60 | ((ipmiID - 0x70) >> 1);
+            sdr->ownerID = ipmiID;
+            sensor_array[i].readout_value = 0;
+        }
     }
 }
 
