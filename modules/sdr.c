@@ -88,16 +88,13 @@ void sdr_init(uint8_t ipmiID)
 {
     uint8_t i;
     for (i = 0; i < NUM_SDR; i++) {
-    	if( i == 0) {
-    		SDR_type_12h_t * sdr = (SDR_type_12h_t *) sensor_array[i].sdr;
-    		sdr->slaveaddr = ipmiID;
-    		sdr->entityinstance =  0x60 | ((ipmiID - 0x70) >> 1);
-    	} else {
-    		SDR_type_01h_t * sdr = (SDR_type_01h_t *) sensor_array[i].sdr;
-    		sdr->entityinstance =  0x60 | ((ipmiID - 0x70) >> 1);
-    		sdr->ownerID = ipmiID;
-    		sensor_array[i].readout_value = 0;
-    	}
+        if( i == 0) {
+            sensor_array[i].slave_addr = ipmiID;
+        } else {
+            sensor_array[i].ownerID = ipmiID;
+            sensor_array[i].readout_value = 0;
+        }
+        sensor_array[i].entityinstance =  0x60 | ((ipmiID - 0x70) >> 1);
     }
 }
 
@@ -166,10 +163,24 @@ void ipmi_se_get_sdr( ipmi_msg *req,  ipmi_msg* rsp)
 
     uint8_t tmp_c;
     uint8_t * pSDR = (uint8_t*) sensor_array[record_id].sdr;
+    uint8_t sdr_type = pSDR[3];
 
     for (uint8_t i = 0; i < size; i++) {
         tmp_c = pSDR[i+offset];
-        rsp->data[len++] = tmp_c;
+	if ( sdr_type == TYPE_12) {
+	    if ((i+offset) == 5) {
+		tmp_c = sensor_array[record_id].slave_addr;
+	    } else if ((i+offset) == 13) {
+		tmp_c = sensor_array[record_id].entityinstance;
+	    }
+	} else if ( sdr_type == TYPE_01 || sdr_type == TYPE_02 ) {
+	    if ((i+offset) == 5) {
+		tmp_c = sensor_array[record_id].ownerID;
+	    } else if ((i+offset) == 9) {
+		tmp_c = sensor_array[record_id].entityinstance;
+	    }
+	}
+	rsp->data[len++] = tmp_c;
     }
 
     rsp->data_len = len;

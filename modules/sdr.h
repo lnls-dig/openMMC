@@ -198,6 +198,8 @@ typedef struct {
     uint16_t readout_value;
     uint8_t slave_addr;
     uint8_t signed_flag;
+    uint8_t ownerID; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
+    uint8_t entityinstance; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
     TaskHandle_t * task_handle;
     struct {
         uint16_t upper_non_recoverable_go_high:1;
@@ -223,16 +225,16 @@ extern sensor_t sensor_array[NUM_SDR];
 #define GET_SENSOR_NUMBER(n)    ((SDR_type_01h_t *)sensor_array[n].sdr)->sensornum
 #define GET_EVENT_TYPE_CODE(n)  ((SDR_type_01h_t *)sensor_array[n].sdr)->event_reading_type
 
-void ipmi_se_get_sdr( ipmi_msg *req, ipmi_msg* rsp);
-void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp);
-void ipmi_se_get_sdr_info( ipmi_msg *req, ipmi_msg* rsp);
-void ipmi_se_reserve_device_sdr( ipmi_msg *req, ipmi_msg* rsp);
+void ipmi_se_get_sdr( ipmi_msg *req, ipmi_msg* rsp );
+void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp );
+void ipmi_se_get_sdr_info( ipmi_msg *req, ipmi_msg* rsp );
+void ipmi_se_reserve_device_sdr( ipmi_msg *req, ipmi_msg* rsp );
 
-void initializeDCDC();
-void do_quiesced_init();
-void do_quiesced(unsigned char ctlcode);
-void sdr_init(uint8_t ipmiID);
+void initializeDCDC( void );
+void do_quiesced_init( void );
+void do_quiesced( unsigned char ctlcode );
+void sdr_init( uint8_t ipmiID );
 void sensor_init( void );
-void check_sensor_event(uint8_t sensID);
+void check_sensor_event( uint8_t sensID );
 
 #endif

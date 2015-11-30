@@ -3,7 +3,7 @@
 #include "sensors.h"
 
 /* Management Controller Device Locator Record 37.9 SDR Type 12h */
-static SDR_type_12h_t  SDR0 = {
+const SDR_type_12h_t SDR0 = {
     .hdr.recID_LSB = 0x00, /* record number, LSB - filled by sdr_init() */
     .hdr.recID_MSB = 0x00, /* record number, MSB - filled by sdr_init() */
     .hdr.SDRversion = 0x51, /* IPMI protocol version */
@@ -26,7 +26,7 @@ static SDR_type_12h_t  SDR0 = {
 };
 
 /* AMC Hot-Swap sensor */
-static SDR_type_02h_t SDR_HOT_SWAP = {
+const SDR_type_02h_t SDR_HOT_SWAP = {
     .hdr.recID_LSB = HOT_SWAP_SENSOR,
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -66,7 +66,7 @@ static SDR_type_02h_t SDR_HOT_SWAP = {
 };
 
 /* FMC1 12V */
-static SDR_type_01h_t SDR_FMC1_12V = {
+const SDR_type_01h_t SDR_FMC1_12V = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_12V,
     .hdr.recID_MSB = 0x00,
@@ -123,7 +123,7 @@ static SDR_type_01h_t SDR_FMC1_12V = {
 };
 
 /* FMC1 PVADJ */
-static SDR_type_01h_t SDR_FMC1_VADJ = {
+const SDR_type_01h_t SDR_FMC1_VADJ = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_VADJ,
     .hdr.recID_MSB = 0x00,
@@ -180,7 +180,7 @@ static SDR_type_01h_t SDR_FMC1_VADJ = {
 };
 
 /* FMC1 P3V3 */
-static SDR_type_01h_t SDR_FMC1_P3V3 = {
+const SDR_type_01h_t SDR_FMC1_P3V3 = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_3V3,
     .hdr.recID_MSB = 0x00,
@@ -236,7 +236,7 @@ static SDR_type_01h_t SDR_FMC1_P3V3 = {
 };
 
 /* FMC1 12V Current */
-static SDR_type_01h_t SDR_FMC1_12V_CURR = {
+const SDR_type_01h_t SDR_FMC1_12V_CURR = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_12V_CURR,
     .hdr.recID_MSB = 0x00,
@@ -293,7 +293,7 @@ static SDR_type_01h_t SDR_FMC1_12V_CURR = {
 };
 
 /* FMC1 PVADJ Current */
-static SDR_type_01h_t SDR_FMC1_VADJ_CURR = {
+const SDR_type_01h_t SDR_FMC1_VADJ_CURR = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_VADJ_CURR,
     .hdr.recID_MSB = 0x00,
@@ -350,7 +350,7 @@ static SDR_type_01h_t SDR_FMC1_VADJ_CURR = {
 };
 
 /* FMC1 P3V3 Current */
-static SDR_type_01h_t SDR_FMC1_P3V3_CURR = {
+const SDR_type_01h_t SDR_FMC1_P3V3_CURR = {
 
     .hdr.recID_LSB = NUM_SDR_FMC1_3V3_CURR,
     .hdr.recID_MSB = 0x00,
@@ -406,7 +406,7 @@ static SDR_type_01h_t SDR_FMC1_P3V3_CURR = {
 };
 
 /* FMC2 12V */
-static SDR_type_01h_t SDR_FMC2_12V = {
+const SDR_type_01h_t SDR_FMC2_12V = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_12V,
     .hdr.recID_MSB = 0x00,
@@ -462,7 +462,7 @@ static SDR_type_01h_t SDR_FMC2_12V = {
 };
 
 /* FMC2 PVADJ */
-static SDR_type_01h_t SDR_FMC2_VADJ = {
+const SDR_type_01h_t SDR_FMC2_VADJ = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_VADJ,
     .hdr.recID_MSB = 0x00,
@@ -519,7 +519,7 @@ static SDR_type_01h_t SDR_FMC2_VADJ = {
 };
 
 /* FMC2 P3V3 */
-static SDR_type_01h_t SDR_FMC2_P3V3 = {
+const SDR_type_01h_t SDR_FMC2_P3V3 = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_3V3,
     .hdr.recID_MSB = 0x00,
@@ -576,7 +576,7 @@ static SDR_type_01h_t SDR_FMC2_P3V3 = {
 };
 
 /* FMC2 12V Current */
-static SDR_type_01h_t SDR_FMC2_12V_CURR = {
+const SDR_type_01h_t SDR_FMC2_12V_CURR = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_12V_CURR,
     .hdr.recID_MSB = 0x00,
@@ -633,7 +633,7 @@ static SDR_type_01h_t SDR_FMC2_12V_CURR = {
 };
 
 /* FMC2 PVADJ Current */
-static SDR_type_01h_t SDR_FMC2_VADJ_CURR = {
+const SDR_type_01h_t SDR_FMC2_VADJ_CURR = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_VADJ_CURR,
     .hdr.recID_MSB = 0x00,
@@ -690,7 +690,7 @@ static SDR_type_01h_t SDR_FMC2_VADJ_CURR = {
 };
 
 /* FMC2 P3V3 Current */
-static SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
+const SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
 
     .hdr.recID_LSB = NUM_SDR_FMC2_3V3_CURR,
     .hdr.recID_MSB = 0x00,
@@ -745,7 +745,7 @@ static SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
     .IDstring = { 'F','M','C','2',' ','+','3','V', '3',' ','C','u','r','r'} /* sensor string */
 };
 
-static SDR_type_01h_t SDR_LM75_uC = {
+const SDR_type_01h_t SDR_LM75_uC = {
 
     .hdr.recID_LSB = NUM_SDR_LM75_uC,
     .hdr.recID_MSB = 0x00,
@@ -801,7 +801,7 @@ static SDR_type_01h_t SDR_LM75_uC = {
     .IDstring = { 'T','e','m','p',' ', 'u', 'C' } /*  sensor string */
 };
 
-static SDR_type_01h_t SDR_LM75_CLOCK_SWITCH = {
+const SDR_type_01h_t SDR_LM75_CLOCK_SWITCH = {
 
     .hdr.recID_LSB = NUM_SDR_LM75_CLOCK_SWITCH,
     .hdr.recID_MSB = 0x00,
@@ -857,7 +857,7 @@ static SDR_type_01h_t SDR_LM75_CLOCK_SWITCH = {
     .IDstring = { 'T','e','m','p',' ', 'C','l','k',' ', 'S','w','i','t','c','h' } /*  sensor string */
 };
 
-static SDR_type_01h_t SDR_LM75_DCDC = {
+const SDR_type_01h_t SDR_LM75_DCDC = {
 
     .hdr.recID_LSB = NUM_SDR_LM75_DCDC,
     .hdr.recID_MSB = 0x00,
@@ -913,7 +913,7 @@ static SDR_type_01h_t SDR_LM75_DCDC = {
     .IDstring = { 'T','e','m','p',' ', 'D','C','D','C' } /*  sensor string */
 };
 
-static SDR_type_01h_t SDR_LM75_RAM = {
+const SDR_type_01h_t SDR_LM75_RAM = {
 
     .hdr.recID_LSB = NUM_SDR_LM75_RAM,
     .hdr.recID_MSB = 0x00,
