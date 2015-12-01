@@ -24,26 +24,26 @@
 
 #include "ipmb.h"
 
-#define NUM_SENSOR			17	/* Number of sensors */
-#define NUM_SDR				(NUM_SENSOR+1)	/* Number of SDRs */
+#define NUM_SENSOR                      17      /* Number of sensors */
+#define NUM_SDR                         (NUM_SENSOR+1)  /* Number of SDRs */
 
-#define HOT_SWAP_SENSOR			1
-#define NUM_SDR_FMC1_12V		2
-#define NUM_SDR_FMC1_VADJ		3
-#define NUM_SDR_FMC1_3V3		4
-#define NUM_SDR_FMC1_12V_CURR		5
-#define NUM_SDR_FMC1_VADJ_CURR		6
-#define NUM_SDR_FMC1_3V3_CURR		7
-#define NUM_SDR_FMC2_12V		8
-#define NUM_SDR_FMC2_VADJ		9
-#define NUM_SDR_FMC2_3V3		10
-#define NUM_SDR_FMC2_12V_CURR		11
-#define NUM_SDR_FMC2_VADJ_CURR		12
-#define NUM_SDR_FMC2_3V3_CURR		13
-#define NUM_SDR_LM75_uC			14
-#define NUM_SDR_LM75_CLOCK_SWITCH	15
-#define NUM_SDR_LM75_DCDC		16
-#define NUM_SDR_LM75_RAM		17
+#define HOT_SWAP_SENSOR                 1
+#define NUM_SDR_FMC1_12V                2
+#define NUM_SDR_FMC1_VADJ               3
+#define NUM_SDR_FMC1_3V3                4
+#define NUM_SDR_FMC1_12V_CURR           5
+#define NUM_SDR_FMC1_VADJ_CURR          6
+#define NUM_SDR_FMC1_3V3_CURR           7
+#define NUM_SDR_FMC2_12V                8
+#define NUM_SDR_FMC2_VADJ               9
+#define NUM_SDR_FMC2_3V3                10
+#define NUM_SDR_FMC2_12V_CURR           11
+#define NUM_SDR_FMC2_VADJ_CURR          12
+#define NUM_SDR_FMC2_3V3_CURR           13
+#define NUM_SDR_LM75_uC                 14
+#define NUM_SDR_LM75_CLOCK_SWITCH       15
+#define NUM_SDR_LM75_DCDC               16
+#define NUM_SDR_LM75_RAM                17
 
 /* Sensor Types */
 #define SENSOR_TYPE_TEMPERATURE         0x01
@@ -55,32 +55,32 @@
 #define SENSOR_TYPE_HOT_SWAP            0xF2
 
 /* Assertion Event Codes */
-#define ASSERTION_EVENT			0x00
-#define DEASSERTION_EVENT		0x80
+#define ASSERTION_EVENT                 0x00
+#define DEASSERTION_EVENT               0x80
 
 /* Sensor States */
-#define SENSOR_STATE_NORMAL		0x00	// temperature is in normal range
-#define SENSOR_STATE_LOW			0x01	// temperature is below lower non critical
-#define SENSOR_STATE_LOW_CRIT		0x02	// temperature is below lower critical
-#define SENSOR_STATE_LOW_NON_REC		0x04	// temperature is below lower non recoverable
-#define SENSOR_STATE_HIGH			0x08	// temperature is higher upper non critical
-#define SENSOR_STATE_HIGH_CRIT		0x10	// temperature is higher upper critical
-#define SENSOR_STATE_HIGH_NON_REC		0x20	// temperature is higher high non recoverable
+#define SENSOR_STATE_NORMAL             0x00	// temperature is in normal range
+#define SENSOR_STATE_LOW                0x01	// temperature is below lower non critical
+#define SENSOR_STATE_LOW_CRIT           0x02	// temperature is below lower critical
+#define SENSOR_STATE_LOW_NON_REC        0x04	// temperature is below lower non recoverable
+#define SENSOR_STATE_HIGH               0x08	// temperature is higher upper non critical
+#define SENSOR_STATE_HIGH_CRIT          0x10	// temperature is higher upper critical
+#define SENSOR_STATE_HIGH_NON_REC       0x20	// temperature is higher high non recoverable
 
 
 /* IPMI Sensor Events */
-#define IPMI_THRESHOLD_LNC_GL		0x00	// lower non critical going low
-#define IPMI_THRESHOLD_LNC_GH		0x01	// lower non critical going high
-#define IPMI_THRESHOLD_LC_GL		0x02	// lower critical going low
-#define IPMI_THRESHOLD_LC_GH		0x03	// lower critical going HIGH
-#define IPMI_THRESHOLD_LNR_GL		0x04	// lower non recoverable going low
-#define IPMI_THRESHOLD_LNR_GH		0x05	// lower non recoverable going high
-#define IPMI_THRESHOLD_UNC_GL		0x06	// upper non critical going low
-#define IPMI_THRESHOLD_UNC_GH		0x07	// upper non critical going high
-#define IPMI_THRESHOLD_UC_GL		0x08	// upper critical going low
-#define IPMI_THRESHOLD_UC_GH		0x09	// upper critical going HIGH
-#define IPMI_THRESHOLD_UNR_GL		0x0A	// upper non recoverable going low
-#define IPMI_THRESHOLD_UNR_GH		0x0B	// upper non recoverable going high
+#define IPMI_THRESHOLD_LNC_GL           0x00	// lower non critical going low
+#define IPMI_THRESHOLD_LNC_GH           0x01	// lower non critical going high
+#define IPMI_THRESHOLD_LC_GL            0x02	// lower critical going low
+#define IPMI_THRESHOLD_LC_GH            0x03	// lower critical going HIGH
+#define IPMI_THRESHOLD_LNR_GL           0x04	// lower non recoverable going low
+#define IPMI_THRESHOLD_LNR_GH           0x05	// lower non recoverable going high
+#define IPMI_THRESHOLD_UNC_GL           0x06	// upper non critical going low
+#define IPMI_THRESHOLD_UNC_GH           0x07	// upper non critical going high
+#define IPMI_THRESHOLD_UC_GL            0x08	// upper critical going low
+#define IPMI_THRESHOLD_UC_GH            0x09	// upper critical going HIGH
+#define IPMI_THRESHOLD_UNR_GL           0x0A	// upper non recoverable going low
+#define IPMI_THRESHOLD_UNR_GH           0x0B	// upper non recoverable going high
 
 
 typedef enum {
@@ -221,9 +221,13 @@ extern sensor_t sensor_array[NUM_SDR];
 
 #define SDR_ARRAY_LENGTH (sizeof(sensor_array) / sizeof(sensor_array[0]))
 
-#define GET_SENSOR_TYPE(n)      ((SDR_type_01h_t *)sensor_array[n].sdr)->sensortype
-#define GET_SENSOR_NUMBER(n)    ((SDR_type_01h_t *)sensor_array[n].sdr)->sensornum
-#define GET_EVENT_TYPE_CODE(n)  ((SDR_type_01h_t *)sensor_array[n].sdr)->event_reading_type
+#define GET_SENSOR_TYPE(n)		((SDR_type_01h_t *)sensor_array[n].sdr)->sensortype
+#define GET_SENSOR_TYPE_NEW(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
+
+#define GET_SENSOR_NUMBER(n)		((SDR_type_01h_t *)sensor_array[n].sdr)->sensornum
+#define GET_SENSOR_NUMBER_NEW(sensor)   ((SDR_type_01h_t *)sensor->sdr)->sensornum
+
+#define GET_EVENT_TYPE_CODE(n)		((SDR_type_01h_t *)sensor_array[n].sdr)->event_reading_type
 
 void ipmi_se_get_sdr( ipmi_msg *req, ipmi_msg* rsp );
 void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp );
