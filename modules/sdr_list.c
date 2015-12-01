@@ -986,9 +986,9 @@ sensor_t sensor_array[NUM_SDR]  = {
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_P3V3, .sdr_length = sizeof(SDR_FMC1_P3V3), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_P3V3_DEVID, .slave_addr = 0x43 },
 
     /* FMC1 Current */
-    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_12V,  .sdr_length = sizeof(SDR_FMC1_12V_CURR),  .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_12V_CURR_DEVID,  .slave_addr = 0x40 },
-    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_VADJ, .sdr_length = sizeof(SDR_FMC1_VADJ_CURR), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_VADJ_CURR_DEVID, .slave_addr = 0x41 },
-    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_P3V3, .sdr_length = sizeof(SDR_FMC1_P3V3_CURR), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_P3V3_CURR_DEVID, .slave_addr = 0x43 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_12V_CURR,  .sdr_length = sizeof(SDR_FMC1_12V_CURR),  .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_12V_CURR_DEVID,  .slave_addr = 0x40 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_VADJ_CURR, .sdr_length = sizeof(SDR_FMC1_VADJ_CURR), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_VADJ_CURR_DEVID, .slave_addr = 0x41 },
+    { .type = TYPE_01, .sdr = (void *) &SDR_FMC1_P3V3_CURR, .sdr_length = sizeof(SDR_FMC1_P3V3_CURR), .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC1_P3V3_CURR_DEVID, .slave_addr = 0x43 },
 
     /* FMC2 Voltage */
     { .type = TYPE_01, .sdr = (void *) &SDR_FMC2_12V,  .sdr_length = sizeof(SDR_FMC2_12V),  .task_handle = &vTaskINA220_Handle,  .diag_devID = FMC2_12V_DEVID,  .slave_addr = 0x45 },
@@ -1006,11 +1006,3 @@ sensor_t sensor_array[NUM_SDR]  = {
     { .type = TYPE_01, .sdr = (void *) &SDR_LM75_DCDC,         .sdr_length = sizeof(SDR_LM75_DCDC),         .task_handle = &vTaskLM75_Handle,    .diag_devID = DCDC_TEMP_DEVID, .slave_addr = 0x4E },
     { .type = TYPE_01, .sdr = (void *) &SDR_LM75_RAM,          .sdr_length = sizeof(SDR_LM75_RAM),          .task_handle = &vTaskLM75_Handle,    .diag_devID = RAM_TEMP_DEVID,  .slave_addr = 0x4F }
 };
-
-
-
-
-
-
-
-
