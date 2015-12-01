@@ -36,12 +36,12 @@
 
 const t_ina220_config ina220_cfg = {
     .config_reg_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
-                                       .pga_gain = INA220_PGA_GAIN_320MV,
+                                       .pga_gain = INA220_PGA_GAIN_40MV,
                                        .bus_adc_resolution = INA220_RES_SAMPLES_12BIT,
                                        .shunt_adc_resolution = INA220_RES_SAMPLES_12BIT,
                                        .mode = INA220_MODE_SHUNT_BUS_CONT },
     .calibration_factor = 40960000,
-    .calibration_reg = 0x51, /* Calculated using INA220EVM software from Texas Instruments */
+    .calibration_reg = 0xA000, /* Calculated using INA220EVM software from Texas Instruments */
     .registers = INA220_REGISTERS,
     .shunt_div = 100,
     .bus_voltage_shift = 3,
@@ -58,9 +58,7 @@ void vTaskINA220( void *Parameters )
     TickType_t xLastWakeTime;
     /* Task will run every 100ms */
     const TickType_t xFrequency = INA220_UPDATE_RATE / portTICK_PERIOD_MS;
-
     sensor_t * ina220_sensor;
-    SDR_type_01h_t * pSDR;
     t_ina220_data * data_ptr;
 
     /* Initialise the xLastWakeTime variable with the current time. */
@@ -71,17 +69,16 @@ void vTaskINA220( void *Parameters )
         for ( i = 0; i < MAX_INA220_COUNT; i++) {
             ina220_readall( &ina220_data[i] );
 
-            pSDR = ina220_data[i].pSDR;
             ina220_sensor = ina220_data[i].sensor;
             data_ptr = &ina220_data[i];
 
-            switch (pSDR->sensortype) {
+            switch ((GET_SENSOR_TYPE_NEW(ina220_sensor))) {
             case SENSOR_TYPE_VOLTAGE:
                 ina220_sensor->readout_value = (data_ptr->regs[INA220_BUS_VOLTAGE] >> data_ptr->config->bus_voltage_shift)/16;
                 break;
             case SENSOR_TYPE_CURRENT:
                 /* Current in mA */
-                ina220_sensor->readout_value = data_ptr->regs[INA220_CURRENT];
+                ina220_sensor->readout_value = data_ptr->regs[INA220_CURRENT]/32;
                 break;
             default:
                 /* Shunt voltage and power not implemented */
@@ -89,9 +86,9 @@ void vTaskINA220( void *Parameters )
             }
 
             /* Check for threshold events */
-            check_sensor_event(pSDR->sensornum);
+            check_sensor_event(ina220_sensor);
 
-            switch (pSDR->sensornum) {
+            switch (GET_SENSOR_NUMBER_NEW(ina220_sensor)) {
             case NUM_SDR_FMC2_12V:
                 /* Compare reading with sensor threshold levels */
                 if (ina220_sensor->state == SENSOR_STATE_NORMAL ) {
@@ -185,28 +182,31 @@ Bool ina220_calibrate( t_ina220_data * data )
 void ina220_init( void )
 {
     uint8_t i, j;
+    i = 0;
 
     xTaskCreate( vTaskINA220, "INA220", 400, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
 
-    while (i < MAX_INA220_COUNT) {
-        for ( j = 0; j < NUM_SDR; j++ ) {
-            /* Update their SDR */
-            /* Check if the handle pointer is not NULL */
-            if (sensor_array[j].task_handle == NULL) {
-                continue;
-            }
+    for ( j = 0; j < NUM_SDR; j++ ) {
+        /* Update their SDR */
+        /* Check if the handle pointer is not NULL */
+        if (sensor_array[j].task_handle == NULL) {
+            continue;
+        }
 
-            /* Check if this task should update the selected SDR */
-            if ( *(sensor_array[j].task_handle) != vTaskINA220_Handle ) {
-                continue;
-            }
+        /* Check if this task should update the selected SDR */
+        if ( *(sensor_array[j].task_handle) != vTaskINA220_Handle ) {
+            continue;
+        }
 
-            ina220_data[i].pSDR = (SDR_type_01h_t *) sensor_array[j].sdr;
+        if (i < MAX_INA220_COUNT ) {
             ina220_data[i].sensor = &sensor_array[j];
-
             ina220_data[i].i2c_id = sensor_array[j].slave_addr;
             ina220_config( ina220_data[i].i2c_id, &ina220_data[i] );
             ina220_calibrate( &ina220_data[i] );
+
+            if ((GET_SENSOR_TYPE_NEW(ina220_data[i].sensor)) == SENSOR_TYPE_CURRENT ) {
+                ina220_data[i].sensor->signed_flag = 1;
+            }
             i++;
         }
     }
