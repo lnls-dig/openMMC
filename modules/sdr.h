@@ -235,6 +235,6 @@ void do_quiesced_init( void );
 void do_quiesced( unsigned char ctlcode );
 void sdr_init( uint8_t ipmiID );
 void sensor_init( void );
-void check_sensor_event( uint8_t sensID );
+void check_sensor_event( sensor_t * sensor );
 
 #endif

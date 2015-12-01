@@ -222,13 +222,12 @@ void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp) {
     rsp->completion_code = IPMI_CC_OK;
 }
 
-void check_sensor_event(uint8_t sensID)
+void check_sensor_event( sensor_t * sensor )
 {
     /** Should be rewritten to be compliant with RTM management !! */
     uint8_t ev = 0xFF;
     uint8_t ev_type;
 
-    sensor_t * sensor = &sensor_array[sensID];
     configASSERT(sensor);
 
     SDR_type_01h_t * sdr = ( SDR_type_01h_t * ) sensor->sdr;
@@ -618,6 +617,6 @@ void check_sensor_event(uint8_t sensID)
     sensor->old_state = sensor->state;
 
     if (ev != 0xFF) {
-        ipmi_event_send(sensID, ev_type, &ev, 1);
+        ipmi_event_send(sdr->sensornum, ev_type, &ev, 1);
     }
 }
