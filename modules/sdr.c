@@ -161,26 +161,26 @@ void ipmi_se_get_sdr( ipmi_msg *req,  ipmi_msg* rsp)
         rsp->data[len++] = (record_id + 1) >> 8; /* next record ID */
     }
 
-    uint8_t tmp_c;
+    uint8_t tmp_c, index;
     uint8_t * pSDR = (uint8_t*) sensor_array[record_id].sdr;
     uint8_t sdr_type = pSDR[3];
 
     for (uint8_t i = 0; i < size; i++) {
-        tmp_c = pSDR[i+offset];
-	if ( sdr_type == TYPE_12) {
-	    if ((i+offset) == 5) {
-		tmp_c = sensor_array[record_id].slave_addr;
-	    } else if ((i+offset) == 13) {
-		tmp_c = sensor_array[record_id].entityinstance;
-	    }
-	} else if ( sdr_type == TYPE_01 || sdr_type == TYPE_02 ) {
-	    if ((i+offset) == 5) {
-		tmp_c = sensor_array[record_id].ownerID;
-	    } else if ((i+offset) == 9) {
-		tmp_c = sensor_array[record_id].entityinstance;
-	    }
-	}
-	rsp->data[len++] = tmp_c;
+        index = i + offset;
+        tmp_c = pSDR[index];
+
+        if (index == 5) {
+            tmp_c = sensor_array[record_id].ownerID;
+        } else if ( sdr_type == TYPE_01 || sdr_type == TYPE_02 ) {
+            if (index == 9) {
+                tmp_c = sensor_array[record_id].entityinstance;
+            }
+        } else if ( sdr_type == TYPE_11 || sdr_type == TYPE_12 ) {
+            if (index == 13) {
+                tmp_c = sensor_array[record_id].entityinstance;
+            }
+        }
+        rsp->data[len++] = tmp_c;
     }
 
     rsp->data_len = len;
