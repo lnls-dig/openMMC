@@ -31,7 +31,7 @@
 #include "FreeRTOS.h"
 #include "port.h"
 
-#define MAX_INA220_COUNT        6
+#define MAX_INA220_COUNT        12
 #define INA220_UPDATE_RATE      100
 
 /* common register definitions */
@@ -88,29 +88,30 @@
 typedef union {
     struct {
 #ifdef BF_MS_FIRST
-	uint16_t mode:3;
-	uint16_t shunt_adc_resolution:4;
-	uint16_t bus_adc_resolution:4;
-	uint16_t pga_gain:2;
-	uint16_t bus_voltage_range:1;
-	uint16_t reserved:1;
-	uint16_t reset:1;
+        uint16_t mode:3;
+        uint16_t shunt_adc_resolution:4;
+        uint16_t bus_adc_resolution:4;
+        uint16_t pga_gain:2;
+        uint16_t bus_voltage_range:1;
+        uint16_t reserved:1;
+        uint16_t reset:1;
 #else
-	uint16_t reset:1;
-	uint16_t reserved:1;
-	uint16_t bus_voltage_range:1;
-	uint16_t pga_gain:2;
-	uint16_t bus_adc_resolution:4;
-	uint16_t shunt_adc_resolution:4;
-	uint16_t mode:3;
+        uint16_t reset:1;
+        uint16_t reserved:1;
+        uint16_t bus_voltage_range:1;
+        uint16_t pga_gain:2;
+        uint16_t bus_adc_resolution:4;
+        uint16_t shunt_adc_resolution:4;
+        uint16_t mode:3;
 #endif
     } cfg_struct;
     uint16_t cfg_word;
 } t_ina220_config_reg;
 
 typedef struct {
-    t_ina220_config_reg config_default;
+    t_ina220_config_reg config_reg_default;
     uint32_t calibration_factor;
+    uint16_t calibration_reg;
     uint8_t registers;
     uint8_t shunt_div;
     uint8_t bus_voltage_shift;
@@ -121,16 +122,16 @@ typedef struct {
 typedef struct {
     uint8_t i2c_id;
     sensor_t * sensor;
-    SDR_type_01h_t * pSDR;
     const t_ina220_config * config;
     uint32_t rshunt;
-    t_ina220_config_reg curr_config;
+    t_ina220_config_reg curr_reg_config;
     uint16_t regs[INA220_REGISTERS];
 } t_ina220_data;
 
 TaskHandle_t vTaskINA220_Handle;
 
 uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data);
+Bool ina220_calibrate( t_ina220_data * data );
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
 void ina220_readall( t_ina220_data * data );

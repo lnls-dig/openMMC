@@ -35,12 +35,13 @@
 #include "ina220.h"
 
 const t_ina220_config ina220_cfg = {
-    .config_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
-				   .pga_gain = INA220_PGA_GAIN_320MV,
-				   .bus_adc_resolution = INA220_RES_SAMPLES_12BIT,
-				   .shunt_adc_resolution = INA220_RES_SAMPLES_12BIT,
-				   .mode = INA220_MODE_SHUNT_BUS_CONT },
+    .config_reg_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
+                                       .pga_gain = INA220_PGA_GAIN_40MV,
+                                       .bus_adc_resolution = INA220_RES_SAMPLES_12BIT,
+                                       .shunt_adc_resolution = INA220_RES_SAMPLES_12BIT,
+                                       .mode = INA220_MODE_SHUNT_BUS_CONT },
     .calibration_factor = 40960000,
+    .calibration_reg = 0xA000, /* Calculated using INA220EVM software from Texas Instruments */
     .registers = INA220_REGISTERS,
     .shunt_div = 100,
     .bus_voltage_shift = 3,
@@ -57,9 +58,7 @@ void vTaskINA220( void *Parameters )
     TickType_t xLastWakeTime;
     /* Task will run every 100ms */
     const TickType_t xFrequency = INA220_UPDATE_RATE / portTICK_PERIOD_MS;
-
     sensor_t * ina220_sensor;
-    SDR_type_01h_t * pSDR;
     t_ina220_data * data_ptr;
 
     /* Initialise the xLastWakeTime variable with the current time. */
@@ -70,30 +69,29 @@ void vTaskINA220( void *Parameters )
         for ( i = 0; i < MAX_INA220_COUNT; i++) {
             ina220_readall( &ina220_data[i] );
 
-            pSDR = ina220_data[i].pSDR;
             ina220_sensor = ina220_data[i].sensor;
             data_ptr = &ina220_data[i];
 
-            switch (pSDR->sensortype) {
+            switch ((GET_SENSOR_TYPE_NEW(ina220_sensor))) {
             case SENSOR_TYPE_VOLTAGE:
                 ina220_sensor->readout_value = (data_ptr->regs[INA220_BUS_VOLTAGE] >> data_ptr->config->bus_voltage_shift)/16;
                 break;
             case SENSOR_TYPE_CURRENT:
                 /* Current in mA */
-                ina220_sensor->readout_value = data_ptr->regs[INA220_CURRENT];
+                ina220_sensor->readout_value = data_ptr->regs[INA220_CURRENT]/32;
                 break;
             default:
                 /* Shunt voltage and power not implemented */
                 break;
             }
 
-	    /* Check for threshold events */
-	    check_sensor_event(pSDR->sensornum);
+            /* Check for threshold events */
+            check_sensor_event(ina220_sensor);
 
-	    switch (pSDR->sensornum) {
+            switch (GET_SENSOR_NUMBER_NEW(ina220_sensor)) {
             case NUM_SDR_FMC2_12V:
                 /* Compare reading with sensor threshold levels */
-		if (ina220_sensor->state == SENSOR_STATE_NORMAL ) {
+                if (ina220_sensor->state == SENSOR_STATE_NORMAL ) {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
                 } else {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
@@ -118,14 +116,14 @@ uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
     } else {
         return -1;
     }
-    data->curr_config = data->config->config_default;
+    data->curr_reg_config = data->config->config_reg_default;
 
     /* Change to 'afc_i2c_take_by_chipid', which is more generic */
     if( afc_i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 100) == pdFALSE ) {
         return -1;
     }
 
-    uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_config.cfg_word >> 8) , ( data->curr_config.cfg_word & 0xFFFF) };
+    uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_reg_config.cfg_word >> 8) , ( data->curr_reg_config.cfg_word & 0xFFFF) };
 
     portENABLE_INTERRUPTS();
     xI2CMasterWrite( i2c_bus, data->i2c_id, cfg_buff, sizeof(cfg_buff)/sizeof(cfg_buff[0]) );
@@ -161,30 +159,54 @@ void ina220_readall( t_ina220_data * data )
     }
 }
 
+Bool ina220_calibrate( t_ina220_data * data )
+{
+    uint8_t i2c_bus;
+    uint16_t cal = data->config->calibration_reg;
+    uint8_t cal_reg[3] = { INA220_CALIBRATION, (cal >> 8), (cal & 0xFFFF) };
+
+    /*! @todo: Change to 'afc_i2c_take_by_chipid', which is more generic */
+    if( afc_i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
+        return false;
+    }
+
+    portENABLE_INTERRUPTS();
+    xI2CMasterWrite( i2c_bus, data->i2c_id, &cal_reg[0], sizeof(cal_reg)/sizeof(cal_reg[0]) );
+    portDISABLE_INTERRUPTS();
+
+    afc_i2c_give( i2c_bus );
+
+    return true;
+}
+
 void ina220_init( void )
 {
     uint8_t i, j;
+    i = 0;
 
     xTaskCreate( vTaskINA220, "INA220", 400, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
 
-    while (i < MAX_INA220_COUNT) {
-        for ( j = 0; j < NUM_SDR; j++ ) {
-            /* Update their SDR */
-            /* Check if the handle pointer is not NULL */
-            if (sensor_array[j].task_handle == NULL) {
-                continue;
-            }
+    for ( j = 0; j < NUM_SDR; j++ ) {
+        /* Update their SDR */
+        /* Check if the handle pointer is not NULL */
+        if (sensor_array[j].task_handle == NULL) {
+            continue;
+        }
 
-            /* Check if this task should update the selected SDR */
-            if ( *(sensor_array[j].task_handle) != vTaskINA220_Handle ) {
-                continue;
-            }
+        /* Check if this task should update the selected SDR */
+        if ( *(sensor_array[j].task_handle) != vTaskINA220_Handle ) {
+            continue;
+        }
 
-            ina220_data[i].pSDR = (SDR_type_01h_t *) sensor_array[j].sdr;
+        if (i < MAX_INA220_COUNT ) {
             ina220_data[i].sensor = &sensor_array[j];
-
             ina220_data[i].i2c_id = sensor_array[j].slave_addr;
             ina220_config( ina220_data[i].i2c_id, &ina220_data[i] );
+            ina220_calibrate( &ina220_data[i] );
+
+            if ((GET_SENSOR_TYPE_NEW(ina220_data[i].sensor)) == SENSOR_TYPE_CURRENT ) {
+                ina220_data[i].sensor->signed_flag = 1;
+            }
             i++;
         }
     }
