@@ -86,6 +86,7 @@
 typedef enum {
     TYPE_01 = 0x1,
     TYPE_02 = 0x2,
+    TYPE_11 = 0x11,
     TYPE_12 = 0x12
 } SDR_TYPE;
 
