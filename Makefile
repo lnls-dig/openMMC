@@ -65,22 +65,21 @@ PROJ_OBJS = $(PROJ_SRC:%.c=%.o)
 
 .PRECIOUS: %.axf %.bin
 
-all: $(PROJ).bin
+all: $(BUILDDIR)/$(PROJ).axf
 
-folders:
-	@mkdir -p $(LIBDIR)
-	@mkdir -p $(BUILDDIR)
+$(LIBDIR) $(BUILDDIR):
+	mkdir -p $@
 
-%.bin: $(BUILDDIR)/%.axf
+%.bin: %.axf
 	@echo 'Creating Binary file from .axf'
-	$(OBJCOPY) -O binary $< $(BUILDDIR)/$@
+	$(OBJCOPY) -O binary $< $@
 	@echo 'Binary file created succesfully!'
 	@echo ' '
 
 #Linker
-%.axf: folders $(FREERTOS_LIBFILE) $(LPCOPEN_LIBFILE) $(PROJ_OBJS)
+%.axf: $(FREERTOS_LIBFILE) $(LPCOPEN_LIBFILE) $(PROJ_OBJS) | $(BUILDDIR)
 	@echo 'Invoking MCU Linker'
-	$(CC) $(LD_FLAGS) -o $(BUILDDIR)/$(notdir $@) $(PROJ_OBJS) -L$(LIBDIR) $(LIBS)
+	$(CC) $(LD_FLAGS) -o $@ $(PROJ_OBJS) -L$(LIBDIR) $(LIBS)
 	@echo '$@ linked successfully!'
 	@echo ' '
 
@@ -93,14 +92,14 @@ folders:
 	@echo ' '
 
 #Archiver for FreeRTOS objects
-$(FREERTOS_LIBFILE): $(FREERTOS_OBJS)
+$(FREERTOS_LIBFILE): $(FREERTOS_OBJS) | $(LIBDIR)
 	@echo 'Archiving $@ objs'
 	$(AR) -r $@ $(FREERTOS_OBJS)
 	@echo 'Library $@ successfully created'
 	@echo ' '
 
 #Archiver for LPCOpen objects
-$(LPCOPEN_LIBFILE): $(LPCOPEN_OBJS)
+$(LPCOPEN_LIBFILE): $(LPCOPEN_OBJS) | $(LIBDIR)
 	@echo 'Archiving $@ objs'
 	$(AR) -r $@ $(LPCOPEN_OBJS)
 	@echo 'Library $@ successfully created'
@@ -118,12 +117,11 @@ mrproper: clean
 
 boot:
 	@echo 'Booting LPCLink...'
-	$(LPCXPRESSO_PATH)/bin/dfu-util -d 0x471:0xdf55 -c 0 -t 2048 -R -D $(LPCXPRESSO_PATH)/bin/LPCXpressoWIN.enc
+	-$(LPCXPRESSO_PATH)/bin/dfu-util -d 0x471:0xdf55 -c 0 -t 2048 -R -D $(LPCXPRESSO_PATH)/bin/LPCXpressoWIN.enc
 	@echo 'LPCLink booted!'
 	@echo ' '
 
-program: $(BUILDDIR)/$(PROJ).axf
-	@$(MAKE) -i boot
+program: $(BUILDDIR)/$(PROJ).axf boot
 	@echo 'Programing Flash...'
 #Program flash and reset chip
 	$(LPCXPRESSO_PATH)/bin/crt_emu_cm3_nxp -wire=winusb -pLPC1764 -flash-load-exec=$(BUILDDIR)/$(PROJ).axf
