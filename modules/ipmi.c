@@ -127,7 +127,7 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd)
     return handler;
 }
 
-ipmb_error ipmi_event_send( uint8_t sensor_index, uint8_t assert_deassert, uint8_t *evData, uint8_t length)
+ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t *evData, uint8_t length)
 {
     ipmi_msg evt;
     uint8_t data_len = 0;
@@ -137,9 +137,9 @@ ipmb_error ipmi_event_send( uint8_t sensor_index, uint8_t assert_deassert, uint8
     evt.cmd = IPMI_PLATFORM_EVENT_CMD;
 
     evt.data[data_len++] = IPMI_EVENT_MESSAGE_REV;
-    evt.data[data_len++] = GET_SENSOR_TYPE(sensor_index);
-    evt.data[data_len++] = GET_SENSOR_NUMBER(sensor_index);
-    evt.data[data_len++] = assert_deassert | (GET_EVENT_TYPE_CODE(sensor_index) & 0x7F);
+    evt.data[data_len++] = GET_SENSOR_TYPE(sensor);
+    evt.data[data_len++] = GET_SENSOR_NUMBER(sensor);
+    evt.data[data_len++] = assert_deassert | (GET_EVENT_TYPE_CODE(sensor) & 0x7F);
     evt.data[data_len++] = (length >= 1)? evData[0] : 0xFF;
     evt.data[data_len++] = (length >= 2)? evData[1] : 0xFF;
     evt.data[data_len++] = (length >= 3)? evData[2] : 0xFF;

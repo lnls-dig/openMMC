@@ -617,6 +617,6 @@ void check_sensor_event( sensor_t * sensor )
     sensor->old_state = sensor->state;
 
     if (ev != 0xFF) {
-        ipmi_event_send(sdr->sensornum, ev_type, &ev, 1);
+        ipmi_event_send(sensor, ev_type, &ev, 1);
     }
 }

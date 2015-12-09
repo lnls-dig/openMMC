@@ -255,7 +255,7 @@ void vTaskPayload(void *pvParmeters)
 
 	    evt_msg = HOTSWAP_QUIESCED_MASK >> 1;
 
-	    if ( ipmi_event_send(HOT_SWAP_SENSOR, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
+	    if ( ipmi_event_send(&sensor_array[HOT_SWAP_SENSOR], ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
                 QUIESCED_req = 0;
                 new_state = PAYLOAD_NO_POWER;
             }

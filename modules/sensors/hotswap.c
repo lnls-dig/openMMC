@@ -167,7 +167,7 @@ void vTaskHotSwap( void *Parameters )
 
         evt_msg = new_flag >> 1;
 
-        if ( ipmi_event_send(HOT_SWAP_SENSOR, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
+        if ( ipmi_event_send(hotswap_sensor, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
             /* Update the SDR */
             hotswap_sensor->readout_value = (hotswap_sensor->readout_value & 0xFC) | new_flag;
         } else {
@@ -187,7 +187,7 @@ void vTaskHotSwap( void *Parameters )
 
         evt_msg = new_state >> 1;
 
-        if ( ipmi_event_send(HOT_SWAP_SENSOR, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
+        if ( ipmi_event_send(hotswap_sensor, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
             /* Update the SDR */
             hotswap_sensor->readout_value = new_state;
             old_state = new_state;

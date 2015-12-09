@@ -72,7 +72,7 @@ void vTaskINA220( void *Parameters )
             ina220_sensor = ina220_data[i].sensor;
             data_ptr = &ina220_data[i];
 
-            switch ((GET_SENSOR_TYPE_NEW(ina220_sensor))) {
+            switch ((GET_SENSOR_TYPE(ina220_sensor))) {
             case SENSOR_TYPE_VOLTAGE:
                 ina220_sensor->readout_value = (data_ptr->regs[INA220_BUS_VOLTAGE] >> data_ptr->config->bus_voltage_shift)/16;
                 break;
@@ -88,10 +88,10 @@ void vTaskINA220( void *Parameters )
             /* Check for threshold events */
             check_sensor_event(ina220_sensor);
 
-            switch (GET_SENSOR_NUMBER_NEW(ina220_sensor)) {
+            switch (GET_SENSOR_NUMBER(ina220_sensor)) {
             case NUM_SDR_FMC2_12V:
-                /* Compare reading with sensor threshold levels */
-                if (ina220_sensor->state == SENSOR_STATE_NORMAL ) {
+                /* Check if the Payload power is in an acceptable zone */
+                if (ina220_sensor->state & (SENSOR_STATE_NORMAL | SENSOR_STATE_HIGH | SENSOR_STATE_LOW ) ) {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
                 } else {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
@@ -204,7 +204,7 @@ void ina220_init( void )
             ina220_config( ina220_data[i].i2c_id, &ina220_data[i] );
             ina220_calibrate( &ina220_data[i] );
 
-            if ((GET_SENSOR_TYPE_NEW(ina220_data[i].sensor)) == SENSOR_TYPE_CURRENT ) {
+            if ((GET_SENSOR_TYPE(ina220_data[i].sensor)) == SENSOR_TYPE_CURRENT ) {
                 ina220_data[i].sensor->signed_flag = 1;
             }
             i++;

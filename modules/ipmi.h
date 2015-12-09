@@ -23,6 +23,7 @@
 #define IPMI_H_
 
 #include "ipmb.h"
+#include "sdr.h"
 
 #define IPMI_MAX_DATA_LEN 24
 
@@ -300,7 +301,7 @@ typedef struct{
 void IPMITask ( void *pvParameters );
 void ipmi_init ( void );
 t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd);
-ipmb_error ipmi_event_send( uint8_t sensor_index, uint8_t assert_deassert, uint8_t *evData, uint8_t length);
+ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t *evData, uint8_t length);
 
 /* Handler functions */
 void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg *rsp );

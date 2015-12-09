@@ -222,13 +222,10 @@ extern sensor_t sensor_array[NUM_SDR];
 
 #define SDR_ARRAY_LENGTH (sizeof(sensor_array) / sizeof(sensor_array[0]))
 
-#define GET_SENSOR_TYPE(n)		((SDR_type_01h_t *)sensor_array[n].sdr)->sensortype
-#define GET_SENSOR_TYPE_NEW(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
+#define GET_SENSOR_TYPE(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
+#define GET_SENSOR_NUMBER(sensor)   ((SDR_type_01h_t *)sensor->sdr)->sensornum
 
-#define GET_SENSOR_NUMBER(n)		((SDR_type_01h_t *)sensor_array[n].sdr)->sensornum
-#define GET_SENSOR_NUMBER_NEW(sensor)   ((SDR_type_01h_t *)sensor->sdr)->sensornum
-
-#define GET_EVENT_TYPE_CODE(n)		((SDR_type_01h_t *)sensor_array[n].sdr)->event_reading_type
+#define GET_EVENT_TYPE_CODE(n)      ((SDR_type_01h_t *)sensor->sdr)->event_reading_type
 
 void ipmi_se_get_sdr( ipmi_msg *req, ipmi_msg* rsp );
 void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp );
