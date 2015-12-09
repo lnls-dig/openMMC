@@ -35,14 +35,14 @@
 #include "task_priorities.h"
 
 #define WATCHDOG_CLK_FREQ 8000000
-#define WATCHDOG_TIMEOUT WATCHDOG_CLK_FREQ*3 /* 3 seconds */
-#define WATCHDOG_FEED_DELAY (WATCHDOG_TIMEOUT/3)*2
+#define WATCHDOG_TIMEOUT 3 /* in seconds */
+#define WATCHDOG_FEED_DELAY (WATCHDOG_TIMEOUT/3)*2*1000
 
 void watchdog_init( void )
 {
     wdt_init();
     wdt_config();
-    wdt_set_timeout(WATCHDOG_TIMEOUT);
+    wdt_set_timeout(WATCHDOG_TIMEOUT*WATCHDOG_CLK_FREQ);
     xTaskCreate( WatchdogTask, (const char *) "Watchdog Task", configMINIMAL_STACK_SIZE, (void * ) NULL, tskWATCHDOG_PRIORITY, ( TaskHandle_t * ) NULL);
 }
 
