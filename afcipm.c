@@ -65,6 +65,7 @@ int main(void)
     {}
 #endif
 
+    watchdog_init();
     LED_init();
 
     fru_init();
