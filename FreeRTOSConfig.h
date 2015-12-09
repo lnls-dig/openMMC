@@ -77,6 +77,7 @@ licensing and training services.
 #define configAPPLICATION_ALLOCATED_HEAP        1
 #define USE_HEAP_4
 
+void vAssertCalled( char* file, uint32_t line);
 #define configASSERT( x )     if( ( x ) == 0 ) { vAssertCalled( __FILE__, __LINE__ );}
 
 #if (configGENERATE_RUN_TIME_STATS == 1)
