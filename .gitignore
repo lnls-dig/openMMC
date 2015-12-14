@@ -40,6 +40,8 @@ Debug/
 *.swp
 *.map
 *~
+*#*
+*.#*
 
 #Dependency files
 *.d
@@ -47,3 +49,10 @@ Debug/
 #Binaries
 *.axf
 *.bin
+
+#Cmake file
+CMakeFiles/
+*.dir/*
+Makefile
+*cmake_install.cmake
+CMakeCache.txt
