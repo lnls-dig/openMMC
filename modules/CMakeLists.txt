@@ -2,11 +2,15 @@ set(MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(PROJ_HDRS ${PROJ_HDRS} ${MODULE_PATH} )
 
+set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/board_version.c)
+set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/led.c)
+
 if (";${TARGET_MODULES};" MATCHES ";IPMI;")
   set(PROJ_SRCS ${PROJ_SRCS}
     ${MODULE_PATH}/i2c.c
     ${MODULE_PATH}/ipmb.c
     ${MODULE_PATH}/ipmi.c
+    ${MODULE_PATH}/ipmi_handlers.c
     )
 endif()
 
@@ -20,6 +24,7 @@ endif()
 
 if (";${TARGET_MODULES};" MATCHES ";SDR;")
   set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/sdr.c )
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/sdr_list.c )
 endif()
 
 if (";${TARGET_MODULES};" MATCHES ";JTAG_SWITCH;")
@@ -42,7 +47,7 @@ if (";${TARGET_MODULES};" MATCHES ";WATCHDOG;")
   set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/watchdog.c )
 endif()
 
-if (";${TARGET_MODULES};" MATCHES ";SENSOR;")
+if (";${TARGET_MODULES};" MATCHES "SENSOR")
   add_subdirectory(sensors)
 endif()
 
