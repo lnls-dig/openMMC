@@ -623,7 +623,6 @@ const SDR_type_01h_t SDR_FMC2_12V_CURR = {
     .lower_nonrecover_thr = -60, /* Lower non-recoverable Threshold */
     .lower_critical_thr = -50, /* Lower critical Threshold */
     .lower_noncritical_thr = 10, /* Lower non-critical Threshold */
-    .lower_noncritical_thr = 185, /* Lower non-critical Threshold */
     .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
