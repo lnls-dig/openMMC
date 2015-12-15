@@ -84,3 +84,21 @@ target_include_directories(${CMAKE_PROJECT_NAME}.axf PUBLIC ${PROJ_HDRS})
 target_link_libraries(${CMAKE_PROJECT_NAME}.axf gcc c m)
 target_link_libraries(${CMAKE_PROJECT_NAME}.axf FreeRTOS)
 target_link_libraries(${CMAKE_PROJECT_NAME}.axf lpcopen)
+
+##Program command
+set(LPCXPRESSO_PATH /usr/local/lpcxpresso_7.8.0_426/lpcxpresso/)
+
+find_program(DFU_UTIL dfu-util)
+find_program(NXP_PROG crt_emu_cm3_nxp PATHS ${LPCXPRESSO_PATH}/bin NO_DEFAULT_PATH)
+
+if(NOT DFU_UTIL)
+  message(WARNING "Dfu-util not found! Can't boot the LPCLink board!")
+elseif(NOT NXP_PROG)
+  message(WARNING "crt_emu_cm3_nxp not found! Can't program the LPC chip!")
+else()
+  add_custom_command(TARGET ${CMAKE_PROJECT_NAME}.axf POST_BUILD
+    COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${LPCXPRESSO_PATH}/bin/LPCXpressoWIN.enc
+    COMMAND ${NXP_PROG} -wire=winusb -pLPC1764 -flash-load-exec=${CMAKE_PROJECT_NAME}.axf
+    )
+endif()
+
