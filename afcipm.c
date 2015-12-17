@@ -40,6 +40,7 @@
 #include "fpga_spi.h"
 
 //#define HEAP_TEST
+//#define STOP_TEST
 
 /* LED pins initialization */
 static void prvHardwareInit( void );
@@ -58,32 +59,43 @@ int main(void)
 #if (configGENERATE_RUN_TIME_STATS == 1)
     vConfigureTimerForRunTimeStats();
 #endif
-//#define STOP_TEST
+
 #ifdef STOP_TEST
     int test = 0;
     while (test == 0)
     {}
 #endif
-
+#ifdef MODULE_WATCHDOG
     watchdog_init();
+#endif
+
     LED_init();
-
+#ifdef MODULE_FRU
     fru_init();
-    portENABLE_INTERRUPTS();
+#endif
 
+    portENABLE_INTERRUPTS();
     afc_board_i2c_init();
     afc_board_discover();
     portDISABLE_INTERRUPTS();
 
     ipmb_addr = get_ipmb_addr();
+#ifdef MODULE_SDR
     sdr_init(ipmb_addr);
+#endif
+#ifdef MODULE_SENSORS
     sensor_init();
+#endif
+#ifdef MODULE_PAYLOAD
     payload_init();
     do_quiesced_init();
-
+#endif
+#ifdef MODULE_JTAG_SWITCH
     init_scansta();
+#endif
+#ifdef MODULE_FPGA_SPI
     init_fpga_spi();
-
+#endif
     /*  Init IPMI interface */
     /* NOTE: ipmb_init() is called inside this function */
     ipmi_init();

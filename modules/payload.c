@@ -132,9 +132,11 @@ void payload_init( void )
 
     initializeDCDC();
 
+#ifdef MODULE_DAC_AD84XX
     dac_vadj_init();
     dac_vadj_config( 0, 25 );
     dac_vadj_config( 1, 25 );
+#endif
 
     if (afc_board_info.board_version == BOARD_VERSION_AFC_V3_1) {
         /* Flash CS Mux */
@@ -225,8 +227,10 @@ void vTaskPayload(void *pvParmeters)
             break;
 
         case PAYLOAD_STATE_FPGA_SETUP:
+#ifdef MODULE_CLOCK_SWITCH
             adn4604_setup();
-            new_state = PAYLOAD_FPGA_BOOTING;
+#endif
+	    new_state = PAYLOAD_FPGA_BOOTING;
             break;
 
         case PAYLOAD_FPGA_BOOTING:

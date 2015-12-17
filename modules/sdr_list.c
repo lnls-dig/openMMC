@@ -975,7 +975,7 @@ sensor_t sensor_array[NUM_SDR]  = {
 
     /* AMC Hotswap */
     { .type = TYPE_02, .sdr = (void *) &SDR_HOT_SWAP,  .sdr_length = sizeof(SDR_HOT_SWAP),  .task_handle = &vTaskHotSwap_Handle, .diag_devID = NO_DIAG },
-#ifdef RTM_PRESENT
+#ifdef MODULE_RTM
     { .type = TYPE_02, .sdr = (void *) &SDR_HOT_SWAP,  .sdr_length = sizeof(SDR_HOT_SWAP),  .task_handle = &vTaskHotSwap_Handle, .diag_devID = NO_DIAG },
 #endif
 
