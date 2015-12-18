@@ -43,7 +43,6 @@
 //#define STOP_TEST
 
 /* LED pins initialization */
-static void prvHardwareInit( void );
 TickType_t getTickDifference(TickType_t current_time, TickType_t start_time);
 void heap_test ( void* param);
 TaskHandle_t heap_handle;
@@ -54,8 +53,6 @@ int main(void)
     /* Update clock register value - LPC specific */
     SystemCoreClockUpdate();
 
-    /* Configure LED pins */
-    prvHardwareInit();
 #if (configGENERATE_RUN_TIME_STATS == 1)
     vConfigureTimerForRunTimeStats();
 #endif
@@ -142,50 +139,6 @@ void heap_test ( void* param)
 }
 #endif
 
-void prvToggleLED( LED_id led )
-{
-    unsigned long ulLEDState;
-    unsigned long ulLEDport;
-    unsigned long ulLEDpin;
-
-    switch( led ){
-    case LED_BLUE:
-        ulLEDport = LEDBLUE_PORT;
-        ulLEDpin = LEDBLUE_PIN;
-        break;
-
-    case LED_GREEN:
-        ulLEDport = LEDGREEN_PORT;
-        ulLEDpin = LEDGREEN_PIN;
-        break;
-
-    case LED_RED:
-        ulLEDport = LEDRED_PORT;
-        ulLEDpin = LEDRED_PIN;
-        break;
-
-    default:
-	break;
-    }
-    /* Obtain the current P0 state. */
-    ulLEDState = Chip_GPIO_GetPinState(LPC_GPIO, ulLEDport, ulLEDpin);
-
-    /* Turn the LED off if it was on, and on if it was off. */
-    Chip_GPIO_SetPinState(LPC_GPIO, ulLEDport, ulLEDpin, !ulLEDState);
-}
-/*-----------------------------------------------------------*/
-
-static void prvHardwareInit ( void )
-{
-    /* Init LED Pin */
-    Chip_GPIO_Init(LPC_GPIO);
-    /* Set pin as output */
-    Chip_GPIO_SetPinDIR(LPC_GPIO, LEDBLUE_PORT, LEDBLUE_PIN, true);
-    Chip_GPIO_SetPinDIR(LPC_GPIO, LEDGREEN_PORT, LEDGREEN_PIN, true);
-    Chip_GPIO_SetPinDIR(LPC_GPIO, LEDRED_PORT, LEDRED_PIN, true);
-    /* Init GAddr test pin as output */
-    Chip_GPIO_SetPinDIR(LPC_GPIO, GA_TEST_PORT, GA_TEST_PIN, true);
-}
 /*-----------------------------------------------------------*/
 /* FreeRTOS Debug Functions */
 
@@ -226,7 +179,6 @@ void vConfigureTimerForRunTimeStats( void )
 
 void vAssertCalled( char* file, uint32_t line) {
     taskDISABLE_INTERRUPTS();
-    prvToggleLED(LED_RED);
     for( ;; );
 }
 
