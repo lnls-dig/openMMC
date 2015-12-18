@@ -35,3 +35,11 @@ elseif(${TARGET_BOARD} MATCHES "(test)") # (?i) makes the regexp case insensitiv
     )
 endif()
 
+if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
+  add_definitions(-D__CODE_RED)
+  add_definitions(-DCORE_M3)
+  add_definitions(-D__USE_LPCOPEN)
+  add_definitions(-DNO_BOARD_LIB)
+  add_definitions(-D__NEWLIB__)
+  add_definitions(-D__LPC17XX__)
+endif()

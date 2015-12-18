@@ -63,17 +63,8 @@ set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_BUILD_FLAGS} ${CMAKE_ERROR
 set(CMAKE_C_FLAGS_DEBUG     "-O0 -g3 -DDEBUG")
 set(CMAKE_C_FLAGS_RELEASE   "-O3")
 
-set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/lpc1764.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/afcipm.map -Wl,-gc-sections --specs=nosys.specs -nostdlib -nostartfiles")
-
-if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
-  set(CMAKE_BUILD_FLAGS "${CMAKE_BUILD_FLAGS}")
-  add_definitions(-D__CODE_RED)
-  add_definitions(-DCORE_M3)
-  add_definitions(-D__USE_LPCOPEN)
-  add_definitions(-DNO_BOARD_LIB)
-  add_definitions(-D__NEWLIB__)
-  add_definitions(-D__LPC17XX__)
-endif()
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${CMAKE_SOURCE_DIR}/linker/lpc1764.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/afcipm.map")
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 # When we break up long strings in CMake we get semicolon
 # separated lists, undo this here...
