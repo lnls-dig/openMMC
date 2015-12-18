@@ -4,10 +4,29 @@ cmake_minimum_required(VERSION 2.8.7)
 # Project definition
 project(afcipm C CXX ASM)
 
+if(NOT WIN32)
+  string(ASCII 27 Esc)
+  set(ColourReset "${Esc}[m")
+  set(ColourBold  "${Esc}[1m")
+  set(Red         "${Esc}[31m")
+  set(Green       "${Esc}[32m")
+  set(Yellow      "${Esc}[33m")
+  set(Blue        "${Esc}[34m")
+  set(Magenta     "${Esc}[35m")
+  set(Cyan        "${Esc}[36m")
+  set(White       "${Esc}[37m")
+  set(BoldRed     "${Esc}[1;31m")
+  set(BoldGreen   "${Esc}[1;32m")
+  set(BoldYellow  "${Esc}[1;33m")
+  set(BoldBlue    "${Esc}[1;34m")
+  set(BoldMagenta "${Esc}[1;35m")
+  set(BoldCyan    "${Esc}[1;36m")
+  set(BoldWhite   "${Esc}[1;37m")
+endif()
+
 ##
 # CMake environment settings
 #
-
 if(NOT CMAKE_TOOLCHAIN_FILE)
   message(WARNING "${ColourBold}${Red}No toolchain configuration file specified. Using default option!${ColourReset}")
 
@@ -19,7 +38,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build_cfg")
 
 # Include user configuration
 include(${CMAKE_MODULE_PATH}/config.cmake)
-
 
 set(CMAKE_COLOR_MAKEFILE ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -94,10 +112,11 @@ find_program(DFU_UTIL dfu-util)
 find_program(NXP_PROG crt_emu_cm3_nxp PATHS ${LPCXPRESSO_PATH}/bin NO_DEFAULT_PATH)
 
 if(NOT DFU_UTIL)
-  message(WARNING "Dfu-util not found! Can't boot the LPCLink board!")
+  message(WARNING "${ColourBold}${Red}Dfu-util not found! Can't boot the LPCLink board!${ColourReset}")
 elseif(NOT NXP_PROG)
-  message(WARNING "crt_emu_cm3_nxp not found! Can't program the LPC chip!")
+  message(WARNING "${ColourBold}${Red}crt_emu_cm3_nxp not found! Can't program the LPC chip!${ColourReset}")
 else()
+
   add_custom_command(TARGET ${CMAKE_PROJECT_NAME}.axf POST_BUILD
     COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${LPCXPRESSO_PATH}/bin/LPCXpressoWIN.enc
     COMMAND ${NXP_PROG} -wire=winusb -pLPC1764 -flash-load-exec=${CMAKE_PROJECT_NAME}.axf
