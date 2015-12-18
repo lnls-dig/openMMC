@@ -95,8 +95,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 #Link libraries
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/port)
+link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 ## Create executable
 add_executable(${CMAKE_PROJECT_NAME}.axf ${PROJ_SRCS})
