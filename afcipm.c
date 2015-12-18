@@ -38,6 +38,7 @@
 #include "fru.h"
 #include "jtag.h"
 #include "fpga_spi.h"
+#include "watchdog.h"
 
 //#define HEAP_TEST
 //#define STOP_TEST
