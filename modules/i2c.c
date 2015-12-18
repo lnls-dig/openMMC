@@ -109,7 +109,8 @@ uint8_t get_ipmb_addr( void )
     uint8_t index;
 
     /* Set the test pin and read all GA pins */
-    Chip_GPIO_SetPinState(LPC_GPIO, GA_TEST_PORT, GA_TEST_PIN, 1);
+    gpio_set_pin_dir(GA_TEST_PORT, GA_TEST_PIN, OUTPUT);
+    gpio_set_pin_state(GA_TEST_PORT, GA_TEST_PIN, HIGH);
 
     /* when using NAMC-EXT-RTM at least 11 instruction cycles required
      *  to have correct GA value after GA_TEST_PIN changes */
@@ -120,13 +121,13 @@ uint8_t get_ipmb_addr( void )
         }
     }
 
-    ga0 = Chip_GPIO_GetPinState(LPC_GPIO, GA0_PORT, GA0_PIN);
-    ga1 = Chip_GPIO_GetPinState(LPC_GPIO, GA1_PORT, GA1_PIN);
-    ga2 = Chip_GPIO_GetPinState(LPC_GPIO, GA2_PORT, GA2_PIN);
+    ga0 = gpio_read_pin(GA0_PORT, GA0_PIN);
+    ga1 = gpio_read_pin(GA1_PORT, GA1_PIN);
+    ga2 = gpio_read_pin(GA2_PORT, GA2_PIN);
 
     /* Clear the test pin and see if any GA pin has changed is value,
      * meaning that it is unconnected */
-    Chip_GPIO_SetPinState(LPC_GPIO, GA_TEST_PORT, GA_TEST_PIN, 0);
+    gpio_set_pin_state(GA_TEST_PORT, GA_TEST_PIN, LOW);
 
     /* when using NAMC-EXT-RTM at least 11 instruction cycles required
      *  to have correct GA value after GA_TEST_PIN changes */
@@ -137,15 +138,15 @@ uint8_t get_ipmb_addr( void )
     }
 
 
-    if ( ga0 != Chip_GPIO_GetPinState(LPC_GPIO, GA0_PORT, GA0_PIN) ){
+    if ( ga0 != gpio_read_pin(GA0_PORT, GA0_PIN) ){
         ga0 = UNCONNECTED;
     }
 
-    if ( ga1 != Chip_GPIO_GetPinState(LPC_GPIO, GA1_PORT, GA1_PIN) ){
+    if ( ga1 != gpio_read_pin(GA1_PORT, GA1_PIN) ){
         ga1 = UNCONNECTED;
     }
 
-    if ( ga2 != Chip_GPIO_GetPinState(LPC_GPIO, GA2_PORT, GA2_PIN) ){
+    if ( ga2 != gpio_read_pin(GA2_PORT, GA2_PIN) ){
         ga2 = UNCONNECTED;
     }
 
