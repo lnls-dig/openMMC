@@ -9,10 +9,13 @@ project(afcipm C CXX ASM)
 #
 
 if(NOT CMAKE_TOOLCHAIN_FILE)
-  message(FATAL_ERROR "No toolchain configuration file specified.")
+  message(WARNING "${ColourBold}${Red}No toolchain configuration file specified. Using default option!${ColourReset}")
+
+  include(build_cfg/toolchain/toolchain-arm-none-eabi.cmake)
+
 endif()
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build_cfg")
 
 # Include user configuration
 include(${CMAKE_MODULE_PATH}/config.cmake)
@@ -69,10 +72,9 @@ set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/afcipm.c)
 add_subdirectory(FreeRTOS)
 add_subdirectory(port)
 add_subdirectory(modules)
-
-#if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-#  add_subdirectory(trace)
-#endif()
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_subdirectory(trace)
+endif()
 
 #Link libraries
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS)
