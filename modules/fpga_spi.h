@@ -1,6 +1,9 @@
 #ifndef FPGA_SPI_H_
 #define FPGA_SPI_H_
 
+#include "sdr.h"
+#include "utils.h"
+
 #define FPGA_UPDATE_RATE        5000    // in ms
 #define FPGA_MEM_ADDR_MAX       0xFF
 
@@ -57,7 +60,6 @@ typedef struct __attribute__ ((__packed__)) {
 #endif
 } t_fmc_diag;
 
-#include "sdr.h"
 /* AFC diagnostic struct sent to FPGA via SPI */
 typedef struct __attribute__ ((__packed__)) {
     uint32_t cardID[4];
@@ -73,7 +75,6 @@ typedef union {
     uint32_t buffer[sizeof(board_diagnostic)/sizeof(uint32_t)];
 } t_board_diagnostic;
 
-uint8_t cmpBuffs(uint32_t *buf_a, uint32_t len_a, uint32_t *bufb, uint32_t len_b);
 void vTaskFPGA_COMM( void * Parameters );
 void init_fpga_spi( void );
 

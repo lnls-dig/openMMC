@@ -38,12 +38,12 @@
 #include "fru.h"
 #include "jtag.h"
 #include "fpga_spi.h"
+#include "watchdog.h"
 
 //#define HEAP_TEST
+//#define STOP_TEST
 
 /* LED pins initialization */
-static void prvHardwareInit( void );
-TickType_t getTickDifference(TickType_t current_time, TickType_t start_time);
 void heap_test ( void* param);
 TaskHandle_t heap_handle;
 /*-----------------------------------------------------------*/
@@ -53,37 +53,45 @@ int main(void)
     /* Update clock register value - LPC specific */
     SystemCoreClockUpdate();
 
-    /* Configure LED pins */
-    prvHardwareInit();
 #if (configGENERATE_RUN_TIME_STATS == 1)
     vConfigureTimerForRunTimeStats();
 #endif
-//#define STOP_TEST
+
 #ifdef STOP_TEST
     int test = 0;
     while (test == 0)
     {}
 #endif
-
+#ifdef MODULE_WATCHDOG
     watchdog_init();
+#endif
+
     LED_init();
-
+#ifdef MODULE_FRU
     fru_init();
-    portENABLE_INTERRUPTS();
+#endif
 
+    portENABLE_INTERRUPTS();
     afc_board_i2c_init();
     afc_board_discover();
     portDISABLE_INTERRUPTS();
 
     ipmb_addr = get_ipmb_addr();
+#ifdef MODULE_SDR
     sdr_init(ipmb_addr);
+#endif
+#ifdef MODULE_SENSORS
     sensor_init();
+#endif
+#ifdef MODULE_PAYLOAD
     payload_init();
-    do_quiesced_init();
-
+#endif
+#ifdef MODULE_JTAG_SWITCH
     init_scansta();
+#endif
+#ifdef MODULE_FPGA_SPI
     init_fpga_spi();
-
+#endif
     /*  Init IPMI interface */
     /* NOTE: ipmb_init() is called inside this function */
     ipmi_init();
@@ -100,19 +108,6 @@ int main(void)
 
 }
 /*-----------------------------------------------------------*/
-
-TickType_t getTickDifference(TickType_t current_time, TickType_t start_time)
-{
-    TickType_t result = 0;
-    if (current_time < start_time) {
-        result = start_time - current_time;
-        result = portMAX_DELAY - result;
-    } else {
-        result = current_time - start_time;
-    }
-    return result;
-}
-
 #ifdef HEAP_TEST
 static char stats[500];
 void heap_test ( void* param)
@@ -130,50 +125,6 @@ void heap_test ( void* param)
 }
 #endif
 
-void prvToggleLED( LED_id led )
-{
-    unsigned long ulLEDState;
-    unsigned long ulLEDport;
-    unsigned long ulLEDpin;
-
-    switch( led ){
-    case LED_BLUE:
-        ulLEDport = LEDBLUE_PORT;
-        ulLEDpin = LEDBLUE_PIN;
-        break;
-
-    case LED_GREEN:
-        ulLEDport = LEDGREEN_PORT;
-        ulLEDpin = LEDGREEN_PIN;
-        break;
-
-    case LED_RED:
-        ulLEDport = LEDRED_PORT;
-        ulLEDpin = LEDRED_PIN;
-        break;
-
-    default:
-	break;
-    }
-    /* Obtain the current P0 state. */
-    ulLEDState = Chip_GPIO_GetPinState(LPC_GPIO, ulLEDport, ulLEDpin);
-
-    /* Turn the LED off if it was on, and on if it was off. */
-    Chip_GPIO_SetPinState(LPC_GPIO, ulLEDport, ulLEDpin, !ulLEDState);
-}
-/*-----------------------------------------------------------*/
-
-static void prvHardwareInit ( void )
-{
-    /* Init LED Pin */
-    Chip_GPIO_Init(LPC_GPIO);
-    /* Set pin as output */
-    Chip_GPIO_SetPinDIR(LPC_GPIO, LEDBLUE_PORT, LEDBLUE_PIN, true);
-    Chip_GPIO_SetPinDIR(LPC_GPIO, LEDGREEN_PORT, LEDGREEN_PIN, true);
-    Chip_GPIO_SetPinDIR(LPC_GPIO, LEDRED_PORT, LEDRED_PIN, true);
-    /* Init GAddr test pin as output */
-    Chip_GPIO_SetPinDIR(LPC_GPIO, GA_TEST_PORT, GA_TEST_PIN, true);
-}
 /*-----------------------------------------------------------*/
 /* FreeRTOS Debug Functions */
 
@@ -214,7 +165,6 @@ void vConfigureTimerForRunTimeStats( void )
 
 void vAssertCalled( char* file, uint32_t line) {
     taskDISABLE_INTERRUPTS();
-    prvToggleLED(LED_RED);
     for( ;; );
 }
 
@@ -227,4 +177,3 @@ void vApplicationMallocFailedHook( void ) {
 void vApplicationIdleHook (void) {
 
 }
-

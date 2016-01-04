@@ -37,6 +37,7 @@
 #define LOW 0
 #define HIGH 1
 
+#define gpio_init()                            Chip_GPIO_Init( LPC_GPIO )
 #define gpio_read_pin( port, pin )             Chip_GPIO_GetPinState( LPC_GPIO, port, pin )
 #define gpio_read_port( port )                 Chip_GPIO_GetPortValue( LPC_GPIO, port )
 #define gpio_set_pin( port, pin )              Chip_GPIO_SetPinOutHigh( LPC_GPIO, port, pin )

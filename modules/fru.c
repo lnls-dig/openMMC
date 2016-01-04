@@ -7,7 +7,7 @@
 #include <string.h>
 
 #include "FreeRTOS.h"
-#include "ipmi.h"
+#include "utils.h"
 #include "fru.h"
 #include "user_fru.h"
 
@@ -33,7 +33,7 @@ void fru_header_build( uint8_t * fru_buffer )
 #ifdef MULTIRECORD_AREA_ENABLE
     hdr->multirecord_offset = MULTIRECORD_AREA_OFFSET/8;
 #endif
-    hdr->checksum = ipmb_calculate_chksum((uint8_t *) hdr, sizeof(t_fru_common_header));
+    hdr->checksum = calculate_chksum((uint8_t *) hdr, sizeof(t_fru_common_header));
 }
 
 void board_info_area_build( uint8_t * fru_buffer )
@@ -94,7 +94,7 @@ void board_info_area_build( uint8_t * fru_buffer )
     board_info->end_of_record = 0xC1;
 
     /* Checksum */
-    board_ptr->checksum = ipmb_calculate_chksum((uint8_t *)board_info, BOARD_INFO_AREA_SIZE);
+    board_ptr->checksum = calculate_chksum((uint8_t *)board_info, BOARD_INFO_AREA_SIZE);
 #endif
 }
 
@@ -164,7 +164,7 @@ void product_info_area_build( uint8_t * fru_buffer )
 
     product_info->end_of_record = 0xC1;
 
-    product_ptr->checksum = ipmb_calculate_chksum((uint8_t *)product_info, PRODUCT_INFO_AREA_SIZE);
+    product_ptr->checksum = calculate_chksum((uint8_t *)product_info, PRODUCT_INFO_AREA_SIZE);
 #endif
 }
 
@@ -189,9 +189,9 @@ void module_current_record_build( uint8_t * fru_buffer )
     /* Checksums */
 
     /* Record Checksum */
-    module_current_record->hdr.record_cksum = ipmb_calculate_chksum( ((uint8_t *)module_current_record)+sizeof(t_multirecord_area_header), module_current_record->hdr.record_len);
+    module_current_record->hdr.record_cksum = calculate_chksum( ((uint8_t *)module_current_record)+sizeof(t_multirecord_area_header), module_current_record->hdr.record_len);
     /* Header Checksum */
-    module_current_record->hdr.header_cksum = ipmb_calculate_chksum( (uint8_t *)&(module_current_record->hdr), sizeof(t_multirecord_area_header));
+    module_current_record->hdr.header_cksum = calculate_chksum( (uint8_t *)&(module_current_record->hdr), sizeof(t_multirecord_area_header));
 #endif
 }
 
@@ -227,8 +227,8 @@ void amc_point_to_point_record_build( uint8_t * fru_buffer )
 
     AMC_POINT_TO_POINT_RECORD_LIST;
 
-    p2p_record->hdr.record_cksum = ipmb_calculate_chksum( ((uint8_t *)p2p_record)+sizeof(t_multirecord_area_header), p2p_record->hdr.record_len); //record checksum
-    p2p_record->hdr.header_cksum = ipmb_calculate_chksum( (uint8_t *)&(p2p_record->hdr), sizeof(t_multirecord_area_header)); //Header checksum
+    p2p_record->hdr.record_cksum = calculate_chksum( ((uint8_t *)p2p_record)+sizeof(t_multirecord_area_header), p2p_record->hdr.record_len); //record checksum
+    p2p_record->hdr.header_cksum = calculate_chksum( (uint8_t *)&(p2p_record->hdr), sizeof(t_multirecord_area_header)); //Header checksum
 
 #endif
 }
@@ -257,8 +257,8 @@ void point_to_point_clock_build( uint8_t * fru_buffer )
 
     memcpy(clock_cfg->descriptor, &clock_descriptor_list, sizeof(clock_cfg->descriptor));
 
-    clock_cfg->hdr.record_cksum = ipmb_calculate_chksum( ((uint8_t *)clock_cfg)+sizeof(t_multirecord_area_header), clock_cfg->hdr.record_len );
-    clock_cfg->hdr.header_cksum = ipmb_calculate_chksum( (uint8_t *)&(clock_cfg->hdr), sizeof(t_multirecord_area_header) );
+    clock_cfg->hdr.record_cksum = calculate_chksum( ((uint8_t *)clock_cfg)+sizeof(t_multirecord_area_header), clock_cfg->hdr.record_len );
+    clock_cfg->hdr.header_cksum = calculate_chksum( (uint8_t *)&(clock_cfg->hdr), sizeof(t_multirecord_area_header) );
 #endif
 }
 

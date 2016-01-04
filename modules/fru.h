@@ -8,6 +8,7 @@
 #include "FreeRTOS.h"
 #include "string.h"
 #include "user_fru.h"
+#include "ipmi.h"
 
 #define MAX_FRU_SIZE            2048
 
@@ -581,7 +582,6 @@ void point_to_point_clock_build( uint8_t * fru_buffer );
 void module_current_record_build( uint8_t * fru_buffer );
 
 /* IPMI Handlers */
-#include "ipmi.h"
 void fru_read_to_buffer(char *buff, uint8_t offset, uint8_t length);
 void fru_read_common_header(t_fru_common_header * header);
 void ipmi_storage_get_fru_info ( ipmi_msg * req, ipmi_msg * rsp);

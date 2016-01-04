@@ -623,7 +623,6 @@ const SDR_type_01h_t SDR_FMC2_12V_CURR = {
     .lower_nonrecover_thr = -60, /* Lower non-recoverable Threshold */
     .lower_critical_thr = -50, /* Lower critical Threshold */
     .lower_noncritical_thr = 10, /* Lower non-critical Threshold */
-    .lower_noncritical_thr = 185, /* Lower non-critical Threshold */
     .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
@@ -976,7 +975,7 @@ sensor_t sensor_array[NUM_SDR]  = {
 
     /* AMC Hotswap */
     { .type = TYPE_02, .sdr = (void *) &SDR_HOT_SWAP,  .sdr_length = sizeof(SDR_HOT_SWAP),  .task_handle = &vTaskHotSwap_Handle, .diag_devID = NO_DIAG },
-#ifdef RTM_PRESENT
+#ifdef MODULE_RTM
     { .type = TYPE_02, .sdr = (void *) &SDR_HOT_SWAP,  .sdr_length = sizeof(SDR_HOT_SWAP),  .task_handle = &vTaskHotSwap_Handle, .diag_devID = NO_DIAG },
 #endif
 

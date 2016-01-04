@@ -180,6 +180,14 @@ void LEDTask( void * Parameters )
 
 void LED_init(void)
 {
+    /* Init LED Pin */
+    gpio_init();
+
+    /* Set pins as output */
+    gpio_set_pin_dir( LEDBLUE_PORT, LEDBLUE_PIN, OUTPUT);
+    gpio_set_pin_dir( LEDGREEN_PORT, LEDGREEN_PIN, OUTPUT);
+    gpio_set_pin_dir( LEDRED_PORT, LEDRED_PIN, OUTPUT);
+
     LED_state_rec_t* pLED;
     for (int i = 0; i<LED_CNT; i++){
 	pLED = &LEDstate[i];
