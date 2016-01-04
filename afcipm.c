@@ -85,7 +85,6 @@ int main(void)
 #endif
 #ifdef MODULE_PAYLOAD
     payload_init();
-    do_quiesced_init();
 #endif
 #ifdef MODULE_JTAG_SWITCH
     init_scansta();

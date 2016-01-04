@@ -135,7 +135,7 @@ manufacturing_info_raw afc_board_info = {0};
 
 void afc_board_i2c_init( void )
 {
-    int i;
+    uint8_t i;
     for (i=0; i<I2C_MUX_COUNT; i++) {
         i2c_mux[i].semaphore = xSemaphoreCreateBinary();
         vI2CInit(i2c_mux[i].i2c_interface, SPEED_100KHZ, I2C_Mode_Local_Master);

@@ -36,7 +36,6 @@
 #include "task_priorities.h"
 #include "fpga_spi.h"
 
-
 size_t sdr_get_size_by_type(SDR_TYPE type)
 {
     switch (type) {
@@ -51,7 +50,7 @@ size_t sdr_get_size_by_type(SDR_TYPE type)
     }
 }
 
-size_t sdr_get_size_by_entry(int id)
+size_t sdr_get_size_by_entry(uint8_t id)
 {
     if (id >= SDR_ARRAY_LENGTH) {
         return 0;
@@ -67,22 +66,6 @@ void sensor_init( void )
 }
 
 static uint16_t reservationID;
-
-SemaphoreHandle_t semaphore_fru_control;
-
-uint8_t payload_ctrl_code;
-
-void do_quiesced_init()
-{
-    payload_ctrl_code = 0;
-    semaphore_fru_control = xSemaphoreCreateBinary();
-}
-
-void do_quiesced(unsigned char ctlcode)
-{
-    payload_ctrl_code = ctlcode;
-    xSemaphoreGive(semaphore_fru_control);
-}
 
 void sdr_init(uint8_t ipmiID)
 {

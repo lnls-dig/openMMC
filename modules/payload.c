@@ -67,7 +67,8 @@
  * 255 - power fail
  */
 
-void setDC_DC_ConvertersON(bool on) {
+void setDC_DC_ConvertersON( bool on )
+{
     bool _on = on;
 
     /* @todo: check vadj relationship */
@@ -90,7 +91,8 @@ void setDC_DC_ConvertersON(bool on) {
     gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, _on);
 }
 
-void initializeDCDC() {
+void initializeDCDC( void )
+{
     setDC_DC_ConvertersON(false);
     gpio_set_pin_dir( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, OUTPUT);
