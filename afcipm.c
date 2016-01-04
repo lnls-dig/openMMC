@@ -44,7 +44,6 @@
 //#define STOP_TEST
 
 /* LED pins initialization */
-TickType_t getTickDifference(TickType_t current_time, TickType_t start_time);
 void heap_test ( void* param);
 TaskHandle_t heap_handle;
 /*-----------------------------------------------------------*/
@@ -110,19 +109,6 @@ int main(void)
 
 }
 /*-----------------------------------------------------------*/
-
-TickType_t getTickDifference(TickType_t current_time, TickType_t start_time)
-{
-    TickType_t result = 0;
-    if (current_time < start_time) {
-        result = start_time - current_time;
-        result = portMAX_DELAY - result;
-    } else {
-        result = current_time - start_time;
-    }
-    return result;
-}
-
 #ifdef HEAP_TEST
 static char stats[500];
 void heap_test ( void* param)
@@ -192,4 +178,3 @@ void vApplicationMallocFailedHook( void ) {
 void vApplicationIdleHook (void) {
 
 }
-

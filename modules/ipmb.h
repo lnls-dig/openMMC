@@ -201,6 +201,5 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp );
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue );
 
 ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len );
-uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range );
 
 #endif

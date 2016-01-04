@@ -181,25 +181,5 @@ void vTaskFPGA_COMM( void * Parameters )
 
 void init_fpga_spi( void )
 {
-
     xTaskCreate(vTaskFPGA_COMM, "FPGA_COMM", 450, NULL, tskFPGA_COMM_PRIORITY, (TaskHandle_t *) NULL);
-}
-
-/* Compare two buffers' size and data
- * Returns 0 if equal, 0xFF if different */
-uint8_t cmpBuffs( uint32_t *bufa, uint32_t len_a, uint32_t *bufb, uint32_t len_b )
-{
-    uint16_t i;
-    if (len_a != len_b) {
-        return 0xFF;
-    }
-
-    for( i = 0; i<len_a; i++ ) {
-        if( *bufa != *bufb ) {
-            return (0xFF);
-        }
-        bufa++;
-        bufb++;
-    }
-    return (0);
 }

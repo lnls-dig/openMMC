@@ -29,6 +29,7 @@
 #include "string.h"
 
 /* Project includes */
+#include "utils.h"
 #include "i2c.h"
 #include "ipmb.h"
 #include "ipmi.h"
@@ -279,25 +280,6 @@ ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
     }
 }
 
-/*! @brief Calculate the IPMB message checksum byte.
- * The cheksum byte is calculated by perfoming a simple 8bit 2's complement of the sum of all previous bytes.
- * Since we're using a unsigned int to hold the checksum value, we only need to subtract all bytes from it.
- * @param buffer Pointer to the message bytes.
- * @param range How many bytes will be used in the calculation.
- *
- * @return Checksum of the specified bytes of the buffer.
- */
-uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range )
-{
-    configASSERT( buffer != NULL );
-    uint8_t chksum = 0;
-    uint8_t i;
-    for ( i = 0; i < range; i++ ) {
-        chksum -= buffer[i];
-    }
-    return chksum;
-}
-
 /*! @brief Asserts the input message checksums by comparing them with our calculated ones.
  *
  * @param buffer Pointer to the message bytes.
@@ -313,8 +295,8 @@ ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
 
     uint8_t header_chksum = buffer[2];
     uint8_t msg_chksum = buffer[buffer_len-1];
-    uint8_t calc_header_chksum = ipmb_calculate_chksum( buffer, IPMI_HEADER_CHECKSUM_POSITION );
-    uint8_t calc_msg_chksum = ipmb_calculate_chksum( buffer, buffer_len-1 );
+    uint8_t calc_header_chksum = calculate_chksum( buffer, IPMI_HEADER_CHECKSUM_POSITION );
+    uint8_t calc_msg_chksum = calculate_chksum( buffer, buffer_len-1 );
     if ( header_chksum == calc_header_chksum ) {
         if ( msg_chksum == calc_msg_chksum ) {
             return ipmb_error_success;
@@ -364,7 +346,7 @@ ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
 
     buffer[i++] = msg->dest_addr;
     buffer[i++] = ( ( ( msg->netfn << 2 ) & IPMB_NETFN_MASK ) | ( msg->dest_LUN & IPMB_DEST_LUN_MASK ) );
-    buffer[i++] = ipmb_calculate_chksum( &buffer[0], IPMI_HEADER_CHECKSUM_POSITION );
+    buffer[i++] = calculate_chksum( &buffer[0], IPMI_HEADER_CHECKSUM_POSITION );
     buffer[i++] = msg->src_addr;
     buffer[i++] = ( ( ( msg->seq << 2 ) & IPMB_SEQ_MASK ) | ( msg->src_LUN & IPMB_SRC_LUN_MASK ) );
     buffer[i++] = msg->cmd;
@@ -373,7 +355,7 @@ ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
     }
     memcpy (&buffer[i], &msg->data[0], msg->data_len);
     i += msg->data_len;
-    buffer[i] = ipmb_calculate_chksum( &buffer[0], i );
+    buffer[i] = calculate_chksum( &buffer[0], i );
 
     return ipmb_error_success;
 }

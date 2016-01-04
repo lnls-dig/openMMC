@@ -22,6 +22,7 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
+#include "utils.h"
 #include "board_version.h"
 #include "port.h"
 #include "ipmb.h"
@@ -171,7 +172,7 @@ void afc_board_discover( void )
 	Checksum (1-byte) */
 
     uint8_t ee_write[9] = { 0xF0, 0x01, 0x03, 0x00, 0x9A, 0x65, 0x1B, 0x1C, 0x00 };
-    ee_write[8] = ipmb_calculate_chksum(&ee_write[1], 8);
+    ee_write[8] = calculate_chksum(&ee_write[1], 8);
 
     /* Unlock protected EEPROM */
     unlock[1] = 0x55;
@@ -188,7 +189,7 @@ void afc_board_discover( void )
 
     portDISABLE_INTERRUPTS();
 
-    uint8_t crc_fail = ipmb_calculate_chksum((uint8_t *) &afc_board_info, 8 );
+    uint8_t crc_fail = calculate_chksum((uint8_t *) &afc_board_info, 8 );
 
     if (crc_fail == 0) {
         if ( ( afc_board_info.carrier_type == CARRIER_TYPE_AFC && afc_board_info.board_version == 0x00 ) ||

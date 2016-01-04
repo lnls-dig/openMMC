@@ -2,6 +2,7 @@ set(MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(PROJ_HDRS ${PROJ_HDRS} ${MODULE_PATH} )
 
+set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/utils.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/board_version.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/led.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/i2c.c ${MODULE_PATH}/ipmb.c ${MODULE_PATH}/ipmi.c ${MODULE_PATH}/ipmi_handlers.c)
