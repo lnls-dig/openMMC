@@ -107,8 +107,11 @@ elseif(NOT NXP_PROG)
   message(WARNING "${ColourBold}${Red}crt_emu_cm3_nxp not found! Can't program the LPC chip!${ColourReset}")
 else()
 
-  add_custom_command(TARGET ${CMAKE_PROJECT_NAME}.axf POST_BUILD
+  execute_process(
     COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${LPCXPRESSO_PATH}/bin/LPCXpressoWIN.enc
-    COMMAND ${NXP_PROG} -wire=winusb -pLPC1764 -flash-load-exec=${CMAKE_PROJECT_NAME}.axf
+    ERROR_QUIET
+    )
+  add_custom_command(TARGET ${CMAKE_PROJECT_NAME}.axf POST_BUILD
+    COMMAND ${NXP_PROG} -wire=winusb -pLPC1764 -flash-load-exec=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.axf
     )
 endif()
