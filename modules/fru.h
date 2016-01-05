@@ -584,7 +584,4 @@ void module_current_record_build( uint8_t * fru_buffer );
 /* IPMI Handlers */
 void fru_read_to_buffer(char *buff, uint8_t offset, uint8_t length);
 void fru_read_common_header(t_fru_common_header * header);
-void ipmi_storage_get_fru_info ( ipmi_msg * req, ipmi_msg * rsp);
-void ipmi_storage_read_fru_data_cmd ( ipmi_msg * req, ipmi_msg * rsp);
-
 #endif

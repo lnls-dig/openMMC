@@ -28,13 +28,14 @@
 #include "pin_mapping.h"
 #include "led.h"
 #include "task_priorities.h"
-#include "led.h"
 #include "sdr.h"
+#include "payload.h"
 
 /* Local variables */
 QueueHandle_t ipmi_rxqueue = NULL;
 
-extern t_req_handler_record handlers[MAX_HANDLERS];
+volatile const t_req_handler_record *ipmiEntries = &_ipmi_handlers;
+volatile const t_req_handler_record *ipmiEntries_end = &_eipmi_handlers;
 
 void IPMITask( void * pvParameters )
 {
@@ -113,13 +114,13 @@ void ipmi_init ( void )
  */
 t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd)
 {
-    uint8_t cur_handler;
     t_req_handler handler = 0;
+    t_req_handler_record * p_ptr = (t_req_handler_record *) ipmiEntries;
 
-    for(cur_handler = 0; cur_handler < MAX_HANDLERS; cur_handler++) {
-        if( (handlers[cur_handler].netfn == netfn) &&   \
-            (handlers[cur_handler].cmd == cmd)) {
-            handler = handlers[cur_handler].req_handler;
+    while (p_ptr < ipmiEntries_end) {
+        if( (p_ptr->netfn == netfn) &&   \
+            (p_ptr->cmd == cmd)) {
+            handler = p_ptr->req_handler;
             break;
         }
     }
@@ -160,7 +161,7 @@ ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t 
  *
  * @return
  */
-void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp )
+IPMI_HANDLER(ipmi_get_device_id,  NETFN_APP, IPMI_GET_DEVICE_ID_CMD, ipmi_msg *req, ipmi_msg* rsp)
 {
     int len = rsp->data_len = 0;
 
@@ -194,7 +195,7 @@ void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp )
  *
  * @return ipmi_msg Message with data, data length and completion code.
  */
-void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp )
+IPMI_HANDLER(ipmi_picmg_get_PROPERTIES, NETFN_GRPEXT,IPMI_PICMG_CMD_GET_PROPERTIES, ipmi_msg *req, ipmi_msg *rsp )
 {
     int len = rsp->data_len = 0;
     rsp->completion_code = IPMI_CC_OK;
@@ -220,7 +221,7 @@ void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp )
  * @return void
  */
 #include "led.h"
-void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
+IPMI_HANDLER(ipmi_picmg_set_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_LED_STATE, ipmi_msg *req, ipmi_msg *rsp )
 {
     led_error error;
     const LED_activity_desc_t * pLEDact;
@@ -284,14 +285,13 @@ void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
 
-void ipmi_picmg_set_amc_port( ipmi_msg *req, ipmi_msg *rsp)
+IPMI_HANDLER(ipmi_picmg_cmd_set_amc_port_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_AMC_PORT_STATE, ipmi_msg *req, ipmi_msg *rsp)
 {
     rsp->completion_code = IPMI_CC_OK;
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
 
-#include "payload.h"
-void ipmi_picmg_fru_control( ipmi_msg *req, ipmi_msg *rsp)
+IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL, ipmi_msg *req, ipmi_msg *rsp)
 {
     payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
     rsp->completion_code = IPMI_CC_OK;

@@ -73,6 +73,13 @@ SECTIONS
 
     _etext = .;
 
+    .ipmi_handlers : ALIGN(4)
+    {
+    	_ipmi_handlers = .;
+    	KEEP(*(.ipmi_handlers))
+    	_eipmi_handlers = .;
+    } > MFlash128
+
     /* DATA section for RamAHB16 */
     .data_RAM2 : ALIGN(4)
     {
