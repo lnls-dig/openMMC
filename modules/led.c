@@ -235,3 +235,77 @@ led_error LED_update( uint8_t led_num, const LED_activity_desc_t * pLEDact )
     }
     return led_success;
 }
+
+/*!
+ * @brief Handler for "Set FRU LED State"" request. Check IPMI 2.0
+ * table 3-31 for more information.
+ *
+ * @param[in] req Pointer to request struct to be handled and answered. Contains
+ * which LED should be set, how it should be set and other commands.
+ *
+ * @param[out] rsp Pointer to response struct to be modified with the message
+ *
+ * @return void
+ */
+void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
+{
+    led_error error;
+    const LED_activity_desc_t * pLEDact;
+    LED_activity_desc_t LEDact;
+    pLEDact = &LEDact;
+    /* We use this pointer assignment, so we can also set it to NULL if we need */
+
+    switch (req->data[3]) {
+    case 0x00:
+        /* OFF override */
+        pLEDact = &LED_Off_Activity;
+        break;
+    case 0xFF:
+        /* ON override */
+        pLEDact = &LED_On_Activity;
+        break;
+    case 0xFB:
+        /* Lamp Test */
+        /*! @todo Put the lamp test as a higher priority action, not a type of override */
+        LEDact.action = LED_ACTV_BLINK;
+        LEDact.initstate = LED_ON_STATE;
+        /* On duration in 100ms units */
+        LEDact.delay_init = req->data[4] * 100;
+        /* Set the toggle delay to 0, so we know its a "single-shot" descriptor, so the LED module should revert to its override/local_control state later */
+        LEDact.delay_tog = 0;
+        break;
+    case 0xFC:
+        /* Local state */
+        pLEDact = NULL;
+        break;
+    case 0xFD:
+    case 0xFE:
+        /* Reserved */
+        break;
+    default:
+        /* Blink Override */
+        LEDact.action = LED_ACTV_BLINK;
+        LEDact.initstate = LED_ON_STATE;
+        /* On duration in 10ms units */
+        LEDact.delay_init = req->data[4] / 10;
+        /* Off duration in 10ms units*/
+        LEDact.delay_tog = req->data[3] / 10;
+        break;
+    }
+
+    error = LED_update( req->data[2], pLEDact );
+
+    switch (error) {
+    case led_success:
+        rsp->completion_code = IPMI_CC_OK;
+        break;
+    case led_invalid_argument:
+        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+        break;
+    case led_unspecified_error:
+        rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+        break;
+    }
+    rsp->data_len = 0;
+    rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
+}

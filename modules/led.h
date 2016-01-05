@@ -1,8 +1,9 @@
 #ifndef LED_H_
 #define LED_H_
 
-/* LEDs Pin and port definitions */
+#include "ipmi.h"
 
+/* LEDs Pin and port definitions */
 #define LED_OFF_STATE		(1)
 #define LED_ON_STATE		(0)
 
@@ -56,7 +57,7 @@ extern const LED_activity_desc_t LED_3sec_Lamp_Test_Activity;
 
 #define LED_on(cfg)		       gpio_clr_pin(cfg.port, cfg.pin)
 #define LED_off(cfg)		       gpio_set_pin(cfg.port, cfg.pin)
-#define LED_toggle(cfg)		       gpio_pin_toggle( cfg.port, cfg.pin )
+#define LED_toggle(cfg)		       gpio_pin_toggle(cfg.port, cfg.pin)
 #define LED_is_off(cfg)		       gpio_read_pin(cfg.port, cfg.pin)
 #define LED_is_on(cfg)		       !gpio_read_pin(cfg.port, cfg.pin)
 #define LED_get_state(cfg)	       gpio_read_pin(cfg.port, cfg.pin)
@@ -64,5 +65,6 @@ extern const LED_activity_desc_t LED_3sec_Lamp_Test_Activity;
 
 void LED_init(void);
 led_error LED_update( uint8_t led_num, const LED_activity_desc_t * pLEDact );
+void ipmi_picmg_set_led(ipmi_msg *req, ipmi_msg *rsp);
 
 #endif /* LED_H_ */

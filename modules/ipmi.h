@@ -305,7 +305,6 @@ ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t 
 
 /* Handler functions */
 void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg *rsp );
-void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp );
 void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp );
 
 #endif
