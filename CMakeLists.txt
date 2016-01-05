@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.8.7)
 # Project definition
 project(afcipm C CXX ASM)
 
+# Color definitions
 if(NOT WIN32)
   string(ASCII 27 Esc)
   set(ColourReset "${Esc}[m")
@@ -27,6 +28,8 @@ endif()
 ##
 # CMake environment settings
 #
+
+#Find a toolchain file
 if(NOT CMAKE_TOOLCHAIN_FILE)
   message(WARNING "${ColourBold}${Red}No toolchain configuration file specified. Using default option!${ColourReset}")
 
@@ -59,10 +62,12 @@ set(CMAKE_BUILD_FLAGS "-mcpu=${TARGET_CPU} -mtune=${TARGET_CPU} -march=${TARGET_
 set(CMAKE_BUILD_FLAGS "${CMAKE_BUILD_FLAGS} -mthumb -mthumb-interwork -mno-sched-prolog -mapcs-frame")
 set(CMAKE_BUILD_FLAGS "${CMAKE_BUILD_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER}")
 
+# Build specific flags
 set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_BUILD_FLAGS} ${CMAKE_ERROR_FLAGS}")
 set(CMAKE_C_FLAGS_DEBUG     "-O0 -g3 -DDEBUG")
 set(CMAKE_C_FLAGS_RELEASE   "-O3")
 
+# Linker flags
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${CMAKE_SOURCE_DIR}/linker/lpc1764.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/afcipm.map")
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
@@ -76,7 +81,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" CACHE STRING "")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "")
 
-# Source paths
+# Include all subdirectories to be compiled
 set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/afcipm.c)
 add_subdirectory(FreeRTOS)
 add_subdirectory(port)
@@ -85,12 +90,14 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_subdirectory(trace)
 endif()
 
-#Link libraries
+# Libraries path
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 ## Create executable
 add_executable(${CMAKE_PROJECT_NAME}.axf ${PROJ_SRCS})
+# Headers path
 target_include_directories(${CMAKE_PROJECT_NAME}.axf PUBLIC ${PROJ_HDRS})
+# Link libraries
 target_link_libraries(${CMAKE_PROJECT_NAME}.axf gcc c m)
 target_link_libraries(${CMAKE_PROJECT_NAME}.axf FreeRTOS)
 target_link_libraries(${CMAKE_PROJECT_NAME}.axf lpcopen)
@@ -107,11 +114,14 @@ elseif(NOT NXP_PROG)
   message(WARNING "${ColourBold}${Red}crt_emu_cm3_nxp not found! Can't program the LPC chip!${ColourReset}")
 else()
 
+# Boot the programmer
   execute_process(
     COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${LPCXPRESSO_PATH}/bin/LPCXpressoWIN.enc
     ERROR_QUIET
     )
-  add_custom_command(TARGET ${CMAKE_PROJECT_NAME}.axf POST_BUILD
+# Program the chip (available only for LPC1764 so far)
+  add_custom_target(program
+    DEPENDS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.axf
     COMMAND ${NXP_PROG} -wire=winusb -pLPC1764 -flash-load-exec=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_PROJECT_NAME}.axf
     )
 endif()
