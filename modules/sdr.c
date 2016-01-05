@@ -85,7 +85,7 @@ void sdr_init(uint8_t ipmiID)
 /* IPMI SDR Commands handlers */
 /******************************/
 
-void ipmi_se_get_sdr_info(ipmi_msg *req, ipmi_msg *rsp) {
+IPMI_HANDLER(ipmi_se_get_sdr_info, NETFN_SE, IPMI_GET_DEVICE_SDR_INFO_CMD, ipmi_msg *req, ipmi_msg *rsp) {
     int len = rsp->data_len;
 
     if (req->data_len == 0 || req->data[0] == 0) {
@@ -110,14 +110,14 @@ void ipmi_se_get_sdr_info(ipmi_msg *req, ipmi_msg *rsp) {
  *
  * @return void
  */
-void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp)
+IPMI_HANDLER(ipmi_se_set_event_reciever, NETFN_SE, IPMI_SET_EVENT_RECEIVER_CMD, ipmi_msg *req, ipmi_msg *rsp)
 {
     /** @todo: actually enable/disable sending events*/
     rsp->completion_code = IPMI_CC_OK;
     rsp->data_len = 0;
 }
 
-void ipmi_se_get_sdr( ipmi_msg *req,  ipmi_msg* rsp)
+IPMI_HANDLER(ipmi_se_get_sdr, NETFN_SE, IPMI_GET_DEVICE_SDR_CMD, ipmi_msg *req,  ipmi_msg* rsp)
 {
     uint16_t recv_reserv_id = req->data[0] | (req->data[1] << 8);
     uint16_t record_id = req->data[2] | (req->data[3] << 8);
@@ -170,7 +170,7 @@ void ipmi_se_get_sdr( ipmi_msg *req,  ipmi_msg* rsp)
     rsp->completion_code = IPMI_CC_OK;
 }
 
-void ipmi_se_reserve_device_sdr( ipmi_msg *req, ipmi_msg* rsp) {
+IPMI_HANDLER(ipmi_se_reserve_device_sdr, NETFN_SE, IPMI_RESERVE_DEVICE_SDR_REPOSITORY_CMD, ipmi_msg *req, ipmi_msg* rsp) {
     int len = rsp->data_len;
 
     reservationID++;
@@ -184,7 +184,7 @@ void ipmi_se_reserve_device_sdr( ipmi_msg *req, ipmi_msg* rsp) {
     rsp->completion_code = IPMI_CC_OK;
 }
 
-void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp) {
+IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD,  ipmi_msg *req, ipmi_msg* rsp) {
     int sensor_number = req->data[0];
     int len = rsp->data_len;
 

@@ -31,8 +31,6 @@
 #define MAX_FRU_ID             0x01
 #define FRU_DEVICE_ID          0x00
 
-#define MAX_HANDLERS 20
-
 /* Known NetFn codes (even request codes only) */
 #define NETFN_CHASSIS						0x00
 #define NETFN_BRIDGE						0x02
@@ -297,14 +295,31 @@ typedef struct{
   t_req_handler req_handler;
 } t_req_handler_record;
 
+/*
+ * WARNING!!! Using IPMI_HANDLER_ALIAS and IPMI_HANDLER required to have .ipmi_handlers section in linker script
+ * .ipmi_handlers : ALIGN(4)
+ * {
+ * 	 _ipmi_handlers = .;
+ * 	 KEEP(*(.ipmi_handlers))
+ *   _eipmi_handlers = .;
+ * } >FLASHAREA
+*/
+
+extern const t_req_handler_record *_ipmi_handlers;
+extern const t_req_handler_record *_eipmi_handlers;
+
+#define IPMI_HANDLER_ALIAS(handler_fn, netfn_id, cmd_id) \
+    const t_req_handler_record __attribute__ ((section (".ipmi_handlers"))) ipmi_handler_##netfn_id##__##cmd_id##_s = { .req_handler = handler_fn , .netfn = netfn_id, .cmd = cmd_id }
+
+#define IPMI_HANDLER(name, netfn_id, cmd_id, args...) \
+    void ipmi_handler_##netfn_id##__##cmd_id##_f(args);			\
+    const t_req_handler_record __attribute__ ((section (".ipmi_handlers"))) ipmi_handler_##netfn_id##__##cmd_id##_s = { .req_handler = ipmi_handler_##netfn_id##__##cmd_id##_f , .netfn = netfn_id, .cmd = cmd_id }; \
+    void ipmi_handler_##netfn_id##__##cmd_id##_f(args)
+
 /* Function Prototypes */
 void IPMITask ( void *pvParameters );
 void ipmi_init ( void );
 t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd);
 ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t *evData, uint8_t length);
-
-/* Handler functions */
-void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg *rsp );
-void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp );
 
 #endif

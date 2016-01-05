@@ -247,7 +247,8 @@ led_error LED_update( uint8_t led_num, const LED_activity_desc_t * pLEDact )
  *
  * @return void
  */
-void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
+
+IPMI_HANDLER(ipmi_picmg_set_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_LED_STATE, ipmi_msg *req, ipmi_msg *rsp )
 {
     led_error error;
     const LED_activity_desc_t * pLEDact;

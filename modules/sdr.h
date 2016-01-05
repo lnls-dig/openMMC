@@ -227,11 +227,6 @@ extern sensor_t sensor_array[NUM_SDR];
 
 #define GET_EVENT_TYPE_CODE(n)      ((SDR_type_01h_t *)sensor->sdr)->event_reading_type
 
-void ipmi_se_get_sdr( ipmi_msg *req, ipmi_msg* rsp );
-void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp );
-void ipmi_se_get_sdr_info( ipmi_msg *req, ipmi_msg* rsp );
-void ipmi_se_reserve_device_sdr( ipmi_msg *req, ipmi_msg* rsp );
-
 void initializeDCDC( void );
 void sdr_init( uint8_t ipmiID );
 void sensor_init( void );

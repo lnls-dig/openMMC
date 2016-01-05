@@ -294,7 +294,9 @@ void fru_read_common_header(t_fru_common_header * header) {
     fru_read_to_buffer( (char *) header, 0, sizeof(t_fru_common_header));
 }
 
-void ipmi_storage_get_fru_inventory( ipmi_msg * req, ipmi_msg * rsp )
+/* IPMI Handlers */
+
+IPMI_HANDLER(ipmi_storage_get_fru_info, NETFN_STORAGE, IPMI_GET_FRU_INVENTORY_AREA_INFO_CMD, ipmi_msg * req, ipmi_msg * rsp )
 {
     uint8_t len = rsp->data_len = 0;
     rsp->data[len++] = FRU_SIZE & 0xFF;
@@ -304,7 +306,7 @@ void ipmi_storage_get_fru_inventory( ipmi_msg * req, ipmi_msg * rsp )
     rsp->completion_code = IPMI_CC_OK;
 }
 
-void ipmi_storage_read_fru_data( ipmi_msg * req, ipmi_msg * rsp )
+IPMI_HANDLER(ipmi_storage_read_fru_data_cmd, NETFN_STORAGE, IPMI_READ_FRU_DATA_CMD, ipmi_msg * req, ipmi_msg * rsp )
 {
     uint32_t offset;
     uint8_t len = rsp->data_len = 0;
