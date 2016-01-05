@@ -30,7 +30,6 @@
 #include "pin_mapping.h"
 #include "i2c.h"
 #include "led.h"
-#include "ipmb.h"
 #include "ipmi.h"
 #include "sdr.h"
 #include "payload.h"
@@ -117,10 +116,9 @@ void heap_test ( void* param)
 
     for (;;) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-	        water_mark = uxTaskGetStackHighWaterMark(NULL);
-	        used_heap = configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize();
-	        vTaskGetRunTimeStats(stats);
-
+	water_mark = uxTaskGetStackHighWaterMark(NULL);
+	used_heap = configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize();
+	vTaskGetRunTimeStats(stats);
     }
 }
 #endif
