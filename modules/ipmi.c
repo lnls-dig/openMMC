@@ -123,6 +123,7 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd)
             handler = p_ptr->req_handler;
             break;
         }
+	p_ptr++;
     }
 
     return handler;
