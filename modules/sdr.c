@@ -124,6 +124,26 @@ IPMI_HANDLER(ipmi_se_set_event_reciever, NETFN_SE, IPMI_SET_EVENT_RECEIVER_CMD, 
     rsp->data_len = 0;
 }
 
+/*!
+ * @brief Handler for "Get Event Receiver" command, as on IPMIv2 1.1
+ * section 29.1.
+ *
+ * Returns the previously set event receiver address and LUN
+ *
+ * @param[in] req Incoming request to be handled and answered.
+ *
+ * @return void
+ */
+IPMI_HANDLER(ipmi_se_get_event_reciever, NETFN_SE, IPMI_GET_EVENT_RECEIVER_CMD, ipmi_msg *req, ipmi_msg *rsp)
+{
+    uint8_t len = 0;
+    rsp->data[len++] = event_receiver_addr;
+    rsp->data[len++] = event_receiver_lun;
+
+    rsp->completion_code = IPMI_CC_OK;
+    rsp->data_len = len;
+}
+
 IPMI_HANDLER(ipmi_se_get_sdr, NETFN_SE, IPMI_GET_DEVICE_SDR_CMD, ipmi_msg *req,  ipmi_msg* rsp)
 {
     uint16_t recv_reserv_id = req->data[0] | (req->data[1] << 8);
