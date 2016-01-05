@@ -31,8 +31,6 @@
 #define MAX_FRU_ID             0x01
 #define FRU_DEVICE_ID          0x00
 
-#define MAX_HANDLERS 20
-
 /* Known NetFn codes (even request codes only) */
 #define NETFN_CHASSIS						0x00
 #define NETFN_BRIDGE						0x02

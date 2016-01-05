@@ -294,6 +294,8 @@ void fru_read_common_header(t_fru_common_header * header) {
     fru_read_to_buffer( (char *) header, 0, sizeof(t_fru_common_header));
 }
 
+/* IPMI Handlers */
+
 IPMI_HANDLER(ipmi_storage_get_fru_info, NETFN_STORAGE, IPMI_GET_FRU_INVENTORY_AREA_INFO_CMD, ipmi_msg * req, ipmi_msg * rsp )
 {
     uint8_t len = rsp->data_len = 0;
