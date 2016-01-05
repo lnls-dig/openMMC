@@ -103,16 +103,23 @@ IPMI_HANDLER(ipmi_se_get_sdr_info, NETFN_SE, IPMI_GET_DEVICE_SDR_INFO_CMD, ipmi_
  * @brief Handler for "Set Event Receiver" command, as on IPMIv2 1.1
  * section 29.1.
  *
- * This handler should set (or reset) the address to which IPMI events
+ * Set (or reset) the address to which IPMI events
  * will be sent. Also, disable sending events if command 0xFF is received.
  *
  * @param[in] req Incoming request to be handled and answered.
  *
  * @return void
  */
+uint8_t event_receiver_addr = 0xFF;
+uint8_t event_receiver_lun = 0x00;
+
 IPMI_HANDLER(ipmi_se_set_event_reciever, NETFN_SE, IPMI_SET_EVENT_RECEIVER_CMD, ipmi_msg *req, ipmi_msg *rsp)
 {
-    /** @todo: actually enable/disable sending events*/
+    /* Update the event receiver address (even if its 0xFF,
+       the checking will be done in check_sensor_event function) */
+    event_receiver_addr = req->data[0];
+    event_receiver_lun = req->data[1];
+
     rsp->completion_code = IPMI_CC_OK;
     rsp->data_len = 0;
 }
@@ -599,7 +606,7 @@ void check_sensor_event( sensor_t * sensor )
 
     sensor->old_state = sensor->state;
 
-    if (ev != 0xFF) {
+    if ((ev != 0xFF) && (event_receiver_addr != 0xFF)) {
         ipmi_event_send(sensor, ev_type, &ev, 1);
     }
 }
