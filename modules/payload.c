@@ -275,3 +275,11 @@ void vTaskPayload(void *pvParmeters)
         vTaskDelayUntil( &xLastWakeTime, PAYLOAD_BASE_DELAY );
     }
 }
+
+
+IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL, ipmi_msg *req, ipmi_msg *rsp)
+{
+    payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
+    rsp->completion_code = IPMI_CC_OK;
+    rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
+}

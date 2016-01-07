@@ -28,7 +28,6 @@
 #include "pin_mapping.h"
 #include "task_priorities.h"
 #include "led.h"
-#include "sdr.h"
 #include "payload.h"
 
 /* Local variables */
@@ -206,13 +205,6 @@ IPMI_HANDLER(ipmi_picmg_get_properties, NETFN_GRPEXT,IPMI_PICMG_CMD_GET_PROPERTI
 
 IPMI_HANDLER(ipmi_picmg_cmd_set_amc_port_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_AMC_PORT_STATE, ipmi_msg *req, ipmi_msg *rsp)
 {
-    rsp->completion_code = IPMI_CC_OK;
-    rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
-}
-
-IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL, ipmi_msg *req, ipmi_msg *rsp)
-{
-    payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
     rsp->completion_code = IPMI_CC_OK;
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
