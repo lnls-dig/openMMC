@@ -24,8 +24,10 @@
   @author Henrique Silva
 */
 
-TickType_t getTickDifference(TickType_t current_time, TickType_t start_time);
+TickType_t getTickDifference( TickType_t current_time, TickType_t start_time );
 
-uint8_t calculate_chksum ( uint8_t * buffer, uint8_t range );
+uint8_t calculate_chksum( uint8_t * buffer, uint8_t range );
 
-uint8_t cmpBuffs(uint32_t *buf_a, uint32_t len_a, uint32_t *bufb, uint32_t len_b);
+uint8_t cmpBuffs( uint32_t *buf_a, uint32_t len_a, uint32_t *bufb, uint32_t len_b );
+
+uint8_t isPowerOfTwo( uint8_t x );
