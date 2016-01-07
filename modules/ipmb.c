@@ -45,9 +45,6 @@ ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len );
 
 #define I2C_SPEED 100000
 
-/* Macro to check is the message is a response (odd netfn) */
-#define IS_RESPONSE(msg) (msg.netfn & 0x01)
-
 /* Local variables */
 QueueHandle_t ipmb_txqueue = NULL;
 QueueHandle_t client_queue = NULL;
@@ -67,7 +64,7 @@ void IPMB_TXTask ( void * pvParameters )
             /* We're sending a response */
 
             /**********************************/
-            /*       Error checking             */
+            /*       Error checking           */
             /**********************************/
 
             /* See if we've already tried sending this message 3 times */
@@ -77,7 +74,7 @@ void IPMB_TXTask ( void * pvParameters )
             }
 
             /**********************************/
-            /* Try sending the message  */
+            /*     Try sending the message    */
             /**********************************/
 
             /* Encode the message buffer to the IPMB format */

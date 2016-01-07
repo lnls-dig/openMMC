@@ -96,6 +96,8 @@
 /*! @brief MicroTCA's MCH slave address */
 #define MCH_ADDRESS             0x20
 
+/* @brief Macro to check is the message is a response (odd netfn) */
+#define IS_RESPONSE(msg) (msg.netfn & 0x01)
 
 /*! @brief IPMI message struct */
 typedef struct ipmi_msg {
