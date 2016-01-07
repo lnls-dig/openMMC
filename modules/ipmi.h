@@ -257,6 +257,18 @@
 #define IPMI_PICMG_CMD_GET_SHELF_MANAGER_IP_ADDRESSES           0x21
 #define IPMI_PICMG_CMD_SHELF_POWER_ALLOCATION                   0x22
 #define IPMI_PICMG_CMD_GET_TELCO_ALARM_CAPABILITY               0x29
+/* HPM Commands */
+#define IPMI_PICMG_CMD_HPM_GET_UPGRADE_CAPABILITIES             0x2E
+#define IPMI_PICMG_CMD_HPM_GET_COMPONENT_PROPERTIES             0x2F
+#define IPMI_PICMG_CMD_HPM_ABORT_FIRMWARE_UPGRADE               0x30
+#define IPMI_PICMG_CMD_HPM_INITIATE_UPGRADE_ACTION              0x31
+#define IPMI_PICMG_CMD_HPM_UPLOAD_FIRMWARE_BLOCK                0x32
+#define IPMI_PICMG_CMD_HPM_FINISH_FIRMWARE_UPLOAD               0x33
+#define IPMI_PICMG_CMD_HPM_GET_UPGRADE_STATUS                   0x34
+#define IPMI_PICMG_CMD_HPM_ACTIVATE_FIRMWARE                    0x35
+#define IPMI_PICMG_CMD_HPM_QUERY_SELF_RESULTS                   0x36
+#define IPMI_PICMG_CMD_HPM_QUERY_ROLLBACK_STATUS                0x37
+#define IPMI_PICMG_CMD_HPM_INITIATE_MANUAL_ROLLBACK             0x38
 
 #define IPMI_EVENT_MESSAGE_REV                                  0x04
 
@@ -285,6 +297,7 @@
 #define IPMI_CC_INSUFFICIENT_PRIVILEGES                         0xd4
 #define IPMI_CC_NOT_SUPPORTED_PRESENT_STATE                     0xd5
 #define IPMI_CC_ILLEGAL_COMMAND_DISABLED                        0xd6
+#define IPMI_CC_COMMAND_IN_PROGRESS                             0x80
 #define IPMI_CC_UNSPECIFIED_ERROR                               0xff
 
 typedef void (* t_req_handler)(ipmi_msg * req, ipmi_msg * resp);
