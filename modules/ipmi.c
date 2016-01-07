@@ -45,9 +45,6 @@ void IPMITask( void * pvParameters )
     t_req_handler req_handler = (t_req_handler) 0;
 
     for ( ;; ) {
-        /* Received request and handler function must be allocated
-           dynamically so they can be passed to the dynamically-created
-           handler tasks. These tasks must also free the memory after use */
 
         if( xQueueReceive( ipmi_rxqueue, &req_received , portMAX_DELAY ) == pdFALSE) {
 	    /* Should no return pdFALSE */
@@ -60,8 +57,6 @@ void IPMITask( void * pvParameters )
 
         if (req_handler != 0) {
 
-            /* TODO: create unique name for each created task, probably
-               related to netfn and command */
             response.completion_code = IPMI_CC_UNSPECIFIED_ERROR;
             response.data_len = 0;
 
@@ -196,7 +191,7 @@ IPMI_HANDLER(ipmi_get_device_id,  NETFN_APP, IPMI_GET_DEVICE_ID_CMD, ipmi_msg *r
  *
  * @return ipmi_msg Message with data, data length and completion code.
  */
-IPMI_HANDLER(ipmi_picmg_get_PROPERTIES, NETFN_GRPEXT,IPMI_PICMG_CMD_GET_PROPERTIES, ipmi_msg *req, ipmi_msg *rsp )
+IPMI_HANDLER(ipmi_picmg_get_properties, NETFN_GRPEXT,IPMI_PICMG_CMD_GET_PROPERTIES, ipmi_msg *req, ipmi_msg *rsp )
 {
     int len = rsp->data_len = 0;
     rsp->completion_code = IPMI_CC_OK;
