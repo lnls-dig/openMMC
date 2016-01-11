@@ -164,6 +164,9 @@ void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint8_t tx_len, uint8_t *rx_bu
     data_st->rx_data = rx_buf;
     data_st->length = rx_len+tx_len;
 
+    /* Assert Slave Select pin to enable the transfer */
+    ssp_ssel_control(id, ASSERT);
+
     if (ssp_cfg[id].polling) {
         Chip_SSP_RWFrames_Blocking(ssp_cfg[id].lpc_id, data_st);
 
@@ -177,4 +180,6 @@ void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint8_t tx_len, uint8_t *rx_bu
         /* Wait until the transfer is finished */
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
+    /* Deassert SSEL pin */
+    ssp_ssel_control(id, DEASSERT);
 }

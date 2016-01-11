@@ -25,11 +25,7 @@ static void write_fpga_byte( uint16_t address, uint32_t data )
     tx_buff[5] = ( ( data >> 8)  & 0xFF );
     tx_buff[6] = ( data & 0xFF );
 
-    ssp_ssel_control(FPGA_SPI, ASSERT);
-
     ssp_write( FPGA_SPI, tx_buff, sizeof(tx_buff) );
-
-    ssp_ssel_control(FPGA_SPI, DEASSERT);
 }
 
 static void write_fpga_buffer( t_board_diagnostic diag )
@@ -52,14 +48,9 @@ static uint32_t read_fpga_byte( uint16_t address )
     tx_buff[1] = (address >> 8) & 0xFF;
     tx_buff[2] = address & 0xFF;
 
-    ssp_ssel_control(FPGA_SPI, ASSERT);
-
     ssp_write_read( FPGA_SPI, &tx_buff[0], sizeof(tx_buff), &rx_buff[0], sizeof(rx_buff) );
 
-    ssp_ssel_control(FPGA_SPI, DEASSERT);
-
     return ( (rx_buff[3] << 24) | (rx_buff[4] << 16) | (rx_buff[5] << 8) | rx_buff[6]);
-
 }
 
 static void read_fpga_buffer( uint32_t * buffer, uint32_t buffer_len )
