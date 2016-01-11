@@ -20,10 +20,12 @@
  */
 
 /* Project includes */
-#include "FreeRTOS.h"
 #include "ipmi.h"
 #include "hpm.h"
 #include "utils.h"
+#include "string.h"
+#include "led.h"
+#include "payload.h"
 
 /* Local Variables */
 
@@ -34,7 +36,7 @@ static uint8_t cmd_in_progress;
 static uint8_t last_cmd_cc;
 
 /*Current component under upgrade */
-static uint8_t active_component;
+static uint8_t active_id;
 
 /* IPMC Capabilities */
 t_ipmc_capabilities ipmc_cap = {
@@ -50,7 +52,7 @@ t_ipmc_capabilities ipmc_cap = {
 };
 
 /* Components properties */
-t_comp_properties comp_properties[HPM_MAX_COMPONENTS] = {
+t_component hpm_components[HPM_MAX_COMPONENTS] = {
     [HPM_BOOTLOADER_COMPONENT_ID] = {
         .properties = {
             .flags = {
@@ -113,7 +115,7 @@ IPMI_HANDLER(ipmi_picmg_get_upgrade_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_H
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
     rsp->data[len++] = HPM_SUPPORTED_VERSION;
-    rsp->data[len++] = (uint8_t) ipmc_cap;
+    rsp->data[len++] = ipmc_cap.byte;
     rsp->data[len++] = HPM_UPGRADE_TIMEOUT;
     rsp->data[len++] = HPM_SELF_TEST_TIMEOUT;
     rsp->data[len++] = HPM_ROLLBACK_TIMEOUT;
@@ -133,6 +135,8 @@ IPMI_HANDLER(ipmi_picmg_get_component_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_H
     uint8_t comp_id = req->data[1];
     uint8_t comp_properties_selector = req->data[2];
 
+    rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+
     if (comp_id > 7) {
         rsp->data[len++] = IPMI_PICMG_GRP_EXT;
         /* Return command-specific completion code: 0x82 (Invalid Component ID) */
@@ -146,7 +150,8 @@ IPMI_HANDLER(ipmi_picmg_get_component_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_H
     switch (comp_properties_selector) {
     case 0x00:
         /* General component properties */
-        rsp->data[len++] = (uint8_t) comp_properties[comp_id];
+        rsp->data[len++] = hpm_components[comp_id].properties.byte;
+        rsp->completion_code = IPMI_CC_OK;
         break;
     case 0x01:
         /* Firmware current version */
@@ -157,11 +162,13 @@ IPMI_HANDLER(ipmi_picmg_get_component_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_H
         rsp->data[len++] = FW_REV_AUX_1;
         rsp->data[len++] = FW_REV_AUX_2;
         rsp->data[len++] = FW_REV_AUX_3;
+        rsp->completion_code = IPMI_CC_OK;
         break;
     case 0x02:
         /* Description string */
-        sprintf(&rsp->data[len], "%s", comp_description_string[comp_id]);
-        len += sizeof(comp_description_string[comp_id]);
+        memcpy( &rsp->data[len], &hpm_components[comp_id].description[0], 12 );
+        len += 12;
+        rsp->completion_code = IPMI_CC_OK;
         break;
     case 0x03:
         /* Rollback Firmware version */
@@ -172,6 +179,7 @@ IPMI_HANDLER(ipmi_picmg_get_component_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_H
         rsp->data[len++] = FW_REV_AUX_1;
         rsp->data[len++] = FW_REV_AUX_2;
         rsp->data[len++] = FW_REV_AUX_3;
+        rsp->completion_code = IPMI_CC_OK;
         break;
     case 0x04:
         /* Deferred upgrade Firmware version */
@@ -182,14 +190,11 @@ IPMI_HANDLER(ipmi_picmg_get_component_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_H
         rsp->data[len++] = FW_REV_AUX_1;
         rsp->data[len++] = FW_REV_AUX_2;
         rsp->data[len++] = FW_REV_AUX_3;
+        rsp->completion_code = IPMI_CC_OK;
         break;
     default:
         /* Return command-specific completion code: 0x83 (Invalid Component properties selector) */
         rsp->completion_code = 0x83;
-    }
-
-    if (rsp->completion_code == 0) {
-        rsp->completion_code = IPMI_CC_OK;
     }
 
     rsp->data_len = len;
@@ -203,45 +208,61 @@ IPMI_HANDLER(ipmi_picmg_initiate_upgrade_action, NETFN_GRPEXT, IPMI_PICMG_CMD_HP
     uint8_t comp_id = req->data[1];
     uint8_t upgrade_action = req->data[2];
 
+    rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+
     if (comp_id > 7) {
-	/* Component ID out of range */
-	rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+        /* Component ID out of range */
+        rsp->data[len++] = IPMI_PICMG_GRP_EXT;
         /* Return command-specific completion code: 0x82 (Invalid Component ID) */
         rsp->data_len = len;
         rsp->completion_code = 0x82;
         return;
     }
 
-    active_component = comp_id;
+    active_id = comp_id;
 
+#if 0
     if (((upgrade_action == 0x02)|(upgrade_action == 0x03))
         && !isPowerofTwo(comp_id)) {
-	/* More than one component selected */
+        /* More than one component selected */
         rsp->data[len++] = IPMI_PICMG_GRP_EXT;
-	rsp->data_len = len;
+        rsp->data_len = len;
         rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
         return;
     }
-
+#endif
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
 
     switch (upgrade_action) {
     case 0x00:
-	/* Backup component */
-	break;
+        /* Backup component */
+        break;
     case 0x01:
-	/* Prepare Component */
-	break;
+        /* Prepare Component */
+        if (!hpm_components[active_id].hpm_prepare_comp_f()) {
+	    rsp->completion_code = IPMI_CC_INV_CMD;
+        } else {
+            rsp->completion_code = IPMI_CC_OK;
+	}
+        break;
     case 0x02:
-	/* Upload for upgrade */
-	break;
+        /* Upload for upgrade */
+        /* Set the component that'll be upgraded */
+        active_id = comp_id;
+	if (!hpm_components[active_id].hpm_prepare_comp_f()) {
+	    rsp->completion_code = IPMI_CC_INV_CMD;
+        } else {
+            rsp->completion_code = IPMI_CC_OK;
+	}
+        break;
     case 0x03:
-	/* Upload for compare */
-	break;
+        /* Upload for compare */
+        break;
+    default:
+        break;
     }
 
     rsp->data_len = len;
-    rsp->completion_code = IPMI_CC_OK;
 
     /* This is a long-duration command, update both cmd_in_progress and last_cmd_cc */
     cmd_in_progress = req->cmd;
@@ -276,10 +297,11 @@ IPMI_HANDLER(ipmi_picmg_abort_firmware_upgrade, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM
 IPMI_HANDLER(ipmi_picmg_upload_firmware_block, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_UPLOAD_FIRMWARE_BLOCK, ipmi_msg *req, ipmi_msg* rsp)
 {
     uint8_t len = rsp->data_len = 0;
+    uint8_t block_data[HPM_BLOCK_SIZE];
 
-    if (active_component > 7) {
-	/* Component ID out of range */
-	rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+    if (active_id > 7) {
+        /* Component ID out of range */
+        rsp->data[len++] = IPMI_PICMG_GRP_EXT;
         /* Return command-specific completion code: 0x81 (Invalid Component ID) */
         rsp->data_len = len;
         rsp->completion_code = 0x81;
@@ -287,14 +309,16 @@ IPMI_HANDLER(ipmi_picmg_upload_firmware_block, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_
     }
 
     uint8_t block_num = req->data[1];
-    //uint8_t block_data[] = req->data[n];
+    memcpy(&block_data[0], &req->data[2], req->data_len-2);
 
     /* TODO: perform checksum of the block */
-    /* TODO: write block to flash */
+
+    if (hpm_components[active_id].hpm_upload_block_f) {
+        /* WARNING: This function can't block! */
+        hpm_components[active_id].hpm_upload_block_f(&block_data[0], sizeof(block_data));
+    }
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
-    //rsp->data[len++] = section_offset;
-    //rsp->data[len++] = section_len;
 
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
@@ -312,6 +336,8 @@ IPMI_HANDLER(ipmi_picmg_finish_firmware_upload, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM
 
     /* TODO: compare image_len with the actual data received */
     /* TODO: implement HPM.1 REQ3.59 */
+
+    hpm_components[active_id].hpm_finish_upload_f( image_len );
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
 
