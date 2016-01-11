@@ -13,7 +13,7 @@
 #define HPM_UPGRADE_TIMEOUT 10 /* in 5 seconds counts */
 #define HPM_SELF_TEST_TIMEOUT 5 /* in 5 seconds counts */
 #define HPM_ROLLBACK_TIMEOUT 10 /* in 5 seconds counts */
-#define HPM_INACCESSIBILITY_TIMEOUT 4 /* in 5 seconds counts */
+#define HPM_INACCESSIBILITY_TIMEOUT 10 /* in 5 seconds counts */
 
 /* Components ID */
 #define HPM_BOOTLOADER_COMPONENT_ID 0
@@ -21,6 +21,9 @@
 #define HPM_PAYLOAD_COMPONENT_ID 2
 
 #define HPM_MAX_COMPONENTS HPM_PAYLOAD_COMPONENT_ID+1
+typedef uint32_t (* t_hpm_upload_block)(uint8_t * block, uint8_t size);
+typedef uint8_t (* t_hpm_finish_upload)(uint32_t image_size);
+typedef uint8_t (* t_hpm_prepare_comp)(void);
 
 typedef union {
     struct {
@@ -47,5 +50,15 @@ typedef union __attribute__ ((__packed__)) {
     } flags;
     uint8_t byte;
 } t_comp_properties;
+
+typedef struct {
+    t_comp_properties properties;
+    char description[12];
+    t_hpm_prepare_comp hpm_prepare_comp_f;
+    t_hpm_upload_block hpm_upload_block_f;
+    t_hpm_finish_upload hpm_finish_upload_f;
+} t_component;
+
+#define HPM_BLOCK_SIZE 20
 
 #endif
