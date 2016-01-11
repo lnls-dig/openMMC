@@ -86,21 +86,25 @@ t_comp_properties comp_properties[HPM_MAX_COMPONENTS] = {
                 .rollback_backup_support = 0x01
             }
         },
+        .hpm_prepare_comp_f = payload_hpm_prepare_comp,
+        .hpm_upload_block_f = payload_hpm_upload_block,
+        .hpm_finish_upload_f = payload_hpm_finish_upload
     }
-};
-
-/* Components description strings */
-const char* comp_description_string[HPM_MAX_COMPONENTS] = {
-    [HPM_BOOTLOADER_COMPONENT_ID] = "Bootloader";
-    [HPM_IPMC_COMPONENT_ID] = "IPMC";
-    [HPM_PAYLOAD_COMPONENT_ID] = "Payload FPGA";
 };
 
 /*******************************************************/
 
 void hpm_init( void )
 {
-    /* TODO: Start IAP */
+    memcpy(hpm_components[HPM_BOOTLOADER_COMPONENT_ID].description, "Bootloader", sizeof("Bootloader"));
+    memcpy(hpm_components[HPM_IPMC_COMPONENT_ID].description, "AFC IPMC", sizeof("AFC IPMC"));
+    memcpy(hpm_components[HPM_PAYLOAD_COMPONENT_ID].description, "FPGA Payload", sizeof("FPGA Payload"));
+#if 0
+    sprintf(hpm_components[HPM_BOOTLOADER_COMPONENT_ID].description, "%s", "Bootloader");
+    sprintf(hpm_components[HPM_IPMC_COMPONENT_ID].description, "%s", "AFC IPMC");
+    sprintf(hpm_components[HPM_PAYLOAD_COMPONENT_ID].description, "%s", "FPGA Payload");*/
+#endif
+
 }
 
 IPMI_HANDLER(ipmi_picmg_get_upgrade_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_GET_UPGRADE_CAPABILITIES, ipmi_msg *req, ipmi_msg* rsp)

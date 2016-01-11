@@ -16,11 +16,13 @@
 #define HPM_INACCESSIBILITY_TIMEOUT 10 /* in 5 seconds counts */
 
 /* Components ID */
-#define HPM_BOOTLOADER_COMPONENT_ID 0
-#define HPM_IPMC_COMPONENT_ID 1
-#define HPM_PAYLOAD_COMPONENT_ID 2
+enum {
+    HPM_BOOTLOADER_COMPONENT_ID = 0,
+    HPM_IPMC_COMPONENT_ID,
+    HPM_PAYLOAD_COMPONENT_ID,
+    HPM_MAX_COMPONENTS
+};
 
-#define HPM_MAX_COMPONENTS HPM_PAYLOAD_COMPONENT_ID+1
 typedef uint32_t (* t_hpm_upload_block)(uint8_t * block, uint8_t size);
 typedef uint8_t (* t_hpm_finish_upload)(uint32_t image_size);
 typedef uint8_t (* t_hpm_prepare_comp)(void);
