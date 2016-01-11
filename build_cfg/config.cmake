@@ -22,6 +22,7 @@ if(${TARGET_BOARD} MATCHES "(afcv3_1)|(afcv3_0)") # (?i) makes the regexp case i
     "HOTSWAP_SENSOR"
     "TEMPERATURE_SENSOR"
     "VOLTAGE_SENSOR"
+    "HPM"
     #"RTM"
     )
 elseif(${TARGET_BOARD} MATCHES "(test)") # (?i) makes the regexp case insensitive
