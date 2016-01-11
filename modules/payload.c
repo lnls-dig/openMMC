@@ -36,6 +36,7 @@
 #include "led.h"
 #include "ad84xx.h"
 #include "hotswap.h"
+#include "flash_spi.h"
 
 /* payload states
  *   0 - no power
@@ -121,7 +122,7 @@ QueueHandle_t queue_payload_handle = 0;
 void payload_send_message(uint8_t msg)
 {
     if (queue_payload_handle) {
-	xQueueSend(queue_payload_handle, &msg, (TickType_t) 0);
+        xQueueSend(queue_payload_handle, &msg, (TickType_t) 0);
     }
 }
 
@@ -178,6 +179,7 @@ void vTaskPayload(void *pvParmeters)
     gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH);
 
     for ( ;; ) {
+
         /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
         gpio_set_pin_state( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, HIGH);
 
@@ -232,7 +234,7 @@ void vTaskPayload(void *pvParmeters)
 #ifdef MODULE_CLOCK_SWITCH
             adn4604_setup();
 #endif
-	    new_state = PAYLOAD_FPGA_BOOTING;
+            new_state = PAYLOAD_FPGA_BOOTING;
             break;
 
         case PAYLOAD_FPGA_BOOTING:
@@ -259,9 +261,9 @@ void vTaskPayload(void *pvParmeters)
             setDC_DC_ConvertersON(false);
             sensor_array[HOT_SWAP_SENSOR].readout_value = HOTSWAP_QUIESCED_MASK;
 
-	    evt_msg = HOTSWAP_QUIESCED_MASK >> 1;
+            evt_msg = HOTSWAP_QUIESCED_MASK >> 1;
 
-	    if ( ipmi_event_send(&sensor_array[HOT_SWAP_SENSOR], ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
+            if ( ipmi_event_send(&sensor_array[HOT_SWAP_SENSOR], ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
                 QUIESCED_req = 0;
                 new_state = PAYLOAD_NO_POWER;
             }
@@ -276,10 +278,87 @@ void vTaskPayload(void *pvParmeters)
     }
 }
 
-
 IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL, ipmi_msg *req, ipmi_msg *rsp)
 {
     payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
     rsp->completion_code = IPMI_CC_OK;
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
+
+/* HPM Functions */
+#ifdef MODULE_HPM
+
+#include "string.h"
+
+uint8_t hpm_page[256];
+uint8_t hpm_pg_index;
+uint32_t hpm_page_addr;
+
+uint8_t payload_hpm_prepare_comp( void )
+{
+    /* Initialize variables */
+    memset(hpm_page, 0, sizeof(hpm_page));
+    hpm_pg_index = 0;
+    hpm_page_addr = 0;
+
+    /* TODO: Check DONE pin before accessing the SPI bus, since the FPGA may be reading it in order to boot */
+
+    /* Initialize flash */
+    ssp_init( FLASH_SPI, FLASH_SPI_BITRATE, FLASH_SPI_FRAME_SIZE, SSP_MASTER, SSP_POLLING );
+
+    /* Erase FLASH */
+    flash_bulk_erase();
+
+    return 1;
+}
+
+uint32_t payload_hpm_upload_block( uint8_t * block, uint8_t size )
+{
+    /* TODO: Check DONE pin before accessing the SPI bus, since the FPGA may be reading it in order to boot */
+    uint8_t remaining_bytes_start;
+
+    if ( sizeof(hpm_page) - hpm_pg_index > size) {
+        /* Our page is not full yet, just append the new data */
+        memcpy(&hpm_page[hpm_pg_index], block, size);
+        hpm_pg_index += size;
+
+    } else {
+        /* Complete the remaining bytes on the buffer */
+        memcpy(&hpm_page[hpm_pg_index], block, (sizeof(hpm_page) - hpm_pg_index));
+        remaining_bytes_start = (sizeof(hpm_page) - hpm_pg_index);
+
+        /* Program the complete page in the Flash */
+        flash_program_page( hpm_page_addr, &hpm_page[0], sizeof(hpm_page));
+
+        hpm_page_addr += sizeof(hpm_page);
+
+        /* Empty our buffer and reset the index */
+        memset(hpm_page, 0, sizeof(hpm_page));
+        hpm_pg_index = 0;
+
+        /* Save the trailing bytes */
+        memcpy(&hpm_page[hpm_pg_index], block+remaining_bytes_start, size-remaining_bytes_start);
+
+        hpm_pg_index = size-remaining_bytes_start;
+
+    }
+    /* Return the offset address */
+    return hpm_page_addr + hpm_pg_index;
+}
+
+uint8_t payload_hpm_finish_upload( uint32_t image_size )
+{
+    /* Reset FPGA - Pulse PROGRAM_B pin */
+    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW);
+    asm("nop");
+    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH);
+
+    LED_activity_desc_t LEDact;
+    const LED_activity_desc_t * pLEDact;
+    pLEDact = &LEDact;
+    pLEDact = &LED_On_Activity;
+    LED_update( LED_RED, pLEDact );
+
+    return 1;
+}
+#endif
