@@ -59,60 +59,56 @@ static t_ssp_config ssp_cfg[MAX_SSP_INTERFACES] = {
 /* Maybe use semaphores to control the access to SSP0 */
 uint8_t active_SSP0 = 0xFF;
 
-void SSP0_IRQHandler( void )
+static void ssp_irq_handler( LPC_SSP_T * ssp_id )
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    Chip_SSP_DATA_SETUP_T * xf_setup = &ssp_cfg[active_SSP0].xf_setup;
+    Chip_SSP_DATA_SETUP_T * xf_setup;
+    uint8_t ssp_cfg_index;
+
+    if ((ssp_id == LPC_SSP0) && (active_SSP0 != 0xFF)) {
+        ssp_cfg_index = active_SSP0;
+    } else if (ssp_id == LPC_SSP1) {
+        /* The only component in SPI1 is the Flash memory */
+        ssp_cfg_index = FLASH_SPI;
+    }
+
+    xf_setup = &ssp_cfg[ssp_cfg_index].xf_setup;
 
     /* Disable SSP interrupts */
-    Chip_SSP_Int_Disable(LPC_SSP0);
+    Chip_SSP_Int_Disable(ssp_id);
 
-    if (ssp_cfg[active_SSP0].frame_size <= 8) {
-        Chip_SSP_Int_RWFrames8Bits(LPC_SSP0, xf_setup);
+    if (ssp_cfg[ssp_cfg_index].frame_size <= 8) {
+        Chip_SSP_Int_RWFrames8Bits(ssp_id, xf_setup);
     }
     else {
-        Chip_SSP_Int_RWFrames16Bits(LPC_SSP0, xf_setup);
+        Chip_SSP_Int_RWFrames16Bits(ssp_id, xf_setup);
     }
 
     if ((xf_setup->rx_cnt != xf_setup->length) || (xf_setup->tx_cnt != xf_setup->length)) {
-	/* Enable all interrupts, we're going to read/write more data */
-        Chip_SSP_Int_Enable(LPC_SSP0);
+        /* Enable ssp interrupts, we're going to read/write more data */
+        Chip_SSP_Int_Enable(ssp_id);
     }
     else {
         /* Transfer is completed, notify the caller task */
-	vTaskNotifyGiveFromISR(ssp_cfg[active_SSP0].caller_task, &xHigherPriorityTaskWoken);
+        vTaskNotifyGiveFromISR(ssp_cfg[ssp_cfg_index].caller_task, &xHigherPriorityTaskWoken);
     }
 
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+}
+
+void SSP0_IRQHandler( void )
+{
+    ssp_irq_handler(LPC_SSP0);
 }
 
 void SSP1_IRQHandler( void )
 {
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    Chip_SSP_DATA_SETUP_T * xf_setup = &ssp_cfg[FLASH_SPI].xf_setup;
-
-    /* Disable SSP interrupts */
-    Chip_SSP_Int_Disable(LPC_SSP1);
-
-    if (ssp_cfg[FLASH_SPI].frame_size <= 8) {
-        Chip_SSP_Int_RWFrames8Bits(LPC_SSP1, xf_setup);
-    }
-    else {
-        Chip_SSP_Int_RWFrames16Bits(LPC_SSP1, xf_setup);
-    }
-
-    if ((xf_setup->rx_cnt != xf_setup->length) || (xf_setup->tx_cnt != xf_setup->length)) {
-	/* Enable all interrupts, we're going to read/write more data */
-        Chip_SSP_Int_Enable(LPC_SSP1);
-    }
-    else {
-        /* Transfer is completed, notify the caller task */
-	vTaskNotifyGiveFromISR(ssp_cfg[FLASH_SPI].caller_task, &xHigherPriorityTaskWoken);
-    }
-
-    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+    ssp_irq_handler(LPC_SSP1);
 }
 
+/*! @brief Function that controls the Slave Select (SSEL) signal
+ * This pin is controlled manually because the internal SSP driver resets the SSEL pin every 8 bits that are transfered
+ */
 void ssp_ssel_control( uint8_t id, t_ssel_state state )
 {
     gpio_set_pin_state( ssp_pins[id].port, ssp_pins[id].ssel_pin, state );
@@ -136,22 +132,9 @@ void ssp_init( uint8_t id, uint32_t bitrate, uint8_t frame_sz, bool master_mode,
     Chip_IOCON_PinMux(LPC_IOCON, ssp_pins[id].port, ssp_pins[id].miso_pin, IOCON_MODE_INACT, ssp_pins[id].miso_func);
 
     if (ssp_pins[id].ssel_func == 0) {
-	gpio_set_pin_dir( ssp_pins[id].port, ssp_pins[id].ssel_pin, OUTPUT);
-	gpio_set_pin_state( ssp_pins[id].port, ssp_pins[id].ssel_pin, HIGH);
+        gpio_set_pin_dir( ssp_pins[id].port, ssp_pins[id].ssel_pin, OUTPUT);
+        gpio_set_pin_state( ssp_pins[id].port, ssp_pins[id].ssel_pin, HIGH);
     }
-
-#if 0
-    /* Reset the other port to GPIO mode */
-    if ( id == FPGA_SPI && active_SSP0 == DAC_VADJ_SPI) {
-	Chip_IOCON_PinMux(LPC_IOCON, ssp_pins[DAC_VADJ_SPI].port, ssp_pins[DAC_VADJ_SPI].sck_pin, IOCON_MODE_INACT, 0);
-	Chip_IOCON_PinMux(LPC_IOCON, ssp_pins[DAC_VADJ_SPI].port, ssp_pins[DAC_VADJ_SPI].mosi_pin, IOCON_MODE_INACT, 0);
-	Chip_IOCON_PinMux(LPC_IOCON, ssp_pins[DAC_VADJ_SPI].port, ssp_pins[DAC_VADJ_SPI].miso_pin, IOCON_MODE_INACT, 0);
-    } else if (id == DAC_VADJ_SPI && active_SSP0 == FPGA_SPI) {
-	Chip_IOCON_PinMux(LPC_IOCON, ssp_pins[FPGA_SPI].port, ssp_pins[FPGA_SPI].sck_pin, IOCON_MODE_INACT, 0);
-	Chip_IOCON_PinMux(LPC_IOCON, ssp_pins[FPGA_SPI].port, ssp_pins[FPGA_SPI].mosi_pin, IOCON_MODE_INACT, 0);
-	Chip_IOCON_PinMux(LPC_IOCON, ssp_pins[FPGA_SPI].port, ssp_pins[FPGA_SPI].miso_pin, IOCON_MODE_INACT, 0);
-    }
-#endif
 
     Chip_SSP_Init(ssp_cfg[id].lpc_id);
     Chip_SSP_SetBitRate(ssp_cfg[id].lpc_id, bitrate);
@@ -161,12 +144,12 @@ void ssp_init( uint8_t id, uint32_t bitrate, uint8_t frame_sz, bool master_mode,
 
     if (!poll) {
         /* Configure interruption priority and enable it */
-	NVIC_SetPriority( ssp_cfg[id].irq, configMAX_SYSCALL_INTERRUPT_PRIORITY );
+        NVIC_SetPriority( ssp_cfg[id].irq, configMAX_SYSCALL_INTERRUPT_PRIORITY );
         NVIC_EnableIRQ( ssp_cfg[id].irq );
     }
 
     if (ssp_cfg[id].lpc_id == LPC_SSP0) {
-	active_SSP0 = id;
+        active_SSP0 = id;
     }
 }
 
@@ -182,16 +165,16 @@ void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint8_t tx_len, uint8_t *rx_bu
     data_st->length = rx_len+tx_len;
 
     if (ssp_cfg[id].polling) {
-	Chip_SSP_RWFrames_Blocking(ssp_cfg[id].lpc_id, data_st);
+        Chip_SSP_RWFrames_Blocking(ssp_cfg[id].lpc_id, data_st);
 
     } else {
-	Chip_SSP_Int_FlushData(ssp_cfg[id].lpc_id);
+        Chip_SSP_Int_FlushData(ssp_cfg[id].lpc_id);
 
-	/* Enable interrupt-based data transmission */
-	Chip_SSP_Int_Enable( ssp_cfg[id].lpc_id );
+        /* Enable interrupt-based data transmission */
+        Chip_SSP_Int_Enable( ssp_cfg[id].lpc_id );
 
-	/* User defined timeout ? */
-	/* Wait until the transfer is finished */
-	ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        /* User defined timeout ? */
+        /* Wait until the transfer is finished */
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
     }
 }
