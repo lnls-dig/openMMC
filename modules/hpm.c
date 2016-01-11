@@ -38,41 +38,54 @@ static uint8_t active_component;
 
 /* IPMC Capabilities */
 t_ipmc_capabilities ipmc_cap = {
-    .upgrade_undesirable = 0;
-    .automatic_rollback_overridden = 0;
-    .ipmc_degraded_in_update = 0;
-    .deferred_activation = 1;
-    .services_affected = 0;
-    .manual_rollback = 1;
-    .automatic_rollback = 1;
-    .self_test = 1;
+    .flags = { .upgrade_undesirable = 0,
+               .automatic_rollback_overridden = 0,
+               .ipmc_degraded_in_update = 0,
+               .deferred_activation = 1,
+               .services_affected = 1,
+               .manual_rollback = 1,
+               .automatic_rollback = 1,
+               .self_test = 1
+    }
 };
 
 /* Components properties */
 t_comp_properties comp_properties[HPM_MAX_COMPONENTS] = {
     [HPM_BOOTLOADER_COMPONENT_ID] = {
-        .reserved = 0x00;
-        .cold_reset_required = 1;
-        .deferred_activation_supported = 0;
-        .comparison_supported = 1;
-        .preparation_support = 0;
-        .rollback_backup_support = 0x01;
+        .properties = {
+            .flags = {
+                .reserved = 0x00,
+                .cold_reset_required = 1,
+                .deferred_activation_supported = 0,
+                .comparison_supported = 1,
+                .preparation_support = 0,
+                .rollback_backup_support = 0x01
+            }
+        },
     },
     [HPM_IPMC_COMPONENT_ID] = {
-        .reserved = 0x00;
-        .cold_reset_required = 1;
-        .deferred_activation_supported = 0;
-        .comparison_supported = 1;
-        .preparation_support = 0;
-        .rollback_backup_support = 0x01;
+        .properties = {
+            .flags = {
+                .reserved = 0x00,
+                .cold_reset_required = 1,
+                .deferred_activation_supported = 0,
+                .comparison_supported = 1,
+                .preparation_support = 0,
+                .rollback_backup_support = 0x01
+            }
+        },
     },
     [HPM_PAYLOAD_COMPONENT_ID] = {
-        .reserved = 0x00;
-        .cold_reset_required = 1;
-        .deferred_activation_supported = 0;
-        .comparison_supported = 1;
-        .preparation_support = 1;
-        .rollback_backup_support = 0x01;
+        .properties = {
+            .flags = {
+                .reserved = 0x00,
+                .cold_reset_required = 1,
+                .deferred_activation_supported = 0,
+                .comparison_supported = 1,
+                .preparation_support = 1,
+                .rollback_backup_support = 0x01
+            }
+        },
     }
 };
 

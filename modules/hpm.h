@@ -22,24 +22,30 @@
 
 #define HPM_MAX_COMPONENTS HPM_PAYLOAD_COMPONENT_ID+1
 
-typedef struct __attribute__ ((__packed__)) {
-    uint8_t upgrade_undesirable:1;
-    uint8_t automatic_rollback_overridden:1;
-    uint8_t ipmc_degraded_in_update:1;
-    uint8_t deferred_activation:1;
-    uint8_t services_affected:1;
-    uint8_t manual_rollback:1;
-    uint8_t automatic_rollback:1;
-    uint8_t self_test:1;
+typedef union {
+    struct {
+        uint8_t upgrade_undesirable:1;
+        uint8_t automatic_rollback_overridden:1;
+        uint8_t ipmc_degraded_in_update:1;
+        uint8_t deferred_activation:1;
+        uint8_t services_affected:1;
+        uint8_t manual_rollback:1;
+        uint8_t automatic_rollback:1;
+        uint8_t self_test:1;
+    } flags;
+    uint8_t byte;
 } t_ipmc_capabilities;
 
-typedef struct __attribute__ ((__packed__)) {
-    uint8_t reserved:2;
-    uint8_t cold_reset_required:1;
-    uint8_t deferred_activation_supported:1;
-    uint8_t comparison_supported:1;
-    uint8_t preparation_support:1;
-    uint8_t rollback_backup_support:2;
+typedef union __attribute__ ((__packed__)) {
+    struct {
+        uint8_t reserved:2,
+            cold_reset_required:1,
+            deferred_activation_supported:1,
+            comparison_supported:1,
+            preparation_support:1,
+            rollback_backup_support:2;
+    } flags;
+    uint8_t byte;
 } t_comp_properties;
 
 #endif
