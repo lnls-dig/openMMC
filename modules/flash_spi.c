@@ -86,7 +86,7 @@ void flash_program_page( uint32_t address, uint8_t * data, uint16_t size )
 
     memcpy(&tx_buff[4], data, size);
 
-    ssp_write( FLASH_SPI, &tx_buff[0], sizeof(tx_buff) );
+    ssp_write( FLASH_SPI, &tx_buff[0], size+4 );
 
     vPortFree(tx_buff);
 }
