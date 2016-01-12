@@ -36,7 +36,6 @@
 #include "led.h"
 #include "ad84xx.h"
 #include "hotswap.h"
-#include "flash_spi.h"
 
 /* payload states
  *   0 - no power
@@ -288,6 +287,7 @@ IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTRO
 /* HPM Functions */
 #ifdef MODULE_HPM
 
+#include "flash_spi.h"
 #include "string.h"
 
 uint8_t hpm_page[256];
@@ -314,7 +314,7 @@ uint8_t payload_hpm_prepare_comp( void )
     gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW);
 
     /* Erase FLASH */
-    flash_bulk_erase();
+    //flash_bulk_erase();
 
     return 1;
 }
@@ -357,7 +357,6 @@ uint8_t payload_hpm_finish_upload( uint32_t image_size )
 {
     /* Reset FPGA - Pulse PROGRAM_B pin */
     gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW);
-    asm("nop");
     gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH);
 
     LED_activity_desc_t LEDact;
