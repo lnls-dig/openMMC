@@ -304,7 +304,8 @@ uint8_t payload_hpm_prepare_comp( void )
     /* TODO: Check DONE pin before accessing the SPI bus, since the FPGA may be reading it in order to boot */
 
     /* Initialize flash */
-    ssp_init( FLASH_SPI, FLASH_SPI_BITRATE, FLASH_SPI_FRAME_SIZE, SSP_MASTER, SSP_POLLING );
+    ssp_init( FLASH_SPI, FLASH_SPI_BITRATE, FLASH_SPI_FRAME_SIZE, SSP_MASTER, SSP_INTERRUPT );
+
     /* Prevent the FPGA from accessing the Flash to configure itself now */
     gpio_set_pin_dir( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, OUTPUT);
     gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH);
