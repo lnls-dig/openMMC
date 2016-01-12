@@ -153,7 +153,7 @@ void ssp_init( uint8_t id, uint32_t bitrate, uint8_t frame_sz, bool master_mode,
     }
 }
 
-void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint8_t tx_len, uint8_t *rx_buf, uint8_t rx_len )
+void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint32_t tx_len, uint8_t *rx_buf, uint32_t rx_len )
 {
     Chip_SSP_DATA_SETUP_T * data_st = &ssp_cfg[id].xf_setup;
 
