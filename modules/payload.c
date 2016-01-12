@@ -312,7 +312,7 @@ uint8_t payload_hpm_prepare_comp( void )
     return 1;
 }
 
-uint32_t payload_hpm_upload_block( uint8_t * block, uint8_t size )
+uint32_t payload_hpm_upload_block( uint8_t * block, uint16_t size )
 {
     /* TODO: Check DONE pin before accessing the SPI bus, since the FPGA may be reading it in order to boot */
     uint8_t remaining_bytes_start;

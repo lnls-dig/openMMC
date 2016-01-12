@@ -61,7 +61,7 @@ void payload_init(void);
 
 #ifdef MODULE_HPM
 uint8_t payload_hpm_prepare_comp( void );
-uint32_t payload_hpm_upload_block( uint8_t * block, uint8_t size );
+uint32_t payload_hpm_upload_block( uint8_t * block, uint16_t size );
 uint8_t payload_hpm_finish_upload( uint32_t image_size );
 #endif
 
