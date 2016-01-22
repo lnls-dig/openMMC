@@ -3,14 +3,24 @@ include(CMakeForceCompiler)
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
 
-# specify the cross compiler
-cmake_force_c_compiler(arm-none-eabi-gcc GNU)
-cmake_force_cxx_compiler(arm-none-eabi-g++ GNU)
+# Set a toolchain path. You only need to set this if the toolchain isn't in
+# your system path. Don't forget a trailing path separator!
+set( TC_PATH "" )
 
-set(CMAKE_FIND_ROOT_PATH "/usr/local/arm-none-eabi")
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+# The toolchain prefix for all toolchain executables
+set( CROSS_COMPILE arm-none-eabi- )
+
+# specify the cross compiler. We force the compiler so that CMake doesn't
+# attempt to build a simple test program as this will fail without us using
+# the -nostartfiles option on the command line
+cmake_force_c_compiler(${CROSS_COMPILE}gcc GNU)
+cmake_force_cxx_compiler(${CROSS_COMPILE}g++ GNU)
+
+# We must set the OBJCOPY setting into cache so that it's available to the
+# whole project. Otherwise, this does not get set into the CACHE and therefore
+# the build doesn't know what the OBJCOPY filepath is
+set( CMAKE_OBJCOPY ${TC_PATH}${CROSS_COMPILE}objcopy
+    CACHE FILEPATH "The toolchain objcopy command " FORCE )
 
 set(COMMON_FLAGS "-fno-builtin -ffunction-sections -fdata-sections -fno-strict-aliasing -fmessage-length=0")
 set(CMAKE_C_FLAGS "${COMMON_FLAGS} -std=gnu99")

@@ -1,9 +1,9 @@
 #Select which microcontroller and board are being used
 set(TARGET_BOARD      "afcv3_1")
-set(TARGET_CONTROLLER "lpc1764")
+set(TARGET_CONTROLLER "LPC1764")
 
 # CPU and arch definition
-if(${TARGET_CONTROLLER} STREQUAL "lpc1764")
+if(${TARGET_CONTROLLER} STREQUAL "LPC1764")
   set(TARGET_ARCH     "armv7-m")
   set(TARGET_CPU      "cortex-m3")
 endif()
