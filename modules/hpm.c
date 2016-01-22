@@ -26,6 +26,7 @@
 #include "string.h"
 #include "led.h"
 #include "payload.h"
+#include "boot.h"
 
 /* Local Variables */
 
@@ -76,6 +77,11 @@ t_component hpm_components[HPM_MAX_COMPONENTS] = {
                 .rollback_backup_support = 0x01
             }
         },
+        .hpm_prepare_comp_f = ipmc_hpm_prepare_comp,
+        .hpm_upload_block_f = ipmc_hpm_upload_block,
+        .hpm_finish_upload_f = ipmc_hpm_finish_upload,
+        .hpm_get_upgrade_status_f = ipmc_hpm_get_upgrade_status,
+        .hpm_activate_firmware_f = ipmc_hpm_activate_firmware
     },
     [HPM_PAYLOAD_COMPONENT_ID] = {
         .properties = {
@@ -101,14 +107,13 @@ t_component hpm_components[HPM_MAX_COMPONENTS] = {
 void hpm_init( void )
 {
     memcpy(hpm_components[HPM_BOOTLOADER_COMPONENT_ID].description, "Bootloader", sizeof("Bootloader"));
-    memcpy(hpm_components[HPM_IPMC_COMPONENT_ID].description, "AFC IPMC", sizeof("AFC IPMC"));
+    memcpy(hpm_components[HPM_IPMC_COMPONENT_ID].description, "AFC MMC", sizeof("AFC MMC"));
     memcpy(hpm_components[HPM_PAYLOAD_COMPONENT_ID].description, "FPGA Payload", sizeof("FPGA Payload"));
 #if 0
     sprintf(hpm_components[HPM_BOOTLOADER_COMPONENT_ID].description, "%s", "Bootloader");
     sprintf(hpm_components[HPM_IPMC_COMPONENT_ID].description, "%s", "AFC IPMC");
-    sprintf(hpm_components[HPM_PAYLOAD_COMPONENT_ID].description, "%s", "FPGA Payload");*/
+    sprintf(hpm_components[HPM_PAYLOAD_COMPONENT_ID].description, "%s", "FPGA Payload");
 #endif
-
 }
 
 IPMI_HANDLER(ipmi_picmg_get_upgrade_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_GET_UPGRADE_CAPABILITIES, ipmi_msg *req, ipmi_msg* rsp)
@@ -377,4 +382,151 @@ IPMI_HANDLER(ipmi_picmg_activate_firmware, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_ACTI
     /* This is a long-duration command, update both cmd_in_progress and last_cmd_cc */
     cmd_in_progress = req->cmd;
     last_cmd_cc = rsp->completion_code;
+}
+
+/* IPMC HPM Functions */
+#include "iap.h"
+
+uint32_t ipmc_page_addr = 0;
+uint32_t ipmc_image_size = 0;
+uint32_t ipmc_pg_index = 0;
+uint32_t ipmc_page[64];
+
+uint8_t ipmc_hpm_prepare_comp( void )
+{
+    ipmc_image_size = 0;
+    ipmc_pg_index = 0;
+    ipmc_page_addr = 0;
+
+    for(uint32_t i=0; i<(sizeof(ipmc_page)/sizeof(uint32_t)); i++) {
+        ipmc_page[i] = 0xFFFFFFFF;
+    }
+
+    if (ipmc_erase_sector(IPMC_UPDATE_SECTOR_START, IPMC_UPDATE_SECTOR_END) != IAP_CMD_SUCCESS) {
+        return IPMI_CC_UNSPECIFIED_ERROR;
+    }
+    return IPMI_CC_OK;
+}
+
+uint8_t ipmc_hpm_upload_block( uint8_t * block, uint16_t size )
+{
+    uint8_t remaining_bytes_start;
+
+    if ( sizeof(ipmc_page)/4 - ipmc_pg_index > size/4) {
+        /* Our page is not full yet, just append the new data */
+        for (uint16_t i =0; i < size; i+=4, ipmc_pg_index++) {
+            ipmc_page[ipmc_pg_index] = (block[i+3] << 24)|(block[i+2] << 16)|(block[i+1] << 8)|(block[i]);
+        }
+
+        return IPMI_CC_OK;
+
+    } else {
+        /* Complete the remaining bytes on the buffer */
+        remaining_bytes_start = (sizeof(ipmc_page)/4 - ipmc_pg_index)*4;
+
+        for (uint16_t i =0; ipmc_pg_index < sizeof(ipmc_page)/4 ; i+=4, ipmc_pg_index++) {
+            ipmc_page[ipmc_pg_index] = (block[i+3] << 24)|(block[i+2] << 16)|(block[i+1] << 8)|(block[i]);
+        }
+
+        /* Program the complete page in the Flash */
+        ipmc_program_page( ipmc_page_addr, ipmc_page, sizeof(ipmc_page));
+
+        /* Advance the address counter */
+        ipmc_page_addr += sizeof(ipmc_page);
+
+        ipmc_image_size += sizeof(ipmc_page);
+
+        /* Empty our buffer and reset the index */
+        for(uint32_t i=0; i<(sizeof(ipmc_page)/sizeof(uint32_t)); i++) {
+            ipmc_page[i] = 0xFFFFFFFF;
+        }
+        ipmc_pg_index = 0;
+
+        /* Save the trailing bytes */
+        for (uint32_t i =0; i <(size-remaining_bytes_start); i+=4) {
+            ipmc_page[ipmc_pg_index++] = (block[i+3+remaining_bytes_start] << 24)|(block[i+2+remaining_bytes_start] << 16)|(block[i+1+remaining_bytes_start] << 8)|(block[i+remaining_bytes_start]);
+        }
+
+        return IPMI_CC_COMMAND_IN_PROGRESS;
+    }
+}
+
+uint8_t ipmc_hpm_finish_upload( uint32_t image_size )
+{
+    /* Check if the last page was already programmed */
+    if (ipmc_pg_index != 0) {
+        /* Program the complete page in the Flash */
+        ipmc_program_page( ipmc_page_addr, ipmc_page, sizeof(ipmc_page));
+        ipmc_image_size += ipmc_pg_index*4;
+        ipmc_pg_index = 0;
+        ipmc_page_addr = 0;
+    }
+
+    for(uint16_t i=0; i<(sizeof(ipmc_page)/sizeof(uint32_t)); i++) {
+        ipmc_page[i] = 0xFFFFFFFF;
+    }
+
+    /* BUG: This will overwrite the last page in the flash */
+    /* TODO: Write actual firmware ID */
+    ipmc_page[63] = 0x55555555;
+    ipmc_program_page( UPGRADE_FLASH_END_ADDR-IPMC_UPDATE_ADDRESS_OFFSET-256, ipmc_page, sizeof(ipmc_page));
+
+    if (ipmc_image_size != image_size) {
+        /* HPM CC: Number of bytes received does not match the size provided in the "Finish firmware upload" request */
+        return 0x81;
+    }
+    return IPMI_CC_OK;
+}
+
+uint8_t ipmc_hpm_get_upgrade_status( void )
+{
+    /* The IAP commands run when they're called and block the firmware. Long commands would cause timeouts on the IPMB */
+    return IPMI_CC_OK;
+}
+
+uint8_t ipmc_hpm_activate_firmware( void )
+{
+    /* Schedule a reset in the next watchdog task cycle, inhibiting the task to feed its counter */
+#ifdef MODULE_WATCHDOG
+    watchdog_reset_mcu();
+#endif
+    return IPMI_CC_OK;
+}
+
+uint8_t ipmc_program_page( uint32_t address, uint32_t * data, uint32_t size )
+{
+    if (size % 256) {
+        /* Data should be a 256 byte boundary */
+        return IPMI_CC_PARAM_OUT_OF_RANGE;
+    }
+
+    portDISABLE_INTERRUPTS();
+
+    if (Chip_IAP_PreSectorForReadWrite( IPMC_UPDATE_SECTOR_START, IPMC_UPDATE_SECTOR_END ) != IAP_CMD_SUCCESS) {
+        portENABLE_INTERRUPTS();
+        return IPMI_CC_UNSPECIFIED_ERROR;
+    }
+
+    if (Chip_IAP_CopyRamToFlash( IPMC_UPDATE_ADDRESS_OFFSET + address, data, size )) {
+        portENABLE_INTERRUPTS();
+        return IPMI_CC_UNSPECIFIED_ERROR;
+    }
+
+    portENABLE_INTERRUPTS();
+    return IPMI_CC_OK;
+}
+
+uint8_t ipmc_erase_sector( uint32_t sector_start, uint32_t sector_end)
+{
+    portDISABLE_INTERRUPTS();
+    if (Chip_IAP_PreSectorForReadWrite( sector_start, sector_end ) != IAP_CMD_SUCCESS) {
+        portENABLE_INTERRUPTS();
+        return IPMI_CC_UNSPECIFIED_ERROR;
+    }
+    if (Chip_IAP_EraseSector( sector_start, sector_end ) != IAP_CMD_SUCCESS) {
+        portENABLE_INTERRUPTS();
+        return IPMI_CC_UNSPECIFIED_ERROR;
+    }
+    portENABLE_INTERRUPTS();
+    return IPMI_CC_OK;
 }

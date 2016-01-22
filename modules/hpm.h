@@ -15,6 +15,10 @@
 #define HPM_ROLLBACK_TIMEOUT 10 /* in 5 seconds counts */
 #define HPM_INACCESSIBILITY_TIMEOUT 10 /* in 5 seconds counts */
 
+#define IPMC_UPDATE_SECTOR_START 0x10
+#define IPMC_UPDATE_SECTOR_END   0x11
+#define IPMC_UPDATE_ADDRESS_OFFSET (IPMC_UPDATE_SECTOR_START << 12)
+
 /* Components ID */
 enum {
     HPM_BOOTLOADER_COMPONENT_ID = 0,
@@ -66,5 +70,13 @@ typedef struct {
 } t_component;
 
 #define HPM_BLOCK_SIZE 20
+
+uint8_t ipmc_hpm_prepare_comp( void );
+uint8_t ipmc_hpm_upload_block( uint8_t * block, uint16_t size );
+uint8_t ipmc_hpm_finish_upload( uint32_t image_size );
+uint8_t ipmc_hpm_activate_firmware( void );
+uint8_t ipmc_hpm_get_upgrade_status( void );
+uint8_t ipmc_program_page( uint32_t address, uint32_t * data, uint32_t size );
+uint8_t ipmc_erase_sector( uint32_t sector_start, uint32_t sector_end);
 
 #endif
