@@ -63,7 +63,7 @@ const LED_activity_desc_t LED_2Hz_Blink_Activity = {LED_ACTV_BLINK, LED_ON_STATE
 const LED_activity_desc_t LED_3sec_Lamp_Test_Activity = {LED_ACTV_BLINK, LED_ON_STATE, 30, 0};
 
 LED_state_rec_t LEDstate[LED_CNT] = {
-    {
+    [LED_BLUE] = {
         .local_ptr = &LED_On_Activity,
         .counter = 0,
         .Color = LEDCOLOR_BLUE,
@@ -74,27 +74,27 @@ LED_state_rec_t LEDstate[LED_CNT] = {
         }
     },
 
-    {
+    [LED_GREEN] = {
         .local_ptr = &LED_2Hz_Blink_Activity,
         .Color = LEDCOLOR_GREEN,
         .counter = 0,
         .pin_cfg = {
-                    .pin = LEDGREEN_PIN,
-                    .port = LEDGREEN_PORT,
-                    .func = LED_PIN_FUNC
-                }
+            .pin = LEDGREEN_PIN,
+            .port = LEDGREEN_PORT,
+            .func = LED_PIN_FUNC
+        }
 
     },
 
-    {
+    [LED_RED] = {
         .local_ptr = &LED_Off_Activity,
         .Color = LEDCOLOR_RED,
         .counter = 0,
         .pin_cfg = {
-                    .pin = LEDRED_PIN,
-                    .port = LEDRED_PORT,
-                    .func = LED_PIN_FUNC
-                }
+            .pin = LEDRED_PIN,
+            .port = LEDRED_PORT,
+            .func = LED_PIN_FUNC
+        }
     }
 };
 
@@ -123,11 +123,11 @@ void LEDTask( void * Parameters )
             if (cycle == 0) {
                 if (xQueueReceive( pLED->queue, &new_cfg, 0 ) == pdTRUE) {
                     /* Save the last config */
-		    memcpy(&(pLED->last_cfg), &(pLED->cur_cfg), sizeof(LED_activity_desc_t));
+                    memcpy(&(pLED->last_cfg), &(pLED->cur_cfg), sizeof(LED_activity_desc_t));
 
                     /* Update the config struct */
-		    memcpy(&(pLED->cur_cfg), &new_cfg, sizeof(LED_activity_desc_t));
-		    LED_set_state(pLED->pin_cfg, pLED->cur_cfg.initstate);
+                    memcpy(&(pLED->cur_cfg), &new_cfg, sizeof(LED_activity_desc_t));
+                    LED_set_state(pLED->pin_cfg, pLED->cur_cfg.initstate);
                     pLED->counter = pLED->cur_cfg.delay_init;
                 }
             }
@@ -159,7 +159,7 @@ void LEDTask( void * Parameters )
                          * Revert the LED to the last know state and stay in toggled state until next cycle
                          */
                         pLED->counter = cycle;
-			memcpy(&(pLED->cur_cfg), &(pLED->last_cfg), sizeof(LED_activity_desc_t));
+                        memcpy(&(pLED->cur_cfg), &(pLED->last_cfg), sizeof(LED_activity_desc_t));
                     }
                 } else {
                     (pLED->counter)--;
@@ -190,9 +190,9 @@ void LED_init(void)
 
     LED_state_rec_t* pLED;
     for (int i = 0; i<LED_CNT; i++){
-	pLED = &LEDstate[i];
-	pLED->queue = xQueueCreate( 2, sizeof(LED_activity_desc_t));
-	xQueueSend( pLED->queue, pLED->local_ptr, 0 );
+        pLED = &LEDstate[i];
+        pLED->queue = xQueueCreate( 2, sizeof(LED_activity_desc_t));
+        xQueueSend( pLED->queue, pLED->local_ptr, 0 );
     }
 
     xTaskCreate( LEDTask, (const char *) "LED Task", 120, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
@@ -224,14 +224,14 @@ led_error LED_update( uint8_t led_num, const LED_activity_desc_t * pLEDact )
 
         if (pLEDact == NULL) {
             /* Update the local control pointer/prescaler */
-	    new_cfg = *(pLED->local_ptr);
+            new_cfg = *(pLED->local_ptr);
         } else {
             new_cfg = *(pLEDact);
         }
-	/* Send the new config to the LED Task */
+        /* Send the new config to the LED Task */
         if (xQueueSend(pLED->queue, &new_cfg, 0) != pdTRUE) {
-	    /* TODO: Handle error */
-	}
+            /* TODO: Handle error */
+        }
     }
     return led_success;
 }
@@ -309,4 +309,85 @@ IPMI_HANDLER(ipmi_picmg_set_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_
     }
     rsp->data_len = 0;
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
+}
+
+IPMI_HANDLER(ipmi_picmg_get_fru_led_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_FRU_LED_PROPERTIES, ipmi_msg *req, ipmi_msg *rsp )
+{
+    uint8_t len = rsp->data_len = 0;
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+    /* FRU can control the BLUE LED, LED 1 (RED) and LED 2 (GREEN) */
+    rsp->data[len++] = 0x03;
+    /* Application specific LED count */
+    rsp->data[len++] = 0x00;
+
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}
+
+IPMI_HANDLER(ipmi_picmg_get_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_FRU_LED_STATE, ipmi_msg *req, ipmi_msg *rsp )
+{
+    uint8_t len = rsp->data_len = 0;
+    uint8_t led_id = req->data[2];
+
+    if (led_id > LED_CNT) {
+	rsp->data_len = len;
+	rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+	return;
+    }
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+
+    /* LED State:
+     * [7:4] Reserved,
+     * [3] LED has an unmet hardware restriction,
+     * [2] Lamp Test enabled
+     * [2] Override state enabled
+     * [2] Local control enabled */
+    rsp->data[len++] = 0x01; // Reading not yet implemented
+
+    /* Local Control LED function */
+    switch (LEDState[led_id].curr_cfg.action) {
+    case LED_ACTV_OFF:
+	rsp->data[len++] = 0x00;
+	rsp->data[len++] = 0x00;
+	break;
+    case LED_ACTV_ON:
+	rsp->data[len++] = 0xFF;
+	rsp->data[len++] = 0x00;
+	break;
+    case LED_ACTV_BLINK:
+	rsp->data[len++] = LEDState[led_id].curr_cfg.delay_init;
+	rsp->data[len++] = LEDState[led_id].curr_cfg.delay_tog;
+	break;
+    }
+
+    /*  Local Control Color */
+    rsp->data[len++] = LEDstate[led_id].Color;
+
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}
+
+
+IPMI_HANDLER(ipmi_picmg_get_led_color_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_LED_COLOR_CAPABILITIES, ipmi_msg *req, ipmi_msg *rsp )
+{
+    uint8_t len = rsp->data_len = 0;
+    uint8_t led_id = req->data[2];
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+
+    /* LED Color Capabilities */
+    rsp->data[len++] = LEDstate[led_id].Color;
+    /* Default LED Color in Local Control State */
+    rsp->data[len++] = LEDstate[led_id].Color;
+    /* Default LED Color in Override State */
+    rsp->data[len++] = LEDstate[led_id].Color;
+    /* LED Flags:
+     * [7:2] Reserved,
+     * [1] LED has a hardware restriction,
+     * [0] LED won't work without payload power */
+    rsp->data[len++] = 0x00;
+
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
 }

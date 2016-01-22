@@ -284,6 +284,22 @@ IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTRO
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
 
+IPMI_HANDLER(ipmi_picmg_cmd_get_fru_control_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL_CAPABILITIES, ipmi_msg *req, ipmi_msg *rsp)
+{
+    uint8_t len = rsp->data_len = 0;
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+
+    /* FRU Control Capabilities Mask:
+     * [7:4] Reserved
+     * [3] - Capable of issuing a diagnostic interrupt
+     * [2] - Capable of issuing a graceful reboot
+     * [1] - Capable of issuing a warm reset */
+    rsp->data[len++] = 0x06; /* Graceful reboot and Warm reset */
+
+    rsp->completion_code = IPMI_CC_OK;
+}
+
 /* HPM Functions */
 #ifdef MODULE_HPM
 
