@@ -327,3 +327,26 @@ IPMI_HANDLER(ipmi_storage_read_fru_data_cmd, NETFN_STORAGE, IPMI_READ_FRU_DATA_C
     rsp->data_len = len + count;
     rsp->completion_code = IPMI_CC_OK;
 }
+
+IPMI_HANDLER(ipmi_storage_write_fru_data_cmd, NETFN_STORAGE, IPMI_WRITE_FRU_DATA_CMD, ipmi_msg * req, ipmi_msg * rsp )
+{
+    uint8_t len = rsp->data_len = 0;
+    uint16_t i;
+    uint16_t offset =  (req->data[2] << 8) | (req->data[1]);
+
+    if ((offset + req->data_len - 3) < FRU_SIZE) {
+	for (i = 0; i< req->data_len-3; i++) {
+	    fru_data[offset+i] = req->data[3+i];
+	}
+	/* Count written (1 based) */
+	rsp->data[len++] = i+1;
+
+	rsp->data_len = len;
+	rsp->completion_code = IPMI_CC_OK;
+    } else {
+	/* Count written (1 based) */
+	rsp->data[len++] = 0;
+	rsp->data_len = len;
+	rsp->completion_code = IPMI_CC_PARAM_OUT_OF_RANGE;
+    }
+}
