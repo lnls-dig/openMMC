@@ -61,8 +61,10 @@ void payload_init(void);
 
 #ifdef MODULE_HPM
 uint8_t payload_hpm_prepare_comp( void );
-uint32_t payload_hpm_upload_block( uint8_t * block, uint16_t size );
+uint8_t payload_hpm_upload_block( uint8_t * block, uint16_t size );
 uint8_t payload_hpm_finish_upload( uint32_t image_size );
+uint8_t payload_hpm_get_upgrade_status( void );
+uint8_t payload_hpm_activate_firmware( void );
 #endif
 
 #endif /* IPMI_PAYLOAD_H_ */

@@ -297,11 +297,9 @@ uint32_t hpm_page_addr;
 uint8_t payload_hpm_prepare_comp( void )
 {
     /* Initialize variables */
-    memset(hpm_page, 0, sizeof(hpm_page));
+    memset(hpm_page, 0xFF, sizeof(hpm_page));
     hpm_pg_index = 0;
     hpm_page_addr = 0;
-
-    /* TODO: Check DONE pin before accessing the SPI bus, since the FPGA may be reading it in order to boot */
 
     /* Initialize flash */
     ssp_init( FLASH_SPI, FLASH_SPI_BITRATE, FLASH_SPI_FRAME_SIZE, SSP_MASTER, SSP_INTERRUPT );
@@ -314,12 +312,12 @@ uint8_t payload_hpm_prepare_comp( void )
     gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW);
 
     /* Erase FLASH */
-    //flash_bulk_erase();
+    flash_bulk_erase();
 
-    return 1;
+    return IPMI_CC_COMMAND_IN_PROGRESS;
 }
 
-uint32_t payload_hpm_upload_block( uint8_t * block, uint16_t size )
+uint8_t payload_hpm_upload_block( uint8_t * block, uint16_t size )
 {
     /* TODO: Check DONE pin before accessing the SPI bus, since the FPGA may be reading it in order to boot */
     uint8_t remaining_bytes_start;
@@ -328,6 +326,8 @@ uint32_t payload_hpm_upload_block( uint8_t * block, uint16_t size )
         /* Our page is not full yet, just append the new data */
         memcpy(&hpm_page[hpm_pg_index], block, size);
         hpm_pg_index += size;
+
+        return IPMI_CC_OK;
 
     } else {
         /* Complete the remaining bytes on the buffer */
@@ -340,7 +340,7 @@ uint32_t payload_hpm_upload_block( uint8_t * block, uint16_t size )
         hpm_page_addr += sizeof(hpm_page);
 
         /* Empty our buffer and reset the index */
-        memset(hpm_page, 0, sizeof(hpm_page));
+        memset(hpm_page, 0xFF, sizeof(hpm_page));
         hpm_pg_index = 0;
 
         /* Save the trailing bytes */
@@ -348,23 +348,40 @@ uint32_t payload_hpm_upload_block( uint8_t * block, uint16_t size )
 
         hpm_pg_index = size-remaining_bytes_start;
 
+        return IPMI_CC_COMMAND_IN_PROGRESS;
     }
-    /* Return the offset address */
-    return hpm_page_addr + hpm_pg_index;
 }
 
 uint8_t payload_hpm_finish_upload( uint32_t image_size )
+{
+    /* Check if the last page was already programmed */
+    if (!hpm_pg_index) {
+        /* Program the complete page in the Flash */
+        flash_program_page( hpm_page_addr, &hpm_page[0], (sizeof(hpm_page)-hpm_pg_index));
+        hpm_pg_index = 0;
+        hpm_page_addr = 0;
+
+        return IPMI_CC_COMMAND_IN_PROGRESS;
+    }
+
+    return IPMI_CC_OK;
+}
+
+uint8_t payload_hpm_get_upgrade_status( void )
+{
+    if (is_flash_busy()) {
+        return IPMI_CC_COMMAND_IN_PROGRESS;
+    } else {
+        return IPMI_CC_OK;
+    }
+}
+
+uint8_t payload_hpm_activate_firmware( void )
 {
     /* Reset FPGA - Pulse PROGRAM_B pin */
     gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW);
     gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH);
 
-    LED_activity_desc_t LEDact;
-    const LED_activity_desc_t * pLEDact;
-    pLEDact = &LEDact;
-    pLEDact = &LED_On_Activity;
-    LED_update( LED_RED, pLEDact );
-
-    return 1;
+    return IPMI_CC_OK;
 }
 #endif
