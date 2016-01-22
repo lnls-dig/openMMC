@@ -1,6 +1,6 @@
 # Build microcontroller-specific sources
 
-if(${TARGET_CONTROLLER} MATCHES "(lpc17)")
+if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
   set(LPC17XX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/nxp/lpc17xx)
   set(LPCOPEN_SRCPATH ${LPC17XX_PATH}/lpcopen/src)
   set(LPCOPEN_INCPATH ${LPC17XX_PATH}/lpcopen/inc)
@@ -11,6 +11,9 @@ if(${TARGET_CONTROLLER} MATCHES "(lpc17)")
     ${LPC17XX_PATH}/lpc17_i2c.c
     ${LPC17XX_PATH}/lpc17_spi.c
     ${LPC17XX_PATH}/lpc17_ssp.c
+    )
+
+  set(LPC17_SRCS ${LPC17_SRCS}
     ${LPC17XX_PATH}/sysinit.c
     ${LPC17XX_PATH}/cr_startup_lpc175x_6x.c
     )
@@ -43,4 +46,5 @@ if(${TARGET_CONTROLLER} MATCHES "(lpc17)")
 endif()
 
 set(PROJ_SRCS ${PROJ_SRCS} PARENT_SCOPE)
+set(LPC17_SRCS ${LPC17_SRCS} PARENT_SCOPE)
 set(PROJ_HDRS ${PROJ_HDRS} PARENT_SCOPE)

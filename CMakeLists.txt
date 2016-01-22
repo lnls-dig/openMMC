@@ -67,10 +67,6 @@ set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_BUILD_FLAGS} ${CMAKE_ERROR
 set(CMAKE_C_FLAGS_DEBUG     "-O0 -g3 -DDEBUG")
 set(CMAKE_C_FLAGS_RELEASE   "-O3")
 
-# Linker flags
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${CMAKE_SOURCE_DIR}/linker/lpc1764.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/afcipm.map")
-set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
-
 # When we break up long strings in CMake we get semicolon
 # separated lists, undo this here...
 string(REGEX REPLACE ";" " " CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
@@ -99,6 +95,17 @@ add_executable(${CMAKE_PROJECT_NAME} ${LPC17_SRCS} ${PROJ_SRCS})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${MODULES_FLAGS})
 
 add_executable(bootloader ${BOOT_SRCS} ${LPC17_SRCS})
+
+# Linker flags
+set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+  SUFFIX ".axf"
+  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/lpc1764_app.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/lpc1764_app.map" )
+
+set_target_properties(bootloader PROPERTIES
+  SUFFIX ".axf"
+  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/lpc1764_boot.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/lpc1764_boot.map")
+
 
 # Headers path
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
