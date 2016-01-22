@@ -181,6 +181,27 @@ IPMI_HANDLER(ipmi_get_device_id,  NETFN_APP, IPMI_GET_DEVICE_ID_CMD, ipmi_msg *r
 }
 
 /*!
+ * @brief Handler for GET Device GUID command
+ *
+ * @param req pointer to request message
+ *
+ * @param rsp pointer to response message
+ *
+ * @return
+ */
+IPMI_HANDLER(ipmi_get_device_guid,  NETFN_APP, IPMI_GET_DEVICE_GUID_CMD, ipmi_msg *req, ipmi_msg* rsp)
+{
+    int len = rsp->data_len = 0;
+
+    rsp->completion_code = IPMI_CC_OK;
+
+    /* TODO: Generate GUID - Globally Unique ID */
+    memset( &rsp->data[len], 0x00, 16);
+
+    rsp->data_len = 16;
+}
+
+/*!
  * @brief handler for GET Properties request. To be called by IPMI
  *  request handler, it must obey the predefined function signature
  *  and protocol. Check IPMI 2.0 table 3-11 for more information.
@@ -208,3 +229,17 @@ IPMI_HANDLER(ipmi_picmg_cmd_set_amc_port_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET
     rsp->completion_code = IPMI_CC_OK;
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
+
+/* Compatibility with Vadatech */
+IPMI_HANDLER(ipmi_get_device_locator_record, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_DEVICE_LOCATOR_RECORD, ipmi_msg * req, ipmi_msg * rsp )
+{
+    uint8_t len = rsp->data_len = 0;
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+    rsp->data[len++] = 0x00;
+    rsp->data[len++] = 0x00;
+
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}
+
