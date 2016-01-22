@@ -85,22 +85,27 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "")
 set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/afcipm.c)
 add_subdirectory(FreeRTOS)
 add_subdirectory(port)
+add_subdirectory(boot)
 add_subdirectory(modules)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  add_subdirectory(trace)
+  #add_subdirectory(trace)
 endif()
 
 # Libraries path
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 ## Create executable
-add_executable(${CMAKE_PROJECT_NAME}.axf ${PROJ_SRCS})
+add_executable(${CMAKE_PROJECT_NAME} ${LPC17_SRCS} ${PROJ_SRCS})
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${MODULES_FLAGS})
+
+add_executable(bootloader ${BOOT_SRCS} ${LPC17_SRCS})
+
 # Headers path
-target_include_directories(${CMAKE_PROJECT_NAME}.axf PUBLIC ${PROJ_HDRS})
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
+target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
 # Link libraries
-target_link_libraries(${CMAKE_PROJECT_NAME}.axf gcc c m)
-target_link_libraries(${CMAKE_PROJECT_NAME}.axf FreeRTOS)
-target_link_libraries(${CMAKE_PROJECT_NAME}.axf lpcopen)
+target_link_libraries(${CMAKE_PROJECT_NAME} gcc c m FreeRTOS lpcopen)
+target_link_libraries(bootloader gcc c m lpcopen)
 
 ##Program command
 set(LPCXPRESSO_PATH /usr/local/lpcxpresso_7.8.0_426/lpcxpresso/)
