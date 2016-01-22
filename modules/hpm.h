@@ -23,9 +23,11 @@ enum {
     HPM_MAX_COMPONENTS
 };
 
-typedef uint32_t (* t_hpm_upload_block)(uint8_t * block, uint8_t size);
+typedef uint8_t (* t_hpm_upload_block)(uint8_t * block, uint16_t size);
 typedef uint8_t (* t_hpm_finish_upload)(uint32_t image_size);
 typedef uint8_t (* t_hpm_prepare_comp)(void);
+typedef uint8_t (* t_hpm_get_upgrade_status)(void);
+typedef uint8_t (* t_hpm_activate_firmware)(void);
 
 typedef union {
     struct {
@@ -59,6 +61,8 @@ typedef struct {
     t_hpm_prepare_comp hpm_prepare_comp_f;
     t_hpm_upload_block hpm_upload_block_f;
     t_hpm_finish_upload hpm_finish_upload_f;
+    t_hpm_get_upgrade_status hpm_get_upgrade_status_f;
+    t_hpm_activate_firmware hpm_activate_firmware_f;
 } t_component;
 
 #define HPM_BLOCK_SIZE 20

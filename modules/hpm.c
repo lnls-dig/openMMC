@@ -273,10 +273,17 @@ IPMI_HANDLER(ipmi_picmg_get_upgrade_status, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_GET
 {
     uint8_t len = rsp->data_len = 0;
 
+    if (hpm_components[active_id].hpm_get_upgrade_status_f) {
+        /* WARNING: This function can't block! */
+        last_cmd_cc = hpm_components[active_id].hpm_get_upgrade_status_f();
+    } else {
+        /* Returning IPMI_CC_OK for debug purposes only, should be IPMI_CC_UNSPECIFIED_ERROR */
+        last_cmd_cc = IPMI_CC_OK;
+    }
+
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
     rsp->data[len++] = cmd_in_progress;
     rsp->data[len++] = last_cmd_cc;
-
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 
@@ -338,6 +345,18 @@ IPMI_HANDLER(ipmi_picmg_finish_firmware_upload, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM
     /* TODO: implement HPM.1 REQ3.59 */
 
     hpm_components[active_id].hpm_finish_upload_f( image_len );
+
+IPMI_HANDLER(ipmi_picmg_activate_firmware, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_ACTIVATE_FIRMWARE, ipmi_msg *req, ipmi_msg* rsp)
+{
+    uint8_t len = rsp->data_len = 0;
+
+    /* TODO: Compare firmware revisions before activating */
+
+    if (hpm_components[active_id].hpm_activate_firmware_f) {
+        rsp->completion_code = hpm_components[active_id].hpm_activate_firmware_f();
+    } else {
+        rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+    }
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
 
