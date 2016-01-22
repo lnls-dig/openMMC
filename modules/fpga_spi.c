@@ -48,7 +48,7 @@ static uint32_t read_fpga_byte( uint16_t address )
     tx_buff[1] = (address >> 8) & 0xFF;
     tx_buff[2] = address & 0xFF;
 
-    ssp_write_read( FPGA_SPI, &tx_buff[0], sizeof(tx_buff), &rx_buff[0], sizeof(rx_buff) );
+    ssp_write_read( FPGA_SPI, &tx_buff[0], sizeof(tx_buff), &rx_buff[0], sizeof(rx_buff), portMAX_DELAY );
 
     return ( (rx_buff[3] << 24) | (rx_buff[4] << 16) | (rx_buff[5] << 8) | rx_buff[6]);
 }

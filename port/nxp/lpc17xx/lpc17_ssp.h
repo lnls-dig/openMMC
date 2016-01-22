@@ -48,14 +48,14 @@ typedef struct {
 
 void ssp_init( uint8_t id, uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll );
 void ssp_ssel_control( uint8_t id, t_ssel_state state );
-void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint32_t tx_len, uint8_t *rx_buf, uint32_t rx_len );
+void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint32_t tx_len, uint8_t *rx_buf, uint32_t rx_len, uint32_t timeout );
 
-#define ssp_chip_init(id)                   Chip_SSP_Init(SSP(id))
-#define ssp_chip_deinit(id)                 Chip_SSP_DeInit(SSP(id))
-#define ssp_flush_rx(id)                    Chip_SSP_Int_FlushData(SSP(id))
-#define ssp_set_bitrate(id, bitrate)        Chip_SSP_SetBitRate(SSP(id), bitrate)
-#define ssp_write(id, buffer, buffer_len)   ssp_write_read(id, buffer, buffer_len, NULL, 0)
-#define ssp_read(id, buffer, buffer_len)    ssp_write_read(id, NULL, 0, buffer, buffer_len)
+#define ssp_chip_init(id)                             Chip_SSP_Init(SSP(id))
+#define ssp_chip_deinit(id)                           Chip_SSP_DeInit(SSP(id))
+#define ssp_flush_rx(id)                              Chip_SSP_Int_FlushData(SSP(id))
+#define ssp_set_bitrate(id, bitrate)                  Chip_SSP_SetBitRate(SSP(id), bitrate)
+#define ssp_write(id, buffer, buffer_len)             ssp_write_read(id, buffer, buffer_len, NULL, 0, 0)
+#define ssp_read(id, buffer, buffer_lenm, timeout)    ssp_write_read(id, NULL, 0, buffer, buffer_len, timeout)
 
 
 #endif

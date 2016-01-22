@@ -29,9 +29,9 @@ void flash_read_id( uint8_t * id_buffer, uint8_t buff_size )
     /* Size of rx buffer must be the sum of the length of the data expected to receive and the length of the sent data */
     uint8_t rx_buff[4] = {0};
 
-    ssp_write_read( FLASH_SPI, &tx_buff[0], sizeof(tx_buff), &rx_buff[0], sizeof(rx_buff) );
+    ssp_write_read( FLASH_SPI, &tx_buff[0], 1, &rx_buff[0], 3, portMAX_DELAY );
 
-    memcpy(id_buffer, &tx_buff[1], 3);
+    memcpy(id_buffer, &rx_buff[1], 3);
 }
 
 uint8_t flash_read_status_reg( void )
@@ -41,7 +41,7 @@ uint8_t flash_read_status_reg( void )
     /* Size of rx buffer must be the sum of the length of the data expected to receive and the length of the sent data */
     uint8_t rx_buff[2] = {0};
 
-    ssp_write_read( FLASH_SPI, &tx_buff[0], sizeof(tx_buff), &rx_buff[0], sizeof(rx_buff) );
+    ssp_write_read( FLASH_SPI, &tx_buff[0], 1, &rx_buff[0], 1, portMAX_DELAY );
 
     return rx_buff[1];
 }
@@ -67,13 +67,14 @@ uint8_t flash_read_data( uint32_t address )
     /* Size of rx buffer must be the sum of the length of the data expected to receive and the length of the sent data */
     uint8_t rx_buff[5] = {0};
 
-    ssp_write_read( FLASH_SPI, &tx_buff[0], sizeof(tx_buff), &rx_buff[0], sizeof(rx_buff) );
+    ssp_write_read( FLASH_SPI, &tx_buff[0], 4, &rx_buff[0], 1, portMAX_DELAY );
 
     return rx_buff[4];
 }
 
 void flash_program_page( uint32_t address, uint8_t * data, uint16_t size )
 {
+    /* The sector MUST be erased before trying to program new data into it */
     flash_write_enable();
 
     /* Use malloc to reserve 'size' plus 4 bytes (address and cmd) */

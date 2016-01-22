@@ -1,4 +1,5 @@
 #include "port.h"
+#include "string.h"
 #include "pin_mapping.h"
 
 const t_ssp_pin ssp_pins[MAX_SSP_INTERFACES] = {
@@ -91,6 +92,8 @@ static void ssp_irq_handler( LPC_SSP_T * ssp_id )
     else {
         /* Transfer is completed, notify the caller task */
         vTaskNotifyGiveFromISR(ssp_cfg[ssp_cfg_index].caller_task, &xHigherPriorityTaskWoken);
+	/* Deassert SSEL pin */
+	ssp_ssel_control(ssp_cfg_index, DEASSERT);
     }
 
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
@@ -153,15 +156,23 @@ void ssp_init( uint8_t id, uint32_t bitrate, uint8_t frame_sz, bool master_mode,
     }
 }
 
-void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint32_t tx_len, uint8_t *rx_buf, uint32_t rx_len )
+uint8_t * tx_ssp;
+uint8_t * rx_ssp;
+
+void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint32_t tx_len, uint8_t *rx_buf, uint32_t rx_len, uint32_t timeout )
 {
     Chip_SSP_DATA_SETUP_T * data_st = &ssp_cfg[id].xf_setup;
+
+    tx_ssp = pvPortMalloc(tx_len);
+    rx_ssp = pvPortMalloc(rx_len+tx_len);
+
+    memcpy(tx_ssp, tx_buf, tx_len);
 
     ssp_cfg[id].caller_task = xTaskGetCurrentTaskHandle();
     data_st->tx_cnt = 0;
     data_st->rx_cnt = 0;
-    data_st->tx_data = tx_buf;
-    data_st->rx_data = rx_buf;
+    data_st->tx_data = tx_ssp;
+    data_st->rx_data = rx_ssp;
     data_st->length = rx_len+tx_len;
 
     /* Assert Slave Select pin to enable the transfer */
@@ -169,7 +180,7 @@ void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint32_t tx_len, uint8_t *rx_b
 
     if (ssp_cfg[id].polling) {
         Chip_SSP_RWFrames_Blocking(ssp_cfg[id].lpc_id, data_st);
-
+	ssp_ssel_control(id, DEASSERT);
     } else {
         Chip_SSP_Int_FlushData(ssp_cfg[id].lpc_id);
 
@@ -178,8 +189,11 @@ void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint32_t tx_len, uint8_t *rx_b
 
         /* User defined timeout ? */
         /* Wait until the transfer is finished */
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        ulTaskNotifyTake(pdTRUE, timeout);
     }
-    /* Deassert SSEL pin */
-    ssp_ssel_control(id, DEASSERT);
+    if (rx_buf && rx_len > 0) {
+        memcpy(rx_buf, rx_ssp, rx_len+tx_len);
+    }
+    vPortFree(rx_ssp);
+    vPortFree(tx_ssp);
 }
