@@ -33,8 +33,8 @@
 /* Local variables */
 QueueHandle_t ipmi_rxqueue = NULL;
 
-volatile const t_req_handler_record *ipmiEntries = &_ipmi_handlers;
-volatile const t_req_handler_record *ipmiEntries_end = &_eipmi_handlers;
+volatile const t_req_handler_record *ipmiEntries = (t_req_handler_record *) &_ipmi_handlers;
+volatile const t_req_handler_record *ipmiEntries_end = (t_req_handler_record *) &_eipmi_handlers;
 
 void IPMITask( void * pvParameters )
 {
