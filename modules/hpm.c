@@ -239,21 +239,17 @@ IPMI_HANDLER(ipmi_picmg_initiate_upgrade_action, NETFN_GRPEXT, IPMI_PICMG_CMD_HP
         break;
     case 0x01:
         /* Prepare Component */
-        if (!hpm_components[active_id].hpm_prepare_comp_f()) {
-	    rsp->completion_code = IPMI_CC_INV_CMD;
-        } else {
-            rsp->completion_code = IPMI_CC_OK;
-	}
+        if (hpm_components[active_id].hpm_prepare_comp_f) {
+            rsp->completion_code = hpm_components[active_id].hpm_prepare_comp_f();
+        }
         break;
     case 0x02:
         /* Upload for upgrade */
         /* Set the component that'll be upgraded */
         active_id = comp_id;
-	if (!hpm_components[active_id].hpm_prepare_comp_f()) {
-	    rsp->completion_code = IPMI_CC_INV_CMD;
-        } else {
-            rsp->completion_code = IPMI_CC_OK;
-	}
+        if (hpm_components[active_id].hpm_prepare_comp_f) {
+            rsp->completion_code = hpm_components[active_id].hpm_prepare_comp_f();
+        }
         break;
     case 0x03:
         /* Upload for compare */
@@ -322,13 +318,13 @@ IPMI_HANDLER(ipmi_picmg_upload_firmware_block, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_
 
     if (hpm_components[active_id].hpm_upload_block_f) {
         /* WARNING: This function can't block! */
-        hpm_components[active_id].hpm_upload_block_f(&block_data[0], sizeof(block_data));
+        rsp->completion_code = hpm_components[active_id].hpm_upload_block_f(&block_data[0], sizeof(block_data));
+    } else {
+        rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
     }
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
-
     rsp->data_len = len;
-    rsp->completion_code = IPMI_CC_OK;
 
     /* This is a long-duration command, update both cmd_in_progress and last_cmd_cc */
     cmd_in_progress = req->cmd;
@@ -344,7 +340,21 @@ IPMI_HANDLER(ipmi_picmg_finish_firmware_upload, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM
     /* TODO: compare image_len with the actual data received */
     /* TODO: implement HPM.1 REQ3.59 */
 
-    hpm_components[active_id].hpm_finish_upload_f( image_len );
+    if ( hpm_components[active_id].hpm_finish_upload_f) {
+        rsp->completion_code = hpm_components[active_id].hpm_finish_upload_f( image_len );
+    } else {
+        rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+    }
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+
+    rsp->data_len = len;
+
+
+    /* This is a long-duration command, update both cmd_in_progress and last_cmd_cc */
+    cmd_in_progress = req->cmd;
+    last_cmd_cc = rsp->completion_code;
+}
 
 IPMI_HANDLER(ipmi_picmg_activate_firmware, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_ACTIVATE_FIRMWARE, ipmi_msg *req, ipmi_msg* rsp)
 {
@@ -361,7 +371,6 @@ IPMI_HANDLER(ipmi_picmg_activate_firmware, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_ACTI
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
 
     rsp->data_len = len;
-    rsp->completion_code = IPMI_CC_OK;
 
     /* This is a long-duration command, update both cmd_in_progress and last_cmd_cc */
     cmd_in_progress = req->cmd;
