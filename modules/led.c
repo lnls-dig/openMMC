@@ -43,16 +43,6 @@
 #include "pin_mapping.h"
 #include "task_priorities.h"
 
-typedef struct {
-    LED_activity_desc_t cur_cfg;
-    LED_activity_desc_t last_cfg;
-    LED_activity_desc_t const * local_ptr;
-    uint32_t counter;
-    uint8_t Color;
-    LEDPincfg_t pin_cfg;
-    QueueHandle_t queue;
-} LED_state_rec_t;
-
 //extern LED_state_rec_t LEDstate[LED_CNT];
 
 const LED_activity_desc_t LED_Off_Activity = {LED_ACTV_OFF, LED_OFF_STATE, 0, 0};
@@ -109,8 +99,8 @@ void LEDTask( void * Parameters )
     LED_activity_desc_t new_cfg;
     LED_state_rec_t* pLED;
     uint8_t led_id;
-    /* Task will run every 100ms */
-    TickType_t xFrequency = 100 / portTICK_PERIOD_MS;
+    /* Task will run every 50ms */
+    TickType_t xFrequency = 50 / portTICK_PERIOD_MS;
     TickType_t xLastWakeTime;
 
     /* Initialise the xLastWakeTime variable with the current time. */
@@ -346,7 +336,7 @@ IPMI_HANDLER(ipmi_picmg_get_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_FRU_
     rsp->data[len++] = 0x01; // Reading not yet implemented
 
     /* Local Control LED function */
-    switch (LEDState[led_id].curr_cfg.action) {
+    switch (LEDstate[led_id].cur_cfg.action) {
     case LED_ACTV_OFF:
 	rsp->data[len++] = 0x00;
 	rsp->data[len++] = 0x00;
@@ -356,8 +346,8 @@ IPMI_HANDLER(ipmi_picmg_get_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_FRU_
 	rsp->data[len++] = 0x00;
 	break;
     case LED_ACTV_BLINK:
-	rsp->data[len++] = LEDState[led_id].curr_cfg.delay_init;
-	rsp->data[len++] = LEDState[led_id].curr_cfg.delay_tog;
+	rsp->data[len++] = LEDstate[led_id].cur_cfg.delay_init;
+	rsp->data[len++] = LEDstate[led_id].cur_cfg.delay_tog;
 	break;
     }
 

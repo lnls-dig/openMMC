@@ -43,6 +43,16 @@ typedef struct {
     uint32_t delay_tog;        // period in opposite state in 10ms units, 0=skip
 } LED_activity_desc_t;
 
+typedef struct {
+    LED_activity_desc_t cur_cfg;
+    LED_activity_desc_t last_cfg;
+    LED_activity_desc_t const * local_ptr;
+    uint32_t counter;
+    uint8_t Color;
+    LEDPincfg_t pin_cfg;
+    QueueHandle_t queue;
+} LED_state_rec_t;
+
 typedef enum {
     led_success = 0,
     led_unspecified_error,
