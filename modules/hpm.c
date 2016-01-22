@@ -27,7 +27,9 @@
 #include "led.h"
 #include "payload.h"
 #include "boot.h"
-
+#ifdef MODULE_WATCHDOG
+#include "watchdog.h"
+#endif
 /* Local Variables */
 
 /* Stores the code of the current or last completed long duration command */
@@ -318,7 +320,6 @@ IPMI_HANDLER(ipmi_picmg_upload_firmware_block, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_
         return;
     }
 
-    uint8_t block_num = req->data[1];
     memcpy(&block_data[0], &req->data[2], req->data_len-2);
 
     /* TODO: perform checksum of the block */
@@ -344,7 +345,6 @@ IPMI_HANDLER(ipmi_picmg_finish_firmware_upload, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM
 
     uint32_t image_len = (req->data[5] << 24) | (req->data[4] << 16) | (req->data[3] << 8) | (req->data[2]);
 
-    /* TODO: compare image_len with the actual data received */
     /* TODO: implement HPM.1 REQ3.59 */
 
     if ( hpm_components[active_id].hpm_finish_upload_f) {
@@ -356,7 +356,6 @@ IPMI_HANDLER(ipmi_picmg_finish_firmware_upload, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
 
     rsp->data_len = len;
-
 
     /* This is a long-duration command, update both cmd_in_progress and last_cmd_cc */
     cmd_in_progress = req->cmd;
@@ -443,7 +442,7 @@ uint8_t ipmc_hpm_upload_block( uint8_t * block, uint16_t size )
         ipmc_pg_index = 0;
 
         /* Save the trailing bytes */
-        for (uint32_t i =0; i <(size-remaining_bytes_start); i+=4) {
+        for (uint8_t i =0; i <(size-remaining_bytes_start); i+=4) {
             ipmc_page[ipmc_pg_index++] = (block[i+3+remaining_bytes_start] << 24)|(block[i+2+remaining_bytes_start] << 16)|(block[i+1+remaining_bytes_start] << 8)|(block[i+remaining_bytes_start]);
         }
 
