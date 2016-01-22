@@ -4,6 +4,7 @@
 #define WATCHDOG_H_
 
 void watchdog_init( void );
-void WatchdogTask (void * Parameters);
+void WatchdogTask( void * Parameters );
+void watchdog_reset_mcu( void );
 
 #endif
