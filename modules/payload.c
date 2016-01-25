@@ -218,6 +218,14 @@ void vTaskPayload(void *pvParmeters)
             case PAYLOAD_MESSAGE_QUIESCED:
                 QUIESCED_req = 1;
                 break;
+	    case PAYLOAD_MESSAGE_COLD_RST:
+		state = PAYLOAD_SWITCHING_OFF;
+		break;
+	    case PAYLOAD_MESSAGE_REBOOT:
+		gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+		asm("NOP");
+		gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+		break;
             }
         }
 
@@ -238,7 +246,9 @@ void vTaskPayload(void *pvParmeters)
             break;
 
         case PAYLOAD_POWER_GOOD_WAIT:
-            if (QUIESCED_req) {
+	    sensor_array[HOT_SWAP_SENSOR].readout_value &= ~HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK;
+	    sensor_array[HOT_SWAP_SENSOR].readout_value &= ~HOTSWAP_BACKEND_PWR_FAILURE_MASK;
+	    if (QUIESCED_req) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (P1V0_good == 1) {
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
@@ -295,9 +305,31 @@ void vTaskPayload(void *pvParmeters)
 
 IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL, ipmi_msg *req, ipmi_msg *rsp)
 {
-    payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
+    uint8_t len = rsp->data_len = 0;
+    uint8_t fru_ctl = req->data[2];
+
     rsp->completion_code = IPMI_CC_OK;
-    rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
+
+    switch (fru_ctl) {
+    case FRU_CTLCODE_COLD_RST:
+	payload_send_message(PAYLOAD_MESSAGE_COLD_RST);
+	break;
+    case FRU_CTLCODE_WARM_RST:
+	payload_send_message(PAYLOAD_MESSAGE_WARM_RST);
+	break;
+    case FRU_CTLCODE_REBOOT:
+	payload_send_message(PAYLOAD_MESSAGE_REBOOT);
+	break;
+    case FRU_CTLCODE_QUIESCE:
+	payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
+	break;
+
+    default:
+	rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+	break;
+    }
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
 }
 
 IPMI_HANDLER(ipmi_picmg_cmd_get_fru_control_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL_CAPABILITIES, ipmi_msg *req, ipmi_msg *rsp)
