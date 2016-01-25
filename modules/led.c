@@ -100,7 +100,7 @@ void LEDTask( void * Parameters )
     LED_state_rec_t* pLED;
     uint8_t led_id;
     /* Task will run every 50ms */
-    TickType_t xFrequency = 50 / portTICK_PERIOD_MS;
+    TickType_t xFrequency = 100 / portTICK_PERIOD_MS;
     TickType_t xLastWakeTime;
 
     /* Initialise the xLastWakeTime variable with the current time. */
