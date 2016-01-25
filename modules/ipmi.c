@@ -216,9 +216,9 @@ IPMI_HANDLER(ipmi_picmg_get_properties, NETFN_GRPEXT,IPMI_PICMG_CMD_GET_PROPERTI
     int len = rsp->data_len = 0;
     rsp->completion_code = IPMI_CC_OK;
 
-    /* Hardcoded response according to the  */
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
     rsp->data[len++] = IPMI_EXTENSION_VERSION;
+    /* MMCs must report MAX_FRU_ID and FRU_DEVICE_ID both as 0 - AMC.0 Table 3-1 */
     rsp->data[len++] = MAX_FRU_ID;
     rsp->data[len++] = FRU_DEVICE_ID;
     rsp->data_len = len;

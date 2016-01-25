@@ -27,8 +27,8 @@
 
 #define IPMI_MAX_DATA_LEN 24
 
-#define IPMI_EXTENSION_VERSION 0x23
-#define MAX_FRU_ID             0x01
+#define IPMI_EXTENSION_VERSION 0x14
+#define MAX_FRU_ID             0x00
 #define FRU_DEVICE_ID          0x00
 
 /* Known NetFn codes (even request codes only) */
