@@ -95,8 +95,8 @@ void hotswap_init( void )
     Chip_GPIOINT_SetIntRising(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT, (1 << HOT_SWAP_HANDLE_PIN));
 
     /* Configure the IRQ */
-    NVIC_SetPriority( EINT3_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1);
-    NVIC_EnableIRQ( EINT3_IRQn );
+    irq_set_priority( EINT3_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1);
+    irq_enable( EINT3_IRQn );
 #endif
     /* Create Hot Swap task */
     xTaskCreate( vTaskHotSwap, "Hot Swap", 200, (void *) NULL, tskHOTSWAP_PRIORITY, &vTaskHotSwap_Handle);
