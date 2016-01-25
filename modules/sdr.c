@@ -221,12 +221,18 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
         return;
     }
 
-    rsp->data[len++] = sensor_array[sensor_number].readout_value;
-    /* Sensor scanning disabled */
-    rsp->data[len++] = 0x40;
-    /* Present threshold status */
-    /* TODO: Implement threshold reading */
-    rsp->data[len++] = 0xC0;
+    if (sensor_number == HOT_SWAP_SENSOR) {
+        rsp->data[len++] = 0x00;
+        rsp->data[len++] = 0xC0;
+        /* Current State Mask */
+        rsp->data[len++] = sensor_array[sensor_number].readout_value;
+    } else {
+        rsp->data[len++] = sensor_array[sensor_number].readout_value;
+        rsp->data[len++] = 0x40;
+        /* Present threshold status */
+        /* TODO: Implement threshold reading */
+        rsp->data[len++] = 0xC0;
+    }
 
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
