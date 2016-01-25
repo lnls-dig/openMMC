@@ -334,7 +334,8 @@ IPMI_HANDLER(ipmi_storage_write_fru_data_cmd, NETFN_STORAGE, IPMI_WRITE_FRU_DATA
     uint16_t i;
     uint16_t offset =  (req->data[2] << 8) | (req->data[1]);
 
-    if ((offset + req->data_len - 3) < FRU_SIZE) {
+    /* Use signed comparison here in case offset + data_len < 3 */
+    if ((offset + req->data_len - 3) < (int16_t)FRU_SIZE) {
 	for (i = 0; i< req->data_len-3; i++) {
 	    fru_data[offset+i] = req->data[3+i];
 	}

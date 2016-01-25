@@ -133,7 +133,7 @@ void vApplicationStackOverflowHook ( TaskHandle_t pxTask, signed char * pcTaskNa
     taskDISABLE_INTERRUPTS();
     /* Place a breakpoint here, so we know when there's a stack overflow */
     for ( ; ; ) {
-        uint32_t watermark = uxTaskGetStackHighWaterMark(pxTask);
+        uxTaskGetStackHighWaterMark(pxTask);
     }
 }
 #endif
