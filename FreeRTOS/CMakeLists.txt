@@ -1,6 +1,6 @@
 # Build FreeRTOS library
 
-set(FREERTOS_INC ${CMAKE_CURRENT_BINARY_DIR}/include)
+set(FREERTOS_INC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 include_directories(${FREERTOS_INC})
 
