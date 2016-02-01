@@ -29,7 +29,7 @@
 #define LM75_H_
 
 #define LM75_MAX_COUNT		4
-#define LM75_UPDATE_RATE	100
+#define LM75_UPDATE_RATE	500
 
 extern TaskHandle_t vTaskLM75_Handle;
 

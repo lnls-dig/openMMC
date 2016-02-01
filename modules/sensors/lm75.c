@@ -31,7 +31,6 @@ TaskHandle_t vTaskLM75_Handle;
 
 void vTaskLM75( void* Parameters )
 {
-    /* Task will run every 100ms */
     const TickType_t xFrequency = LM75_UPDATE_RATE;
 
     uint8_t i2c_bus_id;
