@@ -62,6 +62,17 @@ if (";${TARGET_MODULES};" MATCHES "SENSOR")
   add_subdirectory(sensors)
 endif()
 
+#Modules dependencies check
+if(${TARGET_BOARD_NAME} MATCHES "^(AFC)")
+  if (("${MODULES_FLAGS}" MATCHES "-DMODULE_PAYLOAD") AND NOT ("${MODULES_FLAGS}" MATCHES "-DMODULE_DAC_AD84XX"))
+    message(WARNING "${Red}[AFC] Payload module is being used but the DAC_AD84XX was not included in this build. The VADJ reference will not be configured! ${ColourReset}")
+  endif()
+endif()
+
+if(NOT ("${MODULES_FLAGS}" MATCHES "-DMODULE_HOTSWAP"))
+  message(FATAL_ERROR "${Red}[ERROR] Mandatory Hotswap sensor module not included!${ColourReset}")
+endif()
+
 set(PROJ_SRCS ${PROJ_SRCS} PARENT_SCOPE)
 set(PROJ_HDRS ${PROJ_HDRS} PARENT_SCOPE)
 set(MODULES_FLAGS ${MODULES_FLAGS} PARENT_SCOPE)
