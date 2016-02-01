@@ -65,8 +65,8 @@ const SDR_type_02h_t SDR_HOT_SWAP = {
     .reserved2 = 0x00, /* reserved */
     .reserved3 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xcF, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'M', 'O', 'D', 'U', 'L', 'E', ' ', 'H', 'O', 'T', '_', 'S', 'W', 'A', 'P' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("HOTSWAP HANDLE"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "HOTSWAP HANDLE" /* sensor string */
 };
 
 /* FMC1 12V */
@@ -122,8 +122,8 @@ const SDR_type_01h_t SDR_FMC1_12V = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 9 , /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','1',' ','+', '1', '2', 'V' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC1 +12V") , /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC1 +12V" /* sensor string */
 };
 
 /* FMC1 PVADJ */
@@ -179,8 +179,8 @@ const SDR_type_01h_t SDR_FMC1_VADJ = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 9, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','1',' ', 'V', 'A', 'D', 'J' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC1 VADJ"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC1 VADJ" /* sensor string */
 };
 
 /* FMC1 P3V3 */
@@ -235,8 +235,8 @@ const SDR_type_01h_t SDR_FMC1_P3V3 = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 9, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','1',' ', '+', '3', 'V', '3' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC1 +3V3"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC1 +3V3" /* sensor string */
 };
 
 /* FMC1 12V Current */
@@ -292,8 +292,8 @@ const SDR_type_01h_t SDR_FMC1_12V_CURR = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 14 , /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','1',' ','+', '1', '2', 'V',' ','C','u','r','r' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC1 +12V CURR") , /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC1 +12V CURR" /* sensor string */
 };
 
 /* FMC1 PVADJ Current */
@@ -349,8 +349,8 @@ const SDR_type_01h_t SDR_FMC1_VADJ_CURR = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 14, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','1',' ', 'V', 'A', 'D', 'J',' ','C','u','r','r' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC1 VADJ CURR"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC1 VADJ CURR" /* sensor string */
 };
 
 /* FMC1 P3V3 Current */
@@ -405,8 +405,8 @@ const SDR_type_01h_t SDR_FMC1_P3V3_CURR = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 14, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','1',' ','+','3','V', '3',' ','C','u','r','r'} /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC1 +3V3 CURR"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC1 +3V3 CURR" /* sensor string */
 };
 
 /* FMC2 12V */
@@ -461,8 +461,8 @@ const SDR_type_01h_t SDR_FMC2_12V = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */    .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 9 , /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','2',' ','+', '1', '2', 'V' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC2 +12V") , /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC2 +12V" /* sensor string */
 };
 
 /* FMC2 PVADJ */
@@ -518,8 +518,8 @@ const SDR_type_01h_t SDR_FMC2_VADJ = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 9, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','2',' ', 'V', 'A', 'D', 'J' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC2 VADJ"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC2 VADJ" /* sensor string */
 };
 
 /* FMC2 P3V3 */
@@ -575,8 +575,8 @@ const SDR_type_01h_t SDR_FMC2_P3V3 = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 9, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','2',' ', '+', '3', 'V', '3' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC2 +3V3"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC2 +3V3" /* sensor string */
 };
 
 /* FMC2 12V Current */
@@ -632,8 +632,8 @@ const SDR_type_01h_t SDR_FMC2_12V_CURR = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 14 , /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','2',' ','+', '1', '2', 'V',' ','C','u','r','r' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC2 +12V CURR") , /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC2 +12V CURR" /* sensor string */
 };
 
 /* FMC2 PVADJ Current */
@@ -689,8 +689,8 @@ const SDR_type_01h_t SDR_FMC2_VADJ_CURR = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 14, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','2',' ', 'V', 'A', 'D', 'J',' ','C','u','r','r' } /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC2 VADJ CURR"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC2 VADJ CURR" /* sensor string */
 };
 
 /* FMC2 P3V3 Current */
@@ -745,8 +745,8 @@ const SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 14, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'F','M','C','2',' ','+','3','V', '3',' ','C','u','r','r'} /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("FMC2 +3V3 CURR"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "FMC2 +3V3 CURR" /* sensor string */
 };
 
 const SDR_type_01h_t SDR_LM75_uC = {
@@ -801,8 +801,8 @@ const SDR_type_01h_t SDR_LM75_uC = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 7, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'T','e','m','p',' ', 'u', 'C' } /*  sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("TEMP UC"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "TEMP UC" /*  sensor string */
 };
 
 const SDR_type_01h_t SDR_LM75_CLOCK_SWITCH = {
@@ -857,8 +857,8 @@ const SDR_type_01h_t SDR_LM75_CLOCK_SWITCH = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 0xF, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'T','e','m','p',' ', 'C','l','k',' ', 'S','w','i','t','c','h' } /*  sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("TEMP CLK SWITCH"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "TEMP CLK SWITCH" /*  sensor string */
 };
 
 const SDR_type_01h_t SDR_LM75_DCDC = {
@@ -913,8 +913,8 @@ const SDR_type_01h_t SDR_LM75_DCDC = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 9, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'T','e','m','p',' ', 'D','C','D','C' } /*  sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("TEMP DCDC"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "TEMP DCDC" /*  sensor string */
 };
 
 const SDR_type_01h_t SDR_LM75_RAM = {
@@ -969,8 +969,8 @@ const SDR_type_01h_t SDR_LM75_RAM = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | 8, /* 8 bit ASCII, number of bytes */
-    .IDstring = { 'T','e','m','p',' ', 'R','A','M' } /*  sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("TEMP RAM"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "TEMP RAM" /* sensor string */
 };
 
 sensor_t sensor_array[NUM_SDR]  = {
