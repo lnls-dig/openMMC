@@ -173,5 +173,5 @@ void vApplicationMallocFailedHook( void ) {
 #endif
 
 void vApplicationIdleHook (void) {
-
+    Chip_PMU_SleepState(LPC_PMU);
 }
