@@ -2,6 +2,10 @@
 #include "fpga_spi.h"
 #include "sensors.h"
 
+#define STR(x) _STR(x)
+#define _STR(x) #x
+#define STR_SIZE(x) (sizeof(x) -1)
+
 /* Management Controller Device Locator Record 37.9 SDR Type 12h */
 const SDR_type_12h_t SDR0 = {
     .hdr.recID_LSB = 0x00, /* record number, LSB - filled by sdr_init() */
@@ -21,8 +25,8 @@ const SDR_type_12h_t SDR0 = {
     .entityID = 0xC1,
     .entityinstance = 0x00,
     .OEM = 0x00,
-    .IDtypelen = 0xc7, /* 8 bit ASCII, number of bytes */
-    .IDstring = {'A', 'F', 'C', ' ', 'I', 'P', 'M' }
+    .IDtypelen = 0xc0 | STR_SIZE(STR(TARGET_BOARD_NAME)), /* 8 bit ASCII, number of bytes */
+    .IDstring = STR(TARGET_BOARD_NAME)
 };
 
 /* AMC Hot-Swap sensor */

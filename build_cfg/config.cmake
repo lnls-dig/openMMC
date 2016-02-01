@@ -1,6 +1,15 @@
 #Select which microcontroller and board are being used
-set(TARGET_BOARD      "afcv3_1")
 set(TARGET_CONTROLLER "LPC1764")
+
+set(TARGET_BOARD_NAME  "AFC3_1")
+set(TARGET_BOARD_MAJOR 3)
+set(TARGET_BOARD_MINOR 1)
+
+#Normalize strings to upper case
+string(TOUPPER "${TARGET_CONTROLLER}" TARGET_CONTROLLER_UPPER)
+set(TARGET_CONTROLLER "${TARGET_CONTROLLER_UPPER}")
+string(TOUPPER "${TARGET_BOARD_NAME}" TARGET_BOARD_UPPER)
+set(TARGET_BOARD_NAME "${TARGET_BOARD_UPPER}")
 
 # CPU and arch definition
 if(${TARGET_CONTROLLER} STREQUAL "LPC1764")
@@ -9,7 +18,7 @@ if(${TARGET_CONTROLLER} STREQUAL "LPC1764")
 endif()
 
 # Modules definition
-if(${TARGET_BOARD} MATCHES "(afcv3_1)|(afcv3_0)") # (?i) makes the regexp case insensitive
+if(${TARGET_BOARD_NAME} MATCHES "^(AFC)" AND ${TARGET_BOARD_MAJOR} EQUAL "3")
   set(TARGET_MODULES
     "FRU"
     "PAYLOAD"
@@ -25,7 +34,7 @@ if(${TARGET_BOARD} MATCHES "(afcv3_1)|(afcv3_0)") # (?i) makes the regexp case i
     "HPM"
     #"RTM"
     )
-elseif(${TARGET_BOARD} MATCHES "(test)") # (?i) makes the regexp case insensitive
+elseif(${TARGET_BOARD_NAME} MATCHES "TEST")
   set(TARGET_MODULES
     "FRU"
     "PAYLOAD"
@@ -36,7 +45,7 @@ elseif(${TARGET_BOARD} MATCHES "(test)") # (?i) makes the regexp case insensitiv
     )
 endif()
 
-if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
+if(${TARGET_CONTROLLER} MATCHES "^LPC17")
   add_definitions(-D__CODE_RED)
   add_definitions(-DCORE_M3)
   add_definitions(-D__USE_LPCOPEN)

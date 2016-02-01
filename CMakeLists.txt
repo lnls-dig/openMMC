@@ -31,7 +31,7 @@ endif()
 
 #Find a toolchain file
 if(NOT CMAKE_TOOLCHAIN_FILE)
-  message(WARNING "${ColourBold}${Red}No toolchain configuration file specified. Using default option!${ColourReset}")
+  message(WARNING "${Yellow}No toolchain configuration file specified. Using default option!${ColourReset}")
 
   include(build_cfg/toolchain/toolchain-arm-none-eabi.cmake)
 
@@ -60,7 +60,7 @@ set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat
 
 set(CMAKE_BUILD_FLAGS "-mcpu=${TARGET_CPU} -mtune=${TARGET_CPU} -march=${TARGET_ARCH}")
 set(CMAKE_BUILD_FLAGS "${CMAKE_BUILD_FLAGS} -mthumb -mthumb-interwork -mno-sched-prolog -mapcs-frame")
-set(CMAKE_BUILD_FLAGS "${CMAKE_BUILD_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER}")
+set(CMAKE_BUILD_FLAGS "${CMAKE_BUILD_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DTARGET_BOARD_NAME=${TARGET_BOARD_NAME} -DTARGET_BOARD_MAJOR=${TARGET_BOARD_MAJOR} -DTARGET_BOARD_MINOR=${TARGET_BOARD_MINOR} ")
 
 # Build specific flags
 set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_BUILD_FLAGS} ${CMAKE_ERROR_FLAGS}")
