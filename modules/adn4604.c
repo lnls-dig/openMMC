@@ -24,8 +24,9 @@
 #include "pin_mapping.h"
 #include "board_version.h"
 
-void adn4604_setup(void) {
-    uint8_t i2c_bus_id = I2C1;
+void adn4604_setup(void)
+{
+    uint8_t i2c_bus_id;
     uint8_t adn_slave_addr = 0x4B;
     t_adn_connect_map con;
     t_adn_connect_cfg cfg;
@@ -33,7 +34,7 @@ void adn4604_setup(void) {
     /* Disable UPDATE' pin by pulling it HIGH */
     gpio_set_pin_state( GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, HIGH);
 
-    if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)10) == pdFALSE) {
+    if (i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)10) == pdFALSE) {
         return;
     }
 
@@ -72,7 +73,7 @@ void adn4604_setup(void) {
 
     adn4604_update( i2c_bus_id, adn_slave_addr );
 
-    afc_i2c_give(i2c_bus_id);
+    i2c_give(i2c_bus_id);
 }
 
 void adn4604_tx_enable( uint8_t i2c_bus_id, uint8_t slave_addr, uint8_t output )

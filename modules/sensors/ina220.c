@@ -118,8 +118,8 @@ uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
     }
     data->curr_reg_config = data->config->config_reg_default;
 
-    /* Change to 'afc_i2c_take_by_chipid', which is more generic */
-    if( afc_i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 100) == pdFALSE ) {
+    /* @todo Change to 'i2c_take_by_chipid', which is more generic */
+    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 100) == pdFALSE ) {
         return -1;
     }
 
@@ -129,7 +129,7 @@ uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
     xI2CMasterWrite( i2c_bus, data->i2c_id, cfg_buff, sizeof(cfg_buff)/sizeof(cfg_buff[0]) );
     portDISABLE_INTERRUPTS();
 
-    afc_i2c_give(i2c_bus);
+    i2c_give(i2c_bus);
 
     return 0;
 }
@@ -139,14 +139,14 @@ uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg )
     uint8_t i2c_bus;
     uint8_t val[2];
 
-    /*! @todo: Change to 'afc_i2c_take_by_chipid', which is more generic */
-    if( afc_i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
+    /*! @todo: Change to 'i2c_take_by_chipid', which is more generic */
+    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
         return -1;
     }
 
     xI2CMasterWriteRead( i2c_bus, data->i2c_id, reg, &val[0], sizeof(val)/sizeof(val[0]) );
 
-    afc_i2c_give( i2c_bus );
+    i2c_give( i2c_bus );
 
     return ( (val[0] << 8) | (val[1]) );
 }
@@ -165,8 +165,8 @@ Bool ina220_calibrate( t_ina220_data * data )
     uint16_t cal = data->config->calibration_reg;
     uint8_t cal_reg[3] = { INA220_CALIBRATION, (cal >> 8), (cal & 0xFFFF) };
 
-    /*! @todo: Change to 'afc_i2c_take_by_chipid', which is more generic */
-    if( afc_i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
+    /*! @todo: Change to 'i2c_take_by_chipid', which is more generic */
+    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
         return false;
     }
 
@@ -174,7 +174,7 @@ Bool ina220_calibrate( t_ina220_data * data )
     xI2CMasterWrite( i2c_bus, data->i2c_id, &cal_reg[0], sizeof(cal_reg)/sizeof(cal_reg[0]) );
     portDISABLE_INTERRUPTS();
 
-    afc_i2c_give( i2c_bus );
+    i2c_give( i2c_bus );
 
     return true;
 }

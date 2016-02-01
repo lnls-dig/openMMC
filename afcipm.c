@@ -71,8 +71,8 @@ int main(void)
 #endif
 
     portENABLE_INTERRUPTS();
-    afc_board_i2c_init();
-    afc_board_discover();
+    board_i2c_init();
+    board_discover();
     portDISABLE_INTERRUPTS();
 
     ipmb_addr = get_ipmb_addr();

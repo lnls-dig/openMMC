@@ -104,12 +104,12 @@ typedef struct  {
 
 extern manufacturing_info_raw afc_board_info;
 
-void afc_board_i2c_init( void );
-void afc_board_discover( void );
-void afc_get_manufacturing_info( manufacturing_info_raw *p_board_info );
-void afc_get_board_type( uint8_t *carrier_type, uint8_t *board_version);
-Bool afc_i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t max_wait_time );
-Bool afc_i2c_take_by_chipid( uint8_t chip_id, uint8_t * i2c_address, I2C_ID_T * i2c_interface,  TickType_t max_wait_time );
-void afc_i2c_give( I2C_ID_T i2c_interface );
+void board_i2c_init( void );
+void board_discover( void );
+void get_manufacturing_info( manufacturing_info_raw *p_board_info );
+void get_board_type( uint8_t *carrier_type, uint8_t *board_version);
+Bool i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t max_wait_time );
+Bool i2c_take_by_chipid( uint8_t chip_id, uint8_t * i2c_address, I2C_ID_T * i2c_interface,  TickType_t max_wait_time );
+void i2c_give( I2C_ID_T i2c_interface );
 
 #endif /* AFC_BOARD_VERSION_H_ */

@@ -43,7 +43,7 @@ void vTaskLM75( void* Parameters )
 
     for ( ;; ) {
         /* Try to gain the I2C bus */
-        if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdTRUE) {
+        if (i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdTRUE) {
             /* Update all temperature sensors readings */
             for ( i = 0; i < NUM_SDR; i++ ) {
                 /* Check if the handle pointer is not NULL */
@@ -63,7 +63,7 @@ void vTaskLM75( void* Parameters )
                     lm75_sensor->readout_value = converted_temp;
                 }
             }
-            afc_i2c_give(i2c_bus_id);
+            i2c_give(i2c_bus_id);
         }
         vTaskDelay(xFrequency);
     }
@@ -76,15 +76,14 @@ void LM75_init( void )
     uint8_t i, j;
 
     for ( j = 0, i = 0; i < NUM_SDR && j < LM75_MAX_COUNT; i++, j++ ) {
-        if (afc_i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t) 50) == pdFALSE) {
+        if (i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t) 50) == pdFALSE) {
             continue;
         }
         uint8_t cmd[3] = {0x00, 0x01, 0x9F};
         xI2CMasterWrite(i2c_id, sensor_array[i].slave_addr, ch, 3);
 
-        afc_i2c_give( i2c_bus_id );
+        i2c_give( i2c_bus_id );
     }
 #endif
-    /* Why does this Task's stack is so large? About 320 bytes */
     xTaskCreate( vTaskLM75, "LM75", 330, (void *) NULL, tskLM75SENSOR_PRIORITY, &vTaskLM75_Handle);
 }

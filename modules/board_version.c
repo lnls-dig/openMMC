@@ -42,7 +42,6 @@ struct i2c_chip_mapping {
     uint8_t chip_id;
     uint8_t bus_id;
     uint8_t i2c_address;
-    uint8_t i2c_address2;
 };
 
 struct i2c_bus_mapping {
@@ -59,12 +58,11 @@ struct i2c_mux_state {
     I2C_ID_T i2c_interface;
     int8_t state;
     SemaphoreHandle_t semaphore;
-    TickType_t start_time;
 };
 
 struct i2c_mux_state i2c_mux[] = {
-    { I2C1, -1, 0, 0 },
-    { I2C2, -1, 0, 0 },
+    { I2C1, -1, 0 },
+    { I2C2, -1, 0 },
 };
 
 #define I2C_MUX_COUNT (sizeof(i2c_mux) / sizeof(struct i2c_mux_state))
@@ -72,35 +70,34 @@ struct i2c_mux_state i2c_mux[] = {
 struct i2c_bus_mapping *p_i2c_busmap = NULL;
 
 struct i2c_bus_mapping i2c_bus_map_afc_v2[] = {
-    { I2C_BUS_UNKNOWN_ID,  I2C1,  -1, 0 },
-    { I2C_BUS_FMC1_ID,  I2C1,  0, 1 },
-    { I2C_BUS_FMC2_ID,  I2C2, -1, 1 },
-    { I2C_BUS_CPU_ID,   I2C1,  1, 1 },
-    { I2C_BUS_RTM_ID,   I2C1,  0, 0 },
-    { I2C_BUS_CLOCK_ID, I2C1,  0, 1 },
-    { I2C_BUS_FPGA_ID,  I2C1,  0, 0 },
+    { I2C_BUS_UNKNOWN_ID, I2C1, -1, 0 },
+    { I2C_BUS_FMC1_ID,    I2C1,  0, 1 },
+    { I2C_BUS_FMC2_ID,    I2C2, -1, 1 },
+    { I2C_BUS_CPU_ID,     I2C1,  1, 1 },
+    { I2C_BUS_RTM_ID,     I2C1,  0, 0 },
+    { I2C_BUS_CLOCK_ID,   I2C1,  0, 1 },
+    { I2C_BUS_FPGA_ID,    I2C1,  0, 0 },
 };
 
 struct i2c_bus_mapping i2c_bus_map_afc_v3[] = {
-    { I2C_BUS_UNKNOWN_ID,  I2C1,  -1, 0 },
-    { I2C_BUS_FMC1_ID,  I2C1,  0, 1 },
-    { I2C_BUS_FMC2_ID,  I2C1,  1, 1 },
-    { I2C_BUS_CPU_ID,   I2C1, -1, 1 },
-    { I2C_BUS_RTM_ID,   I2C1,  3, 1 },
-    { I2C_BUS_CLOCK_ID, I2C1,  2, 1 },
-    { I2C_BUS_FPGA_ID,  I2C1,  0, 0 },
+    { I2C_BUS_UNKNOWN_ID, I2C1, -1, 0 },
+    { I2C_BUS_FMC1_ID,    I2C1,  0, 1 },
+    { I2C_BUS_FMC2_ID,    I2C1,  1, 1 },
+    { I2C_BUS_CPU_ID,     I2C1, -1, 1 },
+    { I2C_BUS_RTM_ID,     I2C1,  3, 1 },
+    { I2C_BUS_CLOCK_ID,   I2C1,  2, 1 },
+    { I2C_BUS_FPGA_ID,    I2C1,  0, 0 },
 };
 
 struct i2c_bus_mapping i2c_bus_map_afc_v3_1[] = {
-    { I2C_BUS_UNKNOWN_ID,  I2C1,  -1, 0 },
-    { I2C_BUS_FMC1_ID,  I2C2,  1, 1 },
-    { I2C_BUS_FMC2_ID,  I2C2,  0, 1 },
-    { I2C_BUS_CPU_ID,   I2C1, -1, 1 },
-    { I2C_BUS_RTM_ID,   I2C2,  3, 1 },
-    { I2C_BUS_CLOCK_ID, I2C2,  2, 1 },
-    { I2C_BUS_FPGA_ID,  I2C2, -1, 1 },
+    { I2C_BUS_UNKNOWN_ID, I2C1, -1, 0 },
+    { I2C_BUS_FMC1_ID,    I2C2,  1, 1 },
+    { I2C_BUS_FMC2_ID,    I2C2,  0, 1 },
+    { I2C_BUS_CPU_ID,     I2C1, -1, 1 },
+    { I2C_BUS_RTM_ID,     I2C2,  3, 1 },
+    { I2C_BUS_CLOCK_ID,   I2C2,  2, 1 },
+    { I2C_BUS_FPGA_ID,    I2C2, -1, 1 },
 };
-
 
 struct i2c_chip_mapping i2c_chip_map[] = {
     {CHIP_ID_MUX      ,     I2C_BUS_CPU_ID,     0x70},
@@ -133,7 +130,7 @@ struct i2c_chip_mapping i2c_chip_map[] = {
 
 manufacturing_info_raw afc_board_info = {0};
 
-void afc_board_i2c_init( void )
+void board_i2c_init( void )
 {
     uint8_t i;
     for (i=0; i<I2C_MUX_COUNT; i++) {
@@ -143,10 +140,11 @@ void afc_board_i2c_init( void )
     }
 }
 
-void afc_board_discover( void )
+void board_discover( void )
 {
     portENABLE_INTERRUPTS();
 
+    /* Check RTC EEPROM for board info */
 //#define WRITE_EEPROM
 #ifdef WRITE_EEPROM
     uint8_t unlock[2] = { 0x09, 0x00 };
@@ -156,20 +154,20 @@ void afc_board_discover( void )
      * 02h: kintex based (AFCK)
      * ....
 
-	Board version (1-byte):
+     Board version (1-byte):
      * 00h: AFCv1
      * 01h: AFCv2
      * 02h: AFCv3
      * 03h: AFCv3.1
 
-	Manufacturer Private Enterprise Numbers assigned by IANA (3-bytes big-endian)
+     Manufacturer Private Enterprise Numbers assigned by IANA (3-bytes big-endian)
      * 00h 9Ah 65h (39525): Creotech
      * .....
 
-	Manufacturing day since 1996-01-01 (2-bytes big-endian)
+     Manufacturing day since 1996-01-01 (2-bytes big-endian)
      * 1Bh 1Ch (6940) : 2015-01-01
 
-	Checksum (1-byte) */
+     Checksum (1-byte) */
 
     uint8_t ee_write[9] = { 0xF0, 0x01, 0x03, 0x00, 0x9A, 0x65, 0x1B, 0x1C, 0x00 };
     ee_write[8] = calculate_chksum(&ee_write[1], 8);
@@ -213,12 +211,12 @@ void afc_board_discover( void )
     }
 }
 
-void afc_get_manufacturing_info( manufacturing_info_raw *p_board_info )
+void get_manufacturing_info( manufacturing_info_raw *p_board_info )
 {
 
 }
 
-void afc_get_board_type(uint8_t *carrier_type, uint8_t *board_version)
+void get_board_type(uint8_t *carrier_type, uint8_t *board_version)
 {
     if (carrier_type != NULL) {
         *carrier_type = afc_board_info.carrier_type;
@@ -230,7 +228,7 @@ void afc_get_board_type(uint8_t *carrier_type, uint8_t *board_version)
 }
 
 
-Bool afc_i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t max_wait_time )
+Bool i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t max_wait_time )
 {
     uint8_t i;
     struct i2c_mux_state * p_i2c_mux = NULL;
@@ -313,7 +311,6 @@ Bool afc_i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t
         return true;
         // this is mux inside MMC
     } else {
-	/* What'll happen if p_i2c_bus->mux_bus is '-1' ? I'm casting it as unsigned to prevent GCC pointer sign warning */
         while (xI2CMasterWrite(i2c_chip_map[CHIP_ID_MUX].bus_id, i2c_chip_map[CHIP_ID_MUX].i2c_address, (uint8_t *)&p_i2c_bus->mux_bus, 1 ) < 1) { }
         p_i2c_mux->state = p_i2c_bus->mux_bus;
         *i2c_interface = p_i2c_mux->i2c_interface;
@@ -324,7 +321,7 @@ Bool afc_i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t
     return false;
 }
 
-Bool afc_i2c_take_by_chipid(uint8_t chip_id, uint8_t * i2c_address, I2C_ID_T * i2c_interface,  TickType_t max_wait_time)
+Bool i2c_take_by_chipid(uint8_t chip_id, uint8_t * i2c_address, I2C_ID_T * i2c_interface,  TickType_t max_wait_time)
 {
     if (chip_id > I2C_CHIP_MAP_COUNT) {
         return false;
@@ -335,10 +332,10 @@ Bool afc_i2c_take_by_chipid(uint8_t chip_id, uint8_t * i2c_address, I2C_ID_T * i
         *i2c_address = i2c_chip_map[chip_id].i2c_address;
     }
 
-    return afc_i2c_take_by_busid(bus_id, i2c_interface, max_wait_time);
+    return i2c_take_by_busid(bus_id, i2c_interface, max_wait_time);
 }
 
-void afc_i2c_give(I2C_ID_T i2c_interface)
+void i2c_give(I2C_ID_T i2c_interface)
 {
     for (uint8_t i=0; i<I2C_MUX_COUNT; i++) {
         if (i2c_mux[i].i2c_interface == i2c_interface) {
