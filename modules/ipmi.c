@@ -170,7 +170,7 @@ IPMI_HANDLER(ipmi_get_device_id,  NETFN_APP, IPMI_GET_DEVICE_ID_CMD, ipmi_msg *r
     rsp->data[len++] = 0x05; /* Dev FW Rev UPPER */
     rsp->data[len++] = 0x50; /* Dev FW Rev LOWER */
     rsp->data[len++] = 0x02; /* IPMI Version 2.0 */
-    rsp->data[len++] = 0x1F; /* Dev Support */
+    rsp->data[len++] = 0x3B; /* Dev Support */
     rsp->data[len++] = 0x5A; /* Manufacturer ID LSB */
     rsp->data[len++] = 0x31; /* Manufacturer ID MSB */
     rsp->data[len++] = 0x00; /* ID MSB */
