@@ -7,13 +7,13 @@ static uint8_t frame_size = 8;
 /* Assert SSEL pin */
 void spi_assertSSEL(void)
 {
-    Chip_GPIO_WritePortBit(LPC_GPIO, 0, 16, false);
+    Chip_GPIO_SetPinState(LPC_GPIO, 0, 16, LOW);
 }
 
 /* De-Assert SSEL pin */
 void spi_deassertSSEL(void)
 {
-    Chip_GPIO_WritePortBit(LPC_GPIO, 0, 16, true);
+    Chip_GPIO_SetPinState(LPC_GPIO, 0, 16, HIGH);
 }
 
 void spi_config( uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll )
@@ -53,7 +53,7 @@ void spi_config( uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll
 }
 
 /* Buffer len in bytes */
-uint32_t spi_write( void * buffer, uint32_t buffer_len)
+uint32_t spi_write( uint8_t * buffer, uint32_t buffer_len)
 {
     SPI_DATA_SETUP_T data_st = {0};
 
@@ -63,14 +63,14 @@ uint32_t spi_write( void * buffer, uint32_t buffer_len)
 	Chip_SPI_RWFrames_Blocking( LPC_SPI, &data_st );
 	return buffer_len;
     } else if ((!spi_polling) && (frame_size <= 8)) {
-	data_st.pTxData = (uint8_t *)buffer;
+	data_st.pTxData = buffer;
         data_st.length = buffer_len;
 	Chip_SPI_Int_RWFrames8Bits( LPC_SPI, &data_st );
         /* BUG: We're not verifying if the message was trasmitted */
         return buffer_len;
 
     } else if ((!spi_polling) && (frame_size <= 16)) {
-        data_st.pTxData = (uint8_t *)buffer;
+        data_st.pTxData = buffer;
         data_st.length = buffer_len;
         Chip_SPI_Int_RWFrames16Bits( LPC_SPI, &data_st );
         /* BUG: We're not verifying if the message was trasmitted */
@@ -79,6 +79,8 @@ uint32_t spi_write( void * buffer, uint32_t buffer_len)
     return 0;
 }
 
+
+/* WARNING: DO NOT USE! Functions not fully implemented and tested yet */
 #if 0
 uint32_t spi_read( void * buffer, uint32_t buffer_len)
 {
