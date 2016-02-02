@@ -29,6 +29,8 @@ void spi_config( uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll
     Chip_IOCON_PinMux(LPC_IOCON, 0, 16, IOCON_MODE_PULLUP, IOCON_FUNC0);
     /* Pin 17 is used for PROGRAM_B, as we don't receive any data, the MISO pin is not used */
     Chip_IOCON_PinMux(LPC_IOCON, 0, 18, IOCON_MODE_INACT, IOCON_FUNC3);
+    gpio_set_pin_dir(0, 16, OUTPUT);
+
     spi_deassertSSEL();
 
     spi_init(LPC_SPI);
