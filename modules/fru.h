@@ -78,6 +78,7 @@
 #define MATCHES_10              (0x02)
 
 #define PORT(n)                 n
+#define UNUSED_PORT             0x1F
 
 #define current_in_ma(curr)                     (uint8_t)(curr/100);
 #define PADDING_SIZE(x) (7-(sizeof(x)%8))
@@ -368,7 +369,8 @@ typedef struct __attribute__ ((__packed__)) amc_link_descriptor {
     uint8_t amc_channel_id;
 #else
     uint8_t amc_channel_id;
-    uint16_t link_type:12,
+    uint16_t lane_bit_flag:4,
+        link_type:8,
         link_type_ext:4;
     uint8_t link_grouping_id;
     uint8_t assymetric_match:2,
@@ -394,13 +396,13 @@ typedef struct amc_point_to_point_record {
     uint8_t oem_guid_list[16*POINT_TO_POINT_OEM_GUID_CNT];
 #endif
 #ifdef BF_MS_FIRST
-    uint8_t connected_dev_id:4,
-        reserved:3,
-        record_type:1;
-#else
     uint8_t record_type:1,          /* [7] Record Type - 1 AMC-Module, 0 On-Carrier Device */
         reserved:3,     /* [6:4] Reserved, write as 0h.*/
         connected_dev_id:4;      /* [3:0] Connected Dev ID if Record-Type =0, reserved, otherwise */
+#else
+    uint8_t connected_dev_id:4,
+        reserved:3,
+        record_type:1;
 #endif
     uint8_t amc_channel_descriptor_cnt;
 
@@ -492,6 +494,7 @@ typedef struct amc_clock_config_record {
 #define AMC_CLOCK_CONFIGURATION_LIST_BUILD                              \
     t_clock_config_descriptor clock_descriptor_list[] = { AMC_CLOCK_CONFIGURATION_LIST }
 
+/* TODO: Lanes with value 0x31 should not be included in the lane bit flag */
 #define GENERIC_POINT_TO_POINT_RECORD(id, port0, port1, port2, port3, protocol, extension, matches) \
     p2p_record->amc_channel_descriptor_cnt++;                           \
     p2p_record->amc_channel_descriptor[id].lane0 = port0;               \
@@ -500,7 +503,8 @@ typedef struct amc_clock_config_record {
     p2p_record->amc_channel_descriptor[id].lane3 = port3;               \
     p2p_record->amc_channel_descriptor[id].reserved = 0xF;              \
     p2p_record->amc_link_descriptor[id].amc_channel_id = id;            \
-    p2p_record->amc_link_descriptor[id].link_type = (protocol<<4)|0xF;  \
+    p2p_record->amc_link_descriptor[id].lane_bit_flag = 0xF;            \
+    p2p_record->amc_link_descriptor[id].link_type = protocol;           \
     p2p_record->amc_link_descriptor[id].link_type_ext = extension;      \
     p2p_record->amc_link_descriptor[id].link_grouping_id = 0;           \
     p2p_record->amc_link_descriptor[id].assymetric_match = matches;     \
