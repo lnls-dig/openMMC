@@ -27,20 +27,19 @@
 #include "semphr.h"
 #include "port.h"
 
-#define CARRIER_TYPE_UNKNOWN	0xFF
-#define CARRIER_TYPE_AFC	0x01
-#define CARRIER_TYPE_AFCK	0x02
+#define CARRIER_TYPE_UNKNOWN    0xFF
+#define CARRIER_TYPE_AFC        0x01
+#define CARRIER_TYPE_AFCK       0x02
 
 #define BOARD_VERSION_AFC_V1_0  0x00
-#define BOARD_VERSION_AFC_V2_0	0x01
-#define BOARD_VERSION_AFC_V3_0 	0x02
-#define BOARD_VERSION_AFC_V3_1 	0x03
-#define BOARD_VERSION_UNKNOWN	0xFF
+#define BOARD_VERSION_AFC_V2_0  0x01
+#define BOARD_VERSION_AFC_V3_0  0x02
+#define BOARD_VERSION_AFC_V3_1  0x03
+#define BOARD_VERSION_UNKNOWN   0xFF
 
-
-#define I2CMODE_POOLING		1
-#define I2CMODE_INTERRUPT	0
-#define SPEED_100KHZ		100000
+#define I2CMODE_POOLING         1
+#define I2CMODE_INTERRUPT       0
+#define SPEED_100KHZ            100000
 
 // BUS_ID
 // 0 - FMC1
@@ -48,52 +47,57 @@
 // 3 - CPU_ID
 //
 ///////////////////////
-#define I2C_BUS_UNKNOWN_ID	0
-#define I2C_BUS_FMC1_ID		1
-#define I2C_BUS_FMC2_ID		2
-#define I2C_BUS_CPU_ID		3
-#define I2C_BUS_RTM_ID		4
-#define I2C_BUS_CLOCK_ID	5
-#define I2C_BUS_FPGA_ID		6
 
-#define CHIP_ID_MUX		0
-#define CHIP_ID_LM75AIM_0	1
-#define CHIP_ID_LM75AIM_1	2
-#define CHIP_ID_LM75AIM_2	3
-#define CHIP_ID_LM75AIM_3	4
-#define CHIP_ID_MAX6642		5
+enum {
+    I2C_BUS_FMC1_ID,
+    I2C_BUS_FMC2_ID,
+    I2C_BUS_CPU_ID,
+    I2C_BUS_RTM_ID,
+    I2C_BUS_CLOCK_ID,
+    I2C_BUS_FPGA_ID,
+    I2C_BUS_UNKNOWN_ID = 0xFF
+};
 
-#define CHIP_ID_RTC		6
-#define CHIP_ID_RTC_EEPROM	7
-#define CHIP_ID_EEPROM		8
-#define CHIP_ID_EEPROM_ID	9
-
-#define CHIP_ID_INA_0		10
-#define CHIP_ID_INA_1		11
-#define CHIP_ID_INA_2		12
-#define CHIP_ID_INA_3		13
-#define CHIP_ID_INA_4		14
-#define CHIP_ID_INA_5		15
-
-#define CHIP_ID_ADN		16
-#define CHIP_ID_SI57x		17
-
-#define CHIP_ID_EEPROM_FMC1	18
-#define CHIP_ID_EEPROM_FMC2	19
+enum {
+    CHIP_ID_MUX = 0,
+    CHIP_ID_LM75AIM_0,
+    CHIP_ID_LM75AIM_1,
+    CHIP_ID_LM75AIM_2,
+    CHIP_ID_LM75AIM_3,
+    CHIP_ID_MAX6642,
+    CHIP_ID_RTC,
+    CHIP_ID_RTC_EEPROM,
+    CHIP_ID_EEPROM,
+    CHIP_ID_EEPROM_ID,
+    CHIP_ID_INA_0,
+    CHIP_ID_INA_1,
+    CHIP_ID_INA_2,
+    CHIP_ID_INA_3,
+    CHIP_ID_INA_4,
+    CHIP_ID_INA_5,
+    CHIP_ID_ADN,
+    CHIP_ID_SI57x,
+    CHIP_ID_FMC1_EEPROM,
+    CHIP_ID_FMC1_LM75_1,
+    CHIP_ID_FMC1_LM75_0,
+    CHIP_ID_FMC2_EEPROM,
+    CHIP_ID_FMC2_LM75_1,
+    CHIP_ID_FMC2_LM75_0
+};
 
 typedef struct {
-	uint8_t carrier_type;
-	uint8_t board_version;
-	uint8_t manufacturer[3];
-	uint8_t manufacturing_day[2];
-	uint8_t crc;
+    uint8_t carrier_type;
+    uint8_t board_version;
+    uint8_t manufacturer[3];
+    uint8_t manufacturing_day[2];
+    uint8_t crc;
 } manufacturing_info_raw;
 
 typedef struct {
-	uint8_t carrier_version;
-	uint8_t board_version;
-	uint32_t manufacturer;
-	uint16_t manufacturing_day;
+    uint8_t carrier_version;
+    uint8_t board_version;
+    uint32_t manufacturer;
+    uint16_t manufacturing_day;
 } manufacturing_info;
 
 typedef struct  {
