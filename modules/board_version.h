@@ -106,7 +106,7 @@ typedef struct  {
     I2C_ID_T i2c_bus;
 } I2C_Mutex;
 
-extern manufacturing_info_raw afc_board_info;
+extern manufacturing_info_raw board_info;
 
 void board_i2c_init( void );
 void board_discover( void );

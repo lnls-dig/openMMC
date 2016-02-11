@@ -115,7 +115,7 @@ void vTaskFPGA_COMM( void * Parameters )
         vTaskDelay(FPGA_UPDATE_RATE);
     }
 
-    if (afc_board_info.board_version == BOARD_VERSION_AFC_V3_1) {
+    if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
         gpio_set_pin_state(0, 19, HIGH);
     }
 

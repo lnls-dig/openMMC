@@ -186,26 +186,27 @@ void board_discover( void )
     xI2CMasterWrite(I2C1, 0x57, ee_write, sizeof(ee_write));
 #endif
 
-    if (xI2CMasterWriteRead(I2C1, 0x57, 0xF0, (uint8_t *) &afc_board_info, sizeof(afc_board_info) ) != sizeof(afc_board_info) ) {
+    if (xI2CMasterWriteRead(I2C1, 0x57, 0xF0, (uint8_t *) &board_info, sizeof(board_info) ) != sizeof(board_info) ) {
         return;
     }
 
     portDISABLE_INTERRUPTS();
 
-    uint8_t crc_fail = calculate_chksum((uint8_t *) &afc_board_info, 8 );
+    uint8_t crc_fail = calculate_chksum((uint8_t *) &board_info, 8 );
 
     if (crc_fail == 0) {
-        if ( ( afc_board_info.carrier_type == CARRIER_TYPE_AFC && afc_board_info.board_version == 0x00 ) ||
-             ( afc_board_info.carrier_type == CARRIER_TYPE_AFC && afc_board_info.board_version == 0x01 ) ) {
+        if ( ( board_info.carrier_type == CARRIER_TYPE_AFC && board_info.board_version == 0x00 ) ||
+             ( board_info.carrier_type == CARRIER_TYPE_AFC && board_info.board_version == 0x01 ) ) {
+            p_i2c_busmap = i2c_bus_map_afc_v2;
             i2c_chip_map[CHIP_ID_MUX].bus_id = I2C_BUS_UNKNOWN_ID;
             i2c_chip_map[CHIP_ID_MUX].i2c_address = 0x00;
-            p_i2c_busmap = i2c_bus_map_afc_v2;
-        } else if ((afc_board_info.carrier_type == CARRIER_TYPE_AFC && afc_board_info.board_version == 0x02) ||
-                   afc_board_info.carrier_type == CARRIER_TYPE_AFCK) {
+
+        } else if ((board_info.carrier_type == CARRIER_TYPE_AFC && board_info.board_version == 0x02) ||
+                   board_info.carrier_type == CARRIER_TYPE_AFCK) {
             p_i2c_busmap = i2c_bus_map_afc_v3;
             i2c_chip_map[CHIP_ID_MUX].bus_id = I2C_BUS_CPU_ID;
             i2c_chip_map[CHIP_ID_MUX].i2c_address = 0x70;
-        } else if ((afc_board_info.carrier_type == CARRIER_TYPE_AFC && afc_board_info.board_version == 0x03)) {
+        } else if ((board_info.carrier_type == CARRIER_TYPE_AFC && board_info.board_version == 0x03)) {
             p_i2c_busmap = i2c_bus_map_afc_v3_1;
             i2c_chip_map[CHIP_ID_MUX].bus_id = I2C_BUS_FPGA_ID;
             i2c_chip_map[CHIP_ID_MUX].i2c_address = 0x70;
@@ -224,14 +225,13 @@ void get_manufacturing_info( manufacturing_info_raw *p_board_info )
 void get_board_type(uint8_t *carrier_type, uint8_t *board_version)
 {
     if (carrier_type != NULL) {
-        *carrier_type = afc_board_info.carrier_type;
+        *carrier_type = board_info.carrier_type;
     }
 
     if (board_version != NULL) {
-        *board_version = afc_board_info.board_version;
+        *board_version = board_info.board_version;
     }
 }
-
 
 Bool i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t max_wait_time )
 {
