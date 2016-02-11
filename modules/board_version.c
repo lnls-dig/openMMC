@@ -190,8 +190,7 @@ void board_discover( void )
         return;
     }
 
-    portDISABLE_INTERRUPTS();
-
+    uint8_t pca_cfg = 0x00;
     uint8_t crc_fail = calculate_chksum((uint8_t *) &board_info, 8 );
 
     if (crc_fail == 0) {
@@ -206,15 +205,21 @@ void board_discover( void )
             p_i2c_busmap = i2c_bus_map_afc_v3;
             i2c_chip_map[CHIP_ID_MUX].bus_id = I2C_BUS_CPU_ID;
             i2c_chip_map[CHIP_ID_MUX].i2c_address = 0x70;
+	    /* Init PCA9547 disabled */
+	    xI2CMasterWrite(I2C1, 0x70, &pca_cfg, 1);
+
         } else if ((board_info.carrier_type == CARRIER_TYPE_AFC && board_info.board_version == 0x03)) {
             p_i2c_busmap = i2c_bus_map_afc_v3_1;
             i2c_chip_map[CHIP_ID_MUX].bus_id = I2C_BUS_FPGA_ID;
             i2c_chip_map[CHIP_ID_MUX].i2c_address = 0x70;
+	    /* Init PCA9547 disabled */
+	    xI2CMasterWrite(I2C2, 0x70, &pca_cfg, 1);
         }
         asm("nop");
     } else {
         //@todo: discover i2c layout if fai;
     }
+    portDISABLE_INTERRUPTS();
 }
 
 void get_manufacturing_info( manufacturing_info_raw *p_board_info )
