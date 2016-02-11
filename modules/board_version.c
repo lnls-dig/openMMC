@@ -91,8 +91,8 @@ struct i2c_bus_mapping i2c_bus_map_afc_v3[] = {
 
 struct i2c_bus_mapping i2c_bus_map_afc_v3_1[] = {
     { I2C_BUS_UNKNOWN_ID, I2C1, -1, 0 },
-    { I2C_BUS_FMC1_ID,    I2C2,  1, 1 },
-    { I2C_BUS_FMC2_ID,    I2C2,  0, 1 },
+    { I2C_BUS_FMC1_ID,    I2C2,  0, 1 },
+    { I2C_BUS_FMC2_ID,    I2C2,  1, 1 },
     { I2C_BUS_CPU_ID,     I2C1, -1, 1 },
     { I2C_BUS_RTM_ID,     I2C2,  3, 1 },
     { I2C_BUS_CLOCK_ID,   I2C2,  2, 1 },
