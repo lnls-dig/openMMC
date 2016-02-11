@@ -224,7 +224,9 @@ void board_discover( void )
 
 void get_manufacturing_info( manufacturing_info_raw *p_board_info )
 {
-
+    if (p_board_info != NULL) {
+	p_board_info = &board_info;
+    }
 }
 
 void get_board_type(uint8_t *carrier_type, uint8_t *board_version)
