@@ -100,35 +100,40 @@ struct i2c_bus_mapping i2c_bus_map_afc_v3_1[] = {
 };
 
 struct i2c_chip_mapping i2c_chip_map[] = {
-    {CHIP_ID_MUX      ,     I2C_BUS_CPU_ID,     0x70},
-    {CHIP_ID_LM75AIM_0,     I2C_BUS_CPU_ID,     0x4C},
-    {CHIP_ID_LM75AIM_1,     I2C_BUS_CPU_ID,     0x4D},
-    {CHIP_ID_LM75AIM_2,     I2C_BUS_CPU_ID,     0x4E},
-    {CHIP_ID_LM75AIM_3,     I2C_BUS_CPU_ID,     0x4F},
-    {CHIP_ID_MAX6642,       I2C_BUS_CPU_ID,     0x48},
+    { CHIP_ID_MUX,           I2C_BUS_CPU_ID,     0x70},
+    { CHIP_ID_LM75AIM_0,     I2C_BUS_CPU_ID,     0x4C},
+    { CHIP_ID_LM75AIM_1,     I2C_BUS_CPU_ID,     0x4D},
+    { CHIP_ID_LM75AIM_2,     I2C_BUS_CPU_ID,     0x4E},
+    { CHIP_ID_LM75AIM_3,     I2C_BUS_CPU_ID,     0x4F},
+    { CHIP_ID_MAX6642,       I2C_BUS_CPU_ID,     0x48},
 
-    {CHIP_ID_RTC,           I2C_BUS_CPU_ID,     0x9F},
-    {CHIP_ID_RTC_EEPROM,    I2C_BUS_CPU_ID,     0x57},
-    {CHIP_ID_EEPROM,        I2C_BUS_CPU_ID,     0x50},
-    {CHIP_ID_EEPROM_ID,     I2C_BUS_CPU_ID,     0x58},
+    { CHIP_ID_RTC,           I2C_BUS_CPU_ID,     0x9F},
+    { CHIP_ID_RTC_EEPROM,    I2C_BUS_CPU_ID,     0x57},
+    { CHIP_ID_EEPROM,        I2C_BUS_CPU_ID,     0x50},
+    { CHIP_ID_EEPROM_ID,     I2C_BUS_CPU_ID,     0x58},
 
-    {CHIP_ID_INA_0,         I2C_BUS_CPU_ID,     0x40},
-    {CHIP_ID_INA_1,         I2C_BUS_CPU_ID,     0x41},
-    {CHIP_ID_INA_2,         I2C_BUS_CPU_ID,     0x42},
-    {CHIP_ID_INA_3,         I2C_BUS_CPU_ID,     0x43},
-    {CHIP_ID_INA_4,         I2C_BUS_CPU_ID,     0x44},
-    {CHIP_ID_INA_5,         I2C_BUS_CPU_ID,     0x45},
+    { CHIP_ID_INA_0,         I2C_BUS_CPU_ID,     0x40},
+    { CHIP_ID_INA_1,         I2C_BUS_CPU_ID,     0x41},
+    { CHIP_ID_INA_2,         I2C_BUS_CPU_ID,     0x42},
+    { CHIP_ID_INA_3,         I2C_BUS_CPU_ID,     0x43},
+    { CHIP_ID_INA_4,         I2C_BUS_CPU_ID,     0x44},
+    { CHIP_ID_INA_5,         I2C_BUS_CPU_ID,     0x45},
 
-    {CHIP_ID_ADN,           I2C_BUS_CLOCK_ID,   0x4B},
-    {CHIP_ID_SI57x,         I2C_BUS_CLOCK_ID,   0x30},
+    { CHIP_ID_ADN,           I2C_BUS_CLOCK_ID,   0x4B},
+    { CHIP_ID_SI57x,         I2C_BUS_CLOCK_ID,   0x30},
 
-    {CHIP_ID_EEPROM_FMC1,   I2C_BUS_FMC1_ID,    0x4B},
-    {CHIP_ID_EEPROM_FMC2,   I2C_BUS_FMC2_ID,    0x30},
+    { CHIP_ID_FMC1_EEPROM,   I2C_BUS_FMC1_ID,    0x50},
+    { CHIP_ID_FMC1_LM75_0,   I2C_BUS_FMC1_ID,    0x48},
+    { CHIP_ID_FMC1_LM75_1,   I2C_BUS_FMC1_ID,    0x49},
+
+    { CHIP_ID_FMC2_EEPROM,   I2C_BUS_FMC2_ID,    0x52},
+    { CHIP_ID_FMC2_LM75_0,   I2C_BUS_FMC2_ID,    0x48},
+    { CHIP_ID_FMC2_LM75_1,   I2C_BUS_FMC2_ID,    0x49},
 };
 
 #define I2C_CHIP_MAP_COUNT (sizeof(i2c_chip_map)/sizeof(struct i2c_chip_mapping))
 
-manufacturing_info_raw afc_board_info = {0};
+manufacturing_info_raw board_info = {0};
 
 void board_i2c_init( void )
 {
