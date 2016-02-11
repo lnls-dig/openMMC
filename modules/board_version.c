@@ -280,7 +280,8 @@ Bool i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t max
         *i2c_interface = p_i2c_mux->i2c_interface;
         return true;
     } else if (i2c_chip_map[CHIP_ID_MUX].bus_id == I2C_BUS_UNKNOWN_ID) {
-        /* Change bus mux */
+        /* Change bus mux inside LPC1764
+	 * (There's two set of pins that can operate as I2C1) */
         if (p_i2c_bus->mux_bus == 0) {
             /*! @todo Change LPC specific functions for generic macros */
             Chip_I2C_Disable(p_i2c_bus->i2c_interface);
@@ -288,17 +289,15 @@ Bool i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t max
 
             Chip_IOCON_PinMux(LPC_IOCON, 0, 0, IOCON_MODE_INACT, IOCON_FUNC0);
             Chip_IOCON_PinMux(LPC_IOCON, 0, 1, IOCON_MODE_INACT, IOCON_FUNC0);
-            //Chip_IOCON_EnableOD(LPC_IOCON, 0,  0);
-            //Chip_IOCON_EnableOD(LPC_IOCON, 0,  1);
-
             Chip_IOCON_PinMux(LPC_IOCON, 0, 19, IOCON_MODE_INACT, IOCON_FUNC3);
             Chip_IOCON_PinMux(LPC_IOCON, 0, 20, IOCON_MODE_INACT, IOCON_FUNC3);
+
             Chip_IOCON_EnableOD(LPC_IOCON, 0, 19);
             Chip_IOCON_EnableOD(LPC_IOCON, 0, 20);
             Chip_I2C_Init(p_i2c_bus->i2c_interface);
             Chip_I2C_Enable(p_i2c_bus->i2c_interface);
 
-        } else if ((p_i2c_bus->mux_bus == 1)) {
+        } else if (p_i2c_bus->mux_bus == 1) {
             Chip_I2C_Disable(p_i2c_bus->i2c_interface);
 
             Chip_I2C_DeInit(p_i2c_bus->i2c_interface);
