@@ -1,9 +1,8 @@
 /*
- * board_version.c
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   AFCIPMI  --
- *
- *   Copyright (C) 2015  Piotr Miedzik <P.Miedzik@gsi.de>
+ *   Copyright (C) 2015  Piotr Miedzik  <P.Miedzik@gsi.de>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,6 +16,8 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
 #include "FreeRTOS.h"
@@ -184,7 +185,8 @@ void board_discover( void )
     if (xI2CMasterWriteRead(I2C1, 0x57, 0xF0, (uint8_t *) &afc_board_info, sizeof(afc_board_info) ) != sizeof(afc_board_info) ) {
         return;
     }
-
+/*    uint8_t cfg = 0x00;
+      xI2CMasterWrite(I2C2, 0x70, &cfg, 1);*/
     portDISABLE_INTERRUPTS();
 
     uint8_t crc_fail = calculate_chksum((uint8_t *) &afc_board_info, 8 );
@@ -311,7 +313,7 @@ Bool i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t max
         return true;
         // this is mux inside MMC
     } else {
-        while (xI2CMasterWrite(i2c_chip_map[CHIP_ID_MUX].bus_id, i2c_chip_map[CHIP_ID_MUX].i2c_address, (uint8_t *)&p_i2c_bus->mux_bus, 1 ) < 1) { }
+        //while (xI2CMasterWrite(i2c_chip_map[CHIP_ID_MUX].bus_id, i2c_chip_map[CHIP_ID_MUX].i2c_address, (uint8_t *)&p_i2c_bus->mux_bus, 1 ) < 1) { }
         p_i2c_mux->state = p_i2c_bus->mux_bus;
         *i2c_interface = p_i2c_mux->i2c_interface;
         return true;
