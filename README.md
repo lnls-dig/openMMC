@@ -1,5 +1,5 @@
-# AFCIPM
-MMC firmware for AFC boards
+# openMMC
+Open Source modular IPM Controller firmware
 
 ## Installation:
 The following packages are needed in your system in order to compile the firmware:
@@ -14,7 +14,7 @@ or you can run the following command under Ubuntu:
 
 Next step is to clone this repository into your workspace.
 
-	git clone https://github.com/lnls-dig/afcipm
+	git clone https://github.com/lnls-dig/openMMC
 
 ## Compilation
 
