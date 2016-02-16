@@ -334,6 +334,7 @@ IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTRO
     }
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+    rsp->data_len = len;
 }
 
 IPMI_HANDLER(ipmi_picmg_cmd_get_fru_control_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL_CAPABILITIES, ipmi_msg *req, ipmi_msg *rsp)
@@ -348,7 +349,7 @@ IPMI_HANDLER(ipmi_picmg_cmd_get_fru_control_capabilities, NETFN_GRPEXT, IPMI_PIC
      * [2] - Capable of issuing a graceful reboot
      * [1] - Capable of issuing a warm reset */
     rsp->data[len++] = 0x06; /* Graceful reboot and Warm reset */
-
+    rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }
 
@@ -363,7 +364,7 @@ IPMI_HANDLER(ipmi_picmg_cmd_set_fru_activation_policy, NETFN_GRPEXT, IPMI_PICMG_
 
     /* TODO: Implement FRU activation policy */
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
-
+    rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }
 
