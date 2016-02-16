@@ -78,7 +78,7 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" CACHE STRING "")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "")
 
 # Include all subdirectories to be compiled
-set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/afcipm.c)
+set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/main_mmc.c)
 add_subdirectory(FreeRTOS)
 add_subdirectory(port)
 add_subdirectory(boot)
