@@ -1,9 +1,8 @@
 /*
- * board_version.c
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   AFCIPMI  --
- *
- *   Copyright (C) 2015  Piotr Miedzik <P.Miedzik@gsi.de>
+ *   Copyright (C) 2015  Piotr Miedzik  <P.Miedzik@gsi.de>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,6 +16,8 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
 #include "FreeRTOS.h"
@@ -190,8 +191,9 @@ void board_discover( void )
         return;
     }
 
-    uint8_t pca_cfg = 0x00;
     uint8_t crc_fail = calculate_chksum((uint8_t *) &board_info, 8 );
+
+    portDISABLE_INTERRUPTS();
 
     if (crc_fail == 0) {
         if ( ( board_info.carrier_type == CARRIER_TYPE_AFC && board_info.board_version == 0x00 ) ||
@@ -205,21 +207,16 @@ void board_discover( void )
             p_i2c_busmap = i2c_bus_map_afc_v3;
             i2c_chip_map[CHIP_ID_MUX].bus_id = I2C_BUS_CPU_ID;
             i2c_chip_map[CHIP_ID_MUX].i2c_address = 0x70;
-	    /* Init PCA9547 disabled */
-	    xI2CMasterWrite(I2C1, 0x70, &pca_cfg, 1);
 
         } else if ((board_info.carrier_type == CARRIER_TYPE_AFC && board_info.board_version == 0x03)) {
             p_i2c_busmap = i2c_bus_map_afc_v3_1;
             i2c_chip_map[CHIP_ID_MUX].bus_id = I2C_BUS_FPGA_ID;
             i2c_chip_map[CHIP_ID_MUX].i2c_address = 0x70;
-	    /* Init PCA9547 disabled */
-	    xI2CMasterWrite(I2C2, 0x70, &pca_cfg, 1);
         }
         asm("nop");
     } else {
         //@todo: discover i2c layout if fai;
     }
-    portDISABLE_INTERRUPTS();
 }
 
 void get_manufacturing_info( manufacturing_info_raw *p_board_info )
