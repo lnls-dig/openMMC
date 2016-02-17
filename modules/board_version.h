@@ -50,13 +50,13 @@
 ///////////////////////
 
 enum {
+    I2C_BUS_UNKNOWN_ID = 0x00,
     I2C_BUS_FMC1_ID,
     I2C_BUS_FMC2_ID,
     I2C_BUS_CPU_ID,
     I2C_BUS_RTM_ID,
     I2C_BUS_CLOCK_ID,
-    I2C_BUS_FPGA_ID,
-    I2C_BUS_UNKNOWN_ID = 0xFF
+    I2C_BUS_FPGA_ID
 };
 
 enum {
