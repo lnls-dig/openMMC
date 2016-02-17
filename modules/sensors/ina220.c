@@ -93,7 +93,7 @@ void vTaskINA220( void *Parameters )
             switch (GET_SENSOR_NUMBER(ina220_sensor)) {
             case NUM_SDR_FMC2_12V:
                 /* Check if the Payload power is in an acceptable zone */
-                if (ina220_sensor->state & (SENSOR_STATE_NORMAL | SENSOR_STATE_HIGH | SENSOR_STATE_LOW ) ) {
+                if ((ina220_sensor->state == SENSOR_STATE_NORMAL) || (ina220_sensor->state == SENSOR_STATE_HIGH) || (ina220_sensor->state == SENSOR_STATE_LOW ) ) {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
                 } else {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
