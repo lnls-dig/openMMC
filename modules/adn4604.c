@@ -19,7 +19,10 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/* FreeRTOS Includes */
 #include "FreeRTOS.h"
+
+/* Project Includes */
 #include "adn4604.h"
 #include "pin_mapping.h"
 #include "board_version.h"

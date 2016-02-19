@@ -20,22 +20,16 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/* FreeRTOS Includes */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
 
+/* Project Includes */
 #include "sdr.h"
 #include "sensors.h"
-#include "pin_mapping.h"
-#include "i2c.h"
-#include "port.h"
 #include "ipmi.h"
-#include "ipmb.h"
-#include "payload.h"
-#include "board_version.h"
-#include "led.h"
-#include "task_priorities.h"
-#include "fpga_spi.h"
+
 
 size_t sdr_get_size_by_type(SDR_TYPE type)
 {

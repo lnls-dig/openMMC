@@ -26,17 +26,17 @@
 #include "queue.h"
 #include "semphr.h"
 
+/* Project Includes */
 #include "port.h"
 #include "payload.h"
-#include "sdr.h"
 #include "board_version.h"
 #include "pin_mapping.h"
 #include "ipmi.h"
 #include "task_priorities.h"
 #include "adn4604.h"
-#include "led.h"
 #include "ad84xx.h"
 #include "hotswap.h"
+#include "utils.h"
 
 /* payload states
  *   0 - no power
@@ -125,7 +125,6 @@ void initializeDCDC( void )
     gpio_set_pin_dir( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, OUTPUT);
-
 }
 
 
