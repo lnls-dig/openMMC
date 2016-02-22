@@ -48,6 +48,8 @@ void heap_test ( void* param);
 TaskHandle_t heap_handle;
 /*-----------------------------------------------------------*/
 
+uint8_t ipmb_addr = 0xFF;
+
 int main(void)
 {
     /* Update clock register value - LPC specific */

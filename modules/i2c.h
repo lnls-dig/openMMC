@@ -238,6 +238,6 @@ void vI2CInit( uint8_t i2c_id, uint32_t speed, I2C_Mode mode );
  */
 uint8_t get_ipmb_addr( void );
 
-uint8_t ipmb_addr;
+extern uint8_t ipmb_addr;
 
 #endif /*I2C_H_*/
