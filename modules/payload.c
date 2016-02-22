@@ -93,11 +93,11 @@ void setDC_DC_ConvertersON( bool on )
     bool _on_fmc2 = false | on;
 
     gpio_set_pin_state( GPIO_EN_FMC1_PVADJ_PORT, GPIO_EN_FMC1_PVADJ_PIN, _on_fmc1);
-    gpio_set_pin_state( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, _on_fmc1);
+    //gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, _on_fmc1);
     gpio_set_pin_state( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, _on_fmc1);
 
     gpio_set_pin_state( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, _on_fmc2);
-    gpio_set_pin_state( GPIO_EM_FMC2_P12V_PORT, GPIO_EM_FMC2_P12V_PIN, _on_fmc2);
+    gpio_set_pin_state( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, _on_fmc2);
     gpio_set_pin_state( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, _on_fmc2);
 
 
@@ -116,9 +116,9 @@ void initializeDCDC( void )
 
     gpio_set_pin_dir( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, OUTPUT);
-    gpio_set_pin_dir( GPIO_EM_FMC2_P12V_PORT, GPIO_EM_FMC2_P12V_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, OUTPUT);
 
-    gpio_set_pin_dir( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_FMC1_PVADJ_PORT,  GPIO_EN_FMC1_PVADJ_PIN, OUTPUT);
 
@@ -196,7 +196,7 @@ void vTaskPayload(void *pvParmeters)
     for ( ;; ) {
 
         /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
-        gpio_set_pin_state( GPIO_EM_FMC1_P12V_PORT, GPIO_EM_FMC1_P12V_PIN, HIGH);
+        gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, HIGH);
 
         new_state = state;
 
