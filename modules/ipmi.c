@@ -134,7 +134,7 @@ ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t 
 
     evt.data[data_len++] = IPMI_EVENT_MESSAGE_REV;
     evt.data[data_len++] = GET_SENSOR_TYPE(sensor);
-    evt.data[data_len++] = GET_SENSOR_NUMBER(sensor);
+    evt.data[data_len++] = sensor->num;
     evt.data[data_len++] = assert_deassert | (GET_EVENT_TYPE_CODE(sensor) & 0x7F);
     evt.data[data_len++] = (length >= 1)? evData[0] : 0xFF;
     evt.data[data_len++] = (length >= 2)? evData[1] : 0xFF;
