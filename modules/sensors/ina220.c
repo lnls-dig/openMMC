@@ -110,7 +110,7 @@ void vTaskINA220( void *Parameters )
 
 uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
 {
-    uint8_t i2c_bus = I2C1;
+    uint8_t i2c_bus;
 
     data->config = &ina220_cfg;
     data->i2c_id = i2c_id;
@@ -122,7 +122,7 @@ uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
     data->curr_reg_config = data->config->config_reg_default;
 
     /* @todo Change to 'i2c_take_by_chipid', which is more generic */
-    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 100) == pdFALSE ) {
+    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
         return -1;
     }
 
