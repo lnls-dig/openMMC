@@ -27,14 +27,18 @@
  * @brief DCDCs Voltage reading using INA220 sensor
  */
 
+/* FreeRTOS Includes */
 #include "FreeRTOS.h"
 #include "task.h"
+
+/* Project Includes */
 #include "port.h"
 #include "sdr.h"
 #include "task_priorities.h"
 #include "board_version.h"
 #include "payload.h"
 #include "ina220.h"
+#include "fpga_spi.h"
 
 const t_ina220_config ina220_cfg = {
     .config_reg_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
@@ -90,18 +94,15 @@ void vTaskINA220( void *Parameters )
             /* Check for threshold events */
             check_sensor_event(ina220_sensor);
 
-            switch (GET_SENSOR_NUMBER(ina220_sensor)) {
-            case NUM_SDR_FMC2_12V:
+            if( ina220_sensor->sdr == &SDR_FMC1_12V ) {
                 /* Check if the Payload power is in an acceptable zone */
                 if ((ina220_sensor->state == SENSOR_STATE_NORMAL) || (ina220_sensor->state == SENSOR_STATE_HIGH) || (ina220_sensor->state == SENSOR_STATE_LOW ) ) {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
                 } else {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
                 }
-                break;
-            default:
-                break;
             }
+
             vTaskDelayUntil( &xLastWakeTime, xFrequency );
         }
     }
@@ -188,7 +189,26 @@ void ina220_init( void )
 
     xTaskCreate( vTaskINA220, "INA220", 400, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
 
-    for ( j = 0; j < NUM_SDR; j++ ) {
+    /* FMC1 Voltage */
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V, &vTaskINA220_Handle, FMC1_12V_DEVID, 0x45 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ, &vTaskINA220_Handle, FMC1_VADJ_DEVID, 0x41 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3, &vTaskINA220_Handle, FMC1_P3V3_DEVID, 0x43 );
+    /* FMC1 Current */
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V_CURR, &vTaskINA220_Handle, FMC1_12V_CURR_DEVID, 0x45 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ_CURR, &vTaskINA220_Handle, FMC1_VADJ_CURR_DEVID, 0x41 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3_CURR, &vTaskINA220_Handle, FMC1_P3V3_CURR_DEVID, 0x43 );
+
+    /* FMC2 Voltage */
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V, &vTaskINA220_Handle, FMC2_12V_DEVID, 0x40 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ, &vTaskINA220_Handle, FMC2_VADJ_DEVID, 0x42 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3, &vTaskINA220_Handle, FMC2_P3V3_DEVID, 0x44 );
+    /* FMC2 Current */
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V_CURR, &vTaskINA220_Handle, FMC2_12V_CURR_DEVID, 0x40 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ_CURR, &vTaskINA220_Handle, FMC2_VADJ_CURR_DEVID, 0x42 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3_CURR, &vTaskINA220_Handle, FMC2_P3V3_CURR_DEVID, 0x44 );
+
+
+    for ( j = 0; j < sdr_count; j++ ) {
         /* Update their SDR */
         /* Check if the handle pointer is not NULL */
         if (sensor_array[j].task_handle == NULL) {

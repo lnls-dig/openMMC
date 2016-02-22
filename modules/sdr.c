@@ -26,10 +26,16 @@
 #include "semphr.h"
 
 /* Project Includes */
+#include "i2c.h"
 #include "sdr.h"
 #include "sensors.h"
 #include "ipmi.h"
+#include "fpga_spi.h"
 
+sensor_t *sensor_array = NULL;
+uint8_t sdr_count = 0;
+
+static uint16_t reservationID;
 
 size_t sdr_get_size_by_type(SDR_TYPE type)
 {
@@ -47,10 +53,10 @@ size_t sdr_get_size_by_type(SDR_TYPE type)
 
 size_t sdr_get_size_by_entry(uint8_t id)
 {
-    if (id >= SDR_ARRAY_LENGTH) {
+    if (id >= sdr_count) {
         return 0;
     }
-    return sdr_get_size_by_type(sensor_array[id].type);
+    return sdr_get_size_by_type(sensor_array[id].sdr_type);
 }
 
 void sensor_init( void )
@@ -60,20 +66,45 @@ void sensor_init( void )
     ina220_init();
 }
 
-static uint16_t reservationID;
-
-void sdr_init(uint8_t ipmiID)
+void sdr_init( void )
 {
-    uint8_t i;
-    for (i = 0; i < NUM_SDR; i++) {
-        if( i == 0) {
-            sensor_array[i].slave_addr = ipmiID;
-        } else {
-            sensor_array[i].ownerID = ipmiID;
-            sensor_array[i].readout_value = 0;
-        }
-        sensor_array[i].entityinstance =  0x60 | ((ipmiID - 0x70) >> 1);
-    }
+    sensor_array = pvPortMalloc( sizeof(sensor_t) );
+
+    configASSERT(sensor_array);
+
+    /* Populate SDR Device Locator Record */
+    sensor_array[0].num = 0;
+    sensor_array[0].sdr_type = TYPE_12;
+    sensor_array[0].sdr = (void *) &SDR0;
+    sensor_array[0].sdr_length = sizeof(SDR0);
+    sensor_array[0].task_handle = NULL;
+    sensor_array[0].diag_devID = NO_DIAG;
+    sensor_array[0].slave_addr = ipmb_addr;
+    sensor_array[0].entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
+
+    sdr_count++;
+}
+
+void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr)
+{
+    uint8_t index = sdr_count;
+    uint8_t sdr_len = sdr_get_size_by_type(type);
+
+    sensor_array = pvPortRealloc( sensor_array, sizeof(sensor_t)*(sdr_count+1) );
+
+    sensor_array[index].num = index;
+    sensor_array[index].sdr_type = type;
+    sensor_array[index].sdr = sdr;
+    sensor_array[index].sdr_length = sdr_len;
+    sensor_array[index].task_handle = monitor_task;
+    sensor_array[index].diag_devID = diag_id;
+    sensor_array[index].slave_addr = slave_addr;
+    sensor_array[index].ownerID = ipmb_addr;
+    sensor_array[index].entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
+    sensor_array[index].readout_value = 0;
+    sensor_array[index].state = SENSOR_STATE_LOW_NON_REC;
+
+    sdr_count++;
 }
 
 /******************************/
@@ -84,9 +115,11 @@ IPMI_HANDLER(ipmi_se_get_sdr_info, NETFN_SE, IPMI_GET_DEVICE_SDR_INFO_CMD, ipmi_
     int len = rsp->data_len;
 
     if (req->data_len == 0 || req->data[0] == 0) {
-        rsp->data[len++] = NUM_SENSOR;
+	/* Return number of sensors only */
+        rsp->data[len++] = sdr_count-1;
     } else {
-        rsp->data[len++] = NUM_SDR;
+	/* Return number of SDR entries */
+        rsp->data[len++] = sdr_count;
     }
     /* Static Sensor population and LUN 0 has sensors */
     rsp->data[len++] = 0x01; // if dynamic additional 4 bytes required (see Table 20-2 Get Device SDR INFO Command
@@ -174,12 +207,18 @@ IPMI_HANDLER(ipmi_se_get_sdr, NETFN_SE, IPMI_GET_DEVICE_SDR_CMD, ipmi_msg *req, 
         index = i + offset;
         tmp_c = pSDR[index];
 
-        if (index == 5) {
+	/* Return not-const data from SDR */
+	if (index == 0) {
+	    tmp_c = record_id;
+	} else if (index == 5) {
             tmp_c = sensor_array[record_id].ownerID;
         } else if ( sdr_type == TYPE_01 || sdr_type == TYPE_02 ) {
             if (index == 9) {
                 tmp_c = sensor_array[record_id].entityinstance;
             }
+	    if (index == 7) {
+		tmp_c = record_id;
+	    }
         } else if ( sdr_type == TYPE_11 || sdr_type == TYPE_12 ) {
             if (index == 13) {
                 tmp_c = sensor_array[record_id].entityinstance;
@@ -210,13 +249,13 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
     int sensor_number = req->data[0];
     int len = rsp->data_len;
 
-    if (sensor_number >= NUM_SDR) {
+    if (sensor_number > sdr_count) {
         rsp->completion_code = IPMI_CC_REQ_DATA_NOT_PRESENT;
         rsp->data_len = 0;
         return;
     }
 
-    if (sensor_number == HOT_SWAP_SENSOR) {
+    if (*(sensor_array[sensor_number].task_handle) == vTaskHotSwap_Handle) {
         rsp->data[len++] = 0x00;
         rsp->data[len++] = 0xC0;
         /* Current State Mask */

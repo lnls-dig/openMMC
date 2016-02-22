@@ -21,7 +21,6 @@
 
 #define DEBOUNCE_TIME 250
 
-
 /* Module handle sensor status */
 #define HOT_SWAP_STATE_HANDLE_CLOSED            0x00
 #define HOT_SWAP_STATE_HANDLE_OPENED            0x01

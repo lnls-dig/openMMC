@@ -28,24 +28,6 @@
 #define NUM_SENSOR                      17      /* Number of sensors */
 #define NUM_SDR                         (NUM_SENSOR+1)  /* Number of SDRs */
 
-#define HOT_SWAP_SENSOR                 1
-#define NUM_SDR_FMC1_12V                2
-#define NUM_SDR_FMC1_VADJ               3
-#define NUM_SDR_FMC1_3V3                4
-#define NUM_SDR_FMC1_12V_CURR           5
-#define NUM_SDR_FMC1_VADJ_CURR          6
-#define NUM_SDR_FMC1_3V3_CURR           7
-#define NUM_SDR_FMC2_12V                8
-#define NUM_SDR_FMC2_VADJ               9
-#define NUM_SDR_FMC2_3V3                10
-#define NUM_SDR_FMC2_12V_CURR           11
-#define NUM_SDR_FMC2_VADJ_CURR          12
-#define NUM_SDR_FMC2_3V3_CURR           13
-#define NUM_SDR_LM75_uC                 14
-#define NUM_SDR_LM75_CLOCK_SWITCH       15
-#define NUM_SDR_LM75_DCDC               16
-#define NUM_SDR_LM75_RAM                17
-
 /* Sensor Types */
 #define SENSOR_TYPE_TEMPERATURE         0x01
 #define SENSOR_TYPE_VOLTAGE             0x02
@@ -191,7 +173,8 @@ typedef struct {
 } SDR_type_12h_t;
 
 typedef struct {
-    SDR_TYPE type;
+    uint8_t num;
+    SDR_TYPE sdr_type;
     void * sdr;
     uint8_t sdr_length;
     uint8_t diag_devID;
@@ -219,19 +202,19 @@ typedef struct {
     } asserted_event;
 } sensor_t;
 
-extern sensor_t sensor_array[NUM_SDR];
+extern sensor_t *sensor_array;
+extern uint8_t sdr_count;
 
-#define SDR_ARRAY_LENGTH (sizeof(sensor_array) / sizeof(sensor_array[0]))
 const SDR_type_12h_t SDR0;
 
 #define GET_SENSOR_TYPE(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
-#define GET_SENSOR_NUMBER(sensor)   ((SDR_type_01h_t *)sensor->sdr)->sensornum
 
 #define GET_EVENT_TYPE_CODE(n)      ((SDR_type_01h_t *)sensor->sdr)->event_reading_type
 
 void initializeDCDC( void );
-void sdr_init( uint8_t ipmiID );
+void sdr_init( void );
 void sensor_init( void );
+void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr );
 void check_sensor_event( sensor_t * sensor );
 
 #endif

@@ -29,6 +29,7 @@
 #include "task_priorities.h"
 #include "ipmi.h"
 #include "led.h"
+#include "utils.h"
 
 #define HOTSWAP_POLL
 //#define HOTSWAP_INT
@@ -101,7 +102,9 @@ void hotswap_init( void )
     /* Create Hot Swap task */
     xTaskCreate( vTaskHotSwap, "Hot Swap", 200, (void *) NULL, tskHOTSWAP_PRIORITY, &vTaskHotSwap_Handle);
 
-    for ( uint8_t i = 0; i < NUM_SDR; i++ ) {
+    sdr_insert_entry( TYPE_02, (void *) &SDR_HOT_SWAP, &vTaskHotSwap_Handle, 0, 0 );
+
+    for ( uint8_t i = 0; i < sdr_count; i++ ) {
 
         /* Check if the handle pointer is not NULL */
         if (sensor_array[i].task_handle == NULL) {

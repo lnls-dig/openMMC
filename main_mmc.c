@@ -78,7 +78,7 @@ int main(void)
 
     ipmb_addr = get_ipmb_addr();
 #ifdef MODULE_SDR
-    sdr_init(ipmb_addr);
+    sdr_init();
 #endif
 #ifdef MODULE_SENSORS
     sensor_init();

@@ -19,13 +19,17 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/* FreeRTOS Includes */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "port.h"
+
+/* Project Includes */
 #include "sdr.h"
 #include "task_priorities.h"
 #include "board_version.h"
 #include "lm75.h"
+#include "utils.h"
 
 TaskHandle_t vTaskLM75_Handle;
 
@@ -44,7 +48,7 @@ void vTaskLM75( void* Parameters )
         /* Try to gain the I2C bus */
         if (i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdTRUE) {
             /* Update all temperature sensors readings */
-            for ( i = 0; i < NUM_SDR; i++ ) {
+            for ( i = 0; i < sdr_count; i++ ) {
                 /* Check if the handle pointer is not NULL */
                 if (sensor_array[i].task_handle == NULL) {
                     continue;
@@ -84,7 +88,15 @@ void LM75_init( void )
         i2c_give( i2c_bus_id );
     }
 #endif
+
     xTaskCreate( vTaskLM75, "LM75", 330, (void *) NULL, tskLM75SENSOR_PRIORITY, &vTaskLM75_Handle);
+
+    /* Include all sensors on SDR */
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_uC, &vTaskLM75_Handle, 0, 0x4C );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_CLOCK_SWITCH, &vTaskLM75_Handle, 0, 0x4D );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_DCDC, &vTaskLM75_Handle, 0, 0x4E );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RAM, &vTaskLM75_Handle, 0, 0x4F );
+
 }
 
 /* LM75 SDR List */
