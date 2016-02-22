@@ -57,7 +57,7 @@ typedef enum {
 #define PAYLOAD_BASE_DELAY 100
 
 void payload_send_message(uint8_t msg);
-void vTaskPayload(void *pvParmeters);
+void vTaskPayload(void *pvParameters);
 void payload_init(void);
 
 #ifdef MODULE_HPM

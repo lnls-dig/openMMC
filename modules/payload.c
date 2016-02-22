@@ -174,7 +174,7 @@ void payload_init( void )
     }
 }
 
-void vTaskPayload(void *pvParmeters)
+void vTaskPayload(void *pvParameters)
 {
     payload_state state = PAYLOAD_NO_POWER;
     payload_state new_state = PAYLOAD_STATE_NO_CHANGE;
@@ -183,8 +183,6 @@ void vTaskPayload(void *pvParmeters)
     uint8_t P1V0_good = 0;
     uint8_t FPGA_boot_DONE = 0;
     uint8_t QUIESCED_req = 0;
-
-    uint8_t evt_msg;
 
     uint8_t current_message;
 
@@ -263,22 +261,16 @@ void vTaskPayload(void *pvParmeters)
             break;
 
         case PAYLOAD_FPGA_BOOTING:
-            if (QUIESCED_req == 1) {
+            if (QUIESCED_req == 1 || P12V_good == 0) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (FPGA_boot_DONE) {
                 new_state = PAYLOAD_FPGA_WORKING;
-            } else if (P12V_good == 0) {
-                QUIESCED_req = 0;
-                new_state = PAYLOAD_NO_POWER;
             }
             break;
 
         case PAYLOAD_FPGA_WORKING:
-            if (QUIESCED_req == 1) {
+            if (QUIESCED_req == 1 || P12V_good == 0) {
                 new_state = PAYLOAD_SWITCHING_OFF;
-            } else if (P12V_good == 0) {
-                QUIESCED_req = 0;
-                new_state = PAYLOAD_NO_POWER;
             }
             break;
 
