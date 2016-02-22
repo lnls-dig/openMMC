@@ -30,13 +30,12 @@
 #define tskFPGA_COMM_PRIORITY           (tskIDLE_PRIORITY+1)
 #define tskWATCHDOG_PRIORITY            (tskIDLE_PRIORITY+1)
 
-#define tskSENSOR_PRIORITY              (tskIDLE_PRIORITY+2)
+#define tskPAYLOAD_PRIORITY             (tskIDLE_PRIORITY+2)
 
-#define tskHOTSWAP_PRIORITY             (tskIDLE_PRIORITY+2)
-#define tskLM75SENSOR_PRIORITY          (tskIDLE_PRIORITY+2)
-#define tskINA220SENSOR_PRIORITY        (tskIDLE_PRIORITY+2)
-
-#define tskPAYLOAD_PRIORITY             (tskIDLE_PRIORITY+3)
+#define tskSENSOR_PRIORITY              (tskIDLE_PRIORITY+3)
+#define tskHOTSWAP_PRIORITY             (tskIDLE_PRIORITY+3)
+#define tskLM75SENSOR_PRIORITY          (tskIDLE_PRIORITY+3)
+#define tskINA220SENSOR_PRIORITY        (tskIDLE_PRIORITY+3)
 
 #define tskIPMI_HANDLERS_PRIORITY       (tskIDLE_PRIORITY+4)
 #define tskIPMI_PRIORITY                (tskIDLE_PRIORITY+4)
