@@ -24,6 +24,10 @@
   @author Henrique Silva
 */
 
+#define STR(x) _STR(x)
+#define _STR(x) #x
+#define STR_SIZE(x) (sizeof(x) -1)
+
 TickType_t getTickDifference( TickType_t current_time, TickType_t start_time );
 
 uint8_t calculate_chksum( uint8_t * buffer, uint8_t range );
