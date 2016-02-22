@@ -225,6 +225,7 @@ void ina220_init( void )
             ina220_data[i].i2c_id = sensor_array[j].slave_addr;
             ina220_config( ina220_data[i].i2c_id, &ina220_data[i] );
             ina220_calibrate( &ina220_data[i] );
+            ina220_data[i].sensor->signed_flag = 0;
 
             if ((GET_SENSOR_TYPE(ina220_data[i].sensor)) == SENSOR_TYPE_CURRENT ) {
                 ina220_data[i].sensor->signed_flag = 1;
