@@ -40,7 +40,6 @@
 
 TaskHandle_t vTaskHotSwap_Handle;
 
-extern TickType_t getTickDifference(TickType_t current_time, TickType_t start_time);
 extern const SDR_type_02h_t SDR_HOT_SWAP;
 
 void vTaskHotSwap( void *Parameters );
