@@ -349,6 +349,47 @@ BlockLink_t *pxLink;
 }
 /*-----------------------------------------------------------*/
 
+#include "string.h"
+
+void *pvPortCalloc(size_t count, size_t size)
+{
+	void *p;
+
+	/* allocate 'count' objects of size 'size' */
+	p = pvPortMalloc(count * size);
+	if (p) {
+		/* zero the memory */
+		memset(p, 0, count * size);
+	}
+	return p;
+}
+
+void *calloc(size_t count, size_t nbytes) __attribute__((alias("pvPortCalloc")));
+
+/*-----------------------------------------------------------*/
+
+void *pvPortRealloc(void *mem, size_t newsize)
+{
+	void *p;
+	p = pvPortMalloc(newsize);
+
+	if (p) {
+		/* Copy the contents of the old region */
+		if (mem != NULL) {
+			memcpy(p, mem, newsize);
+			vPortFree(mem);
+		}
+	}
+
+	return p;
+}
+
+void *realloc(void *ptr, size_t nbytes) __attribute__((alias("pvPortRealloc")));
+
+/*-----------------------------------------------------------*/
+
+/*-----------------------------------------------------------*/
+
 size_t xPortGetFreeHeapSize( void )
 {
 	return xFreeBytesRemaining;
