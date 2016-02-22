@@ -246,8 +246,8 @@ void vTaskPayload(void *pvParmeters)
             break;
 
         case PAYLOAD_POWER_GOOD_WAIT:
-	    sensor_array[HOT_SWAP_SENSOR].readout_value &= ~HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK;
-	    sensor_array[HOT_SWAP_SENSOR].readout_value &= ~HOTSWAP_BACKEND_PWR_FAILURE_MASK;
+	    hotswap_clear_mask_bit( HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
+	    hotswap_clear_mask_bit( HOTSWAP_BACKEND_PWR_FAILURE_MASK );
 	    if (QUIESCED_req) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (P1V0_good == 1) {
@@ -284,16 +284,15 @@ void vTaskPayload(void *pvParmeters)
 
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON(false);
-            sensor_array[HOT_SWAP_SENSOR].readout_value |= HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK;
-            evt_msg = HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK >> 1;
-	    ipmi_event_send(&sensor_array[HOT_SWAP_SENSOR], ASSERTION_EVENT, &evt_msg, sizeof(evt_msg));
-
-	    sensor_array[HOT_SWAP_SENSOR].readout_value |= HOTSWAP_QUIESCED_MASK;
-	    evt_msg = HOTSWAP_QUIESCED_MASK >> 1;
-            if ( ipmi_event_send(&sensor_array[HOT_SWAP_SENSOR], ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
+	    /*
+	    hotswap_set_mask_bit( HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
+	    hotswap_send_event( HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
+	    */
+	    hotswap_set_mask_bit( HOTSWAP_QUIESCED_MASK );
+	    if ( hotswap_send_event( HOTSWAP_QUIESCED_MASK ) == ipmb_error_success ) {
                 QUIESCED_req = 0;
                 new_state = PAYLOAD_NO_POWER;
-                sensor_array[HOT_SWAP_SENSOR].readout_value &= ~HOTSWAP_QUIESCED_MASK;
+		hotswap_clear_mask_bit( HOTSWAP_QUIESCED_MASK );
             }
             break;
 

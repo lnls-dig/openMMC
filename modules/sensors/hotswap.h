@@ -45,3 +45,6 @@ extern const SDR_type_02h_t SDR_HOT_SWAP;
 
 void vTaskHotSwap( void *Parameters );
 void hotswap_init( void );
+ipmb_error hotswap_send_event( uint8_t evt );
+void hotswap_set_mask_bit( uint8_t mask );
+void hotswap_clear_mask_bit( uint8_t mask );

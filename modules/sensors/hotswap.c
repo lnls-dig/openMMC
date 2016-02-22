@@ -188,16 +188,38 @@ void vTaskHotSwap( void *Parameters )
             continue;
         }
 
-        evt_msg = new_state >> 1;
+	if ( hotswap_send_event( new_state ) == ipmb_error_success )
+	{
+	    hotswap_set_mask_bit( new_state );
+	    old_state = new_state;
+	}
 
-        if ( ipmi_event_send(hotswap_sensor, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
-            /* Update the SDR */
-            hotswap_sensor->readout_value = new_state;
-            old_state = new_state;
-        }
 #endif
     }
 }
+
+ipmb_error hotswap_send_event( uint8_t evt )
+{
+    uint8_t evt_msg;
+
+    evt_msg = evt >> 1;
+    return ipmi_event_send( hotswap_sensor, ASSERTION_EVENT, &evt_msg, sizeof( evt_msg ) );
+}
+
+void hotswap_clear_mask_bit( uint8_t mask )
+{
+    if ( hotswap_sensor ) {
+	hotswap_sensor->readout_value &= ~mask;
+    }
+}
+
+void hotswap_set_mask_bit( uint8_t mask )
+{
+    if ( hotswap_sensor ) {
+	hotswap_sensor->readout_value |= mask;
+    }
+}
+
 /* AMC Hot-Swap sensor SDR */
 const SDR_type_02h_t SDR_HOT_SWAP = {
 
