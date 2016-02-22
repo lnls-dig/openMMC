@@ -631,3 +631,27 @@ void check_sensor_event( sensor_t * sensor )
         ipmi_event_send(sensor, ev_type, &ev, 1);
     }
 }
+
+/* Management Controller Device Locator Record 37.9 SDR Type 12h */
+
+const SDR_type_12h_t SDR0 = {
+    .hdr.recID_LSB = 0x00,
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51, /* IPMI protocol version */
+    .hdr.rectype = TYPE_12, /* record type: device locator record */
+    .hdr.reclength = sizeof(SDR_type_12h_t) - sizeof(SDR_entry_hdr_t),
+
+/* record key bytes */
+    .slaveaddr = 0x00,
+    .chnum = 0x00,
+    .power_notification_global_init = 0x04,
+    .device_cap = 0x3b,
+    .reserved[0] = 0x00,
+    .reserved[1] = 0x00,
+    .reserved[2] = 0x00,
+    .entityID = 0xC1,
+    .entityinstance = 0x00,
+    .OEM = 0x00,
+    .IDtypelen = 0xc0 | STR_SIZE(STR(TARGET_BOARD_NAME)), /* 8 bit ASCII, number of bytes */
+    .IDstring = STR(TARGET_BOARD_NAME)
+};

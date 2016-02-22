@@ -222,6 +222,7 @@ typedef struct {
 extern sensor_t sensor_array[NUM_SDR];
 
 #define SDR_ARRAY_LENGTH (sizeof(sensor_array) / sizeof(sensor_array[0]))
+const SDR_type_12h_t SDR0;
 
 #define GET_SENSOR_TYPE(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
 #define GET_SENSOR_NUMBER(sensor)   ((SDR_type_01h_t *)sensor->sdr)->sensornum

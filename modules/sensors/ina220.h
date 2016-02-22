@@ -132,6 +132,20 @@ typedef struct {
 
 TaskHandle_t vTaskINA220_Handle;
 
+/* INA220 SDR List */
+extern const SDR_type_01h_t SDR_FMC1_VADJ;
+extern const SDR_type_01h_t SDR_FMC1_12V;
+extern const SDR_type_01h_t SDR_FMC1_P3V3;
+extern const SDR_type_01h_t SDR_FMC1_VADJ_CURR;
+extern const SDR_type_01h_t SDR_FMC1_12V_CURR;
+extern const SDR_type_01h_t SDR_FMC1_P3V3_CURR;
+extern const SDR_type_01h_t SDR_FMC2_VADJ;
+extern const SDR_type_01h_t SDR_FMC2_12V;
+extern const SDR_type_01h_t SDR_FMC2_P3V3;
+extern const SDR_type_01h_t SDR_FMC2_VADJ_CURR;
+extern const SDR_type_01h_t SDR_FMC2_12V_CURR;
+extern const SDR_type_01h_t SDR_FMC2_P3V3_CURR;
+
 uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data);
 Bool ina220_calibrate( t_ina220_data * data );
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );

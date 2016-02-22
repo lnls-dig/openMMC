@@ -19,7 +19,6 @@ endif()
 
 if (";${TARGET_MODULES};" MATCHES ";SDR;")
   set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/sdr.c )
-  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/sdr_list.c )
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_SDR")
 endif()
 
