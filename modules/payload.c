@@ -283,6 +283,9 @@ void vTaskPayload(void *pvParameters)
 	    hotswap_set_mask_bit( HOTSWAP_QUIESCED_MASK );
 	    if ( hotswap_send_event( HOTSWAP_QUIESCED_MASK ) == ipmb_error_success ) {
                 QUIESCED_req = 0;
+		/* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
+		P12V_good = 0;
+		P1V0_good = 0;
                 new_state = PAYLOAD_NO_POWER;
 		hotswap_clear_mask_bit( HOTSWAP_QUIESCED_MASK );
             }
