@@ -2,6 +2,7 @@
 
 set(FREERTOS_INC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+include_directories(${PROJ_HDRS})
 include_directories(${FREERTOS_INC})
 
 set(PROJ_HDRS ${PROJ_HDRS} ${FREERTOS_INC} PARENT_SCOPE)

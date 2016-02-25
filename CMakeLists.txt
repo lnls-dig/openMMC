@@ -79,8 +79,8 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "")
 
 # Include all subdirectories to be compiled
 set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/main_mmc.c)
-add_subdirectory(FreeRTOS)
 add_subdirectory(port)
+add_subdirectory(FreeRTOS)
 add_subdirectory(boot)
 add_subdirectory(modules)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
