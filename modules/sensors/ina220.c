@@ -96,7 +96,9 @@ void vTaskINA220( void *Parameters )
 
             if( ina220_sensor->sdr == &SDR_FMC1_12V ) {
                 /* Check if the Payload power is in an acceptable zone */
-                if ((ina220_sensor->state == SENSOR_STATE_NORMAL) || (ina220_sensor->state == SENSOR_STATE_HIGH) || (ina220_sensor->state == SENSOR_STATE_LOW ) ) {
+		SDR_type_01h_t * ina220_sdr = ( SDR_type_01h_t * ) ina220_sensor->sdr;
+                if ( ( ina220_sensor->readout_value >= (ina220_sdr->lower_critical_thr ) ) &&
+		     ( ina220_sensor->readout_value <= (ina220_sdr->upper_critical_thr ) ) ) {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
                 } else {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
