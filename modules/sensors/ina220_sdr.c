@@ -79,10 +79,10 @@ const SDR_type_01h_t SDR_FMC1_12V = {
     .sensor_min_reading = 0x00, /* Sensor Minimum reading */
     .upper_nonrecover_thr = 205, /* Upper non-recoverable Threshold */
     .upper_critical_thr = 200, /* Upper critical Threshold */
-    .upper_noncritical_thr = 195, /* Upper non critical Threshold */
-    .lower_nonrecover_thr = 175, /* Lower non-recoverable Threshold */
-    .lower_critical_thr = 180, /* Lower critical Threshold */
-    .lower_noncritical_thr = 185, /* Lower non-critical Threshold */
+    .upper_noncritical_thr = 190, /* Upper non critical Threshold */
+    .lower_nonrecover_thr = 170, /* Lower non-recoverable Threshold */
+    .lower_critical_thr = 175, /* Lower critical Threshold */
+    .lower_noncritical_thr = 180, /* Lower non-critical Threshold */
     .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
@@ -420,14 +420,15 @@ const SDR_type_01h_t SDR_FMC2_12V = {
     .upper_nonrecover_thr = 205, /* Upper non-recoverable Threshold */
     .upper_critical_thr = 200, /* Upper critical Threshold */
     .upper_noncritical_thr = 195, /* Upper non critical Threshold */
-    .lower_nonrecover_thr = 175, /* Lower non-recoverable Threshold */
-    .lower_critical_thr = 180, /* Lower critical Threshold */
-    .lower_noncritical_thr = 185, /* Lower non-critical Threshold */
+    .lower_nonrecover_thr = 170, /* Lower non-recoverable Threshold */
+    .lower_critical_thr = 175, /* Lower critical Threshold */
+    .lower_noncritical_thr = 180, /* Lower non-critical Threshold */
     .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
-    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */    .reserved1 = 0x00, /* reserved */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC2_12V_ID) , /* 8 bit ASCII, number of bytes */
+    .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC2_12V_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC2_12V_ID /* sensor string */
 };
 
