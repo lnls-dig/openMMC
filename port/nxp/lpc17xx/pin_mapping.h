@@ -114,6 +114,8 @@
 
 #define GPIO_ADN_UPDATE_PORT    1
 #define GPIO_ADN_UPDATE_PIN     26
+#define GPIO_ADN_RESETN_PORT    1
+#define GPIO_ADN_RESETN_PIN     22
 
 #endif
 

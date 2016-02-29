@@ -35,7 +35,15 @@ void adn4604_setup(void)
     t_adn_connect_cfg cfg;
 
     /* Disable UPDATE' pin by pulling it HIGH */
+    gpio_set_pin_dir(GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, OUTPUT);
     gpio_set_pin_state( GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, HIGH);
+
+    /* There's a delay circuit in the Reset pin of the clock switch, we must wait until it clears out */
+    gpio_set_pin_dir( GPIO_ADN_RESETN_PORT, GPIO_ADN_RESETN_PIN, INPUT);
+    
+    while( gpio_read_pin( GPIO_ADN_RESETN_PORT, GPIO_ADN_RESETN_PIN ) == 0) {
+        vTaskDelay(50);
+    }
 
     if (i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)10) == pdFALSE) {
         return;
