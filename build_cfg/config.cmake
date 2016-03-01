@@ -1,9 +1,9 @@
 #Select which microcontroller and board are being used
-set(TARGET_CONTROLLER "LPC1764")
+set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller")
 
-set(TARGET_BOARD_NAME  "AFC3_1")
-set(TARGET_BOARD_MAJOR 3)
-set(TARGET_BOARD_MINOR 1)
+set(TARGET_BOARD_NAME  "AFC3_1" CACHE STRING "Board Name")
+set(TARGET_BOARD_MAJOR 3 CACHE STRING "Board Major Version")
+set(TARGET_BOARD_MINOR 1 CACHE STRING "Board Minor Version")
 
 #Normalize strings to upper case
 string(TOUPPER "${TARGET_CONTROLLER}" TARGET_CONTROLLER_UPPER)
