@@ -52,7 +52,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING
-    "Choose the type of build, options are: none Debug Release."
+    "Choose the type of build, options are: none Debug Release Trace."
     FORCE)
 endif()
 
@@ -83,8 +83,8 @@ add_subdirectory(port)
 add_subdirectory(FreeRTOS)
 add_subdirectory(boot)
 add_subdirectory(modules)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  #add_subdirectory(trace)
+if(CMAKE_BUILD_TYPE STREQUAL "Trace")
+  add_subdirectory(trace)
 endif()
 
 # Libraries path
