@@ -25,7 +25,6 @@
 #include "fpga_spi.h"
 #include "pin_mapping.h"
 #include "task_priorities.h"
-#include "i2c.h"
 #include "string.h"
 #include "led.h"
 #include "board_version.h"

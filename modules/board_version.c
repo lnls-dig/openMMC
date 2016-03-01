@@ -27,7 +27,6 @@
 #include "board_version.h"
 #include "port.h"
 #include "ipmb.h"
-#include "i2c.h"
 
 /* Chip_ID
  * 0 <- LM75AIM
@@ -141,7 +140,7 @@ void board_i2c_init( void )
     uint8_t i;
     for (i=0; i<I2C_MUX_COUNT; i++) {
         i2c_mux[i].semaphore = xSemaphoreCreateBinary();
-        vI2CInit(i2c_mux[i].i2c_interface, SPEED_100KHZ, I2C_Mode_Local_Master);
+        vI2CConfig(i2c_mux[i].i2c_interface, SPEED_100KHZ);
         xSemaphoreGive(i2c_mux[i].semaphore);
     }
 }

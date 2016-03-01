@@ -1,5 +1,4 @@
 #include "port.h"
-#include "i2c.h"
 #include "string.h"
 #include "board_version.h"
 

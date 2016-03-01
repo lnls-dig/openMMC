@@ -29,7 +29,6 @@
 /* Project includes */
 #include "chip.h"
 #include "pin_mapping.h"
-#include "i2c.h"
 #include "led.h"
 #include "ipmi.h"
 #include "sdr.h"

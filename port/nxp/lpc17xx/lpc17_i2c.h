@@ -1,5 +1,8 @@
 #include "FreeRTOS.h"
 
+/*! @brief Max message length (in bits) used in I2C */
+#define i2cMAX_MSG_LENGTH               32
+
 #define xI2CMasterWrite(id, addr, tx_buff, tx_len) Chip_I2C_MasterSend(id, addr, tx_buff, tx_len)
 #define xI2CMasterRead(id, addr, rx_buff, rx_len) Chip_I2C_MasterRead(id, addr, rx_buff, rx_len)
 #define xI2CMasterWriteRead(id, addr, cmd, rx_buff, rx_len) Chip_I2C_MasterCmdRead(id, addr, cmd, rx_buff, rx_len)

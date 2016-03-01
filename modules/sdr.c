@@ -26,7 +26,6 @@
 #include "semphr.h"
 
 /* Project Includes */
-#include "i2c.h"
 #include "sdr.h"
 #include "sensors.h"
 #include "ipmi.h"
