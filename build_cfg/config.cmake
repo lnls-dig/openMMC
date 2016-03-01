@@ -53,6 +53,13 @@ if(${TARGET_CONTROLLER} MATCHES "^LPC17")
   add_definitions(-D__NEWLIB__)
   add_definitions(-D__LPC17XX__)
 endif()
+
+# Info messages
+message(STATUS "Selected target controller: ${TARGET_CONTROLLER}")
+message(STATUS "Board Name: ${TARGET_BOARD_NAME}")
+message(STATUS "Board Version: ${TARGET_BOARD_MAJOR}.${TARGET_BOARD_MINOR}")
+message(STATUS "Selected modules to compile: ${TARGET_MODULES}")
+
 if (WRITE_ID_EEPROM)
   message(STATUS "EEPROM ID writing enabled!")
   add_definitions(-DWRITE_ID_EEPROM)
