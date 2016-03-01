@@ -151,8 +151,8 @@ void board_discover( void )
     portENABLE_INTERRUPTS();
 
     /* Check RTC EEPROM for board info */
-//#define WRITE_EEPROM
-#ifdef WRITE_EEPROM
+
+#ifdef WRITE_ID_EEPROM
     uint8_t unlock[2] = { 0x09, 0x00 };
 
     /* Carrier type (1-byte):
