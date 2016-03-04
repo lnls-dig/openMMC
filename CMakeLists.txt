@@ -39,9 +39,6 @@ endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build_cfg")
 
-# Include user configuration
-include(${CMAKE_MODULE_PATH}/config.cmake)
-
 set(CMAKE_COLOR_MAKEFILE ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
@@ -56,16 +53,13 @@ if(NOT CMAKE_BUILD_TYPE)
     FORCE)
 endif()
 
+# Include board specific code
 set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat -Wno-unused-parameter -Wno-missing-field-initializers")
 
-set(CMAKE_BUILD_FLAGS "-mcpu=${TARGET_CPU} -mtune=${TARGET_CPU} -march=${TARGET_ARCH}")
-set(CMAKE_BUILD_FLAGS "${CMAKE_BUILD_FLAGS} -mthumb -mthumb-interwork -mno-sched-prolog -mapcs-frame")
-set(CMAKE_BUILD_FLAGS "${CMAKE_BUILD_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DTARGET_BOARD_NAME=${TARGET_BOARD_NAME} -DTARGET_BOARD_MAJOR=${TARGET_BOARD_MAJOR} -DTARGET_BOARD_MINOR=${TARGET_BOARD_MINOR} ")
-
 # Build specific flags
-set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_BUILD_FLAGS} ${CMAKE_ERROR_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG     "-O0 -g3 -DDEBUG")
-set(CMAKE_C_FLAGS_RELEASE   "-O3")
+set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_ERROR_FLAGS}")
+set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS} -O0 -g3 -DDEBUG")
+set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS} -O3")
 
 # When we break up long strings in CMake we get semicolon
 # separated lists, undo this here...
@@ -77,15 +71,18 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" CACHE STRING "")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "")
 
-# Include all subdirectories to be compiled
 set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/main_mmc.c)
-add_subdirectory(port)
+add_subdirectory(port/board)
+add_subdirectory(port/chip)
 add_subdirectory(FreeRTOS)
 add_subdirectory(boot)
 add_subdirectory(modules)
 if(CMAKE_BUILD_TYPE STREQUAL "Trace")
   add_subdirectory(trace)
 endif()
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DTARGET_BOARD_NAME=${TARGET_BOARD_NAME} -DTARGET_BOARD_MAJOR=${TARGET_BOARD_MAJOR} -DTARGET_BOARD_MINOR=${TARGET_BOARD_MINOR} ")
+
 
 # Libraries path
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
