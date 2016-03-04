@@ -1,5 +1,5 @@
 /*
- *   openMMC  --
+ *   AFCIPMI  --
  *
  *   Copyright (C) 2015  Henrique Silva  <henrique.silva@lnls.br>
  *
@@ -18,26 +18,24 @@
  */
 
 /*!
- * @file port.h
+ * @file lpc17_hpm.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
+ * @date March 2016
  *
- * @brief Port layer (includes all portable functions headers)
+ * @brief Firmware update functions (HPM.1)
  */
 
-#ifndef PORT_H_
-#define PORT_H_
-
-/* List of all LPC17xx specific headers to be included */
-
-#include "chip_lpc175x_6x.h"
-#include "lpc17_gpio.h"
-#include "lpc17_i2c.h"
-#include "lpc17_ssp.h"
-#include "lpc17_spi.h"
-#include "lpc17_watchdog.h"
-#include "lpc17_interruptions.h"
-#include "lpc17_hpm.h"
-#include "lpc17_power.h"
-
+#ifdef LPC17_HPM_H_
+#undef LPC17_HPM_H_
 #endif
+#define LPC17_HPM_H_
+
+#include "hpm.h"
+
+uint8_t ipmc_hpm_prepare_comp( void );
+uint8_t ipmc_hpm_upload_block( uint8_t * block, uint16_t size );
+uint8_t ipmc_hpm_finish_upload( uint32_t image_size );
+uint8_t ipmc_hpm_activate_firmware( void );
+uint8_t ipmc_hpm_get_upgrade_status( void );
+uint8_t ipmc_program_page( uint32_t address, uint32_t * data, uint32_t size );
+uint8_t ipmc_erase_sector( uint32_t sector_start, uint32_t sector_end);
