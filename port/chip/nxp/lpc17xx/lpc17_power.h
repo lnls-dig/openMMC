@@ -18,25 +18,21 @@
  */
 
 /*!
- * @file port.h
+ * @file lpc17_power.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
+ * @date March 2016
  *
- * @brief Port layer (includes all portable functions headers)
+ * @brief Definitions of power mode selection for LPC17xx
  */
 
-#ifndef PORT_H_
-#define PORT_H_
-
-/* List of all LPC17xx specific headers to be included */
-
-#include "chip_lpc175x_6x.h"
-#include "lpc17_gpio.h"
-#include "lpc17_i2c.h"
-#include "lpc17_ssp.h"
-#include "lpc17_spi.h"
-#include "lpc17_watchdog.h"
-#include "lpc17_interruptions.h"
-#include "lpc17_power.h"
-
+#ifdef LPC17_POWER_H_
+#undef LPC17_POWER_H_
 #endif
+#define LPC17_POWER_H_
+
+#include "pmu_17xx_40xx.h"
+
+#define pm_sleep()		Chip_PMU_Sleep(LPC_PMU, PMU_MCU_SLEEP)
+#define pm_deep_sleep()		Chip_PMU_Sleep(LPC_PMU, PMU_MCU_DEEP_SLEEP)
+#define pm_power_down()		Chip_PMU_Sleep(LPC_PMU, PMU_MCU_POWER_DOWN)
+#define pm_deep_power_down()	Chip_PMU_Sleep(LPC_PMU, PMU_MCU_DEEP_PWRDOWN)

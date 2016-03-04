@@ -109,6 +109,13 @@ int main(void)
 
 }
 /*-----------------------------------------------------------*/
+/* Put the MCU in sleep state when no task is running */
+void vApplicationIdleHook (void) {
+    pm_sleep();
+}
+
+/*-----------------------------------------------------------*/
+/* System Debug funtions */
 #ifdef HEAP_TEST
 static char stats[500];
 void heap_test ( void* param)
@@ -141,8 +148,6 @@ void vApplicationStackOverflowHook ( TaskHandle_t pxTask, signed char * pcTaskNa
 #endif
 
 #if (configGENERATE_RUN_TIME_STATS == 1)
-
-
 void vConfigureTimerForRunTimeStats( void )
 {
     const unsigned long CTCR_CTM_TIMER = 0x00, TCR_COUNT_ENABLE = 0x01;
@@ -173,7 +178,3 @@ void vApplicationMallocFailedHook( void ) {
 
 }
 #endif
-
-void vApplicationIdleHook (void) {
-    Chip_PMU_SleepState(LPC_PMU);
-}
