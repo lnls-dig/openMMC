@@ -1,9 +1,8 @@
 /*
- * sdr.c
- *
- *   AFCIPMI  --
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
  *   Copyright (C) 2015  Piotr Miedzik  <P.Miedzik@gsi.de>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,55 +16,60 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef IPMI_SDR_H_
-#define IPMI_SDR_H_
+#ifndef SDR_H_
+#define SDR_H_
 
 #include "ipmb.h"
 
-#define NUM_SENSOR              9       /* Number of sensors */
-#define NUM_SDR                 (NUM_SENSOR+1)  /* Number of SDRs */
-
-#define HOT_SWAP_SENSOR         1
-#define NUM_SDR_FMC2_12V        2
-#define NUM_SDR_FMC2_VADJ       3
-#define NUM_SDR_FMC2_3V3        4
-#define NUM_SDR_FMC1_12V        5
-#define NUM_SDR_FMC1_VADJ       6
-#define NUM_SDR_FMC1_3V3        7
-#define NUM_SDR_LM75_1          8
-#define NUM_SDR_LM75_2          9
-#define NUM_SDR_LM75_3          10
-#define NUM_SDR_LM75_4          11
+#define NUM_SENSOR                      17      /* Number of sensors */
+#define NUM_SDR                         (NUM_SENSOR+1)  /* Number of SDRs */
 
 /* Sensor Types */
-#define SENSOR_TYPE_TEMPERATURE                 0x01
-#define SENSOR_TYPE_VOLTAGE                     0x02
-#define SENSOR_TYPE_CURRENT                     0x03
-#define SENSOR_TYPE_FAN                         0x04
-#define SENSOR_TYPE_WATCHDOG                    0x23
-#define SENSOR_TYPE_VERSION_CHANGE              0x2B
-#define SENSOR_TYPE_HOT_SWAP                    0xF2
+#define SENSOR_TYPE_TEMPERATURE         0x01
+#define SENSOR_TYPE_VOLTAGE             0x02
+#define SENSOR_TYPE_CURRENT             0x03
+#define SENSOR_TYPE_FAN                 0x04
+#define SENSOR_TYPE_WATCHDOG            0x23
+#define SENSOR_TYPE_VERSION_CHANGE      0x2B
+#define SENSOR_TYPE_HOT_SWAP            0xF2
 
-/* Module handle sensor status */
-#define HOT_SWAP_CLOSED                         0x00
-#define HOT_SWAP_OPENED                         0x01
-#define HOT_SWAP_QUIESCED                       0x02
+/* Assertion Event Codes */
+#define ASSERTION_EVENT                 0x00
+#define DEASSERTION_EVENT               0x80
 
-#define HOT_SWAP_STATE_HANDLE_CLOSED            (1 << 0)
-#define HOT_SWAP_STATE_HANDLE_OPENED            (1 << 1)
-#define HOT_SWAP_STATE_QUIESCED                 (1 << 2)
-#define HOT_SWAP_STATE_BP_SDOWN                 (1 << 3)
-#define HOT_SWAP_STATE_BP_FAIL                  (1 << 4)
-#define HOT_SWAP_STATE_URTM_PRSENT              (1 << 5)
-#define HOT_SWAP_STATE_URTM_ABSENT              (1 << 6)
-#define HOT_SWAP_STATE_URTM_COMPATIBLE          (1 << 7)
-#define HOT_SWAP_STATE_URTM_INCOMPATIBLE        (1 << 0)
+/* Sensor States */
+#define SENSOR_STATE_NORMAL             0x00	// temperature is in normal range
+#define SENSOR_STATE_LOW                0x01	// temperature is below lower non critical
+#define SENSOR_STATE_LOW_CRIT           0x02	// temperature is below lower critical
+#define SENSOR_STATE_LOW_NON_REC        0x04	// temperature is below lower non recoverable
+#define SENSOR_STATE_HIGH               0x08	// temperature is higher upper non critical
+#define SENSOR_STATE_HIGH_CRIT          0x10	// temperature is higher upper critical
+#define SENSOR_STATE_HIGH_NON_REC       0x20	// temperature is higher high non recoverable
+
+
+/* IPMI Sensor Events */
+#define IPMI_THRESHOLD_LNC_GL           0x00	// lower non critical going low
+#define IPMI_THRESHOLD_LNC_GH           0x01	// lower non critical going high
+#define IPMI_THRESHOLD_LC_GL            0x02	// lower critical going low
+#define IPMI_THRESHOLD_LC_GH            0x03	// lower critical going HIGH
+#define IPMI_THRESHOLD_LNR_GL           0x04	// lower non recoverable going low
+#define IPMI_THRESHOLD_LNR_GH           0x05	// lower non recoverable going high
+#define IPMI_THRESHOLD_UNC_GL           0x06	// upper non critical going low
+#define IPMI_THRESHOLD_UNC_GH           0x07	// upper non critical going high
+#define IPMI_THRESHOLD_UC_GL            0x08	// upper critical going low
+#define IPMI_THRESHOLD_UC_GH            0x09	// upper critical going HIGH
+#define IPMI_THRESHOLD_UNR_GL           0x0A	// upper non recoverable going low
+#define IPMI_THRESHOLD_UNR_GH           0x0B	// upper non recoverable going high
+
 
 typedef enum {
     TYPE_01 = 0x1,
     TYPE_02 = 0x2,
+    TYPE_11 = 0x11,
     TYPE_12 = 0x12
 } SDR_TYPE;
 
@@ -169,37 +173,48 @@ typedef struct {
 } SDR_type_12h_t;
 
 typedef struct {
-    uint8_t ownerID;
-    uint8_t entityID;
-    uint8_t entityinstance;
-    uint16_t readout_value;
-    uint8_t comparator_status;
-    void * sensor_info;
-} sensor_data_entry_t;
-
-typedef struct {
-    SDR_TYPE type;
+    uint8_t num;
+    SDR_TYPE sdr_type;
     void * sdr;
     uint8_t sdr_length;
-    sensor_data_entry_t * data;
-    TaskHandle_t * task_handle;
-    uint8_t slave_addr;
     uint8_t diag_devID;
+    uint8_t state;
+    uint8_t old_state;
+    uint16_t readout_value;
+    uint8_t slave_addr;
+    uint8_t signed_flag;
+    uint8_t ownerID; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
+    uint8_t entityinstance; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
+    TaskHandle_t * task_handle;
+    struct {
+        uint16_t upper_non_recoverable_go_high:1;
+        uint16_t upper_non_recoverable_go_low:1;
+        uint16_t upper_critical_go_high:1;
+        uint16_t upper_critical_go_low:1;
+        uint16_t upper_non_critical_go_high:1;
+        uint16_t upper_non_critical_go_low:1;
+        uint16_t lower_non_recorverable_go_high:1;
+        uint16_t lower_non_recoverable_go_low:1;
+        uint16_t lower_critical_go_high:1;
+        uint16_t lower_critical_go_low:1;
+        uint16_t lower_non_critical_go_high:1;
+        uint16_t lower_non_critical_go_low:1;
+    } asserted_event;
 } sensor_t;
 
-extern sensor_data_entry_t sdrData[NUM_SDR];
-extern const sensor_t const sensor_array[NUM_SDR];
+extern sensor_t *sensor_array;
+extern uint8_t sdr_count;
 
-void ipmi_se_get_sdr( ipmi_msg *req, ipmi_msg* rsp);
-void ipmi_se_get_sensor_reading( ipmi_msg *req, ipmi_msg* rsp);
-void ipmi_se_get_sdr_info( ipmi_msg *req, ipmi_msg* rsp);
-void ipmi_se_reserve_device_sdr( ipmi_msg *req, ipmi_msg* rsp);
-//void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp );
+const SDR_type_12h_t SDR0;
 
-void initializeDCDC();
-void do_quiesced_init();
-void do_quiesced(unsigned char ctlcode);
-void sdr_init(uint8_t ipmiID);
+#define GET_SENSOR_TYPE(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
+
+#define GET_EVENT_TYPE_CODE(n)      ((SDR_type_01h_t *)sensor->sdr)->event_reading_type
+
+void initializeDCDC( void );
+void sdr_init( void );
 void sensor_init( void );
+void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr );
+void check_sensor_event( sensor_t * sensor );
 
 #endif

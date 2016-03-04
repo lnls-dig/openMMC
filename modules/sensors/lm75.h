@@ -1,7 +1,7 @@
 /*
- *   AFCIPMI  --
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   Copyright (C) 2015  Henrique Silva  <henrique.silva@lnls.br>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -15,6 +15,8 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
 /*!
@@ -29,9 +31,14 @@
 #define LM75_H_
 
 #define LM75_MAX_COUNT		4
-#define LM75_UPDATE_RATE	100
+#define LM75_UPDATE_RATE	500
 
 extern TaskHandle_t vTaskLM75_Handle;
+
+const SDR_type_01h_t SDR_LM75_uC;
+const SDR_type_01h_t SDR_LM75_CLOCK_SWITCH;
+const SDR_type_01h_t SDR_LM75_DCDC;
+const SDR_type_01h_t SDR_LM75_RAM;
 
 void LM75_init( void );
 void vTaskLM75( void* Parameters );

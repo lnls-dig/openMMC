@@ -1,7 +1,7 @@
 /*
- *   AFCIPMI  --
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   Copyright (C) 2015  Henrique Silva  <henrique.silva@lnls.br>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -15,14 +15,16 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
 /*!
- * @file lm75.h
+ * @file ina220.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
  * @date September 2015
  *
- * @brief Definitions for LM75 I2C Temperature Sensor
+ * @brief Definitions for INA220 Current/Voltage/Power Sensor
  */
 
 #ifndef INA220_H_
@@ -31,7 +33,7 @@
 #include "FreeRTOS.h"
 #include "port.h"
 
-#define MAX_INA220_COUNT        6
+#define MAX_INA220_COUNT        12
 #define INA220_UPDATE_RATE      100
 
 /* common register definitions */
@@ -45,8 +47,39 @@
 /* register count */
 #define INA220_REGISTERS                6
 
-/* settings - depend on use case */
-#define INA220_CONFIG_DEFAULT           0x399F  /* PGA=8 */
+/* Scale range values */
+#define INA220_16V_SCALE_RANGE          0x00
+#define INA220_32V_SCALE_RANGE          0x01
+
+/* PGA gain */
+#define INA220_PGA_GAIN_40MV           0x00
+#define INA220_PGA_GAIN_80MV           0x01
+#define INA220_PGA_GAIN_160MV          0x02
+#define INA220_PGA_GAIN_320MV          0x03
+
+/* ADC Resolution/Averaging */
+#define INA220_RES_SAMPLES_9BIT         0x0
+#define INA220_RES_SAMPLES_10BIT        0x1
+#define INA220_RES_SAMPLES_11BIT        0x2
+#define INA220_RES_SAMPLES_12BIT        0x3
+
+#define INA220_RES_SAMPLES_2SMP         0x9
+#define INA220_RES_SAMPLES_4SMP         0xA
+#define INA220_RES_SAMPLES_8SMP         0xB
+#define INA220_RES_SAMPLES_16SMP        0xC
+#define INA220_RES_SAMPLES_32SMP        0xD
+#define INA220_RES_SAMPLES_64SMP        0xE
+#define INA220_RES_SAMPLES_128SMP       0xF
+
+/* Operating modes */
+#define INA220_MODE_POWER_DOWN          0x0
+#define INA220_MODE_SHUNT_TRIG          0x1
+#define INA220_MODE_BUS_TRIG            0x2
+#define INA220_MODE_SHUNT_BUS_TRIG      0x3
+#define INA220_MODE_ADC_OFF             0x4
+#define INA220_MODE_SHUNT_CONT          0x5
+#define INA220_MODE_BUS_CONT            0x6
+#define INA220_MODE_SHUNT_BUS_CONT      0x7
 
 /* worst case is 68.10 ms (~14.6Hz, ina219) */
 #define INA220_CONVERSION_RATE          15
@@ -54,9 +87,33 @@
 
 #define INA220_RSHUNT_DEFAULT           10000
 
+typedef union {
+    struct {
+#ifdef BF_MS_FIRST
+        uint16_t mode:3;
+        uint16_t shunt_adc_resolution:4;
+        uint16_t bus_adc_resolution:4;
+        uint16_t pga_gain:2;
+        uint16_t bus_voltage_range:1;
+        uint16_t reserved:1;
+        uint16_t reset:1;
+#else
+        uint16_t reset:1;
+        uint16_t reserved:1;
+        uint16_t bus_voltage_range:1;
+        uint16_t pga_gain:2;
+        uint16_t bus_adc_resolution:4;
+        uint16_t shunt_adc_resolution:4;
+        uint16_t mode:3;
+#endif
+    } cfg_struct;
+    uint16_t cfg_word;
+} t_ina220_config_reg;
+
 typedef struct {
-    uint16_t config_default;
+    t_ina220_config_reg config_reg_default;
     uint32_t calibration_factor;
+    uint16_t calibration_reg;
     uint8_t registers;
     uint8_t shunt_div;
     uint8_t bus_voltage_shift;
@@ -66,25 +123,36 @@ typedef struct {
 
 typedef struct {
     uint8_t i2c_id;
-    const t_ina220_config *config;
+    sensor_t * sensor;
+    const t_ina220_config * config;
     uint32_t rshunt;
-    uint16_t curr_config;
+    t_ina220_config_reg curr_reg_config;
     uint16_t regs[INA220_REGISTERS];
 } t_ina220_data;
 
-extern TaskHandle_t vTaskINA220_Handle;
+TaskHandle_t vTaskINA220_Handle;
 
-#ifdef OLD_INA220
-void INA220_init( void );
-uint16_t INA220_readVolt(uint8_t i2c, uint8_t address, bool raw);
-#else
+/* INA220 SDR List */
+extern const SDR_type_01h_t SDR_FMC1_VADJ;
+extern const SDR_type_01h_t SDR_FMC1_12V;
+extern const SDR_type_01h_t SDR_FMC1_P3V3;
+extern const SDR_type_01h_t SDR_FMC1_VADJ_CURR;
+extern const SDR_type_01h_t SDR_FMC1_12V_CURR;
+extern const SDR_type_01h_t SDR_FMC1_P3V3_CURR;
+extern const SDR_type_01h_t SDR_FMC2_VADJ;
+extern const SDR_type_01h_t SDR_FMC2_12V;
+extern const SDR_type_01h_t SDR_FMC2_P3V3;
+extern const SDR_type_01h_t SDR_FMC2_VADJ_CURR;
+extern const SDR_type_01h_t SDR_FMC2_12V_CURR;
+extern const SDR_type_01h_t SDR_FMC2_P3V3_CURR;
+
 uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data);
+Bool ina220_calibrate( t_ina220_data * data );
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
 void ina220_readall( t_ina220_data * data );
 void ina220_sdr_init ( TaskHandle_t handle );
 void ina220_init( void );
-#endif
 
 void vTaskINA220( void* Parameters );
 

@@ -1,9 +1,7 @@
 /*
- *   hotswap.c
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   AFCIPMI  --
- *
- *   Copyright (C) 2015
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,6 +15,8 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
 #include "FreeRTOS.h"
@@ -29,6 +29,7 @@
 #include "task_priorities.h"
 #include "ipmi.h"
 #include "led.h"
+#include "utils.h"
 
 #define HOTSWAP_POLL
 //#define HOTSWAP_INT
@@ -44,29 +45,45 @@ void EINT3_IRQHandler( void )
     /* Simple debouncing routine */
     /* If the last interruption happened in the last 200ms, this one is only a bounce, ignore it and wait for the next interruption */
 
-    if (getTickDifference(current_time, last_time) < DEBOUNCE_TIME){
-        /*! @todo Clear all the active interrupts tied to EXT3, not only the hot swap */
-        Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT, (1 << HOT_SWAP_HANDLE_PIN));
+    if (getTickDifference(current_time, last_time) < DEBOUNCE_TIME) {
         return;
     }
 
     /* Checks if the interrupt occurred in Port2 */
-    if (Chip_GPIOINT_IsIntPending(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT)) {
-        /*! @bug If any other GPIO interruption is enabled in Port 2, it'll trigger the hotswap messaging */
-        asm("nop");
-        if ( gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN) == 0 ) {
-            hotswap_state = HOT_SWAP_STATE_HANDLE_CLOSED;
-        } else {
-            hotswap_state = HOT_SWAP_STATE_HANDLE_OPENED;
-        }
-
-        xTaskNotifyFromISR( vTaskHotSwap_Handle, hotswap_state, eSetValueWithOverwrite, &xHigherPriorityTaskWoken );
-
+    if (!Chip_GPIOINT_IsIntPending(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT)) {
+        /* Clear interrupt pending bit */
         Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT, (1 << HOT_SWAP_HANDLE_PIN));
+        return;
     }
+
+    if ((Chip_GPIOINT_GetStatusRising(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT) >> HOT_SWAP_HANDLE_PIN) & 1) {
+        hotswap_state = HOT_SWAP_STATE_HANDLE_OPENED;
+    } else if ((Chip_GPIOINT_GetStatusFalling(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT) >> HOT_SWAP_HANDLE_PIN) & 1) {
+        hotswap_state = HOT_SWAP_STATE_HANDLE_CLOSED;
+    }
+
+    /* Notify the Hotswap task about the handle event */
+    xTaskNotifyFromISR( vTaskHotSwap_Handle, hotswap_state, eSetValueWithOverwrite, &xHigherPriorityTaskWoken );
+
+    /* Clear interrupt pending bit */
+    Chip_GPIOINT_ClearIntStatus(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT, (1 << HOT_SWAP_HANDLE_PIN));
+
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 #endif
+
+
+static uint8_t hotswap_get_handle_status( void )
+{
+    if (gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN)) {
+        return HOTSWAP_MODULE_HANDLE_OPEN_MASK;
+    } else {
+        return HOTSWAP_MODULE_HANDLE_CLOSED_MASK;
+    }
+}
+
+static SDR_type_02h_t * hotswap_pSDR;
+static sensor_t * hotswap_sensor;
 
 void hotswap_init( void )
 {
@@ -76,16 +93,18 @@ void hotswap_init( void )
 
     /* Enable Rising and Falling edge interruption on Hot Swap pin */
     Chip_GPIOINT_SetIntFalling(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT, (1 << HOT_SWAP_HANDLE_PIN));
-    Chip_GPIOINT_SetIntRising(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT, (1 <<HOT_SWAP_HANDLE_PIN));
+    Chip_GPIOINT_SetIntRising(LPC_GPIOINT, HOT_SWAP_HANDLE_PORT, (1 << HOT_SWAP_HANDLE_PIN));
 
     /* Configure the IRQ */
-    NVIC_SetPriority( EINT3_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1);
-    NVIC_EnableIRQ( EINT3_IRQn );
+    irq_set_priority( EINT3_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1);
+    irq_enable( EINT3_IRQn );
 #endif
     /* Create Hot Swap task */
     xTaskCreate( vTaskHotSwap, "Hot Swap", 200, (void *) NULL, tskHOTSWAP_PRIORITY, &vTaskHotSwap_Handle);
 
-    for ( uint8_t i = 0; i < NUM_SDR; i++ ) {
+    sdr_insert_entry( TYPE_02, (void *) &SDR_HOT_SWAP, &vTaskHotSwap_Handle, 0, 0 );
+
+    for ( uint8_t i = 0; i < sdr_count; i++ ) {
 
         /* Check if the handle pointer is not NULL */
         if (sensor_array[i].task_handle == NULL) {
@@ -97,7 +116,10 @@ void hotswap_init( void )
             continue;
         }
 
-        sensor_array[i].data->comparator_status |= HOT_SWAP_STATE_HANDLE_OPENED;
+	hotswap_sensor = &sensor_array[i];
+        hotswap_pSDR = (SDR_type_02h_t *) sensor_array[i].sdr;
+
+        hotswap_sensor->readout_value = hotswap_get_handle_status();
     }
 }
 
@@ -105,9 +127,8 @@ void vTaskHotSwap( void *Parameters )
 {
     ipmi_msg pmsg;
     uint8_t data_len = 0;
-    uint8_t i;
-    SDR_type_01h_t *pSDR = NULL;
-    sensor_data_entry_t * pDATA;
+    uint8_t evt_msg;
+
 #ifdef HOTSWAP_INT
     uint8_t new_flag;
     uint8_t init_state;
@@ -131,8 +152,15 @@ void vTaskHotSwap( void *Parameters )
     TickType_t xLastWakeTime;
     const TickType_t xFrequency = 50;
 
-     /* Initialise the xLastWakeTime variable with the current time. */
-     xLastWakeTime = xTaskGetTickCount();
+    /* Override Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
+    if ( gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN) == 0 ) {
+        LED_update( LED_BLUE, &LED_Off_Activity );
+    } else {
+        LED_update( LED_BLUE, &LED_On_Activity );
+    }
+
+    /* Initialise the xLastWakeTime variable with the current time. */
+    xLastWakeTime = xTaskGetTickCount();
 
 #endif
 
@@ -140,86 +168,95 @@ void vTaskHotSwap( void *Parameters )
 #ifdef HOTSWAP_INT
         new_flag = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        /* Find hotswap sensor in SDR table */
-        for ( i = 0; i < NUM_SDR; i++ ) {
+        evt_msg = new_flag >> 1;
 
-            /* Check if the handle pointer is not NULL */
-            if (sensor_array[i].task_handle == NULL) {
-                continue;
-            }
-
-            /* Check if this task should update the selected SDR */
-            if ( *(sensor_array[i].task_handle) != xTaskGetCurrentTaskHandle() ) {
-                continue;
-            }
-
-            pSDR = (SDR_type_01h_t *) sensor_array[i].sdr;
-            pDATA = sensor_array[i].data;
-
-            data_len = 0;
-            pmsg.dest_LUN = 0;
-            pmsg.netfn = NETFN_SE;
-            pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
-            pmsg.data[data_len++] = 0x04;
-            pmsg.data[data_len++] = 0xf2;
-            pmsg.data[data_len++] = pSDR->sensornum;
-            pmsg.data[data_len++] = 0x6f;
-            pmsg.data[data_len++] = (new_flag >> 1); // hot swap state
-            pmsg.data_len = data_len;
-
-            if (ipmb_send_request( &pmsg ) == ipmb_error_success) {
-                /* Update the SDR */
-                pDATA->comparator_status = (pDATA->comparator_status & 0xFC) | new_flag;
-            } else {
-                xTaskNotifyGive(xTaskGetCurrentTaskHandle());
-                vTaskDelay(20);
-            }
-            break;
-
+        if ( ipmi_event_send(hotswap_sensor, ASSERTION_EVENT, &evt_msg, sizeof(evt_msg)) == ipmb_error_success) {
+            /* Update the SDR */
+            hotswap_sensor->readout_value = (hotswap_sensor->readout_value & 0xFC) | new_flag;
+        } else {
+            /* If the message fails to be sent, unblock itself to try again */
+            xTaskNotifyGive(xTaskGetCurrentTaskHandle());
         }
+
 #endif
 #ifdef HOTSWAP_POLL
-	vTaskDelayUntil( &xLastWakeTime, xFrequency );
+        vTaskDelayUntil( &xLastWakeTime, xFrequency );
 
-        /* Find hotswap sensor in SDR table */
-        for ( i = 0; i < NUM_SDR; i++ ) {
+        new_state = hotswap_get_handle_status();
 
-            /* Check if the handle pointer is not NULL */
-            if (sensor_array[i].task_handle == NULL) {
-                continue;
-            }
-
-            /* Check if this task should update the selected SDR */
-            if ( *(sensor_array[i].task_handle) != xTaskGetCurrentTaskHandle() ) {
-                continue;
-            }
-
-	    new_state = gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN);
-
-	    if( new_state == old_state ) {
-		continue;
-	    }
-
-            pSDR = (SDR_type_01h_t *) sensor_array[i].sdr;
-            pDATA = sensor_array[i].data;
-
-            data_len = 0;
-            pmsg.dest_LUN = 0;
-            pmsg.netfn = NETFN_SE;
-            pmsg.cmd = IPMI_PLATFORM_EVENT_CMD;
-            pmsg.data[data_len++] = 0x04;
-            pmsg.data[data_len++] = 0xf2;
-            pmsg.data[data_len++] = pSDR->sensornum;
-            pmsg.data[data_len++] = 0x6f;
-            pmsg.data[data_len++] = new_state; // hot swap state
-            pmsg.data_len = data_len;
-
-            if (ipmb_send_request( &pmsg ) == ipmb_error_success) {
-                /* Update the SDR */
-                pDATA->readout_value = (pDATA->readout_value & 0xFC) | new_state;
-                old_state = new_state;
-            }
+        if( new_state == old_state ) {
+            continue;
         }
+
+	if ( hotswap_send_event( new_state ) == ipmb_error_success )
+	{
+	    hotswap_set_mask_bit( new_state );
+	    old_state = new_state;
+	}
+
 #endif
     }
 }
+
+ipmb_error hotswap_send_event( uint8_t evt )
+{
+    uint8_t evt_msg;
+
+    evt_msg = evt >> 1;
+    return ipmi_event_send( hotswap_sensor, ASSERTION_EVENT, &evt_msg, sizeof( evt_msg ) );
+}
+
+void hotswap_clear_mask_bit( uint8_t mask )
+{
+    if ( hotswap_sensor ) {
+	hotswap_sensor->readout_value &= ~mask;
+    }
+}
+
+void hotswap_set_mask_bit( uint8_t mask )
+{
+    if ( hotswap_sensor ) {
+	hotswap_sensor->readout_value |= mask;
+    }
+}
+
+/* AMC Hot-Swap sensor SDR */
+const SDR_type_02h_t SDR_HOT_SWAP = {
+
+    .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_02,
+    .hdr.reclength = sizeof(SDR_type_02h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = 0x00, /* Filled by sdr_insert_entry() */
+
+/* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x03, /* init: event generation + scanning enabled */
+    .sensorcap = 0xc1, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_HOT_SWAP, /* sensor type: HOT SWAP*/
+    .event_reading_type = 0x6f, /* sensor reading*/
+    .assertion_event_mask = { 0x00, /* LSB assert event mask: 3 bit value */
+                              0x00 }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0x00, /* LSB deassert event mask: 3 bit value */
+                                0x00 }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x00, /* LSB: readable Threshold mask: no thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: no thresholds are setable: */
+    .sensor_units_1 = 0xc0, /* sensor units 1 : Does not return analog reading*/
+    .sensor_units_2 = 0x00, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .record_sharing[0] = 0x00,
+    .record_sharing[1] = 0x00,
+    .pos_thr_hysteresis = 0x00, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 0x00, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .reserved3 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | STR_SIZE("HOTSWAP HANDLE"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "HOTSWAP HANDLE" /* sensor string */
+};

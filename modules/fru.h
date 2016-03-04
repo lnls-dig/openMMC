@@ -1,13 +1,32 @@
 /*
- * fru.h
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
+ *   Copyright (C) 2015  Julian Mendez  <julian.mendez@cern.ch>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
-#ifndef FRU_H
-#define FRU_H
+
+#ifndef FRU_H_
+#define FRU_H_
 
 #include "FreeRTOS.h"
 #include "string.h"
 #include "user_fru.h"
+#include "ipmi.h"
 
 #define MAX_FRU_SIZE            2048
 
@@ -77,6 +96,7 @@
 #define MATCHES_10              (0x02)
 
 #define PORT(n)                 n
+#define UNUSED_PORT             0x1F
 
 #define current_in_ma(curr)                     (uint8_t)(curr/100);
 #define PADDING_SIZE(x) (7-(sizeof(x)%8))
@@ -133,13 +153,6 @@ typedef struct multirecord_area_header {
                                      the record. */
     uint8_t       header_cksum;   /* Header Checksum. Holds the zero checksum of
                                      the header. */
-    uint8_t       manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
-                                     three byte ID assigned to PICMG®. For this
-                                     specification, the value 12634 (00315Ah) shall
-                                     be used. */
-    uint8_t       picmg_rec_id;   /* PICMG Record ID. */
-    uint8_t       rec_fmt_ver;    /* Record Format Version. For this specification,
-                                     the value 0h shall be used. */
 } t_multirecord_area_header;
 
 
@@ -335,34 +348,64 @@ typedef struct t_product_area_format_hdr {
     uint8_t checksum;               // Product Info Area Checksum (zero checksum)
 } t_product_area_format_hdr;
 
-
 typedef struct module_current_record {
     t_multirecord_area_header hdr;
+    uint8_t manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
+                                     three byte ID assigned to PICMG®. For this
+                                     specification, the value 12634 (00315Ah) shall
+                                     be used. */
+    uint8_t picmg_rec_id;   /* PICMG Record ID. */
+    uint8_t rec_fmt_ver;    /* Record Format Version. For this specification,
+                                     the value 0h shall be used. */
     uint8_t current;
 } t_module_current_record;
 
 typedef struct __attribute__ ((__packed__)) amc_channel_descriptor {
-    /* LSB First */
+#ifdef BF_MS_FIRST
+    uint8_t reserved:4;
+    uint8_t lane3:5;
+    uint8_t lane2:5;
+    uint8_t lane1:5;
+    uint8_t lane0:5;
+#else
     uint8_t lane0:5;
     uint8_t lane1:5;
     uint8_t lane2:5;
     uint8_t lane3:5;
     uint8_t reserved:4;
+#endif
 } t_amc_channel_descriptor;
 
 typedef struct __attribute__ ((__packed__)) amc_link_descriptor {
     /* LSB First */
+#ifdef BF_MS_FIRST
+    uint8_t reserved:6,
+	assymetric_match:2;
+    uint8_t link_grouping_id;
+    uint16_t link_type_ext:4,
+	link_type:12;
     uint8_t amc_channel_id;
-    uint16_t link_type:12,
+#else
+    uint8_t amc_channel_id;
+    uint16_t lane_bit_flag:4,
+        link_type:8,
         link_type_ext:4;
     uint8_t link_grouping_id;
-    uint8_t reserved:6,
-        assymetric_match:2;
+    uint8_t assymetric_match:2,
+	reserved:6;
+#endif
 } t_amc_link_descriptor;
 
-#ifdef CERN_FRU
+
 typedef struct amc_point_to_point_record {
     t_multirecord_area_header hdr;
+    uint8_t manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
+                                     three byte ID assigned to PICMG®. For this
+                                     specification, the value 12634 (00315Ah) shall
+                                     be used. */
+    uint8_t picmg_rec_id;   /* PICMG Record ID. */
+    uint8_t rec_fmt_ver;    /* Record Format Version. For this specification,
+                                     the value 0h shall be used. */
     uint8_t oem_guid_cnt;
 #ifdef POINT_TO_POINT_OEM_GUID_LIST
 #if (POINT_TO_POINT_OEM_GUID_CNT == 0)
@@ -371,13 +414,13 @@ typedef struct amc_point_to_point_record {
     uint8_t oem_guid_list[16*POINT_TO_POINT_OEM_GUID_CNT];
 #endif
 #ifdef BF_MS_FIRST
-    uint8_t connected_dev_id:4,
-        reserved:3,
-        record_type:1;
-#else
     uint8_t record_type:1,          /* [7] Record Type - 1 AMC-Module, 0 On-Carrier Device */
         reserved:3,     /* [6:4] Reserved, write as 0h.*/
         connected_dev_id:4;      /* [3:0] Connected Dev ID if Record-Type =0, reserved, otherwise */
+#else
+    uint8_t connected_dev_id:4,
+        reserved:3,
+        record_type:1;
 #endif
     uint8_t amc_channel_descriptor_cnt;
 
@@ -388,53 +431,6 @@ typedef struct amc_point_to_point_record {
 } t_amc_point_to_point_record;
 
 #define AMC_POINT_TO_POINT_RECORD_BUILD
-#else
-
-typedef struct amc_point_to_point_record {
-/* AMC Table 3-16 AdvancedMC Point-to-Point Connectivity record */
-    uint8_t record_type_id; /* Record Type ID. For all records defined
-			       in this specification a value of C0h (OEM)
-			       shall be used. */
-    uint8_t version:4,
-	reserved:3,
-	eol:1;
-    uint8_t record_len;     /* Record Length. # of bytes following rec cksum */
-    uint8_t record_cksum;   /* Record Checksum. Holds the zero checksum of
-			       the record. */
-    uint8_t header_cksum;   /* Header Checksum. Holds the zero checksum of
-			       the header. */
-    uint8_t manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
-			       three byte ID assigned to PICMG�. For this
-			       specification, the value 12634 (00315Ah) shall
-			       be used. */
-    uint8_t picmg_rec_id;   /* PICMG Record ID. For the AMC Point-to-Point
-			       Connectivity record, the value 19h must be used  */
-    uint8_t rec_fmt_ver;    /* Record Format Version. For this specification,
-			       the value 0h shall be used. */
-    uint8_t oem_guid_count; /* OEM GUID Count. The number, n, of OEM GUIDs
-			       defined in this record. */
-//OEM_GUID oem_guid_list[n];
-/* A list 16*n bytes of OEM GUIDs. */
-    
-uint8_t conn_dev_id:4,
-    :3,
-    record_type:1;
-
-    uint8_t ch_descr_count; /* AMC Channel Descriptor Count. The number, m,
-			       of AMC Channel Descriptors defined in this record. */
-
-    uint8_t amc_ch_descr0[3];
-    uint8_t amc_ch_descr1[3];
-    uint8_t amc_ch_descr2[3];
-    uint8_t amc_link_descr0[5];
-    uint8_t amc_link_descr1[5];
-    uint8_t amc_link_descr2[5];
-    uint8_t amc_link_descr3[5];
-    uint8_t amc_link_descr4[5];
-    uint8_t amc_link_descr5[5];
-
-} t_amc_point_to_point_record;
-#endif
 
 typedef struct indirect_clock_descriptor {
 #ifdef BF_MS_FIRST
@@ -466,7 +462,6 @@ typedef struct direct_clock_descriptor {
     uint8_t clock_maximum_frequency[4];
 } t_direct_clock_descriptor;
 
-
 typedef struct clock_config_descriptor {
     uint8_t clock_id;
 #ifdef BF_MS_FIRST
@@ -485,6 +480,13 @@ typedef struct clock_config_descriptor {
 
 typedef struct amc_clock_config_record {
     t_multirecord_area_header hdr;
+    uint8_t manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
+                                     three byte ID assigned to PICMG®. For this
+                                     specification, the value 12634 (00315Ah) shall
+                                     be used. */
+    uint8_t picmg_rec_id;   /* PICMG Record ID. */
+    uint8_t rec_fmt_ver;    /* Record Format Version. For this specification,
+                                     the value 0h shall be used. */
     uint8_t resource_id;
     uint8_t descriptor_cnt;
 #ifdef AMC_CLOCK_CONFIGURATION_DESCRIPTORS_CNT
@@ -510,6 +512,7 @@ typedef struct amc_clock_config_record {
 #define AMC_CLOCK_CONFIGURATION_LIST_BUILD                              \
     t_clock_config_descriptor clock_descriptor_list[] = { AMC_CLOCK_CONFIGURATION_LIST }
 
+/* TODO: Lanes with value 0x31 should not be included in the lane bit flag */
 #define GENERIC_POINT_TO_POINT_RECORD(id, port0, port1, port2, port3, protocol, extension, matches) \
     p2p_record->amc_channel_descriptor_cnt++;                           \
     p2p_record->amc_channel_descriptor[id].lane0 = port0;               \
@@ -518,7 +521,8 @@ typedef struct amc_clock_config_record {
     p2p_record->amc_channel_descriptor[id].lane3 = port3;               \
     p2p_record->amc_channel_descriptor[id].reserved = 0xF;              \
     p2p_record->amc_link_descriptor[id].amc_channel_id = id;            \
-    p2p_record->amc_link_descriptor[id].link_type = (protocol<<4)|0xF;  \
+    p2p_record->amc_link_descriptor[id].lane_bit_flag = 0xF;            \
+    p2p_record->amc_link_descriptor[id].link_type = protocol;           \
     p2p_record->amc_link_descriptor[id].link_type_ext = extension;      \
     p2p_record->amc_link_descriptor[id].link_grouping_id = 0;           \
     p2p_record->amc_link_descriptor[id].assymetric_match = matches;     \
@@ -591,18 +595,15 @@ typedef struct amc_clock_config_record {
 
 extern uint8_t fru_data[FRU_SIZE];
 
-void module_current_record_function( uint8_t * fru_buffer );
-void board_info_area_function( uint8_t * fru_buffer );
-void product_info_area_function( uint8_t * fru_buffer );
-void point_to_point_clock( uint8_t * fru_buffer );
-void fru_header_function( uint8_t * fru_buffer );
 void fru_init( void );
+void fru_header_build( uint8_t * fru_buffer );
+void board_info_area_build( uint8_t * fru_buffer );
+void product_info_area_build( uint8_t * fru_buffer );
+void amc_point_to_point_record_build( uint8_t * fru_buffer );
+void point_to_point_clock_build( uint8_t * fru_buffer );
+void module_current_record_build( uint8_t * fru_buffer );
 
 /* IPMI Handlers */
-#include "ipmi.h"
-void fru_read_to_buffer(char *buff, int offset, int length);
+void fru_read_to_buffer(char *buff, uint8_t offset, uint8_t length);
 void fru_read_common_header(t_fru_common_header * header);
-void ipmi_storage_get_fru_info ( ipmi_msg * req, ipmi_msg * rsp);
-void ipmi_storage_read_fru_data_cmd ( ipmi_msg * req, ipmi_msg * rsp);
-
 #endif

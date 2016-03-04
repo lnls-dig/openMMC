@@ -1,9 +1,8 @@
 /*
- * payload.h
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   AFCIPMI  --
- *
- *   Copyright (C) 2015  Piotr Miedzik <P.Miedzik@gsi.de>
+ *   Copyright (C) 2015  Piotr Miedzik  <P.Miedzik@gsi.de>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,35 +16,37 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
 #ifndef IPMI_PAYLOAD_H_
 #define IPMI_PAYLOAD_H_
 
 typedef enum {
-	PAYLOAD_NO_POWER = 0,
-	PAYLOAD_SWITCHING_ON = 1,
-	PAYLOAD_POWER_GOOD_WAIT = 3,
-	PAYLOAD_STATE_FPGA_SETUP = 4,
-	PAYLOAD_FPGA_BOOTING = 5,
-	PAYLOAD_FPGA_WORKING = 6,
-	PAYLOAD_SWITCHING_OFF = 7,
-	PAYLOAD_QUIESCED = 8,
-	PAYLOAD_OFF = 9,
-	PAYLOAD_STATE_NO_CHANGE = 253,
-	PAYLOAD_STATE_UNKNOWN = 254,
-	PAYLOAD_POWER_FAIL = 255
+    PAYLOAD_NO_POWER = 0,
+    PAYLOAD_SWITCHING_ON,
+    PAYLOAD_POWER_GOOD_WAIT,
+    PAYLOAD_STATE_FPGA_SETUP,
+    PAYLOAD_FPGA_BOOTING,
+    PAYLOAD_FPGA_WORKING,
+    PAYLOAD_SWITCHING_OFF,
+    PAYLOAD_QUIESCED,
+    PAYLOAD_OFF,
+    PAYLOAD_STATE_NO_CHANGE = 253,
+    PAYLOAD_STATE_UNKNOWN = 254,
+    PAYLOAD_POWER_FAIL = 255
 } payload_state;
 
 typedef enum {
-	PAYLOAD_MESSAGE_P12GOOD,
-	PAYLOAD_MESSAGE_P12GOODn,
-	PAYLOAD_MESSAGE_PGOOD,
-	PAYLOAD_MESSAGE_PGOODn,
-	PAYLOAD_MESSAGE_COLD_RST,
-	PAYLOAD_MESSAGE_WARM_RST,
-	PAYLOAD_MESSAGE_REBOOT,
-	PAYLOAD_MESSAGE_QUIESCED
+    PAYLOAD_MESSAGE_P12GOOD,
+    PAYLOAD_MESSAGE_P12GOODn,
+    PAYLOAD_MESSAGE_PGOOD,
+    PAYLOAD_MESSAGE_PGOODn,
+    PAYLOAD_MESSAGE_COLD_RST,
+    PAYLOAD_MESSAGE_WARM_RST,
+    PAYLOAD_MESSAGE_REBOOT,
+    PAYLOAD_MESSAGE_QUIESCED
 } payload_message;
 
 #define FRU_CTLCODE_COLD_RST          (0)       // FRU Control command cold reset code
@@ -53,10 +54,18 @@ typedef enum {
 #define FRU_CTLCODE_REBOOT            (2)       // FRU Control command reboot code
 #define FRU_CTLCODE_QUIESCE           (4)       // FRU Control command quiesce code
 
-#define PAYLOAD_BASE_DELAY 200
+#define PAYLOAD_BASE_DELAY 100
 
 void payload_send_message(uint8_t msg);
-void vTaskPayload(void *pvParmeters);
+void vTaskPayload(void *pvParameters);
 void payload_init(void);
+
+#ifdef MODULE_HPM
+uint8_t payload_hpm_prepare_comp( void );
+uint8_t payload_hpm_upload_block( uint8_t * block, uint16_t size );
+uint8_t payload_hpm_finish_upload( uint32_t image_size );
+uint8_t payload_hpm_get_upgrade_status( void );
+uint8_t payload_hpm_activate_firmware( void );
+#endif
 
 #endif /* IPMI_PAYLOAD_H_ */

@@ -1,9 +1,7 @@
 /*
- * ipmi.h
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   AFCIPMI  --
- *
- *   Copyright (C) 2015  Henrique Silva  <henrique.silva@lnls.br>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,20 +15,21 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
 #ifndef IPMI_H_
 #define IPMI_H_
 
 #include "ipmb.h"
+#include "sdr.h"
 
 #define IPMI_MAX_DATA_LEN 24
 
-#define IPMI_EXTENSION_VERSION 0x23
-#define MAX_FRU_ID             0x01
+#define IPMI_EXTENSION_VERSION 0x14
+#define MAX_FRU_ID             0x00
 #define FRU_DEVICE_ID          0x00
-
-#define MAX_HANDLERS 20
 
 /* Known NetFn codes (even request codes only) */
 #define NETFN_CHASSIS						0x00
@@ -258,6 +257,20 @@
 #define IPMI_PICMG_CMD_GET_SHELF_MANAGER_IP_ADDRESSES           0x21
 #define IPMI_PICMG_CMD_SHELF_POWER_ALLOCATION                   0x22
 #define IPMI_PICMG_CMD_GET_TELCO_ALARM_CAPABILITY               0x29
+/* HPM Commands */
+#define IPMI_PICMG_CMD_HPM_GET_UPGRADE_CAPABILITIES             0x2E
+#define IPMI_PICMG_CMD_HPM_GET_COMPONENT_PROPERTIES             0x2F
+#define IPMI_PICMG_CMD_HPM_ABORT_FIRMWARE_UPGRADE               0x30
+#define IPMI_PICMG_CMD_HPM_INITIATE_UPGRADE_ACTION              0x31
+#define IPMI_PICMG_CMD_HPM_UPLOAD_FIRMWARE_BLOCK                0x32
+#define IPMI_PICMG_CMD_HPM_FINISH_FIRMWARE_UPLOAD               0x33
+#define IPMI_PICMG_CMD_HPM_GET_UPGRADE_STATUS                   0x34
+#define IPMI_PICMG_CMD_HPM_ACTIVATE_FIRMWARE                    0x35
+#define IPMI_PICMG_CMD_HPM_QUERY_SELF_RESULTS                   0x36
+#define IPMI_PICMG_CMD_HPM_QUERY_ROLLBACK_STATUS                0x37
+#define IPMI_PICMG_CMD_HPM_INITIATE_MANUAL_ROLLBACK             0x38
+
+#define IPMI_EVENT_MESSAGE_REV                                  0x04
 
 /* Completion Codes */
 #define IPMI_CC_OK                                              0x00
@@ -284,6 +297,7 @@
 #define IPMI_CC_INSUFFICIENT_PRIVILEGES                         0xd4
 #define IPMI_CC_NOT_SUPPORTED_PRESENT_STATE                     0xd5
 #define IPMI_CC_ILLEGAL_COMMAND_DISABLED                        0xd6
+#define IPMI_CC_COMMAND_IN_PROGRESS                             0x80
 #define IPMI_CC_UNSPECIFIED_ERROR                               0xff
 
 typedef void (* t_req_handler)(ipmi_msg * req, ipmi_msg * resp);
@@ -292,19 +306,33 @@ typedef struct{
   uint8_t netfn;
   uint8_t cmd;
   t_req_handler req_handler;
-}t_req_handler_record;
+} t_req_handler_record;
 
+/*
+ * WARNING!!! Using IPMI_HANDLER_ALIAS and IPMI_HANDLER required to have .ipmi_handlers section in linker script
+ * .ipmi_handlers : ALIGN(4)
+ * {
+ * 	 _ipmi_handlers = .;
+ * 	 KEEP(*(.ipmi_handlers))
+ *   _eipmi_handlers = .;
+ * } >FLASHAREA
+*/
+
+extern const t_req_handler_record *_ipmi_handlers;
+extern const t_req_handler_record *_eipmi_handlers;
+
+#define IPMI_HANDLER_ALIAS(handler_fn, netfn_id, cmd_id) \
+    const t_req_handler_record __attribute__ ((section (".ipmi_handlers"))) ipmi_handler_##netfn_id##__##cmd_id##_s = { .req_handler = handler_fn , .netfn = netfn_id, .cmd = cmd_id }
+
+#define IPMI_HANDLER(name, netfn_id, cmd_id, args...) \
+    void ipmi_handler_##netfn_id##__##cmd_id##_f(args);			\
+    const t_req_handler_record __attribute__ ((section (".ipmi_handlers"))) ipmi_handler_##netfn_id##__##cmd_id##_s = { .req_handler = ipmi_handler_##netfn_id##__##cmd_id##_f , .netfn = netfn_id, .cmd = cmd_id }; \
+    void ipmi_handler_##netfn_id##__##cmd_id##_f(args)
 
 /* Function Prototypes */
 void IPMITask ( void *pvParameters );
 void ipmi_init ( void );
-void IPMI_handler_task( void * pvParameters);
 t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd);
-
-/* Handler functions */
-
-void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg *rsp );
-void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp );
-void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp );
+ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t *evData, uint8_t length);
 
 #endif

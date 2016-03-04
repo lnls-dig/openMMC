@@ -1,7 +1,7 @@
 /*
- *   AFCIPMI  --
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   Copyright (C) 2015  Henrique Silva  <henrique.silva@lnls.br>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -15,6 +15,8 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
 /*!
@@ -87,7 +89,6 @@
  */
 #define IPMB_RESP_HEADER_LENGTH     7
 
-
 #define IPMB_NETFN_MASK         0xFC
 #define IPMB_DEST_LUN_MASK      0x3
 #define IPMB_SEQ_MASK           0xFC
@@ -96,6 +97,19 @@
 /*! @brief MicroTCA's MCH slave address */
 #define MCH_ADDRESS             0x20
 
+/* @brief Macro to check is the message is a response (odd netfn) */
+#define IS_RESPONSE(msg) (msg.netfn & 0x01)
+
+/*! @brief Size of #IPMBL_TABLE
+ */
+#define IPMBL_TABLE_SIZE                27
+
+/*! @brief GA pins definition */
+typedef enum {
+    GROUNDED = 0,
+    POWERED,
+    UNCONNECTED
+}GA_Pin_state;
 
 /*! @brief IPMI message struct */
 typedef struct ipmi_msg {
@@ -140,6 +154,8 @@ typedef enum ipmb_error {
     ipmb_error_msg_chksum,              /*!< Invalid message checksum from incoming message */
     ipmb_error_queue_creation           /*!< Client queue couldn't be created. Invalid pointer to handler was given */
 } ipmb_error;
+
+extern uint8_t ipmb_addr;
 
 /* Function Prototypes */
 
@@ -201,6 +217,20 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp );
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue );
 
 ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len );
-uint8_t ipmb_calculate_chksum ( uint8_t * buffer, uint8_t range );
+
+/*! @brief Reads own I2C slave address using GA pins
+ *
+ * Based on coreipm/coreipm/mmc.c
+ * @author Gokhan Sozmen
+ * Reads the GA pins, performing an unconnection checking, to define the device I2C slave address, as specified by MicroTCA documentation.
+ *
+ * @return 7-bit Slave Address
+ *
+ * @todo Develop a function to discover the Geographic Address once (checking the GA pins)
+ * and store it into a global variable, since everytime a IPMI message is built
+ * (request or response) the MMC has to check its own  address to fill the rs/rqSA field,
+ * and it takes some time to go through all this function.
+ */
+uint8_t get_ipmb_addr( void );
 
 #endif

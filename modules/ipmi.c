@@ -1,9 +1,7 @@
 /*
- * ipmi.c
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   AFCIPMI  --
- *
- *   Copyright (C) 2015  Henrique Silva  <henrique.silva@lnls.br>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,6 +15,8 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
 /* C Standard includes */
@@ -26,31 +26,27 @@
 #include "FreeRTOS.h"
 #include "ipmi.h"
 #include "pin_mapping.h"
-#include "led.h"
 #include "task_priorities.h"
 #include "led.h"
+#include "payload.h"
 
 /* Local variables */
 QueueHandle_t ipmi_rxqueue = NULL;
 
-struct req_param_struct{
-    ipmi_msg req_received;
-    t_req_handler req_handler;
-};
-uint32_t handler_max_watermark = 0;
-extern t_req_handler_record handlers[MAX_HANDLERS];
-extern void ipmi_se_set_receiver ( ipmi_msg *req, ipmi_msg *rsp);
-void IPMITask ( void * pvParameters )
+volatile const t_req_handler_record *ipmiEntries = (t_req_handler_record *) &_ipmi_handlers;
+volatile const t_req_handler_record *ipmiEntries_end = (t_req_handler_record *) &_eipmi_handlers;
+
+void IPMITask( void * pvParameters )
 {
     ipmi_msg req_received;
+    ipmi_msg response;
+    ipmb_error error_code;
     t_req_handler req_handler = (t_req_handler) 0;
 
-    for ( ;; ){
-        /* Received request and handler function must be allocated
-           dynamically so they can be passed to the dynamically-created
-           handler tasks. These tasks must also free the memory after use */
+    for ( ;; ) {
 
-        if( xQueueReceive( ipmi_rxqueue, &req_received , portMAX_DELAY ) == pdFALSE){
+        if( xQueueReceive( ipmi_rxqueue, &req_received , portMAX_DELAY ) == pdFALSE) {
+	    /* Should no return pdFALSE */
             configASSERT(pdFALSE);
             continue;
         }
@@ -58,30 +54,23 @@ void IPMITask ( void * pvParameters )
         req_handler = (t_req_handler) 0;
         req_handler = ipmi_retrieve_handler(req_received.netfn, req_received.cmd);
 
-        if (req_handler != 0){
+        if (req_handler != 0) {
 
-            /* TODO: create unique name for each created task, probably
-               related to netfn and command */
-            struct req_param_struct *req_param = pvPortMalloc(sizeof(struct req_param_struct));
+            response.completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+            response.data_len = 0;
 
-            if (req_param != NULL) {
-                req_param->req_received = req_received;
-                req_param->req_handler = req_handler;
-            } else {
-                /* TODO: handle this problem */
-            }
+            /* Call user-defined function, give request data and retrieve required response */
+	    /* WARNING: Since IPMI task have a high priority, this handler function should not wait other tasks to unblock */
+            req_handler(&req_received, &response);
 
-            while ( xTaskCreate(IPMI_handler_task ,(const char*)"IPMI_handler_task", 80, req_param, tskIPMI_HANDLERS_PRIORITY,  (TaskHandle_t *) NULL ) != pdTRUE ){
-                /* If the task couldn't be created, most likely we're out of heap, enter blocked state so that Idle task can run and free up some memory for us */
-                LED_update(LED_RED, &LED_On_Activity);
-                vTaskDelay(5);
-                /* TODO: handle this problem */
-            }
-            LED_update(LED_RED, &LED_Off_Activity);
+            error_code = ipmb_send_response(&req_received, &response);
 
-        }else{
-            ipmb_error error_code;
-            ipmi_msg response;
+            /* In case of error during IPMB response, the MMC may wait for a
+               new command from the MCH. Check this for debugging purposes
+               only. */
+            configASSERT( (error_code == ipmb_error_success) );
+
+        } else {
             /* If there is no function handler, use data from received
                message to send "invalid command" response (IPMI table 5-2,
                page 44). */
@@ -93,46 +82,6 @@ void IPMITask ( void * pvParameters )
             configASSERT((error_code == ipmb_error_success));
         }
     }
-}
-
-
-/*!
- * This task is created dynamically each time there is an IPMI request
- * demanding response. It receives a pointer to a struct contaning
- * both the function handler and the request to treated, and must free
- * this struct memory and itself before finishing.
- *
- * @param pvParameters pointer to req_param_struct contaning
- * req_handler and req_received. This is dynamically allocated memory
- * and should be freed before quitting.
- */
-void IPMI_handler_task( void * pvParameters){
-    struct req_param_struct * req_param = (struct req_param_struct *) pvParameters;
-    ipmi_msg response;
-    ipmb_error response_error;
-
-    response.completion_code = IPMI_CC_UNSPECIFIED_ERROR;
-    response.data_len = 0;
-    /* Call user-defined function, give request data and retrieve required response */
-    req_param->req_handler(&(req_param->req_received), &response);
-
-    response_error = ipmb_send_response(&(req_param->req_received), &response);
-
-    /* In case of error during IPMB response, the MMC may wait for a
-       new command from the MCH. Check this for debugging purposes
-       only. */
-    configASSERT( response_error == ipmb_error_success );
-
-    /* Check how deep the handler task went in the stack */
-    uint32_t watermark = uxTaskGetStackHighWaterMark(NULL);
-    if (watermark > handler_max_watermark) {
-        handler_max_watermark = watermark;
-    }
-
-    vPortFree(req_param);
-
-    vTaskDelete(NULL);
-
 }
 
 /* Initializes the IPMI Dispatcher:
@@ -149,7 +98,6 @@ void ipmi_init ( void )
     xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle );
 }
 
-
 /*!
  * @brief Finds a handler associated with a given netfunction and command.
  *
@@ -158,23 +106,45 @@ void ipmi_init ( void )
  *
  * @return Pointer to the function which will handle this command, as defined in the netfn handler list.
  */
-t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd){
-    uint8_t cur_handler;
+t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd)
+{
     t_req_handler handler = 0;
+    t_req_handler_record * p_ptr = (t_req_handler_record *) ipmiEntries;
 
-    for(cur_handler = 0; cur_handler < MAX_HANDLERS; cur_handler++)
-    {
-
-        if( (handlers[cur_handler].netfn == netfn) && \
-            (handlers[cur_handler].cmd == cmd))
-        {
-            handler = handlers[cur_handler].req_handler;
+    while (p_ptr < ipmiEntries_end) {
+        if( (p_ptr->netfn == netfn) &&   \
+            (p_ptr->cmd == cmd)) {
+            handler = p_ptr->req_handler;
             break;
         }
+	p_ptr++;
     }
 
     return handler;
 }
+
+ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t *evData, uint8_t length)
+{
+    ipmi_msg evt;
+    uint8_t data_len = 0;
+
+    evt.dest_LUN = 0;
+    evt.netfn = NETFN_SE;
+    evt.cmd = IPMI_PLATFORM_EVENT_CMD;
+
+    evt.data[data_len++] = IPMI_EVENT_MESSAGE_REV;
+    evt.data[data_len++] = GET_SENSOR_TYPE(sensor);
+    evt.data[data_len++] = sensor->num;
+    evt.data[data_len++] = assert_deassert | (GET_EVENT_TYPE_CODE(sensor) & 0x7F);
+    evt.data[data_len++] = (length >= 1)? evData[0] : 0xFF;
+    evt.data[data_len++] = (length >= 2)? evData[1] : 0xFF;
+    evt.data[data_len++] = (length >= 3)? evData[2] : 0xFF;
+
+    evt.data_len = data_len;
+
+    return (ipmb_send_request( &evt ));
+}
+
 
 /*!
  * @brief Handler for GET Device ID command as in IPMI v2.0 section 20.1 for
@@ -186,7 +156,8 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd){
  *
  * @return
  */
-void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp ){
+IPMI_HANDLER(ipmi_get_device_id,  NETFN_APP, IPMI_GET_DEVICE_ID_CMD, ipmi_msg *req, ipmi_msg* rsp)
+{
     int len = rsp->data_len = 0;
 
     rsp->completion_code = IPMI_CC_OK;
@@ -199,7 +170,7 @@ void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp ){
     rsp->data[len++] = 0x05; /* Dev FW Rev UPPER */
     rsp->data[len++] = 0x50; /* Dev FW Rev LOWER */
     rsp->data[len++] = 0x02; /* IPMI Version 2.0 */
-    rsp->data[len++] = 0x1F; /* Dev Support */
+    rsp->data[len++] = 0x3B; /* Dev Support */
     rsp->data[len++] = 0x5A; /* Manufacturer ID LSB */
     rsp->data[len++] = 0x31; /* Manufacturer ID MSB */
     rsp->data[len++] = 0x00; /* ID MSB */
@@ -207,7 +178,27 @@ void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp ){
     rsp->data[len++] = 0x01; /* Product ID MSB */
 
     rsp->data_len = len;
+}
 
+/*!
+ * @brief Handler for GET Device GUID command
+ *
+ * @param req pointer to request message
+ *
+ * @param rsp pointer to response message
+ *
+ * @return
+ */
+IPMI_HANDLER(ipmi_get_device_guid,  NETFN_APP, IPMI_GET_DEVICE_GUID_CMD, ipmi_msg *req, ipmi_msg* rsp)
+{
+    int len = rsp->data_len = 0;
+
+    rsp->completion_code = IPMI_CC_OK;
+
+    /* TODO: Generate GUID - Globally Unique ID */
+    memset( &rsp->data[len], 0x00, 16);
+
+    rsp->data_len = 16;
 }
 
 /*!
@@ -220,106 +211,35 @@ void ipmi_app_get_device_id ( ipmi_msg *req, ipmi_msg * rsp ){
  *
  * @return ipmi_msg Message with data, data length and completion code.
  */
-void ipmi_picmg_get_properties ( ipmi_msg *req, ipmi_msg *rsp )
+IPMI_HANDLER(ipmi_picmg_get_properties, NETFN_GRPEXT,IPMI_PICMG_CMD_GET_PROPERTIES, ipmi_msg *req, ipmi_msg *rsp )
 {
     int len = rsp->data_len = 0;
     rsp->completion_code = IPMI_CC_OK;
 
-    /* Hardcoded response according to the  */
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
     rsp->data[len++] = IPMI_EXTENSION_VERSION;
+    /* MMCs must report MAX_FRU_ID and FRU_DEVICE_ID both as 0 - AMC.0 Table 3-1 */
     rsp->data[len++] = MAX_FRU_ID;
     rsp->data[len++] = FRU_DEVICE_ID;
     rsp->data_len = len;
 }
 
-
-/*!
- * @brief Handler for "Set FRU LED State"" request. Check IPMI 2.0
- * table 3-31 for more information.
- *
- * @param[in] req Pointer to request struct to be handled and answered. Contains
- * which LED should be set, how it should be set and other commands.
- *
- * @param[out] rsp Pointer to response struct to be modified with the message
- *
- * @return void
- */
-#include "led.h"
-void ipmi_picmg_set_led ( ipmi_msg *req, ipmi_msg *rsp )
-{
-    led_error error;
-    const LED_activity_desc_t * pLEDact;
-    LED_activity_desc_t LEDact;
-    pLEDact = &LEDact;
-    /* We use this pointer assignment, so we can also set it to NULL if we need */
-
-    switch (req->data[3]) {
-    case 0x00:
-        /* OFF override */
-        pLEDact = &LED_Off_Activity;
-        break;
-    case 0xFF:
-        /* ON override */
-        pLEDact = &LED_On_Activity;
-        break;
-    case 0xFB:
-        /* Lamp Test */
-        /*! @todo Put the lamp test as a higher priority action, not a type of override */
-        LEDact.action = LED_ACTV_BLINK;
-        LEDact.initstate = LED_ON_STATE;
-        /* On duration in 100ms units */
-        LEDact.delay_init = req->data[4] * 100;
-        /* Set the toggle delay to 0, so we know its a "single-shot" descriptor, so the LED module should revert to its override/local_control state later */
-        LEDact.delay_tog = 0;
-        break;
-    case 0xFC:
-        /* Local state */
-	pLEDact = NULL;
-        break;
-    case 0xFD:
-    case 0xFE:
-        /* Reserved */
-        break;
-    default:
-        /* Blink Override */
-        LEDact.action = LED_ACTV_BLINK;
-        LEDact.initstate = LED_ON_STATE;
-        /* On duration in 10ms units */
-        LEDact.delay_init = req->data[4] / 10;
-        /* Off duration in 10ms units*/
-        LEDact.delay_tog = req->data[3] / 10;
-        break;
-    }
-
-    /* If this function does not block, we can't assure we have programmed the LED correctly, but if it does, there's the risk that this task won't kill itself and we'll run out of heap space */
-    error = LED_update( req->data[2], pLEDact );
-
-    switch (error) {
-    case led_success:
-        rsp->completion_code = IPMI_CC_OK;
-        break;
-    case led_invalid_argument:
-        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
-        break;
-    case led_unspecified_error:
-        rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
-        break;
-    }
-    rsp->data_len = 0;
-    rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
-}
-
-void ipmi_picmg_set_amc_port( ipmi_msg *req, ipmi_msg *rsp)
+IPMI_HANDLER(ipmi_picmg_cmd_set_amc_port_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_AMC_PORT_STATE, ipmi_msg *req, ipmi_msg *rsp)
 {
     rsp->completion_code = IPMI_CC_OK;
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
 
-#include "payload.h"
-void ipmi_picmg_fru_control( ipmi_msg *req, ipmi_msg *rsp)
+/* Compatibility with Vadatech */
+IPMI_HANDLER(ipmi_get_device_locator_record, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_DEVICE_LOCATOR_RECORD, ipmi_msg * req, ipmi_msg * rsp )
 {
-    payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
+    uint8_t len = rsp->data_len = 0;
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+    rsp->data[len++] = 0x00;
+    rsp->data[len++] = 0x00;
+
+    rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
-    rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
+
