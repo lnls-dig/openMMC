@@ -223,16 +223,6 @@ IPMI_HANDLER(ipmi_picmg_initiate_upgrade_action, NETFN_GRPEXT, IPMI_PICMG_CMD_HP
 
     active_id = comp_id;
 
-#if 0
-    if (((upgrade_action == 0x02)|(upgrade_action == 0x03))
-        && !isPowerofTwo(comp_id)) {
-        /* More than one component selected */
-        rsp->data[len++] = IPMI_PICMG_GRP_EXT;
-        rsp->data_len = len;
-        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
-        return;
-    }
-#endif
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
 
     switch (upgrade_action) {
