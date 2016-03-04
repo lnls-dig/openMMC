@@ -127,7 +127,7 @@ I2C_XFER_T slave_cfg;
 uint8_t recv_msg[i2cMAX_MSG_LENGTH];
 uint8_t recv_bytes;
 
-uint8_t xI2CSlaveReceive( I2C_ID_T id, uint8_t * rx_buff, uint8_t buff_len, TickType_t timeout )
+uint8_t xI2CSlaveReceive( I2C_ID_T id, uint8_t * rx_buff, uint8_t buff_len, uint32_t timeout )
 {
     uint8_t bytes_to_copy = 0;
     slave_task_id = xTaskGetCurrentTaskHandle();
