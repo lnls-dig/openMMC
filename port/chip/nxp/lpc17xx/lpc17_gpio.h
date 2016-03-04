@@ -1,5 +1,5 @@
 /*
- *   AFCIPMI  --
+ *   openMMC  --
  *
  *   Copyright (C) 2015  Henrique Silva  <henrique.silva@lnls.br>
  *
