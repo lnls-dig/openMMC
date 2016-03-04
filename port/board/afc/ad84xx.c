@@ -43,7 +43,7 @@ void dac_vadj_config( uint8_t addr, uint8_t val )
 {
     uint16_t data = (addr << 8) | (val);
     spi_assertSSEL();
-    spi_write( &data, sizeof(data) );
+    spi_write( (uint8_t *) &data, sizeof(data) );
     spi_deassertSSEL();
 }
 
