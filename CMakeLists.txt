@@ -33,7 +33,7 @@ endif()
 if(NOT CMAKE_TOOLCHAIN_FILE)
   message(WARNING "${Yellow}No toolchain configuration file specified. Using default option!${ColourReset}")
 
-  include(build_cfg/toolchain/toolchain-arm-none-eabi.cmake)
+  include(toolchain/toolchain-arm-none-eabi.cmake)
 
 endif()
 
