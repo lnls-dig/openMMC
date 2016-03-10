@@ -1,6 +1,11 @@
 /*
  *   openMMC -- Open Source modular IPM Controller firmware
  *
+ *   Copyright (C) Vahan Petrosyan <vahan_petrosyan@desy.de>
+ *   Copyright (C) Frederic Bompard (CPPM)
+ *   Copyright (C) Paschalis Vichoudis (CERN)
+ *   Copyright (C) Markus Joos <markus.joos@cern.ch>
+ *   Copyright (C) Julian Mendez <julian.mendez@cern.ch>
  *   Copyright (C) 2015  Piotr Miedzik  <P.Miedzik@gsi.de>
  *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
@@ -271,6 +276,7 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
     rsp->completion_code = IPMI_CC_OK;
 }
 
+/* Sensor alarm checking function adapted from CERN MMCv2 implementation, credits in this file header */
 void check_sensor_event( sensor_t * sensor )
 {
     /** Should be rewritten to be compliant with RTM management !! */

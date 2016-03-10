@@ -73,7 +73,7 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "")
 
 set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/main_mmc.c)
 add_subdirectory(port/board)
-add_subdirectory(port/chip)
+add_subdirectory(port/ucontroller)
 add_subdirectory(FreeRTOS)
 add_subdirectory(boot)
 add_subdirectory(modules)
