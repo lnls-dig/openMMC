@@ -5,7 +5,7 @@ if(NOT BOARD)
 endif()
 
 #BUG: Regexp will match AFC and AFCK
-if(${BOARD} MATCHES "^(AFC)")
+if(${BOARD} MATCHES "^(AFC|afc)")
   add_subdirectory(afc)
 else()
   message(FATAL_ERROR "${BoldRed}Selected board \"${BOARD}\" is not implemented!${ColourReset}")
