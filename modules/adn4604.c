@@ -24,6 +24,7 @@
 
 /* Project Includes */
 #include "adn4604.h"
+#include "adn4604_usercfg.h"
 #include "pin_mapping.h"
 #include "board_version.h"
 
@@ -33,6 +34,25 @@ void adn4604_setup(void)
     uint8_t adn_slave_addr = 0x4B;
     t_adn_connect_map con;
     t_adn_connect_cfg cfg;
+
+    uint16_t out_enable_flag = {
+	ADN4604_EN_OUT_0 << 0 |
+	ADN4604_EN_OUT_1 << 1 |
+	ADN4604_EN_OUT_2 << 2 |
+	ADN4604_EN_OUT_3 << 3 |
+	ADN4604_EN_OUT_4 << 4 |
+	ADN4604_EN_OUT_5 << 5 |
+	ADN4604_EN_OUT_6 << 6 |
+	ADN4604_EN_OUT_7 << 7 |
+	ADN4604_EN_OUT_8 << 8 |
+	ADN4604_EN_OUT_9 << 9 |
+	ADN4604_EN_OUT_10 << 10 |
+	ADN4604_EN_OUT_11 << 11 |
+	ADN4604_EN_OUT_12 << 12 |
+	ADN4604_EN_OUT_13 << 13 |
+	ADN4604_EN_OUT_14 << 14 |
+	ADN4604_EN_OUT_15 << 15
+    };
 
     /* Disable UPDATE' pin by pulling it HIGH */
     gpio_set_pin_dir(GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, OUTPUT);
@@ -50,22 +70,22 @@ void adn4604_setup(void)
     }
 
     /* Configure the interconnects */
-    con.out0 = 0;
-    con.out1 = 0;
-    con.out2 = 0;
-    con.out3 = 0;
-    con.out4 = 13;
-    con.out5 = 8;
-    con.out6 = 8;
-    con.out7 = 8;
-    con.out8 = 8;
-    con.out9 = 8;
-    con.out10 = 14;
-    con.out11 = 14;
-    con.out12 = 14;
-    con.out13 = 5;
-    con.out14 = 14;
-    con.out15 = 14;
+    con.out0 = ADN4604_CFG_OUT_0;
+    con.out1 = ADN4604_CFG_OUT_1;
+    con.out2 = ADN4604_CFG_OUT_2;
+    con.out3 = ADN4604_CFG_OUT_3;
+    con.out4 = ADN4604_CFG_OUT_4;
+    con.out5 = ADN4604_CFG_OUT_5;
+    con.out6 = ADN4604_CFG_OUT_6;
+    con.out7 = ADN4604_CFG_OUT_7;
+    con.out8 = ADN4604_CFG_OUT_8;
+    con.out9 = ADN4604_CFG_OUT_9;
+    con.out10 = ADN4604_CFG_OUT_10;
+    con.out11 = ADN4604_CFG_OUT_11;
+    con.out12 = ADN4604_CFG_OUT_12;
+    con.out13 = ADN4604_CFG_OUT_13;
+    con.out14 = ADN4604_CFG_OUT_14;
+    con.out15 = ADN4604_CFG_OUT_15;
 
     /* Select the desired MAP register to load the configuration */
     cfg.map_reg = ADN_XPT_MAP0_CON_REG;
@@ -79,7 +99,9 @@ void adn4604_setup(void)
 
     /* Enable desired outputs */
     for (uint8_t i = 0; i < 16; i++) {
-    	adn4604_tx_enable(i2c_bus_id, adn_slave_addr, i);
+	if ( (out_enable_flag >> i) & 0x1 ) {
+	    adn4604_tx_enable(i2c_bus_id, adn_slave_addr, i);
+	}
     }
 
     adn4604_update( i2c_bus_id, adn_slave_addr );

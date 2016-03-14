@@ -25,26 +25,6 @@ set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 #Include the modules sources
 
-if (";${TARGET_MODULES};" MATCHES ";JTAG_SWITCH;")
-  set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/jtag.c )
-  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_JTAG_SWITCH")
-endif()
-
-if (";${TARGET_MODULES};" MATCHES ";CLOCK_SWITCH;")
-  set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/adn4604.c )
-  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_CLOCK_SWITCH")
-endif()
-
-if (";${TARGET_MODULES};" MATCHES ";FPGA_SPI;")
-  set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/fpga_spi.c )
-  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_FPGA_SPI")
-endif()
-
-if (";${TARGET_MODULES};" MATCHES ";DAC_AD84XX;")
-  set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/ad84xx.c )
-  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_DAC_AD84XX")
-endif()
-
 #Extra definitions
 if (WRITE_ID_EEPROM)
   message(STATUS "EEPROM ID writing enabled!")
