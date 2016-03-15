@@ -60,10 +60,12 @@ static t_ina220_data ina220_data[MAX_INA220_COUNT];
 void vTaskINA220( void *Parameters )
 {
     uint8_t i;
-
     TickType_t xLastWakeTime;
     /* Task will run every 100ms */
     const TickType_t xFrequency = INA220_UPDATE_RATE / portTICK_PERIOD_MS;
+
+    extern const SDR_type_01h_t SDR_FMC1_12V;
+
     sensor_t * ina220_sensor;
     t_ina220_data * data_ptr;
 
@@ -190,25 +192,6 @@ void ina220_init( void )
     i = 0;
 
     xTaskCreate( vTaskINA220, "INA220", 400, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
-
-    /* FMC1 Voltage */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V, &vTaskINA220_Handle, FMC1_12V_DEVID, 0x45 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ, &vTaskINA220_Handle, FMC1_VADJ_DEVID, 0x41 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3, &vTaskINA220_Handle, FMC1_P3V3_DEVID, 0x43 );
-    /* FMC1 Current */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V_CURR, &vTaskINA220_Handle, FMC1_12V_CURR_DEVID, 0x45 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ_CURR, &vTaskINA220_Handle, FMC1_VADJ_CURR_DEVID, 0x41 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3_CURR, &vTaskINA220_Handle, FMC1_P3V3_CURR_DEVID, 0x43 );
-
-    /* FMC2 Voltage */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V, &vTaskINA220_Handle, FMC2_12V_DEVID, 0x40 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ, &vTaskINA220_Handle, FMC2_VADJ_DEVID, 0x42 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3, &vTaskINA220_Handle, FMC2_P3V3_DEVID, 0x44 );
-    /* FMC2 Current */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V_CURR, &vTaskINA220_Handle, FMC2_12V_CURR_DEVID, 0x40 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ_CURR, &vTaskINA220_Handle, FMC2_VADJ_CURR_DEVID, 0x42 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3_CURR, &vTaskINA220_Handle, FMC2_P3V3_CURR_DEVID, 0x44 );
-
 
     for ( j = 0; j < sdr_count; j++ ) {
         /* Update their SDR */

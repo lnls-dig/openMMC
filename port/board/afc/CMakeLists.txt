@@ -24,6 +24,8 @@ set(TARGET_MODULES
 set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 #Include the modules sources
+##Sensors SDR list
+set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c )
 
 #Extra definitions
 if (WRITE_ID_EEPROM)

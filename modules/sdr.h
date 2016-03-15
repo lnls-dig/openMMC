@@ -216,5 +216,6 @@ void sdr_init( void );
 void sensor_init( void );
 void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr );
 void check_sensor_event( sensor_t * sensor );
+void user_sdr_init( void );
 
 #endif

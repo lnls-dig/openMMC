@@ -65,6 +65,9 @@ size_t sdr_get_size_by_entry(uint8_t id)
 
 void sensor_init( void )
 {
+    /* This function must be provided by the board port */
+    user_sdr_init();
+
     hotswap_init();
     LM75_init();
     ina220_init();

@@ -15,8 +15,6 @@ endif()
 
 if (";${TARGET_MODULES};" MATCHES ";VOLTAGE_SENSOR;")
   set(PROJ_SRCS ${PROJ_SRCS} ${SENSOR_PATH}/ina220.c)
-#INA220 SDR is in a different source because it's too large and would polute the ina220.c
-  set(PROJ_SRCS ${PROJ_SRCS} ${SENSOR_PATH}/ina220_sdr.c)
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_VOLTAGE_SENSOR")
 endif()
 

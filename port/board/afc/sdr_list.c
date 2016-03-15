@@ -19,9 +19,17 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/* Project Includes */
 #include "sdr.h"
 #include "utils.h"
 
+/* Sensors includes */
+#include "hotswap.h"
+#include "ina220.h"
+#include "fpga_spi.h"
+#include "lm75.h"
+
+/* SDR List */
 #define SDR_FMC1_12V_ID        "FMC1 +12V"
 #define SDR_FMC1_VADJ_ID       "FMC1 VADJ"
 #define SDR_FMC1_P3V3_ID       "FMC1 +3.3V"
@@ -34,6 +42,47 @@
 #define SDR_FMC2_VADJ_CURR_ID  "FMC2 +12V Curr"
 #define SDR_FMC2_12V_CURR_ID   "FMC2 VADJ Curr"
 #define SDR_FMC2_P3V3_CURR_ID  "FMC2 +3.3V Curr"
+
+/* AMC Hot-Swap sensor SDR */
+const SDR_type_02h_t SDR_HOT_SWAP = {
+
+    .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_02,
+    .hdr.reclength = sizeof(SDR_type_02h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = 0x00, /* Filled by sdr_insert_entry() */
+
+/* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x03, /* init: event generation + scanning enabled */
+    .sensorcap = 0xc1, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_HOT_SWAP, /* sensor type: HOT SWAP*/
+    .event_reading_type = 0x6f, /* sensor reading*/
+    .assertion_event_mask = { 0x00, /* LSB assert event mask: 3 bit value */
+                              0x00 }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0x00, /* LSB deassert event mask: 3 bit value */
+                                0x00 }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x00, /* LSB: readable Threshold mask: no thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: no thresholds are setable: */
+    .sensor_units_1 = 0xc0, /* sensor units 1 : Does not return analog reading*/
+    .sensor_units_2 = 0x00, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .record_sharing[0] = 0x00,
+    .record_sharing[1] = 0x00,
+    .pos_thr_hysteresis = 0x00, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 0x00, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .reserved3 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | STR_SIZE("HOTSWAP HANDLE"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "HOTSWAP HANDLE" /* sensor string */
+};
 
 /* FMC1 12V */
 const SDR_type_01h_t SDR_FMC1_12V = {
@@ -715,3 +764,261 @@ const SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC2_P3V3_CURR_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC2_P3V3_CURR_ID /* sensor string */
 };
+
+/* LM75 SDR List */
+
+const SDR_type_01h_t SDR_LM75_uC = {
+
+    .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_01,
+    .hdr.reclength = sizeof(SDR_type_01h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = 0x00, /* Filled by sdr_insert_entry() */
+
+    /* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
+    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
+    .event_reading_type = 0x01, /* sensor reading*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x01, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .linearization = 0x00, /* Linearization */
+    .M = 5, /* M */
+    .M_tol = 0x00, /* M - Tolerance */
+    .B = 0x00, /* B */
+    .B_accuracy = 0x00, /* B - Accuracy */
+    .acc_exp_sensor_dir = 0x00, /* Sensor direction */
+    .Rexp_Bexp = 0xF0, /* R-Exp , B-Exp */
+    .analog_flags = 0x03, /* Analogue characteristics flags */
+    .nominal_reading = (30 << 1), /* Nominal reading */
+    .normal_max = (50 << 1), /* Normal maximum */
+    .normal_min = (20 << 1), /* Normal minimum */
+    .sensor_max_reading = 0xFF, /* Sensor Maximum reading */
+    .sensor_min_reading = 0x00, /* Sensor Minimum reading */
+    .upper_nonrecover_thr = (75 << 1), /* Upper non-recoverable Threshold */
+    .upper_critical_thr = (65 << 1), /* Upper critical Threshold */
+    .upper_noncritical_thr = (55 << 1), /* Upper non critical Threshold */
+    .lower_nonrecover_thr = (5 << 1), /* Lower non-recoverable Threshold */
+    .lower_critical_thr = (10 << 1), /* Lower critical Threshold */
+    .lower_noncritical_thr = (20 << 1), /* Lower non-critical Threshold */
+    .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | STR_SIZE("TEMP UC"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "TEMP UC" /*  sensor string */
+};
+
+const SDR_type_01h_t SDR_LM75_CLOCK_SWITCH = {
+
+    .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_01,
+    .hdr.reclength = sizeof(SDR_type_01h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = 0x00, /* Filled by sdr_insert_entry() */
+
+    /* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
+    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
+    .event_reading_type = 0x01, /* sensor reading*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x01, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .linearization = 0x00, /* Linearization */
+    .M = 5, /* M */
+    .M_tol = 0x00, /* M - Tolerance */
+    .B = 0x00, /* B */
+    .B_accuracy = 0x00, /* B - Accuracy */
+    .acc_exp_sensor_dir = 0x00, /* Sensor direction */
+    .Rexp_Bexp = 0xF0, /* R-Exp , B-Exp */
+    .analog_flags = 0x03, /* Analogue characteristics flags */
+    .nominal_reading = (30 << 1), /* Nominal reading */
+    .normal_max = (50 << 1), /* Normal maximum */
+    .normal_min = (20 << 1), /* Normal minimum */
+    .sensor_max_reading = 0xFF, /* Sensor Maximum reading */
+    .sensor_min_reading = 0x00, /* Sensor Minimum reading */
+    .upper_nonrecover_thr = (75 << 1), /* Upper non-recoverable Threshold */
+    .upper_critical_thr = (65 << 1), /* Upper critical Threshold */
+    .upper_noncritical_thr = (55 << 1), /* Upper non critical Threshold */
+    .lower_nonrecover_thr = (5 << 1), /* Lower non-recoverable Threshold */
+    .lower_critical_thr = (10 << 1), /* Lower critical Threshold */
+    .lower_noncritical_thr = (20 << 1), /* Lower non-critical Threshold */
+    .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | STR_SIZE("TEMP CLK SWITCH"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "TEMP CLK SWITCH" /*  sensor string */
+};
+
+const SDR_type_01h_t SDR_LM75_DCDC = {
+
+    .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_01,
+    .hdr.reclength = sizeof(SDR_type_01h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = 0x00, /* Filled by sdr_insert_entry() */
+
+    /* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
+    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
+    .event_reading_type = 0x01, /* sensor reading*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x01, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .linearization = 0x00, /* Linearization */
+    .M = 5, /* M */
+    .M_tol = 0x00, /* M - Tolerance */
+    .B = 0x00, /* B */
+    .B_accuracy = 0x00, /* B - Accuracy */
+    .acc_exp_sensor_dir = 0x00, /* Sensor direction */
+    .Rexp_Bexp = 0xF0, /* R-Exp , B-Exp */
+    .analog_flags = 0x03, /* Analogue characteristics flags */
+    .nominal_reading = (30 << 1), /* Nominal reading */
+    .normal_max = (50 << 1), /* Normal maximum */
+    .normal_min = (20 << 1), /* Normal minimum */
+    .sensor_max_reading = 0xFF, /* Sensor Maximum reading */
+    .sensor_min_reading = 0x00, /* Sensor Minimum reading */
+    .upper_nonrecover_thr = (75 << 1), /* Upper non-recoverable Threshold */
+    .upper_critical_thr = (65 << 1), /* Upper critical Threshold */
+    .upper_noncritical_thr = (55 << 1), /* Upper non critical Threshold */
+    .lower_nonrecover_thr = (5 << 1), /* Lower non-recoverable Threshold */
+    .lower_critical_thr = (10 << 1), /* Lower critical Threshold */
+    .lower_noncritical_thr = (20 << 1), /* Lower non-critical Threshold */
+    .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | STR_SIZE("TEMP DCDC"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "TEMP DCDC" /*  sensor string */
+};
+
+const SDR_type_01h_t SDR_LM75_RAM = {
+
+    .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51,
+    .hdr.rectype = TYPE_01,
+    .hdr.reclength = sizeof(SDR_type_01h_t) - sizeof(SDR_entry_hdr_t),
+
+    .ownerID = 0x00, /* i2c address, -> SDR_Init */
+    .ownerLUN = 0x00, /* sensor owner LUN */
+    .sensornum = 0x00, /* Filled by sdr_insert_entry() */
+
+    /* record body bytes */
+    .entityID = 0xC1, /* entity id: AMC Module */
+    .entityinstance = 0x00, /* entity instance -> SDR_Init */
+    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
+    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
+    .event_reading_type = 0x01, /* sensor reading*/
+    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
+                              0x0F }, /* MSB assert event mask */
+    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
+                                0x0F }, /* MSB deassert event mask */
+    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
+    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .sensor_units_1 = 0x00, /* sensor units 1 :*/
+    .sensor_units_2 = 0x01, /* sensor units 2 :*/
+    .sensor_units_3 = 0x00, /* sensor units 3 :*/
+    .linearization = 0x00, /* Linearization */
+    .M = 5, /* M */
+    .M_tol = 0x00, /* M - Tolerance */
+    .B = 0x00, /* B */
+    .B_accuracy = 0x00, /* B - Accuracy */
+    .acc_exp_sensor_dir = 0x00, /* Sensor direction */
+    .Rexp_Bexp = 0xF0, /* R-Exp , B-Exp */
+    .analog_flags = 0x03, /* Analogue characteristics flags */
+    .nominal_reading = (30 << 1), /* Nominal reading */
+    .normal_max = (50 << 1), /* Normal maximum */
+    .normal_min = (20 << 1), /* Normal minimum */
+    .sensor_max_reading = 0xFF, /* Sensor Maximum reading */
+    .sensor_min_reading = 0x00, /* Sensor Minimum reading */
+    .upper_nonrecover_thr = (75 << 1), /* Upper non-recoverable Threshold */
+    .upper_critical_thr = (65 << 1), /* Upper critical Threshold */
+    .upper_noncritical_thr = (55 << 1), /* Upper non critical Threshold */
+    .lower_nonrecover_thr = (5 << 1), /* Lower non-recoverable Threshold */
+    .lower_critical_thr = (10 << 1), /* Lower critical Threshold */
+    .lower_noncritical_thr = (20 << 1), /* Lower non-critical Threshold */
+    .pos_thr_hysteresis = 2, /* positive going Threshold hysteresis value */
+    .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
+    .reserved1 = 0x00, /* reserved */
+    .reserved2 = 0x00, /* reserved */
+    .OEM = 0x00, /* OEM reserved */
+    .IDtypelen = 0xc0 | STR_SIZE("TEMP RAM"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "TEMP RAM" /* sensor string */
+};
+
+void user_sdr_init( void )
+{
+    /* Hotswap Sensor */
+    sdr_insert_entry( TYPE_02, (void *) &SDR_HOT_SWAP, &vTaskHotSwap_Handle, 0, 0 );
+
+    /* INA220 sensors */
+    /* FMC1 Voltage */
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V, &vTaskINA220_Handle, FMC1_12V_DEVID, 0x45 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ, &vTaskINA220_Handle, FMC1_VADJ_DEVID, 0x41 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3, &vTaskINA220_Handle, FMC1_P3V3_DEVID, 0x43 );
+    /* FMC1 Current */
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V_CURR, &vTaskINA220_Handle, FMC1_12V_CURR_DEVID, 0x45 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ_CURR, &vTaskINA220_Handle, FMC1_VADJ_CURR_DEVID, 0x41 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3_CURR, &vTaskINA220_Handle, FMC1_P3V3_CURR_DEVID, 0x43 );
+
+    /* FMC2 Voltage */
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V, &vTaskINA220_Handle, FMC2_12V_DEVID, 0x40 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ, &vTaskINA220_Handle, FMC2_VADJ_DEVID, 0x42 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3, &vTaskINA220_Handle, FMC2_P3V3_DEVID, 0x44 );
+    /* FMC2 Current */
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V_CURR, &vTaskINA220_Handle, FMC2_12V_CURR_DEVID, 0x40 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ_CURR, &vTaskINA220_Handle, FMC2_VADJ_CURR_DEVID, 0x42 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3_CURR, &vTaskINA220_Handle, FMC2_P3V3_CURR_DEVID, 0x44 );
+
+    /* Board Temperature */
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_uC, &vTaskLM75_Handle, 0, 0x4C );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_CLOCK_SWITCH, &vTaskLM75_Handle, 0, 0x4D );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_DCDC, &vTaskLM75_Handle, 0, 0x4E );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RAM, &vTaskLM75_Handle, 0, 0x4F );
+
+}
