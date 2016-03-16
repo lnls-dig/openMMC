@@ -26,12 +26,12 @@
 
 #ifdef AFC_V3
 
+/* SPI Interfaces */
 #define FPGA_SPI        0
 #define FLASH_SPI       1
 #define DAC_VADJ_SPI    2
 
 /* I2C Pins definitions */
-
 #define I2C0_PORT       0
 #define I2C0_SDA_PIN    27
 #define I2C0_SCL_PIN    28
@@ -98,6 +98,11 @@
 #define GPIO_EN_P1V0_PORT       3
 #define GPIO_EN_P1V0_PIN	25
 
+/* RTM Power */
+#define GPIO_EN_RTM_PWR_PORT    1
+#define GPIO_EN_RTM_PWR_PIN     30
+
+/* FPGA Control */
 #define GPIO_PROGRAM_B_PORT     0
 #define GPIO_PROGRAM_B_PIN	17
 #define GPIO_DONE_B_PORT        0
@@ -107,11 +112,13 @@
 #define GPIO_PGOOD_P1V0_PORT    3
 #define GPIO_PGOOD_P1V0_PIN	26
 
+/* VADJ DAC */
 #define GPIO_DAC_VADJ_RST_PORT  0
 #define GPIO_DAC_VADJ_RST_PIN   21
 #define GPIO_DAC_VADJ_CSN_PORT  0
 #define GPIO_DAC_VADJ_CSN_PIN   16
 
+/* ADN4604 Clock Switch */
 #define GPIO_ADN_UPDATE_PORT    1
 #define GPIO_ADN_UPDATE_PIN     26
 #define GPIO_ADN_RESETN_PORT    1
