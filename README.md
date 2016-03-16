@@ -22,9 +22,9 @@ Go to the repository folder
 
 	cd /path/to/repo/
 
-If this is the first time compiling this firmware, run CMake configuration scripts
+Run CMake passing the flag `-DBOARD=<board_name>` to configure the compilation scripts to your specific board hardware
 
-	cmake .
+	cmake -DBOARD=<board_name>
 
 You can set your board options in the file `build_cfg/config.cmake`. You can change the Controller, Board name, version and select which modules you want to be included in your compilation.
 

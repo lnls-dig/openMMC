@@ -1,7 +1,7 @@
 ##Include selected board files
 message(STATUS "Selected Board: ${BOARD}")
 if(NOT BOARD)
-  message(FATAL_ERROR "${BoldRed}Target board was not selected!${ColourReset}")
+  message(FATAL_ERROR "${BoldRed}Target board was not selected! You must pass the flag -DBOARD=<board_name>${ColourReset}")
 endif()
 
 #BUG: Regexp will match AFC and AFCK
