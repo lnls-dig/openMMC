@@ -58,6 +58,11 @@ if (";${TARGET_MODULES};" MATCHES ";HPM;")
   endif()
  endif()
 
+if (";${TARGET_MODULES};" MATCHES ";PCA9554;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/pca9554.c )
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_PCA9554")
+endif()
+
 if (";${TARGET_MODULES};" MATCHES "SENSOR")
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_SENSORS")
   add_subdirectory(sensors)
