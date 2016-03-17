@@ -129,6 +129,12 @@ struct i2c_chip_mapping i2c_chip_map[] = {
     { CHIP_ID_FMC2_EEPROM,   I2C_BUS_FMC2_ID,    0x52},
     { CHIP_ID_FMC2_LM75_0,   I2C_BUS_FMC2_ID,    0x48},
     { CHIP_ID_FMC2_LM75_1,   I2C_BUS_FMC2_ID,    0x49},
+
+    { CHIP_ID_RTM_PCA9554,   I2C_BUS_RTM_ID,     0x20},
+    { CHIP_ID_RTM_EEPROM,    I2C_BUS_RTM_ID,     0x50},
+    { CHIP_ID_RTM_LM75_0,    I2C_BUS_RTM_ID,     0x48},
+    { CHIP_ID_RTM_LM75_1,    I2C_BUS_RTM_ID,     0x49},
+
 };
 
 #define I2C_CHIP_MAP_COUNT (sizeof(i2c_chip_map)/sizeof(struct i2c_chip_mapping))

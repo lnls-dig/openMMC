@@ -49,6 +49,7 @@
 //
 ///////////////////////
 
+/** @todo Put these enums in the board layer */
 enum {
     I2C_BUS_UNKNOWN_ID = 0x00,
     I2C_BUS_FMC1_ID,
@@ -83,7 +84,11 @@ enum {
     CHIP_ID_FMC1_LM75_0,
     CHIP_ID_FMC2_EEPROM,
     CHIP_ID_FMC2_LM75_1,
-    CHIP_ID_FMC2_LM75_0
+    CHIP_ID_FMC2_LM75_0,
+    CHIP_ID_RTM_PCA9554,
+    CHIP_ID_RTM_EEPROM,
+    CHIP_ID_RTM_LM75_0,
+    CHIP_ID_RTM_LM75_1
 };
 
 typedef struct {
