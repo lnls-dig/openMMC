@@ -71,6 +71,10 @@
 #define HOT_SWAP_HANDLE_PIN  13
 #define HOT_SWAP_HANDLE_FUNC 0
 
+/* Front Panel BUTTON */
+#define GPIO_FRONT_BUTTON_PORT  2
+#define GPIO_FRONT_BUTTON_PIN   12
+
 /* DCDC converters */
 #define GPIO_EN_P1V2_PORT       0
 #define GPIO_EN_P1V2_PIN	23
