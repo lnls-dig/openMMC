@@ -68,7 +68,7 @@
  * 255 - power fail
  */
 
-void EINT3_IRQHandler( void )
+void EINT2_IRQHandler( void )
 {
     static TickType_t last_time;
     TickType_t current_time = xTaskGetTickCountFromISR();
@@ -158,7 +158,7 @@ void payload_init( void )
 #endif
 
     /* Configure FPGA reset button interruption on front panel */
-    Chip_IOCON_PinMux(LPC_IOCON, GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, IOCON_MODE_INACT, IOCON_FUNC1);
+    Chip_IOCON_PinMux(LPC_IOCON, GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN, IOCON_MODE_INACT, IOCON_FUNC1);
     irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1);
     irq_enable( EINT2_IRQn );
 
