@@ -100,7 +100,7 @@ void hotswap_init( void )
     irq_enable( EINT3_IRQn );
 #endif
     /* Create Hot Swap task */
-    xTaskCreate( vTaskHotSwap, "Hot Swap", 200, (void *) NULL, tskHOTSWAP_PRIORITY, &vTaskHotSwap_Handle);
+    xTaskCreate( vTaskHotSwap, "Hot Swap", 150, (void *) NULL, tskHOTSWAP_PRIORITY, &vTaskHotSwap_Handle);
 
     for ( uint8_t i = 0; i < sdr_count; i++ ) {
 

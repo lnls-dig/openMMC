@@ -122,7 +122,6 @@ void vTaskFPGA_COMM( void * Parameters )
 {
     t_board_diagnostic diag_struct;
     board_diagnostic * diag = &(diag_struct.info);
-    uint32_t rx_trace[FPGA_MEM_ADDR_MAX] = {0};
 
     /* Zero fill the diag struct */
     memset( &(diag_struct.buffer[0]), 0, sizeof(diag_struct.buffer));
@@ -172,6 +171,9 @@ void vTaskFPGA_COMM( void * Parameters )
          * being returned correctly */
 
 #if SSP_TESTS
+	uint32_t rx_trace[FPGA_MEM_ADDR_MAX] = {0};
+        read_fpga_buffer( &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) );
+
 	uint32_t data;
 
 	if( cmpBuffs( &(diag_struct.buffer[0]), sizeof(diag_struct.buffer)/sizeof(diag_struct.buffer[0]), &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) != 0 ) ) {
@@ -192,5 +194,5 @@ void vTaskFPGA_COMM( void * Parameters )
 
 void init_fpga_spi( void )
 {
-    xTaskCreate(vTaskFPGA_COMM, "FPGA_COMM", 450, NULL, tskFPGA_COMM_PRIORITY, (TaskHandle_t *) NULL);
+    xTaskCreate(vTaskFPGA_COMM, "FPGA_COMM", 150, NULL, tskFPGA_COMM_PRIORITY, (TaskHandle_t *) NULL);
 }

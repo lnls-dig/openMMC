@@ -191,7 +191,7 @@ void ina220_init( void )
     uint8_t i, j;
     i = 0;
 
-    xTaskCreate( vTaskINA220, "INA220", 400, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
+    xTaskCreate( vTaskINA220, "INA220", 100, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
 
     for ( j = 0; j < sdr_count; j++ ) {
         /* Update their SDR */

@@ -49,7 +49,7 @@ void watchdog_init( void )
     wdt_config();
     wdt_set_timeout(((WATCHDOG_TIMEOUT/1000)*WATCHDOG_CLK_FREQ));
     watchdog_smphr = xSemaphoreCreateBinary();
-    xTaskCreate( WatchdogTask, (const char *) "Watchdog Task", configMINIMAL_STACK_SIZE, (void * ) NULL, tskWATCHDOG_PRIORITY, ( TaskHandle_t * ) NULL);
+    xTaskCreate( WatchdogTask, (const char *) "Watchdog Task", 60, (void * ) NULL, tskWATCHDOG_PRIORITY, ( TaskHandle_t * ) NULL);
 }
 
 void WatchdogTask (void * Parameters)
