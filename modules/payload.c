@@ -141,7 +141,9 @@ TaskHandle_t vTaskPayload_Handle;
 
 void payload_init( void )
 {
-    xTaskCreate(vTaskPayload, "Payload", 80, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
+    xTaskCreate(vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
+
+    /** @todo: Use event groups instead of queues here */
     queue_payload_handle = xQueueCreate(5, sizeof(uint8_t));
 
     initializeDCDC();
