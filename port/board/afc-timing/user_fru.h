@@ -44,19 +44,16 @@
  * Product information area
  *********************************************/
 #define PRODUCT_MANUFACTURER    "LNLS"
-#define PRODUCT_NAME            "AFC BPM"
+#define PRODUCT_NAME            "AFC Timing"
 #define PRODUCT_PN              "00001"
-#define PRODUCT_VERSION         "v3"
+#define PRODUCT_VERSION         "1"
 #define PRODUCT_SN              "00001"
 #define PRODUCT_ASSET_TAG       "No tag"
 
 /*********************************************
  * AMC: Point to point connectivity record
  *********************************************/
-#define AMC_POINT_TO_POINT_RECORD_CNT           2
-#define AMC_POINT_TO_POINT_RECORD_LIST                                  \
-    GENERIC_POINT_TO_POINT_RECORD(0, PORT(4), PORT(5), PORT(6), PORT(7), PCIE, GEN1_NO_SSC, MATCHES_01); \
-    GENERIC_POINT_TO_POINT_RECORD(1, PORT(8), PORT(9), PORT(10), PORT(11), PCIE, GEN1_NO_SSC, MATCHES_01);
+#define AMC_POINT_TO_POINT_RECORD_CNT           0
 
 /*********************************************
  * AMC: Point to point clock record
@@ -66,8 +63,8 @@
    DIRECT_CLOCK_CONNECTION(CLOCK_ID, ACTIVATION, PLL_USE, SOURCE/RECEIVER, CLOCK_FAMILY, ACCURACY, FREQUENCY, MIN FREQUENCY, MAX FREQUENCY) */
 #define AMC_CLOCK_CONFIGURATION_LIST                                    \
     DIRECT_CLOCK_CONNECTION(FCLKA, CIPMC, NO_PLL, RECEIVER, PCI_RESERVED, 0, MHz(100), MHz(99), MHz(101)), \
-        DIRECT_CLOCK_CONNECTION(TCLKA, APP, NO_PLL, RECEIVER, UNSPEC_FAMILY, 0, MHz(11), MHz(10), MHz(12))
+        DIRECT_CLOCK_CONNECTION(TCLKB, APP, NO_PLL, TRANSMITTER, UNSPEC_FAMILY, 0, MHz(11), MHz(10), MHz(12))
 /**********************************************
  * PICMG: Module current record
  **********************************************/
-#define MODULE_CURRENT_RECORD            current_in_ma(6500)
+#define MODULE_CURRENT_RECORD            current_in_ma(4000)
