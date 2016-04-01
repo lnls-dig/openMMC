@@ -164,8 +164,6 @@ void vTaskFPGA_COMM( void * Parameters )
 
         write_fpga_buffer( diag_struct );
 
-        read_fpga_buffer( &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) );
-
         /* BUG: The SSP interface keeps returning 0 when trying to read the
          * data from the FPGA, despite the fact that the waveform shows it's
          * being returned correctly */
@@ -178,16 +176,15 @@ void vTaskFPGA_COMM( void * Parameters )
 
 	if( cmpBuffs( &(diag_struct.buffer[0]), sizeof(diag_struct.buffer)/sizeof(diag_struct.buffer[0]), &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) != 0 ) ) {
             data = 0xAAAAAAAA;
-            extern const LED_activity_desc_t LED_2Hz_Blink_Activity;
             LED_update(LED_RED, &LED_2Hz_Blink_Activity);
         } else {
             data = 0x55555555;
-            extern const LED_activity_desc_t LED_Off_Activity;
             LED_update(LED_RED, &LED_Off_Activity);
         }
 
         write_fpga_byte( 0x05, data );
 #endif
+        write_fpga_byte( 0x05, 0x55555555 );
         vTaskDelay(FPGA_UPDATE_RATE);
     }
 }
