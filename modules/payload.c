@@ -186,6 +186,8 @@ void vTaskPayload(void *pvParameters)
 
     uint8_t current_message;
 
+    extern sensor_t * hotswap_amc_sensor;
+
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
 
@@ -244,8 +246,8 @@ void vTaskPayload(void *pvParameters)
             break;
 
         case PAYLOAD_POWER_GOOD_WAIT:
-	    hotswap_clear_mask_bit( HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
-	    hotswap_clear_mask_bit( HOTSWAP_BACKEND_PWR_FAILURE_MASK );
+	    hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
+	    hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_FAILURE_MASK );
 	    if (QUIESCED_req) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (P1V0_good == 1) {
@@ -277,17 +279,17 @@ void vTaskPayload(void *pvParameters)
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON(false);
 	    /*
-	    hotswap_set_mask_bit( HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
-	    hotswap_send_event( HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
+	    hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
+	    hotswap_send_event( hotswap_amc_sensor, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
 	    */
-	    hotswap_set_mask_bit( HOTSWAP_QUIESCED_MASK );
-	    if ( hotswap_send_event( HOTSWAP_QUIESCED_MASK ) == ipmb_error_success ) {
+	    hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
+	    if ( hotswap_send_event( hotswap_amc_sensor, HOTSWAP_QUIESCED_MASK ) == ipmb_error_success ) {
                 QUIESCED_req = 0;
 		/* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
 		P12V_good = 0;
 		P1V0_good = 0;
                 new_state = PAYLOAD_NO_POWER;
-		hotswap_clear_mask_bit( HOTSWAP_QUIESCED_MASK );
+		hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
             }
             break;
 
