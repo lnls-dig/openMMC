@@ -19,28 +19,13 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/*!
- * @file lm75.h
- * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
- *
- * @brief Definitions for LM75 I2C Temperature Sensor
- */
+#ifndef RTM_USER_H_
+#define RTM_USER_H_
 
-#ifndef LM75_H_
-#define LM75_H_
-
-#define LM75_MAX_COUNT		6
-#define LM75_UPDATE_RATE	500
-
-extern TaskHandle_t vTaskLM75_Handle;
-
-extern const SDR_type_01h_t SDR_LM75_uC;
-extern const SDR_type_01h_t SDR_LM75_CLOCK_SWITCH;
-extern const SDR_type_01h_t SDR_LM75_DCDC;
-extern const SDR_type_01h_t SDR_LM75_RAM;
-
-void LM75_init( void );
-void vTaskLM75( void* Parameters );
+#define RTM_GPIO_HOTSWAP_HANDLE		0
+#define RTM_GPIO_OVERTEMP_SHUTDOWN	4
+#define RTM_GPIO_LED_RED		5
+#define RTM_GPIO_LED_GREEN		6
+#define RTM_GPIO_LED_BLUE		7
 
 #endif

@@ -98,9 +98,14 @@
 #define GPIO_EN_P1V0_PORT       3
 #define GPIO_EN_P1V0_PIN	25
 
-/* RTM Power */
+/* RTM */
 #define GPIO_EN_RTM_PWR_PORT    1
 #define GPIO_EN_RTM_PWR_PIN     30
+/* NOTE: Due to a hardware limitation, pins 29 and 30 from port 0 MUST have the same direction */
+#define GPIO_RTM_PS_PORT        0
+#define GPIO_RTM_PS_PIN         29
+#define GPIO_EN_RTM_I2C_PORT    0
+#define GPIO_EN_RTM_I2C_PIN     30
 
 /* FPGA Control */
 #define GPIO_PROGRAM_B_PORT     0

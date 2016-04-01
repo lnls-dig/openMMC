@@ -37,6 +37,15 @@
 #define HOTSWAP_QUIESCED_MASK                   0x04
 #define HOTSWAP_BACKEND_PWR_FAILURE_MASK        0x08
 #define HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK       0x10
+#define HOTSWAP_URTM_PRESENT_MASK		0x20
+#define HOTSWAP_URTM_ABSENT_MASK		0x40
+#define HOTSWAP_URTM_COMPATIBLE_MASK		0x80
+#define HOTSWAP_URTM_INCOMPATIBLE_MASK		0x100 /* This will be cropped to 0x00 */
+
+enum {
+    HOTSWAP_AMC,
+    HOTSWAP_RTM
+};
 
 TaskHandle_t vTaskHotSwap_Handle;
 

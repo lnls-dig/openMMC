@@ -37,7 +37,7 @@
 #include "fpga_spi.h"
 
 sensor_t *sensor_array = NULL;
-uint8_t sdr_count = 0;
+volatile uint8_t sdr_count = 0;
 
 static uint16_t reservationID;
 

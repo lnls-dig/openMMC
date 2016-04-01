@@ -38,6 +38,7 @@
 #include "jtag.h"
 #include "fpga_spi.h"
 #include "watchdog.h"
+#include "rtm.h"
 
 //#define HEAP_TEST
 //#define STOP_TEST
@@ -92,6 +93,8 @@ int main(void)
 #endif
 #ifdef MODULE_FPGA_SPI
     init_fpga_spi();
+#ifdef MODULE_RTM
+    rtm_manage_init();
 #endif
     /*  Init IPMI interface */
     /* NOTE: ipmb_init() is called inside this function */

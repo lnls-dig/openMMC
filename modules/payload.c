@@ -106,8 +106,6 @@ void setDC_DC_ConvertersON( bool on )
     gpio_set_pin_state( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, _on);
     gpio_set_pin_state( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, _on);
     gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, _on);
-
-    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, _on);
 }
 
 void initializeDCDC( void )
@@ -127,8 +125,6 @@ void initializeDCDC( void )
     gpio_set_pin_dir( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, OUTPUT);
-
-    gpio_set_pin_dir( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, OUTPUT);
 }
 
 
