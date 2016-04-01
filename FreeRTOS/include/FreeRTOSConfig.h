@@ -75,7 +75,6 @@ licensing and training services.
 #define configUSE_TASK_NOTIFICATIONS            1
 #define configUSE_STATS_FORMATTING_FUNCTIONS    0
 #define configAPPLICATION_ALLOCATED_HEAP        1
-#define USE_HEAP_4
 
 void vAssertCalled( char* file, uint32_t line);
 #define configASSERT( x )     if( ( x ) == 0 ) { vAssertCalled( __FILE__, __LINE__ );}
