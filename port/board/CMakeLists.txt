@@ -4,9 +4,10 @@ if(NOT BOARD)
   message(FATAL_ERROR "${BoldRed}Target board was not selected! You must pass the flag -DBOARD=<board_name>${ColourReset}")
 endif()
 
-#BUG: Regexp will match AFC and AFCK
-if(${BOARD} MATCHES "^(AFC|afc)")
+if(${BOARD} MATCHES "^(AFC|afc)$")
   add_subdirectory(afc)
+elseif(${BOARD} MATCHES "^(afc-timing)$" )
+  add_subdirectory(afc-timing)
 else()
   message(FATAL_ERROR "${BoldRed}Selected board \"${BOARD}\" is not implemented!${ColourReset}")
 endif()

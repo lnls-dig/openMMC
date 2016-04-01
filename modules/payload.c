@@ -68,7 +68,7 @@
  * 255 - power fail
  */
 
-void EINT3_IRQHandler( void )
+void EINT2_IRQHandler( void )
 {
     static TickType_t last_time;
     TickType_t current_time = xTaskGetTickCountFromISR();
@@ -76,12 +76,16 @@ void EINT3_IRQHandler( void )
     /* Simple debouncing routine */
     /* If the last interruption happened in the last 200ms, this one is only a bounce, ignore it and wait for the next interruption */
     if (getTickDifference(current_time, last_time) < DEBOUNCE_TIME) {
+	LPC_SYSCTL->EXTINT |= (1 << 2);
         return;
     }
 
     gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
     asm("NOP");
     gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+
+    /* Clear interruption flag */
+    LPC_SYSCTL->EXTINT |= (1 << 2);
 }
 
 void setDC_DC_ConvertersON( bool on )
@@ -106,6 +110,8 @@ void setDC_DC_ConvertersON( bool on )
     gpio_set_pin_state( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, _on);
     gpio_set_pin_state( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, _on);
     gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, _on);
+
+    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, _on);
 }
 
 void initializeDCDC( void )
@@ -125,6 +131,8 @@ void initializeDCDC( void )
     gpio_set_pin_dir( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, OUTPUT);
+
+    gpio_set_pin_dir( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, OUTPUT);
 }
 
 
@@ -156,8 +164,8 @@ void payload_init( void )
 #endif
 
     /* Configure FPGA reset button interruption on front panel */
-    Chip_IOCON_PinMux(LPC_IOCON, GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, IOCON_MODE_INACT, IOCON_FUNC1);
-    irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1);
+    Chip_IOCON_PinMux(LPC_IOCON, GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN, IOCON_MODE_INACT, IOCON_FUNC1);
+    irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1 );
     irq_enable( EINT2_IRQn );
 
     if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
