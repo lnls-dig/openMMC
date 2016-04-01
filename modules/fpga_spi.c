@@ -190,7 +190,7 @@ void vTaskFPGA_COMM( void * Parameters )
     }
 }
 
-void init_fpga_spi( void )
+void fpga_spi_init( void )
 {
     xTaskCreate(vTaskFPGA_COMM, "FPGA_COMM", 450, NULL, tskFPGA_COMM_PRIORITY, (TaskHandle_t *) NULL);
 }

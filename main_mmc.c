@@ -89,10 +89,11 @@ int main(void)
     payload_init();
 #endif
 #ifdef MODULE_JTAG_SWITCH
-    init_scansta();
+    scansta_init();
 #endif
 #ifdef MODULE_FPGA_SPI
-    init_fpga_spi();
+    fpga_spi_init();
+#endif
 #ifdef MODULE_RTM
     rtm_manage_init();
 #endif
