@@ -147,7 +147,7 @@ void vTaskFPGA_COMM( void * Parameters )
         diag->data_valid = 0x55555555;
 
         /* Update Sensors Readings */
-        for (uint8_t i = 0, j = 0; i <= NUM_SENSOR; i++) {
+        for (uint8_t i = 0, j = 0; i < sdr_count; i++) {
             if (sensor_array[i].diag_devID != NO_DIAG) {
                 diag->sensor[j].dev_id = sensor_array[i].diag_devID;
                 diag->sensor[j].measure = sensor_array[i].readout_value;
