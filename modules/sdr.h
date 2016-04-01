@@ -203,7 +203,7 @@ typedef struct {
 } sensor_t;
 
 extern sensor_t *sensor_array;
-extern uint8_t sdr_count;
+extern volatile uint8_t sdr_count;
 
 const SDR_type_12h_t SDR0;
 
