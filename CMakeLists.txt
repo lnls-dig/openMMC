@@ -52,6 +52,7 @@ if(NOT CMAKE_BUILD_TYPE)
     "Choose the type of build, options are: none Debug Release Trace."
     FORCE)
 endif()
+message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 
 # Include board specific code
 set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat -Wno-unused-parameter -Wno-missing-field-initializers")

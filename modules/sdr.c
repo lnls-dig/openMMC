@@ -92,6 +92,8 @@ void sdr_init( void )
     sdr_count++;
 }
 
+/** @todo: Maybe use a dynamic linked table to hold the SDR entries, since we'll have to remove them later */
+
 void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr)
 {
     uint8_t index = sdr_count;
