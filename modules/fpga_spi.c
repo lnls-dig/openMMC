@@ -103,7 +103,7 @@ static void init_diag_struct( board_diagnostic * diag )
     diag->data_valid = 0x55555555;
 
     /* Sensors Readings */
-    for ( i = 0, temp_sensor = sdr_head; (temp_sensor->next != NULL) && (i <= NUM_SENSOR); temp_sensor = temp_sensor->next) {
+    for ( i = 0, temp_sensor = sdr_head; (temp_sensor != NULL) && (i <= NUM_SENSOR); temp_sensor = temp_sensor->next) {
         if (temp_sensor->diag_devID != NO_DIAG) {
             diag->sensor[i].dev_id = temp_sensor->diag_devID;
             diag->sensor[i].measure = temp_sensor->readout_value;

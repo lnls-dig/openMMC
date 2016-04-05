@@ -25,7 +25,7 @@
 
 #include "ipmb.h"
 
-#define NUM_SENSOR                      17      /* Number of sensors */
+#define NUM_SENSOR                      21      /* Number of sensors */
 #define NUM_SDR                         (NUM_SENSOR+1)  /* Number of SDRs */
 
 /* Sensor Types */
