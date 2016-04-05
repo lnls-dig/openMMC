@@ -335,9 +335,9 @@ Bool i2c_take_by_busid( uint8_t bus_id, I2C_ID_T * i2c_interface, TickType_t max
 
     } else {
         /* Include enable bit (fourth bit) on channel selection byte */
-        uint8_t pca_channel = p_i2c_bus->mux_bus | (1 << 4);
+        uint8_t pca_channel = p_i2c_bus->mux_bus | (1 << 3);
 
-        while (xI2CMasterWrite(i2c_chip_map[CHIP_ID_MUX].bus_id, i2c_chip_map[CHIP_ID_MUX].i2c_address, &pca_channel, 1 ) == 0) { }
+        while (xI2CMasterWrite(p_i2c_busmap[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface, i2c_chip_map[CHIP_ID_MUX].i2c_address, &pca_channel, 1 ) == 0) { }
 
         p_i2c_mux->state = p_i2c_bus->mux_bus;
         *i2c_interface = p_i2c_mux->i2c_interface;
