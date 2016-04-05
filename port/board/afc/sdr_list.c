@@ -1204,8 +1204,8 @@ void user_sdr_init( void )
 void rtm_insert_sdr_entries( void )
 {
 #ifdef MODULE_TEMPERATURE_SENSOR
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_1, &vTaskLM75_Handle, 0, 0x4F );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_2, &vTaskLM75_Handle, 0, 0x4F );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_1, &vTaskLM75_Handle, 0, 0x48 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_2, &vTaskLM75_Handle, 0, 0x49 );
 #endif
 }
 
