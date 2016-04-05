@@ -74,37 +74,44 @@ void RTM_Manage( void * Parameters )
     extern sensor_t * hotswap_rtm_sensor;
 
     for ( ;; ) {
-	vTaskDelay(200);
+        vTaskDelay(200);
 
-	rtm_disable_i2c();
-	ps_new_state = gpio_read_pin( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN );
-	if ( ps_new_state ^ ps_old_state ) {
-	    if (ps_new_state == RTM_PS_PRESENT) {
-		/* RTM Present */
-		hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_URTM_PRESENT_MASK );
+        rtm_disable_i2c();
+        ps_new_state = gpio_read_pin( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN );
 
-		rtm_enable_i2c();
-		pca9554_set_port_dir( 0x1F );
-		/* Turn on Blue LED and off Red and Green */
-		pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
-		pca9554_write_pin( RTM_GPIO_LED_RED, 1 );
-		pca9554_write_pin( RTM_GPIO_LED_GREEN, 1 );
+        if ( ps_new_state ^ ps_old_state ) {
+            if (ps_new_state == RTM_PS_PRESENT) {
+                /* RTM Present */
+                hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_URTM_PRESENT_MASK );
 
-		/* Include RTM sensors in the SDR table */
-		rtm_insert_sdr_entries();
+                rtm_enable_i2c();
+                pca9554_set_port_dir( 0x1F );
+                /* Turn on Blue LED and off Red and Green */
+                pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
+                pca9554_write_pin( RTM_GPIO_LED_RED, 1 );
+                pca9554_write_pin( RTM_GPIO_LED_GREEN, 1 );
 
-	    } else if ( ps_new_state == RTM_PS_ABSENT ) {
-		//rtm_remove_sdr_entries();   //Not implemented yet
-		hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_URTM_ABSENT_MASK );
-	    }
-	    ps_old_state = ps_new_state;
-	}
+                /* Include RTM sensors in the SDR table */
+                rtm_insert_sdr_entries();
 
-	if ( rtm_get_hotswap_handle_status() == HOTSWAP_MODULE_HANDLE_CLOSED_MASK ) {
-	    rtm_enable_payload_power();
-	} else {
-	    rtm_disable_payload_power();
-	}
+            } else if ( ps_new_state == RTM_PS_ABSENT ) {
+                //rtm_remove_sdr_entries();   //Not implemented yet
+                hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_URTM_ABSENT_MASK );
+            }
+            ps_old_state = ps_new_state;
+        }
+
+        /* Remove this, we should not be activating the RTM directly, wait for a command to do that */
+        rtm_enable_i2c();
+        if ( rtm_get_hotswap_handle_status() == HOTSWAP_MODULE_HANDLE_CLOSED_MASK ) {
+            rtm_enable_payload_power();
+            pca9554_write_pin( RTM_GPIO_LED_BLUE, 1 );
+            pca9554_write_pin( RTM_GPIO_LED_GREEN, 0 );
+        } else {
+            rtm_disable_payload_power();
+            pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
+            pca9554_write_pin( RTM_GPIO_LED_GREEN, 1 );
+        }
     }
 }
 

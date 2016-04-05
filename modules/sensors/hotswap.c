@@ -49,39 +49,36 @@ sensor_t * hotswap_rtm_sensor;
 
 void hotswap_init( void )
 {
-    SDR_type_02h_t * hotswap_pSDR;
-    sensor_t * hotswap_sensor;
-
     /* Create Hot Swap task */
     xTaskCreate( vTaskHotSwap, "Hot Swap", 200, (void *) NULL, tskHOTSWAP_PRIORITY, &vTaskHotSwap_Handle);
 
-    for ( uint8_t i = 0; i < sdr_count; i++ ) {
+    SDR_type_02h_t * hotswap_pSDR;
+    sensor_t * hotswap_sensor;
 
-        /* Check if the handle pointer is not NULL */
-        if (sensor_array[i].task_handle == NULL) {
-            continue;
-        }
+    /* Iterate through the SDR Table to find all the Hotswap entries */
+    for ( hotswap_sensor = sdr_head; hotswap_sensor != NULL; hotswap_sensor = hotswap_sensor->next) {
 
-        /* Check if this task should update the selected SDR */
-        if ( *(sensor_array[i].task_handle) != vTaskHotSwap_Handle ) {
-            continue;
-        }
+	if ( hotswap_sensor->task_handle == NULL ) {
+	    continue;
+	}
 
-        hotswap_sensor = &sensor_array[i];
-        hotswap_pSDR = (SDR_type_02h_t *) sensor_array[i].sdr;
+	/* Check if this task should update the selected SDR */
+	if ( *(hotswap_sensor->task_handle) != vTaskHotSwap_Handle ) {
+	    continue;
+	}
 
-        if ( hotswap_pSDR->entityID == 0xC1 ) {
-            hotswap_amc_sensor = hotswap_sensor;
-            hotswap_amc_pSDR = hotswap_pSDR;
-            hotswap_amc_sensor->readout_value = hotswap_get_handle_status();
+        hotswap_pSDR = (SDR_type_02h_t *) hotswap_sensor->sdr;
 
-        } else if ( hotswap_pSDR->entityID == 0xC0 ) {
+	if ( hotswap_pSDR->entityID == 0xC1 ) {
+	    hotswap_amc_sensor = hotswap_sensor;
+	    hotswap_amc_pSDR = hotswap_pSDR;
+	} else if ( hotswap_pSDR->entityID == 0xC0 ) {
 #ifdef MODULE_RTM
-            hotswap_rtm_sensor = hotswap_sensor;
-            hotswap_rtm_pSDR = hotswap_pSDR;
-            hotswap_rtm_sensor->readout_value = rtm_get_hotswap_handle_status();
+	    hotswap_rtm_sensor = hotswap_sensor;
+	    hotswap_rtm_pSDR = hotswap_pSDR;
 #endif
-        }
+	}
+
     }
 }
 
