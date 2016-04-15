@@ -134,9 +134,9 @@ IPMI_HANDLER(ipmi_storage_read_fru_data_cmd, NETFN_STORAGE, IPMI_READ_FRU_DATA_C
     offset = (req->data[2] << 8) | (req->data[1]);
 
 
-    count = fru_read( &(rsp->data[len]), offset, count );
-
+    count = fru_read( &(rsp->data[len+1]), offset, count );
     rsp->data[len++] = count;
+
     rsp->data_len = len + count;
     rsp->completion_code = IPMI_CC_OK;
 }
