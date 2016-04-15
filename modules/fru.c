@@ -44,12 +44,16 @@ void fru_init( void )
     uint8_t common_header[8];
 
     if ( at24mac_read_nortos( 0x00, &common_header[0], 8 ) == 8 ) {
-        if ( calculate_chksum( &common_header[0], 7 ) != common_header[7] ) {
+        if ( (calculate_chksum( &common_header[0], 7 ) != common_header[7]) || common_header[0] != 1 ) {
             fru_info_build( fru_info );
 
 #ifdef FRU_WRITE_EEPROM
             at24mac_write_nortos( 0x00, &fru_info[0], sizeof(fru_info) );
 #endif
+            at24mac_read_nortos( 0x00, &common_header[0], 8 );
+            if (common_header[0] != 1) {
+            	fru_runtime = true;
+            }
         }
     } else {
         /* Could not access the SEEPROM, create a runtime fru info */
