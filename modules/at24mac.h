@@ -28,9 +28,9 @@
 #define AT24MAC_ID_ADDR 0x80
 
 #if defined(AT24MAC402)
-#define AT24MAC_EUI_ADDR 0x98
-#elif defined(AT24MAC602)
 #define AT24MAC_EUI_ADDR 0x9A
+#elif defined(AT24MAC602)
+#define AT24MAC_EUI_ADDR 0x98
 #endif
 
 size_t at24mac_read_generic( uint8_t address, uint8_t *rx_data, size_t buf_len, bool rtos );
