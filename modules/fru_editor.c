@@ -30,10 +30,8 @@
 
 #include "FreeRTOS.h"
 #include "utils.h"
-#include "fru.h"
+#include "fru_editor.h"
 #include "user_fru.h"
-
-uint8_t fru_data[FRU_SIZE];
 
 void fru_header_build( uint8_t * fru_buffer )
 {
@@ -284,92 +282,18 @@ void point_to_point_clock_build( uint8_t * fru_buffer )
 #endif
 }
 
-void fru_init( void )
+size_t fru_info_build( uint8_t *buffer )
 {
     /* Zero initialize the buffer */
-    memset(&fru_data[0], 0, (sizeof(fru_data)/sizeof(fru_data[0])));
+    memset(&buffer[0], 0, (sizeof(buffer)/sizeof(buffer[0])));
 
     /* Populate the fru_buffer */
-    fru_header_build(&fru_data[COMMON_HEADER_OFFSET]);
-    board_info_area_build(&fru_data[BOARD_INFO_AREA_OFFSET]);
-    product_info_area_build(&fru_data[PRODUCT_INFO_AREA_OFFSET]);
-    amc_point_to_point_record_build(&fru_data[AMC_POINT_TO_POINT_RECORD_OFFSET]);
-    point_to_point_clock_build(&fru_data[AMC_CLOCK_CONFIG_RECORD_OFFSET]);
-    module_current_record_build(&fru_data[MODULE_CURRENT_RECORD_OFFSET]);
-}
+    fru_header_build(&buffer[COMMON_HEADER_OFFSET]);
+    board_info_area_build(&buffer[BOARD_INFO_AREA_OFFSET]);
+    product_info_area_build(&buffer[PRODUCT_INFO_AREA_OFFSET]);
+    amc_point_to_point_record_build(&buffer[AMC_POINT_TO_POINT_RECORD_OFFSET]);
+    point_to_point_clock_build(&buffer[AMC_CLOCK_CONFIG_RECORD_OFFSET]);
+    module_current_record_build(&buffer[MODULE_CURRENT_RECORD_OFFSET]);
 
-void fru_read_to_buffer(char *buff, uint8_t offset, uint8_t length)
-{
-    uint8_t i;
-    uint8_t j = offset;
-
-    for (i = 0; i<length; i++, j++ ) {
-        if (j < (sizeof(fru_data)/sizeof(fru_data[0]))) {
-            buff[i] = fru_data[j];
-        } else {
-            buff[i] = 0xFF;
-        }
-    }
-}
-
-void fru_read_common_header(t_fru_common_header * header) {
-    fru_read_to_buffer( (char *) header, 0, sizeof(t_fru_common_header));
-}
-
-/* IPMI Handlers */
-
-IPMI_HANDLER(ipmi_storage_get_fru_info, NETFN_STORAGE, IPMI_GET_FRU_INVENTORY_AREA_INFO_CMD, ipmi_msg * req, ipmi_msg * rsp )
-{
-    uint8_t len = rsp->data_len = 0;
-    rsp->data[len++] = FRU_SIZE & 0xFF;
-    rsp->data[len++] = FRU_SIZE & 0xFF00;
-    rsp->data[len++] = 0x00; /* Device accessed by bytes */
-    rsp->data_len = len;
-    rsp->completion_code = IPMI_CC_OK;
-}
-
-IPMI_HANDLER(ipmi_storage_read_fru_data_cmd, NETFN_STORAGE, IPMI_READ_FRU_DATA_CMD, ipmi_msg * req, ipmi_msg * rsp )
-{
-    uint32_t offset;
-    uint8_t len = rsp->data_len = 0;
-
-    /* Count byte on the request is "1" based */
-    uint8_t count = req->data[3];
-
-    if ( (count-1) > IPMI_MSG_MAX_LENGTH ) {
-        rsp->completion_code = IPMI_CC_CANT_RET_NUM_REQ_BYTES;
-        return;
-    }
-
-    offset = (req->data[2] << 8) | (req->data[1]);
-
-    rsp->data[len++] = count;
-    fru_read_to_buffer( (char *) &(rsp->data[len]), offset, count );
-
-    rsp->data_len = len + count;
-    rsp->completion_code = IPMI_CC_OK;
-}
-
-IPMI_HANDLER(ipmi_storage_write_fru_data_cmd, NETFN_STORAGE, IPMI_WRITE_FRU_DATA_CMD, ipmi_msg * req, ipmi_msg * rsp )
-{
-    uint8_t len = rsp->data_len = 0;
-    uint16_t i;
-    uint16_t offset =  (req->data[2] << 8) | (req->data[1]);
-
-    /* Use signed comparison here in case offset + data_len < 3 */
-    if ((offset + req->data_len - 3) < (int16_t)FRU_SIZE) {
-	for (i = 0; i< req->data_len-3; i++) {
-	    fru_data[offset+i] = req->data[3+i];
-	}
-	/* Count written (1 based) */
-	rsp->data[len++] = i+1;
-
-	rsp->data_len = len;
-	rsp->completion_code = IPMI_CC_OK;
-    } else {
-	/* Count written (1 based) */
-	rsp->data[len++] = 0;
-	rsp->data_len = len;
-	rsp->completion_code = IPMI_CC_PARAM_OUT_OF_RANGE;
-    }
+    return FRU_SIZE;
 }

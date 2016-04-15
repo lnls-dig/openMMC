@@ -11,6 +11,7 @@ message(STATUS "Selected modules to compile: ${TARGET_MODULES}")
 
 if (";${TARGET_MODULES};" MATCHES ";FRU;")
   set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/fru.c )
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/fru_editor.c )
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_FRU")
  endif()
 

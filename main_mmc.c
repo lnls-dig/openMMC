@@ -68,12 +68,14 @@ int main(void)
 #endif
 
     LED_init();
+
+    portENABLE_INTERRUPTS();
+    board_i2c_init();
+
 #ifdef MODULE_FRU
     fru_init();
 #endif
 
-    portENABLE_INTERRUPTS();
-    board_i2c_init();
     board_discover();
     portDISABLE_INTERRUPTS();
 

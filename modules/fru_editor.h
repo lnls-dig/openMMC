@@ -20,8 +20,8 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef FRU_H_
-#define FRU_H_
+#ifndef FRU_EDITOR_H_
+#define FRU_EDITOR_H_
 
 #include "FreeRTOS.h"
 #include "string.h"
@@ -593,9 +593,7 @@ typedef struct amc_clock_config_record {
 
 #define FRU_SIZE                                ( MULTIRECORD_AREA_OFFSET+MULTIRECORD_AREA_SIZE )
 
-extern uint8_t fru_data[FRU_SIZE];
 
-void fru_init( void );
 void fru_header_build( uint8_t * fru_buffer );
 void board_info_area_build( uint8_t * fru_buffer );
 void product_info_area_build( uint8_t * fru_buffer );
@@ -603,7 +601,6 @@ void amc_point_to_point_record_build( uint8_t * fru_buffer );
 void point_to_point_clock_build( uint8_t * fru_buffer );
 void module_current_record_build( uint8_t * fru_buffer );
 
-/* IPMI Handlers */
-void fru_read_to_buffer(char *buff, uint8_t offset, uint8_t length);
-void fru_read_common_header(t_fru_common_header * header);
+size_t fru_info_build( uint8_t *buffer );
+
 #endif
