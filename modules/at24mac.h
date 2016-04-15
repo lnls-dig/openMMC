@@ -33,9 +33,19 @@
 #define AT24MAC_EUI_ADDR 0x9A
 #endif
 
-uint8_t at24mac_read( uint8_t address, uint8_t *rx_data, uint8_t buf_len );
-uint8_t at24mac_read_serial_num( uint8_t *rx_data, uint8_t buf_len );
-uint8_t at24mac_read_eui( uint8_t *rx_data, uint8_t buf_len );
-uint8_t at24mac_write( uint8_t address, uint8_t *tx_data, uint8_t buf_len );
+size_t at24mac_read_generic( uint8_t address, uint8_t *rx_data, size_t buf_len, bool rtos );
+size_t at24mac_read_serial_num_generic( uint8_t *rx_data, size_t buf_len, bool rtos );
+size_t at24mac_read_eui_generic( uint8_t *rx_data, size_t buf_len, bool rtos );
+size_t at24mac_write_generic( uint8_t address, uint8_t *tx_data, size_t buf_len, bool rtos );
+
+#define at24mac_read(address, rx_data, buf_len) at24mac_read_generic(address, rx_data, buf_len, true)
+#define at24mac_read_serial_num(rx_data, buf_len) at24mac_read_serial_num_gereneric(rx_data, buf_len, true)
+#define at24mac_read_eui(rx_data, buf_len) at24mac_read_eui_gereneric(rx_data, buf_len, true)
+#define at24mac_write(address, tx_data, buf_len) at24mac_write_generic(address, tx_data, buf_len, true)
+
+#define at24mac_read_nortos(address, rx_data, buf_len) at24mac_read_generic(address, rx_data, buf_len, false)
+#define at24mac_read_serial_num_nortos(rx_data, buf_len) at24mac_read_serial_num_generic(rx_data, buf_len, false)
+#define at24mac_read_eui_nortos(rx_data, buf_len) at24mac_read_eui_generic(rx_data, buf_len, false)
+#define at24mac_write_nortos(address, tx_data, buf_len) at24mac_write_generic(address, tx_data, buf_len, false)
 
 #endif

@@ -27,81 +27,128 @@
 #include "port.h"
 #include "board_version.h"
 
-uint8_t at24mac_read( uint8_t address, uint8_t *rx_data, uint8_t buf_len )
+size_t at24mac_read_generic( uint8_t address, uint8_t *rx_data, size_t buf_len, bool rtos )
 {
     uint8_t i2c_addr;
     uint8_t i2c_interface;
     uint8_t rx_len = 0;
 
-    if ( (i2c_take_by_chipid(CHIP_ID_EEPROM, &i2c_addr, &i2c_interface, 0) == pdFALSE) && rx_data != NULL) {
+    bool smphr_taken = false;
 
-	rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, address, rx_data, buf_len);
+    /* Only tries to take the semaphore if the "rtos" flag is true */
+    if (rtos) {
+        smphr_taken = i2c_take_by_chipid(CHIP_ID_EEPROM, &i2c_addr, &i2c_interface, 0);
+    } else {
+        smphr_taken = true;
+        i2c_interface = I2C1;
+        i2c_addr = 0x50;
+    }
 
-	i2c_give( i2c_interface );
+    if ( smphr_taken && ( rx_data != NULL ) ) {
+        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, address, rx_data, buf_len);
+
+        if ( rtos ) {
+            i2c_give( i2c_interface );
+        }
     }
 
     return rx_len;
 }
 
-uint8_t at24mac_read_serial_num( uint8_t *rx_data, uint8_t buf_len )
+size_t at24mac_read_serial_num_generic( uint8_t *rx_data, size_t buf_len, bool rtos )
 {
     uint8_t i2c_addr;
     uint8_t i2c_interface;
     uint8_t rx_len = 0;
 
-    if ( (i2c_take_by_chipid(CHIP_ID_EEPROM_ID, &i2c_addr, &i2c_interface, 0) == pdFALSE) && rx_data != NULL) {
+    bool smphr_taken = false;
 
-	rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, AT24MAC_ID_ADDR, rx_data, buf_len);
+    /* Only tries to take the semaphore if the "rtos" flag is true */
+    if (rtos) {
+        smphr_taken = i2c_take_by_chipid(CHIP_ID_EEPROM_ID, &i2c_addr, &i2c_interface, 0);
+    } else {
+        smphr_taken = true;
+        i2c_interface = I2C1;
+        i2c_addr = 0x58;
+    }
 
-	i2c_give( i2c_interface );
+    if ( smphr_taken && ( rx_data != NULL ) ) {
+        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, AT24MAC_ID_ADDR, rx_data, buf_len);
+
+        if ( rtos ) {
+            i2c_give( i2c_interface );
+        }
     }
 
     return rx_len;
 }
 
-uint8_t at24mac_read_eui( uint8_t *rx_data, uint8_t buf_len )
+size_t at24mac_read_eui_generic( uint8_t *rx_data, size_t buf_len, bool rtos )
 {
     uint8_t i2c_addr;
     uint8_t i2c_interface;
     uint8_t rx_len = 0;
 
-    if ( (i2c_take_by_chipid(CHIP_ID_EEPROM_ID, &i2c_addr, &i2c_interface, 0) == pdFALSE) && rx_data != NULL) {
+    bool smphr_taken = false;
 
-	rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, AT24MAC_EUI_ADDR, rx_data, buf_len);
+    /* Only tries to take the semaphore if the "rtos" flag is true */
+    if (rtos) {
+        smphr_taken = i2c_take_by_chipid(CHIP_ID_EEPROM_ID, &i2c_addr, &i2c_interface, 0);
+    } else {
+        smphr_taken = 1;
+        i2c_interface = I2C1;
+        i2c_addr = 0x58;
+    }
 
-	i2c_give( i2c_interface );
+    if ( smphr_taken && ( rx_data != NULL ) ) {
+        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, AT24MAC_EUI_ADDR, rx_data, buf_len);
+
+        if ( rtos ) {
+            i2c_give( i2c_interface );
+        }
     }
 
     return rx_len;
 }
 
-uint8_t at24mac_write( uint8_t address, uint8_t *tx_data, uint8_t buf_len )
+size_t at24mac_write_generic( uint8_t address, uint8_t *tx_data, size_t buf_len, bool rtos )
 {
     uint8_t i2c_addr;
     uint8_t i2c_interface;
     uint8_t bytes_to_write;
     uint8_t curr_addr;
-    uint8_t tx_len = 0;
+    size_t tx_len = 0;
 
-    if ( (i2c_take_by_chipid(CHIP_ID_EEPROM_ID, &i2c_addr, &i2c_interface, 0) == pdFALSE) && tx_data != NULL) {
+    bool smphr_taken = false;
 
-	curr_addr = address;
+    /* Only tries to take the semaphore if the "rtos" flag is true */
+    if (rtos) {
+        smphr_taken = i2c_take_by_chipid(CHIP_ID_EEPROM, &i2c_addr, &i2c_interface, 0);
+    } else {
+        smphr_taken = 1;
+        i2c_interface = I2C1;
+        i2c_addr = 0x50;
+    }
 
-	while (tx_len < buf_len) {
-	    bytes_to_write = 16 - (curr_addr % 16);
+    if ( smphr_taken && ( tx_data != NULL ) ) {
+        curr_addr = address;
 
-	    if (bytes_to_write > ( buf_len - tx_len )) {
-		bytes_to_write = ( buf_len - tx_len );
-	    }
+        while (tx_len < buf_len) {
+            bytes_to_write = 16 - (curr_addr % 16);
 
-	    /* Dummy write to set the address pointer */
-	    xI2CMasterWrite( i2c_interface, i2c_addr, &curr_addr, 1);
-	    /* Write the data */
-	    tx_len += xI2CMasterWrite( i2c_interface, i2c_addr, tx_data+tx_len, bytes_to_write );
-	    curr_addr += bytes_to_write;
-	}
+            if (bytes_to_write > ( buf_len - tx_len )) {
+                bytes_to_write = ( buf_len - tx_len );
+            }
 
-	i2c_give( i2c_interface );
+            /* Dummy write to set the address pointer */
+            xI2CMasterWrite( i2c_interface, i2c_addr, &curr_addr, 1);
+            /* Write the data */
+            tx_len += xI2CMasterWrite( i2c_interface, i2c_addr, tx_data+tx_len, bytes_to_write );
+            curr_addr += bytes_to_write;
+        }
+        if ( rtos ) {
+            i2c_give( i2c_interface );
+        }
     }
 
     return tx_len;
