@@ -63,8 +63,8 @@
    DIRECT_CLOCK_CONNECTION(CLOCK_ID, ACTIVATION, PLL_USE, SOURCE/RECEIVER, CLOCK_FAMILY, ACCURACY, FREQUENCY, MIN FREQUENCY, MAX FREQUENCY) */
 #define AMC_CLOCK_CONFIGURATION_LIST                                    \
     DIRECT_CLOCK_CONNECTION(FCLKA, CIPMC, NO_PLL, RECEIVER, PCI_RESERVED, 0, MHz(100), MHz(99), MHz(101)), \
-        DIRECT_CLOCK_CONNECTION(TCLKB, APP, NO_PLL, SOURCE, UNSPEC_FAMILY, 0, MHz(11), MHz(10), MHz(12))
+        DIRECT_CLOCK_CONNECTION(TCLKB, APP, NO_PLL, SOURCE, UNSPEC_FAMILY, 0, KHz(13500), MHz(13), MHz(14))
 /**********************************************
  * PICMG: Module current record
  **********************************************/
-#define MODULE_CURRENT_RECORD            current_in_ma(4000)
+#define MODULE_CURRENT_RECORD            current_in_ma(3000)
