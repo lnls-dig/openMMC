@@ -68,22 +68,21 @@
  * 255 - power fail
  */
 
+static TickType_t last_time;
+
 void EINT2_IRQHandler( void )
 {
-    static TickType_t last_time;
     TickType_t current_time = xTaskGetTickCountFromISR();
 
     /* Simple debouncing routine */
     /* If the last interruption happened in the last 200ms, this one is only a bounce, ignore it and wait for the next interruption */
-    if (getTickDifference(current_time, last_time) < DEBOUNCE_TIME) {
-	LPC_SYSCTL->EXTINT |= (1 << 2);
-        return;
+    if (getTickDifference(current_time, last_time) > DEBOUNCE_TIME) {
+        gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+        asm("NOP");
+        gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+
+        last_time = current_time;
     }
-
-    gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
-    asm("NOP");
-    gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
-
     /* Clear interruption flag */
     LPC_SYSCTL->EXTINT |= (1 << 2);
 }
