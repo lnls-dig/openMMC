@@ -40,6 +40,7 @@ void fru_init( void )
 
     fru_runtime = false;
 
+#ifdef MODULE_EEPROM_AT24MAC
     /* Read FRU info Common Header */
     uint8_t common_header[8];
 
@@ -55,11 +56,13 @@ void fru_init( void )
             	fru_runtime = true;
             }
         }
-    } else {
-        /* Could not access the SEEPROM, create a runtime fru info */
-        fru_info_build( fru_info );
-        fru_runtime = true;
+	portDISABLE_INTERRUPTS();
+	return;
     }
+#endif
+    /* Could not access the SEEPROM, create a runtime fru info */
+    fru_info_build( fru_info );
+    fru_runtime = true;
 
     portDISABLE_INTERRUPTS();
 }
@@ -69,6 +72,8 @@ size_t fru_read( uint8_t *rx_buff, uint16_t offset, size_t len )
     uint16_t i;
     uint16_t j = offset;
 
+    size_t ret_val = 0;
+
     if (fru_runtime) {
         for (i = 0; i < len; i++, j++ ) {
             if (j < (sizeof(fru_info)/sizeof(fru_info[0]))) {
@@ -77,23 +82,31 @@ size_t fru_read( uint8_t *rx_buff, uint16_t offset, size_t len )
                 rx_buff[i] = 0xFF;
             }
         }
-        return i;
+        ret_val = i;
     } else {
-        return at24mac_read( offset, rx_buff, len );
+#ifdef MODULE_EEPROM_AT24MAC
+        ret_val = at24mac_read( offset, rx_buff, len );
+#endif
     }
+    return ret_val;
 }
 
 size_t fru_write( uint8_t *tx_buff, uint16_t offset, size_t len )
 {
+    size_t ret_val = 0;
+
     if ( fru_runtime ) {
         uint8_t i;
         for (i = 0; i < len; i++) {
             fru_info[offset+i] = tx_buff[i];
         }
-        return i;
+        ret_val = i;
     } else {
-        return at24mac_write( offset, tx_buff, len );
+#ifdef MODULE_EEPROM_AT24MAC
+        ret_val = at24mac_write( offset, tx_buff, len );
+#endif
     }
+    return ret_val;
 }
 
 
