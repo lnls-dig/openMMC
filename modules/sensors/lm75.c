@@ -77,5 +77,5 @@ void vTaskLM75( void* Parameters )
 
 void LM75_init( void )
 {
-    xTaskCreate( vTaskLM75, "LM75", 330, (void *) NULL, tskLM75SENSOR_PRIORITY, &vTaskLM75_Handle);
+    xTaskCreate( vTaskLM75, "LM75", 80, (void *) NULL, tskLM75SENSOR_PRIORITY, &vTaskLM75_Handle);
 }

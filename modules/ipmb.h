@@ -40,9 +40,9 @@
 #define IPMB_I2C                I2C0
 
 /*! @brief Maximum count of messages to be sent */
-#define IPMB_TXQUEUE_LEN        5
+#define IPMB_TXQUEUE_LEN        2
 /*! @brief Maximum count if received messages to be delivered to client task  */
-#define IPMB_CLIENT_QUEUE_LEN   5
+#define IPMB_CLIENT_QUEUE_LEN   2
 
 /*! @brief Maximum retries made by IPMB TX Task when sending a message */
 #define IPMB_MAX_RETRIES        3

@@ -20,7 +20,7 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "fru.h"
+#include "fru_editor.h"
 
 /*********************************************
  * Common defines

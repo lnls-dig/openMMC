@@ -187,7 +187,7 @@ void LED_init(void)
         xQueueSend( pLED->queue, pLED->local_ptr, 0 );
     }
 
-    xTaskCreate( LEDTask, (const char *) "LED Task", 120, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
+    xTaskCreate( LEDTask, (const char *) "LED Task", 80, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
     /*! @todo Handle task creation error */
 }
 

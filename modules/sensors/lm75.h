@@ -30,10 +30,9 @@
 #ifndef LM75_H_
 #define LM75_H_
 
-#define LM75_MAX_COUNT		6
 #define LM75_UPDATE_RATE	500
 
-extern TaskHandle_t vTaskLM75_Handle;
+TaskHandle_t vTaskLM75_Handle;
 
 extern const SDR_type_01h_t SDR_LM75_uC;
 extern const SDR_type_01h_t SDR_LM75_CLOCK_SWITCH;

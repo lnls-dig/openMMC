@@ -67,9 +67,15 @@ void sensor_init( void )
     /* This function must be provided by the board port */
     user_sdr_init();
 
+#ifdef MODULE_HOTSWAP
     hotswap_init();
+#endif
+#ifdef MODULE_TEMPERATURE_SENSOR
     LM75_init();
+#endif
+#if defined(MODULE_CURRENT_SENSOR) || defined(MODULE_VOLTAGE_SENSOR)
     ina220_init();
+#endif
 }
 
 void sdr_init( void )

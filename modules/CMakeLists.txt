@@ -11,6 +11,7 @@ message(STATUS "Selected modules to compile: ${TARGET_MODULES}")
 
 if (";${TARGET_MODULES};" MATCHES ";FRU;")
   set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/fru.c )
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/fru_editor.c )
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_FRU")
  endif()
 
@@ -42,6 +43,11 @@ endif()
 if (";${TARGET_MODULES};" MATCHES ";DAC_AD84XX;")
   set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/ad84xx.c )
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_DAC_AD84XX")
+endif()
+
+if (";${TARGET_MODULES};" MATCHES ";EEPROM_AT24MAC;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/at24mac.c )
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_EEPROM_AT24MAC")
 endif()
 
 if (";${TARGET_MODULES};" MATCHES ";WATCHDOG;")

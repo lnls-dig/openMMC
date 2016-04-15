@@ -15,6 +15,7 @@ set(TARGET_MODULES
   "CLOCK_SWITCH"
   "FPGA_SPI"
   "DAC_AD84XX"
+  "EEPROM_AT24MAC"
   "HOTSWAP_SENSOR"
   "TEMPERATURE_SENSOR"
   "VOLTAGE_SENSOR"
@@ -31,10 +32,10 @@ set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c )
 
 #Extra definitions
-if (WRITE_ID_EEPROM)
-  message(STATUS "EEPROM ID writing enabled!")
-  add_definitions(-DWRITE_ID_EEPROM)
-  set(WRITE_ID_EEPROM false CACHE BOOL "Set this flag to enable writing the board ID on the EEPROM" FORCE)
+if (FRU_WRITE_EEPROM)
+  message(STATUS "FRU EEPROM will be written if no valid data is found!")
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DFRU_WRITE_EEPROM")
+  set(FRU_WRITE_EEPROM false CACHE BOOL "Set this flag to enable writing the board ID on the EEPROM" FORCE)
 endif()
 
 #Set the variables in the main scope

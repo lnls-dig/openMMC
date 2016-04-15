@@ -96,6 +96,7 @@ void vTaskINA220( void *Parameters )
             /* Check for threshold events */
             check_sensor_event(ina220_sensor);
 
+#ifdef MODULE_PAYLOAD
             if( ina220_sensor->sdr == &SDR_FMC1_12V ) {
                 /* Check if the Payload power is in an acceptable zone */
                 SDR_type_01h_t * ina220_sdr = ( SDR_type_01h_t * ) ina220_sensor->sdr;
@@ -106,7 +107,7 @@ void vTaskINA220( void *Parameters )
                     payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
                 }
             }
-
+#endif
             vTaskDelayUntil( &xLastWakeTime, xFrequency );
         }
     }
@@ -191,7 +192,7 @@ void ina220_init( void )
     sensor_t *temp_sensor;
     uint8_t i = 0;
 
-    xTaskCreate( vTaskINA220, "INA220", 400, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
+    xTaskCreate( vTaskINA220, "INA220", 100, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
 
     /* Iterate through the SDR Table to find all the INA220 entries */
     for ( temp_sensor = sdr_head; temp_sensor != NULL; temp_sensor = temp_sensor->next) {

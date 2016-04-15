@@ -50,7 +50,7 @@ sensor_t * hotswap_rtm_sensor;
 void hotswap_init( void )
 {
     /* Create Hot Swap task */
-    xTaskCreate( vTaskHotSwap, "Hot Swap", 200, (void *) NULL, tskHOTSWAP_PRIORITY, &vTaskHotSwap_Handle);
+    xTaskCreate( vTaskHotSwap, "Hot Swap", 150, (void *) NULL, tskHOTSWAP_PRIORITY, &vTaskHotSwap_Handle);
 
     SDR_type_02h_t * hotswap_pSDR;
     sensor_t * hotswap_sensor;

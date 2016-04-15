@@ -28,7 +28,7 @@
 #define _STR(x) #x
 #define STR_SIZE(x) (sizeof(x) -1)
 
-TickType_t getTickDifference( TickType_t current_time, TickType_t start_time );
+uint32_t getTickDifference( uint32_t current_time, uint32_t start_time );
 
 uint8_t calculate_chksum( uint8_t * buffer, uint8_t range );
 

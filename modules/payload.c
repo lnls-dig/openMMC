@@ -68,20 +68,23 @@
  * 255 - power fail
  */
 
-void EINT3_IRQHandler( void )
+static TickType_t last_time;
+
+void EINT2_IRQHandler( void )
 {
-    static TickType_t last_time;
     TickType_t current_time = xTaskGetTickCountFromISR();
 
     /* Simple debouncing routine */
     /* If the last interruption happened in the last 200ms, this one is only a bounce, ignore it and wait for the next interruption */
-    if (getTickDifference(current_time, last_time) < DEBOUNCE_TIME) {
-        return;
-    }
+    if (getTickDifference(current_time, last_time) > DEBOUNCE_TIME) {
+        gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+        asm("NOP");
+        gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
 
-    gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
-    asm("NOP");
-    gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+        last_time = current_time;
+    }
+    /* Clear interruption flag */
+    LPC_SYSCTL->EXTINT |= (1 << 2);
 }
 
 void setDC_DC_ConvertersON( bool on )
@@ -141,7 +144,9 @@ TaskHandle_t vTaskPayload_Handle;
 
 void payload_init( void )
 {
-    xTaskCreate(vTaskPayload, "Payload", 450, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
+    xTaskCreate(vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
+
+    /** @todo: Use event groups instead of queues here */
     queue_payload_handle = xQueueCreate(5, sizeof(uint8_t));
 
     initializeDCDC();
@@ -154,8 +159,8 @@ void payload_init( void )
 #endif
 
     /* Configure FPGA reset button interruption on front panel */
-    Chip_IOCON_PinMux(LPC_IOCON, GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, IOCON_MODE_INACT, IOCON_FUNC1);
-    irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1);
+    Chip_IOCON_PinMux(LPC_IOCON, GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN, IOCON_MODE_INACT, IOCON_FUNC1);
+    irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1 );
     irq_enable( EINT2_IRQn );
 
     if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
