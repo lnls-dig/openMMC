@@ -78,6 +78,8 @@ size_t at24mac_write( uint8_t id, uint8_t address, uint8_t *tx_data, size_t buf_
     uint8_t i2c_interface;
     uint8_t bytes_to_write;
     uint8_t curr_addr;
+    uint8_t page_buf[17];
+
     size_t tx_len = 0;
 
     if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout ) && ( tx_data != NULL ) ) {
@@ -89,11 +91,11 @@ size_t at24mac_write( uint8_t id, uint8_t address, uint8_t *tx_data, size_t buf_
             if (bytes_to_write > ( buf_len - tx_len )) {
                 bytes_to_write = ( buf_len - tx_len );
             }
+            page_buf[0] = curr_addr;
+            memcpy(&page_buf[1], tx_data+tx_len, bytes_to_write);
 
-            /* Dummy write to set the address pointer */
-            xI2CMasterWrite( i2c_interface, i2c_addr, &curr_addr, 1);
             /* Write the data */
-            tx_len += xI2CMasterWrite( i2c_interface, i2c_addr, tx_data+tx_len, bytes_to_write );
+            tx_len += xI2CMasterWrite( i2c_interface, i2c_addr, &page_buf[0] , bytes_to_write+1 );
             curr_addr += bytes_to_write;
         }
         i2c_give( i2c_interface );
