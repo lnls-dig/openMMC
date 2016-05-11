@@ -36,35 +36,25 @@
 
 void fru_init( void )
 {
-    portENABLE_INTERRUPTS();
-
-    fru_runtime = false;
-
+#ifdef FRU_WRITE_EEPROM
+    amc_fru_info_size = amc_fru_info_build( amc_fru_info );
+    at24mac_write( CHIP_ID_EEPROM, 0x00, &amc_fru_info[0], sizeof(amc_fru_info), 0 );
+#endif
 #ifdef MODULE_EEPROM_AT24MAC
     /* Read FRU info Common Header */
     uint8_t common_header[8];
 
-    if ( at24mac_read_nortos( 0x00, &common_header[0], 8 ) == 8 ) {
-        if ( (calculate_chksum( &common_header[0], 7 ) != common_header[7]) || common_header[0] != 1 ) {
-            fru_info_build( fru_info );
-
-#ifdef FRU_WRITE_EEPROM
-            at24mac_write_nortos( 0x00, &fru_info[0], sizeof(fru_info) );
-#endif
-            at24mac_read_nortos( 0x00, &common_header[0], 8 );
-            if (common_header[0] != 1) {
-            	fru_runtime = true;
-            }
-        }
-	portDISABLE_INTERRUPTS();
-	return;
+    if ( at24mac_read( CHIP_ID_EEPROM, 0x00, &common_header[0], 8, 0 ) == 8 ) {
+        if ( (calculate_chksum( &common_header[0], 7 ) == common_header[7]) && common_header[0] == 1 ) {
+	    /* We have a valid FRU image in the SEEPROM */
+	    fru_runtime = false;
+	    return;
+	}
     }
 #endif
     /* Could not access the SEEPROM, create a runtime fru info */
-    fru_info_build( fru_info );
+    amc_fru_info_size = amc_fru_info_build( amc_fru_info );
     fru_runtime = true;
-
-    portDISABLE_INTERRUPTS();
 }
 
 size_t fru_read( uint8_t *rx_buff, uint16_t offset, size_t len )
