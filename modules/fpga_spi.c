@@ -124,6 +124,8 @@ void vTaskFPGA_COMM( void * Parameters )
 {
     t_board_diagnostic diag_struct;
     board_diagnostic * diag = &(diag_struct.info);
+    uint8_t i;
+    sensor_t * temp_sensor;
 
     /* Zero fill the diag struct */
     memset( &(diag_struct.buffer[0]), 0, sizeof(diag_struct.buffer));
@@ -149,8 +151,9 @@ void vTaskFPGA_COMM( void * Parameters )
         diag->data_valid = 0x55555555;
 
         /* Update Sensors Readings */
-        for ( i = 0, temp_sensor = sdr_head; (temp_sensor->next != NULL) || (i <= NUM_SENSOR); temp_sensor = temp_sensor->next) {
-            if (temp_sensor->diag_devID != NO_DIAG) {
+
+        for ( i = 0, temp_sensor = sdr_head; (temp_sensor != NULL) && (i <= NUM_SENSOR); temp_sensor = temp_sensor->next) {
+        	if (temp_sensor->diag_devID != NO_DIAG) {
                 diag->sensor[i].dev_id = temp_sensor->diag_devID;
                 diag->sensor[i].measure = temp_sensor->readout_value;
                 i++;
