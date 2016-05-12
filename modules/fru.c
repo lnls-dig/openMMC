@@ -33,6 +33,7 @@
 #include "utils.h"
 #include "ipmi.h"
 #include "fru_editor.h"
+#include "i2c_mapping.h"
 
 void fru_init( void )
 {

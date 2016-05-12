@@ -27,7 +27,8 @@ set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 #Include the modules sources
 ##Sensors SDR list
-set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c )
+set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c)
+set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/i2c_mapping.c)
 
 #Extra definitions
 if (FRU_WRITE_EEPROM)

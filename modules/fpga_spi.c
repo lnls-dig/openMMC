@@ -27,7 +27,7 @@
 #include "task_priorities.h"
 #include "string.h"
 #include "led.h"
-#include "board_version.h"
+#include "i2c.h"
 #include "sdr.h"
 
 #define FPGA_SPI_BITRATE                10000000

@@ -29,7 +29,6 @@
 /* Project Includes */
 #include "port.h"
 #include "payload.h"
-#include "board_version.h"
 #include "pin_mapping.h"
 #include "ipmi.h"
 #include "task_priorities.h"

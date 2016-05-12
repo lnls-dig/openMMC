@@ -27,7 +27,6 @@
 
 #include "port.h"
 #include "string.h"
-#include "board_version.h"
 
 #define SLAVE_MASK 0xFF
 

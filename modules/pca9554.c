@@ -26,7 +26,8 @@
 #include "port.h"
 #include "pin_mapping.h"
 #include "pca9554.h"
-#include "board_version.h"
+#include "i2c.h"
+#include "i2c_mapping.h"
 
 /* General Register write/read */
 static uint8_t pca9554_read_reg ( uint8_t reg )

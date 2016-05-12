@@ -22,10 +22,11 @@
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
 
+#include "string.h"
 /* Project Includes */
 #include "at24mac.h"
 #include "port.h"
-#include "board_version.h"
+#include "i2c.h"
 
 size_t at24mac_read( uint8_t id, uint8_t address, uint8_t *rx_data, size_t buf_len, uint8_t timeout )
 {
