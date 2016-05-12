@@ -22,10 +22,6 @@
 #ifndef BOARD_DEFS_H_
 #define BOARD_DEFS_H_
 
-#define AFC_V3
-
-#ifdef AFC_V3
-
 /* SPI Interfaces */
 #define FPGA_SPI        0
 #define FLASH_SPI       1
@@ -101,10 +97,17 @@
 #define GPIO_EN_1V5_VTT_PIN	29
 #define GPIO_EN_P1V0_PORT       3
 #define GPIO_EN_P1V0_PIN	25
+#define GPIO_PGOOD_P1V0_PORT    3
+#define GPIO_PGOOD_P1V0_PIN	26
 
-/* RTM Power */
+/* RTM */
 #define GPIO_EN_RTM_PWR_PORT    1
 #define GPIO_EN_RTM_PWR_PIN     30
+/* NOTE: Due to a hardware limitation, pins 29 and 30 from port 0 MUST have the same direction */
+#define GPIO_RTM_PS_PORT        0
+#define GPIO_RTM_PS_PIN         29
+#define GPIO_EN_RTM_I2C_PORT    0
+#define GPIO_EN_RTM_I2C_PIN     30
 
 /* FPGA Control */
 #define GPIO_PROGRAM_B_PORT     0
@@ -113,8 +116,10 @@
 #define GPIO_DONE_B_PIN		22
 #define GPIO_FPGA_RESET_PORT    2
 #define GPIO_FPGA_RESET_PIN     9
-#define GPIO_PGOOD_P1V0_PORT    3
-#define GPIO_PGOOD_P1V0_PIN	26
+#define GPIO_FLASH_CS_MUX_PORT  0
+#define GPIO_FLASH_CS_MUX_PIN   19
+#define GPIO_INITB_PORT         0
+#define GPIO_INITB_PIN          20
 
 /* VADJ DAC */
 #define GPIO_DAC_VADJ_RST_PORT  0
@@ -127,42 +132,5 @@
 #define GPIO_ADN_UPDATE_PIN     26
 #define GPIO_ADN_RESETN_PORT    1
 #define GPIO_ADN_RESETN_PIN     22
-
-#endif
-
-#ifdef MBED
-
-/* I2C Pins definitions */
-
-#define I2C0_PORT       0
-#define I2C0_SDA_PIN    27
-#define I2C0_SCL_PIN    28
-#define I2C0_PIN_FUNC   1
-
-#define I2C1_PORT       0
-#define I2C1_SDA_PIN    0
-#define I2C1_SCL_PIN    1
-#define I2C1_PIN_FUNC   3
-
-#define I2C2_PORT       0
-#define I2C2_SDA_PIN    10
-#define I2C2_SCL_PIN    11
-#define I2C2_PIN_FUNC   2
-
-/* Geographic Address pin definitions */
-#define GA_PORT         1
-#define GA0_PIN         0
-#define GA1_PIN         1
-#define GA2_PIN         4
-#define GA_TEST_PIN     8
-
-#define LEDBLUE_PORT    1
-#define LEDBLUE_PIN     18
-#define LEDGREEN_PORT   1
-#define LEDGREEN_PIN    20
-#define LEDRED_PORT     1
-#define LEDRED_PIN      21
-
-#endif
 
 #endif
