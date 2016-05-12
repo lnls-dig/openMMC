@@ -1,9 +1,7 @@
 #Select which microcontroller and board are being used
 set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller")
 
-set(TARGET_BOARD_NAME  "AFC_Timing" CACHE STRING "Board Name")
-set(TARGET_BOARD_MAJOR 3 CACHE STRING "Board Major Version")
-set(TARGET_BOARD_MINOR 1 CACHE STRING "Board Minor Version")
+set(TARGET_BOARD_NAME  "AFC Timing" CACHE STRING "Board Name")
 
 #List all modules used by this board
 set(TARGET_MODULES
@@ -15,9 +13,11 @@ set(TARGET_MODULES
   "CLOCK_SWITCH"
   "DAC_AD84XX"
   "HOTSWAP_SENSOR"
+  "EEPROM_AT24MAC"
   "TEMPERATURE_SENSOR"
   "VOLTAGE_SENSOR"
   "HPM"
+  "RTM"
   )
 
 set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
