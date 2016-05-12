@@ -27,13 +27,13 @@
 #include "semphr.h"
 
 /* Project includes */
-#include "chip.h"
+#include "port.h"
 #include "pin_mapping.h"
 #include "led.h"
 #include "ipmi.h"
 #include "sdr.h"
 #include "payload.h"
-#include "board_version.h"
+#include "i2c.h"
 #include "fru.h"
 #include "jtag.h"
 #include "fpga_spi.h"
@@ -69,16 +69,11 @@ int main(void)
 #endif
 
     LED_init();
-
-    portENABLE_INTERRUPTS();
-    board_i2c_init();
+    i2c_init();
 
 #ifdef MODULE_FRU
     fru_init();
 #endif
-
-    board_discover();
-    portDISABLE_INTERRUPTS();
 
     ipmb_addr = get_ipmb_addr();
 #ifdef MODULE_SDR
