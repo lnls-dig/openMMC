@@ -138,9 +138,9 @@ void vTaskFPGA_COMM( void * Parameters )
         vTaskDelay(FPGA_UPDATE_RATE);
     }
 
-    if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
+    //if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
         gpio_set_pin_state(0, 19, HIGH);
-    }
+	//}
 
     ssp_init( FPGA_SPI, FPGA_SPI_BITRATE, FPGA_SPI_FRAME_SIZE, SSP_MASTER, SSP_POLLING );
 

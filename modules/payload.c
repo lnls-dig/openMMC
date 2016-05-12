@@ -162,7 +162,7 @@ void payload_init( void )
     irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1 );
     irq_enable( EINT2_IRQn );
 
-    if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
+    //if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
         /* Flash CS Mux */
         /* 0 = FPGA reads bitstream from Program memory
          * 1 = FPGA reads bitstream from User memory
@@ -175,7 +175,7 @@ void payload_init( void )
 
         gpio_set_pin_dir(0, 20, OUTPUT);
         gpio_set_pin_state(0, 20, HIGH);
-    }
+    //}
 }
 
 void vTaskPayload(void *pvParameters)
