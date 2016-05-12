@@ -58,8 +58,9 @@ void fru_init( void )
     fru_runtime = true;
 }
 
-size_t fru_read( uint8_t *rx_buff, uint16_t offset, size_t len )
+size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len )
 {
+    /* TODO: Implement FRU ID */
     uint16_t i;
     uint16_t j = offset;
 
@@ -76,14 +77,15 @@ size_t fru_read( uint8_t *rx_buff, uint16_t offset, size_t len )
         ret_val = i;
     } else {
 #ifdef MODULE_EEPROM_AT24MAC
-        ret_val = at24mac_read( offset, rx_buff, len );
+        ret_val = at24mac_read( id, offset, rx_buff, len, 0 );
 #endif
     }
     return ret_val;
 }
 
-size_t fru_write( uint8_t *tx_buff, uint16_t offset, size_t len )
+size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len )
 {
+    /* TODO: Implement FRU ID */
     size_t ret_val = 0;
 
     if ( fru_runtime ) {
@@ -94,7 +96,7 @@ size_t fru_write( uint8_t *tx_buff, uint16_t offset, size_t len )
         ret_val = i;
     } else {
 #ifdef MODULE_EEPROM_AT24MAC
-        ret_val = at24mac_write( offset, tx_buff, len );
+        ret_val = at24mac_write( id, offset, tx_buff, len, 0 );
 #endif
     }
     return ret_val;

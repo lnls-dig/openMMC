@@ -35,7 +35,7 @@ uint8_t *rtm_fru_info;
 #endif
 
 void fru_init( void );
-size_t fru_read( uint8_t *rx_buff, uint16_t offset, size_t len );
-size_t fru_write( uint8_t *tx_buff, uint16_t offset, size_t len );
+size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len );
+size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len );
 
 #endif
