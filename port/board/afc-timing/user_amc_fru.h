@@ -20,51 +20,53 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#include "fru.h"
+#include "fru_editor.h"
 
 /*********************************************
  * Common defines
  *********************************************/
-#define LANG_CODE               0
-#define FRU_FILE_ID             "AFCFRU"       //Allows knowing the source of the FRU present in the memory
-
-#define BOARD_INFO_AREA_ENABLE
-#define PRODUCT_INFO_AREA_ENABLE
-#define MULTIRECORD_AREA_ENABLE
+#define AMC_LANG_CODE               0
+#define AMC_FRU_FILE_ID             "AFCFRU"       //Allows knowing the source of the FRU present in the memory
 
 /*********************************************
  * Board information area
  *********************************************/
-#define BOARD_MANUFACTURER      "Creotech"
-#define BOARD_NAME              "AMC-FMC-Carrier"
-#define BOARD_SN                "000000001"
-#define BOARD_PN                "AFC"
+#define AMC_BOARD_MANUFACTURING_TIME 10463040               /* Amount of minutes since 0:00 1/1/96 */
+#define AMC_BOARD_MANUFACTURER      "Creotech"
+#define AMC_BOARD_NAME              "AMC-FMC-Carrier"
+#define AMC_BOARD_SN                ""
+#define AMC_BOARD_PN                "AFC v3.1"
 
 /*********************************************
  * Product information area
  *********************************************/
-#define PRODUCT_MANUFACTURER    "LNLS"
-#define PRODUCT_NAME            "AFC Timing"
-#define PRODUCT_PN              "00001"
-#define PRODUCT_VERSION         "1"
-#define PRODUCT_SN              "00001"
-#define PRODUCT_ASSET_TAG       "No tag"
+#define AMC_PRODUCT_MANUFACTURER    "LNLS"
+#define AMC_PRODUCT_NAME            "AFC Timing"
+#define AMC_PRODUCT_PN              ""
+#define AMC_PRODUCT_VERSION         ""
+#define AMC_PRODUCT_SN              ""
+#define AMC_PRODUCT_ASSET_TAG       "No tag"
 
 /*********************************************
  * AMC: Point to point connectivity record
  *********************************************/
-#define AMC_POINT_TO_POINT_RECORD_CNT           0
+#define AMC_POINT_TO_POINT_RECORD_LIST                                  \
+    GENERIC_POINT_TO_POINT_RECORD(0, PORT(4), PORT(5), PORT(6), PORT(7), PCIE, GEN1_NO_SSC, MATCHES_01)
 
 /*********************************************
  * AMC: Point to point clock record
  *********************************************/
-#define AMC_CLOCK_CONFIGURATION_DESCRIPTORS_CNT               2
 /* Example:
    DIRECT_CLOCK_CONNECTION(CLOCK_ID, ACTIVATION, PLL_USE, SOURCE/RECEIVER, CLOCK_FAMILY, ACCURACY, FREQUENCY, MIN FREQUENCY, MAX FREQUENCY) */
 #define AMC_CLOCK_CONFIGURATION_LIST                                    \
-    DIRECT_CLOCK_CONNECTION(FCLKA, CIPMC, NO_PLL, RECEIVER, PCI_RESERVED, 0, MHz(100), MHz(99), MHz(101)), \
-        DIRECT_CLOCK_CONNECTION(TCLKB, APP, NO_PLL, SOURCE, UNSPEC_FAMILY, 0, KHz(13500), MHz(13), MHz(14))
+    DIRECT_CLOCK_CONNECTION(FCLKA, CIPMC, NO_PLL, RECEIVER, PCI_RESERVED, 0, MHz(100), MHz(99), MHz(101)) \
+    DIRECT_CLOCK_CONNECTION(TCLKA, APP, NO_PLL, RECEIVER, UNSPEC_FAMILY, 0, KHz(13500), MHz(13), MHz(14))
 /**********************************************
  * PICMG: Module current record
  **********************************************/
-#define MODULE_CURRENT_RECORD            current_in_ma(3000)
+#define AMC_MODULE_CURRENT_RECORD            current_in_ma(4000)
+
+/*********************************************
+ * RTM Compatibility Record
+ *********************************************/
+#define AMC_COMPATIBILITY_CODE               0x11223344
