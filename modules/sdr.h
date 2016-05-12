@@ -208,6 +208,7 @@ sensor_t *sdr_head;
 sensor_t *sdr_tail;
 
 const SDR_type_12h_t SDR0;
+const SDR_type_12h_t SDR_RTM_DEV_LOCATOR;
 
 #define GET_SENSOR_TYPE(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
 

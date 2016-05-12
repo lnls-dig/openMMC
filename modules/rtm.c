@@ -28,43 +28,9 @@
 #include "rtm_user.h"
 #include "ipmb.h"
 #include "hotswap.h"
-#include "pca9554.h"
 #include "sdr.h"
 #include "task_priorities.h"
 #include "pin_mapping.h"
-
-void rtm_enable_payload_power( void )
-{
-    gpio_set_pin_state(GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 1 );
-}
-
-void rtm_disable_payload_power( void )
-{
-    gpio_set_pin_state(GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 0 );
-}
-
-uint8_t rtm_get_hotswap_handle_status( void )
-{
-    if ( pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE ) ) {
-        return HOTSWAP_MODULE_HANDLE_OPEN_MASK;
-    } else {
-        return HOTSWAP_MODULE_HANDLE_CLOSED_MASK;
-    }
-}
-
-void rtm_enable_i2c( void )
-{
-    /* Enable I2C communication with RTM */
-    gpio_set_pin_dir( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, OUTPUT );
-    gpio_set_pin_state( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, HIGH );
-}
-
-void rtm_disable_i2c( void )
-{
-    gpio_set_pin_dir( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN, INPUT );
-    gpio_set_pin_dir( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, INPUT );
-}
 
 void RTM_Manage( void * Parameters )
 {
@@ -74,43 +40,32 @@ void RTM_Manage( void * Parameters )
     extern sensor_t * hotswap_rtm_sensor;
 
     for ( ;; ) {
-        vTaskDelay(200);
+        vTaskDelay(100);
 
-        rtm_disable_i2c();
-        ps_new_state = gpio_read_pin( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN );
+        ps_new_state = rtm_check_presence();
 
         if ( ps_new_state ^ ps_old_state ) {
-            if (ps_new_state == RTM_PS_PRESENT) {
+            if ( ps_new_state == RTM_PS_PRESENT ) {
                 /* RTM Present */
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_URTM_PRESENT_MASK );
 
-                rtm_enable_i2c();
-                pca9554_set_port_dir( 0x1F );
-                /* Turn on Blue LED and off Red and Green */
-                pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
-                pca9554_write_pin( RTM_GPIO_LED_RED, 1 );
-                pca9554_write_pin( RTM_GPIO_LED_GREEN, 1 );
+		rtm_hardware_init();
 
                 /* Include RTM sensors in the SDR table */
                 rtm_insert_sdr_entries();
 
             } else if ( ps_new_state == RTM_PS_ABSENT ) {
-                //rtm_remove_sdr_entries();   //Not implemented yet
+                rtm_remove_sdr_entries();
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_URTM_ABSENT_MASK );
             }
             ps_old_state = ps_new_state;
         }
 
-        /* Remove this, we should not be activating the RTM directly, wait for a command to do that */
-        rtm_enable_i2c();
+        /* We should not be activating the controlling the RTM LEDs directly, wait for a command to do that */
         if ( rtm_get_hotswap_handle_status() == HOTSWAP_MODULE_HANDLE_CLOSED_MASK ) {
             rtm_enable_payload_power();
-            pca9554_write_pin( RTM_GPIO_LED_BLUE, 1 );
-            pca9554_write_pin( RTM_GPIO_LED_GREEN, 0 );
         } else {
             rtm_disable_payload_power();
-            pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
-            pca9554_write_pin( RTM_GPIO_LED_GREEN, 1 );
         }
     }
 }

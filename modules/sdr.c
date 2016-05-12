@@ -39,6 +39,7 @@
 volatile uint8_t sdr_count = 0;
 
 static uint16_t reservationID;
+static uint32_t sdr_change_count;
 
 size_t sdr_get_size_by_type(SDR_TYPE type)
 {
@@ -87,7 +88,7 @@ void sdr_init( void )
 
     configASSERT(sdr_head);
 
-    /* Populate SDR Device Locator Record */
+    /* Populate AMC SDR Device Locator Record */
     sdr_head->num = 0;
     sdr_head->sdr_type = TYPE_12;
     sdr_head->sdr = (void *) &SDR0;
@@ -101,6 +102,27 @@ void sdr_init( void )
     sdr_tail = sdr_head;
 
     sdr_count++;
+
+#ifdef MODULE_RTM
+    /* Populate RTM SDR Device Locator Record */
+    sensor_t * entry = pvPortMalloc( sizeof(sensor_t) );
+    entry->num = 1;
+    entry->sdr_type = TYPE_12;
+    entry->sdr = (void *) &SDR_RTM_DEV_LOCATOR;
+    entry->sdr_length = sizeof(SDR_RTM_DEV_LOCATOR);
+    entry->task_handle = NULL;
+    entry->diag_devID = NO_DIAG;
+    entry->slave_addr = ipmb_addr;
+    entry->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
+
+    /* Link the sdr list */
+    sdr_tail->next = entry;
+    sdr_tail = entry;
+    entry->next = NULL;
+
+    sdr_count++;
+    sdr_change_count++;
+#endif
 }
 
 void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr)
@@ -128,6 +150,7 @@ void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, ui
     entry->next = NULL;
 
     sdr_count++;
+    sdr_change_count++;
 }
 
 sensor_t * find_sensor_by_sdr( void * sdr )
@@ -177,6 +200,7 @@ void sdr_remove_entry( sensor_t * entry )
     prev->next = cur->next;
 
     sdr_count--;
+    sdr_change_count++;
 
     /* Free the entry */
     vPortFree(cur);
@@ -197,7 +221,13 @@ IPMI_HANDLER(ipmi_se_get_sdr_info, NETFN_SE, IPMI_GET_DEVICE_SDR_INFO_CMD, ipmi_
         rsp->data[len++] = sdr_count;
     }
     /* Static Sensor population and LUN 0 has sensors */
-    rsp->data[len++] = 0x01; // if dynamic additional 4 bytes required (see Table 20-2 Get Device SDR INFO Command
+    rsp->data[len++] = (1 << 7) | (1 << 1) | (1 << 0) ; // if dynamic, additional 4 bytes required (see Table 20-2 Get Device SDR INFO Command)
+
+    rsp->data[len++] = (sdr_change_count << 0 ) & 0x000000FF;
+    rsp->data[len++] = (sdr_change_count << 8 ) & 0x0000FF00;
+    rsp->data[len++] = (sdr_change_count << 16) & 0x00FF0000;
+    rsp->data[len++] = (sdr_change_count << 24) & 0xFF000000;
+
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }
@@ -778,4 +808,28 @@ const SDR_type_12h_t SDR0 = {
     .OEM = 0x00,
     .IDtypelen = 0xc0 | STR_SIZE(STR(TARGET_BOARD_NAME)), /* 8 bit ASCII, number of bytes */
     .IDstring = STR(TARGET_BOARD_NAME)
+};
+
+/* RTM Device Locator Record 37.9 SDR Type 12h */
+
+const SDR_type_12h_t SDR_RTM_DEV_LOCATOR = {
+    .hdr.recID_LSB = 0x00,
+    .hdr.recID_MSB = 0x00,
+    .hdr.SDRversion = 0x51, /* IPMI protocol version */
+    .hdr.rectype = TYPE_12, /* record type: device locator record */
+    .hdr.reclength = sizeof(SDR_type_12h_t) - sizeof(SDR_entry_hdr_t),
+
+/* record key bytes */
+    .slaveaddr = 0x00,
+    .chnum = 0x00,
+    .power_notification_global_init = 0x04,
+    .device_cap = 0x3b,
+    .reserved[0] = 0x00,
+    .reserved[1] = 0x00,
+    .reserved[2] = 0x00,
+    .entityID = 0xC0,
+    .entityinstance = 0x00,
+    .OEM = 0x00,
+    .IDtypelen = 0xc0 | (STR_SIZE(STR(TARGET_BOARD_NAME)) +4), /* 8 bit ASCII, number of bytes */
+    .IDstring = STR(TARGET_BOARD_NAME)"-RTM"
 };

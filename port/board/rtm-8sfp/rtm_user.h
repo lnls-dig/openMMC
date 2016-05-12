@@ -19,17 +19,25 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef RTM_H_
-#define RTM_H_
+#ifndef RTM_USER_H_
+#define RTM_USER_H_
 
-#define RTM_PS_PRESENT    0
-#define RTM_PS_ABSENT     1
+/* PCA9554 outputs */
+#define RTM_GPIO_HOTSWAP_HANDLE		0
+#define RTM_GPIO_OVERTEMP_SHUTDOWN	4
+#define RTM_GPIO_LED_RED		5
+#define RTM_GPIO_LED_GREEN		6
+#define RTM_GPIO_LED_BLUE		7
 
-void rtm_manage_init( void );
+/* Mandatory RTM module functions */
 void rtm_enable_payload_power( void );
-
+void rtm_disable_payload_power( void );
 uint8_t rtm_get_hotswap_handle_status( void );
-void rtm_insert_sdr_entries( void );
-void rtm_remove_sdr_entries( void );
+uint8_t rtm_check_presence( void );
+void rtm_hardware_init( void );
+
+/* User defined functions */
+void rtm_enable_i2c( void );
+void rtm_disable_i2c( void );
 
 #endif

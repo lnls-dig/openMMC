@@ -1,6 +1,7 @@
 /*
  *   openMMC -- Open Source modular IPM Controller firmware
  *
+ *   Copyright (C) 2015  Julian Mendez  <julian.mendez@cern.ch>
  *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -19,13 +20,11 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef RTM_USER_H_
-#define RTM_USER_H_
+/*! @file rtm_fru.h
+ * Creation of FRU information binary
+ * Based on Julian Mendez implementation for CERN MMC
+ */
 
-#define RTM_GPIO_HOTSWAP_HANDLE		0
-#define RTM_GPIO_OVERTEMP_SHUTDOWN	4
-#define RTM_GPIO_LED_RED		5
-#define RTM_GPIO_LED_GREEN		6
-#define RTM_GPIO_LED_BLUE		7
+#ifdef 
 
-#endif
+#include "fru.h"
