@@ -32,8 +32,8 @@
 
 void adn4604_setup(void)
 {
-    uint8_t i2c_bus_id;
-    uint8_t adn_slave_addr = 0x4B;
+    uint8_t i2c_addr;
+    uint8_t i2c_interf;
     t_adn_connect_map con;
     t_adn_connect_cfg cfg;
 
@@ -62,12 +62,12 @@ void adn4604_setup(void)
 
     /* There's a delay circuit in the Reset pin of the clock switch, we must wait until it clears out */
     gpio_set_pin_dir( GPIO_ADN_RESETN_PORT, GPIO_ADN_RESETN_PIN, INPUT);
-    
+
     while( gpio_read_pin( GPIO_ADN_RESETN_PORT, GPIO_ADN_RESETN_PIN ) == 0) {
         vTaskDelay(50);
     }
 
-    if (i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)10) == pdFALSE) {
+    if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) == pdFALSE) {
         return;
     }
 
@@ -93,25 +93,25 @@ void adn4604_setup(void)
     cfg.map_reg = ADN_XPT_MAP0_CON_REG;
     cfg.map_connect = con;
 
-    xI2CMasterWrite( i2c_bus_id, adn_slave_addr, (uint8_t *)&cfg, sizeof(cfg) );
+    xI2CMasterWrite( i2c_interf, i2c_addr, (uint8_t *)&cfg, sizeof(cfg) );
 
     /* Select the active map */
     uint8_t map_sel[2] = { ADN_XPT_MAP_TABLE_SEL_REG, ADN_XPT_MAP0 };
-    xI2CMasterWrite( i2c_bus_id, adn_slave_addr, map_sel, sizeof(map_sel) );
+    xI2CMasterWrite( i2c_interf, i2c_addr, map_sel, sizeof(map_sel) );
 
     /* Enable desired outputs */
     for (uint8_t i = 0; i < 16; i++) {
 	if ( (out_enable_flag >> i) & 0x1 ) {
-	    adn4604_tx_enable(i2c_bus_id, adn_slave_addr, i);
+	    adn4604_tx_enable(i2c_interf, i2c_addr, i);
 	}
     }
 
-    adn4604_update( i2c_bus_id, adn_slave_addr );
+    adn4604_update( i2c_interf, i2c_addr );
 
-    i2c_give(i2c_bus_id);
+    i2c_give(i2c_interf);
 }
 
-void adn4604_tx_enable( uint8_t i2c_bus_id, uint8_t slave_addr, uint8_t output )
+void adn4604_tx_enable( uint8_t i2c_interf, uint8_t i2c_addr, uint8_t output )
 {
     uint8_t enable[2];
     /* TX Enable registers have an 0x20 offset from their value */
@@ -138,12 +138,12 @@ void adn4604_tx_enable( uint8_t i2c_bus_id, uint8_t slave_addr, uint8_t output )
      */
     enable[1] = 0x30;
 
-    xI2CMasterWrite( i2c_bus_id, slave_addr, enable, sizeof(enable) );
+    xI2CMasterWrite( i2c_interf, i2c_addr, enable, sizeof(enable) );
 }
 
-void adn4604_update( uint8_t i2c_bus_id, uint8_t slave_addr )
+void adn4604_update( uint8_t i2c_interf, uint8_t i2c_addr )
 {
     uint8_t update[2] = { ADN_XPT_UPDATE_REG, 0x01 };
 
-    xI2CMasterWrite( i2c_bus_id, slave_addr, update, sizeof(update) );
+    xI2CMasterWrite( i2c_interf, i2c_addr, update, sizeof(update) );
 }
