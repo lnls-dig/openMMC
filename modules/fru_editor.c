@@ -28,241 +28,322 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "FreeRTOS.h"
-#include "utils.h"
 #include "fru_editor.h"
-#include "user_fru.h"
+#include "utils.h"
 
-void fru_header_build( uint8_t * fru_buffer )
+uint8_t fru_header_build( uint8_t **buffer, size_t int_use_off, size_t chassis_off, size_t board_off, size_t product_off, size_t multirecord_off )
 {
-    t_fru_common_header * hdr = (t_fru_common_header *) fru_buffer;
+    uint8_t len = sizeof(fru_common_header_t);
+    uint8_t *hdr_ptr;
 
-    hdr->format_version = 0x01;
-#ifdef INTERNAL_USE_AREA_ENABLE
-    hdr->int_use_offset = INTERNAL_USE_AREA_OFFSET/8;
-#endif
-#ifdef CHASSIS_INFO_AREA_ENABLE
-    hdr->chassis_info_offset = CHASSIS_INFO_AREA_OFFSET/8;
-#endif
-#ifdef BOARD_INFO_AREA_ENABLE
-    hdr->board_info_offset = BOARD_INFO_AREA_OFFSET/8;
-#endif
-#ifdef PRODUCT_INFO_AREA_ENABLE
-    hdr->product_info_offset = PRODUCT_INFO_AREA_OFFSET/8;
-#endif
-#ifdef MULTIRECORD_AREA_ENABLE
-    hdr->multirecord_offset = MULTIRECORD_AREA_OFFSET/8;
-#endif
-    hdr->checksum = calculate_chksum((uint8_t *) hdr, sizeof(t_fru_common_header));
+    /* Allocate the needed memory region */
+    hdr_ptr = pvPortMalloc(len);
+
+    memset(hdr_ptr, 0x00 , len);
+
+    fru_common_header_t * hdr = (fru_common_header_t *) hdr_ptr;
+
+    hdr->format_version = 1;
+
+    hdr->int_use_offset = int_use_off/8;
+    hdr->chassis_info_offset = chassis_off/8;
+    hdr->board_info_offset = board_off/8;
+    hdr->product_info_offset = product_off/8;
+    hdr->multirecord_offset = multirecord_off/8;
+
+    hdr->checksum = calculate_chksum((uint8_t *) hdr, sizeof(fru_common_header_t));
+
+    *buffer = &hdr_ptr[0];
+
+    return len;
 }
 
-void board_info_area_build( uint8_t * fru_buffer )
+uint8_t chassis_info_area_build( uint8_t **buffer, uint8_t type, const char *pn, const char *sn, uint8_t *custom_data, size_t custom_data_sz )
 {
-#ifdef BOARD_INFO_AREA_ENABLE
-    t_board_area_format_hdr * board_ptr = (t_board_area_format_hdr *) fru_buffer;
-    board_area_format_hdr * board_info = &(board_ptr->data);
+    uint8_t i = 0;
+    uint8_t len = 5 + strlen(pn) + strlen(sn) + 2 + custom_data_sz;
+    uint8_t *chassis_ptr;
+
+    /* Pad the size to align the region */
+    while (len%8) {
+        len++;
+    }
+
+    /* Allocate the needed memory region */
+    chassis_ptr = pvPortMalloc(len);
+
+    /* Clear the buffer */
+    memset(chassis_ptr, 0x00, len);
+
     /* Record Format version */
-    board_info->format_version = 0x01;
+    chassis_ptr[i++] = 0x01;
 
     /* Record Length */
-    board_info->len = BOARD_INFO_AREA_SIZE/8;
+    chassis_ptr[i++] = len/8;
 
-    /* Language Code */
-    board_info->lang_code = LANG_CODE;
-
-    /* Manufacturing date/time - LS Byte first */
-    board_info->mfg_time[0] = 0x00;
-    board_info->mfg_time[1] = 0x00;
-    board_info->mfg_time[2] = 0x00;
-
-    /* Board Manufacturer */
-    board_info->manuf_type = 0x03;
-    board_info->manuf_len = (strlen(BOARD_MANUFACTURER) & 0x3F);
-#ifdef BOARD_MANUFACTURER
-    strncpy((char*)&(board_info->manuf), BOARD_MANUFACTURER, strlen(BOARD_MANUFACTURER));
-#endif
-
-    /* Board Product Name */
-    board_info->prod_name_type = 0x03;
-    board_info->prod_name_len = (strlen(BOARD_NAME) & 0x3F);
-#ifdef BOARD_NAME
-    strncpy((char*) &(board_info->prod_name), BOARD_NAME, strlen(BOARD_NAME));
-#endif
-
-    /* Board Serial Number */
-    board_info->ser_num_type = 0x03;
-    board_info->ser_num_len = (strlen(BOARD_SN) & 0x3F);
-#ifdef BOARD_SN
-    strncpy((char*) &(board_info->ser_num), BOARD_SN, strlen(BOARD_SN));
-#endif
+    /* Chassis type (enumeration) */
+    chassis_ptr[i++] = type;
 
     /* Board Part Number */
-    board_info->part_num_type = 0x03;
-    board_info->part_num_len = (strlen(BOARD_PN) & 0x3F);
-#ifdef BOARD_PN
-    strncpy((char*) &(board_info->part_num), BOARD_PN, strlen(BOARD_PN));
-#endif
+    chassis_ptr[i++] = (0x03 << 6) | ((strlen(pn)+1) & 0x3F);
+    strcpy((char *) &chassis_ptr[i], pn);
+    i += strlen(pn) + 1;
 
-    /* FRU File ID */
-    board_info->fru_file_id_type = 0x03;
-    board_info->fru_file_id_len = (strlen(FRU_FILE_ID) & 0x3F);
-#ifdef FRU_FILE_ID
-    strncpy((char*) &(board_info->fru_file_id), FRU_FILE_ID, strlen(FRU_FILE_ID));
-#endif
+    /* Board Serial Number */
+    chassis_ptr[i++] = (0x03 << 6) | ((strlen(sn)+1) & 0x3F);
+    strcpy((char *) &chassis_ptr[i], sn);
+    i += strlen(sn) + 1;
+
+    /* Custom Data */
+    chassis_ptr[i++] = (0x03 << 6) | (custom_data_sz & 0x3F);
+    memcpy( &chassis_ptr[i], custom_data, custom_data_sz);
+    i += custom_data_sz;
 
     /* No more info fields (End of record) */
-    board_info->end_of_record = 0xC1;
+    chassis_ptr[i++] = 0xC1;
 
     /* Checksum */
-    board_ptr->checksum = calculate_chksum((uint8_t *)board_info, BOARD_INFO_AREA_SIZE);
-#endif
+    chassis_ptr[len-1] = calculate_chksum( (uint8_t *)chassis_ptr, len );
+
+    *buffer = &chassis_ptr[0];
+
+    return len;
 }
 
-void product_info_area_build( uint8_t * fru_buffer )
+uint8_t board_info_area_build( uint8_t **buffer, uint8_t lang, uint32_t mfg_time, const char *manuf, const char *name, const char *sn, const char *pn, const char *file_id )
 {
-#ifdef PRODUCT_INFO_AREA_ENABLE
-    t_product_area_format_hdr * product_ptr = (t_product_area_format_hdr *) fru_buffer;
-    product_area_format_hdr * product_info = &(product_ptr->data);
+    uint8_t i = 0;
+    uint8_t len = 13 + strlen(manuf) + strlen(name) + strlen(sn) + strlen(pn) + strlen(file_id) + 5;
+    uint8_t *board_ptr;
 
-/* Format Version */
-    product_info->format_version = 1;
+    /* Pad the size to align the region */
+    while (len%8) {
+        len++;
+    }
 
-/* Record size in 8 bytes */
-    product_info->len = PRODUCT_INFO_AREA_SIZE/8;
+    /* Allocate the needed memory region */
+    board_ptr = pvPortMalloc(len);
 
-/* Language code */
-    product_info->lang_code = LANG_CODE;
+    /* Clear the buffer */
+    memset(board_ptr, 0x00, len);
 
-/* Product Manufacturer */
-    product_info->manuf_name_type = 0x3;
-    product_info->manuf_name_len = (strlen(PRODUCT_MANUFACTURER) & 0x3F);
-#ifdef PRODUCT_MANUFACTURER
-    strncpy((char*) &(product_info->manuf_name), PRODUCT_MANUFACTURER, strlen(PRODUCT_MANUFACTURER));
-#endif
+    /* Record Format version */
+    board_ptr[i++] = 0x01;
 
-/* Product Name */
-    product_info->prod_name_type = 0x03;
-    product_info->prod_name_len = (strlen(PRODUCT_NAME) & 0x3F);
-#ifdef PRODUCT_NAME
-    strncpy((char*) &(product_info->prod_name), PRODUCT_NAME, strlen(PRODUCT_NAME));
-#endif
+    /* Record Length */
+    board_ptr[i++] = len/8;
 
-/* Product Part/Model Number type/length */
-    product_info->prod_part_model_num_type = 0x03;
-    product_info->prod_part_model_num_len = (strlen(PRODUCT_PN) & 0x3F);
-#ifdef PRODUCT_PN
-    strncpy((char*) &(product_info->prod_part_model), PRODUCT_PN, strlen(PRODUCT_PN));
-#endif
+    /* Language Code */
+    board_ptr[i++] = lang;
 
-/* Product Version */
-    product_info->prod_version_type = 0x03;
-    product_info->prod_version_len = (strlen(PRODUCT_VERSION) & 0x3F);
-#ifdef PRODUCT_VERSION
-    strncpy((char*) &(product_info->prod_version), PRODUCT_VERSION, strlen(PRODUCT_VERSION));
-#endif
+    /* Manufacturing date/time - LS Byte first */
+    board_ptr[i++] = (mfg_time & 0x000000FF) >> (0);
+    board_ptr[i++] = (mfg_time & 0x0000FF00) >> (8);
+    board_ptr[i++] = (mfg_time & 0x00FF0000) >> (16);
 
-/* Product Serial Num */
-    product_info->prod_serial_num_type = 0x03;
-    product_info->prod_serial_num_len = (strlen(PRODUCT_SN) & 0x3F);
-#ifdef PRODUCT_SN
-    strncpy((char*) &(product_info->prod_serial_num), PRODUCT_SN, strlen(PRODUCT_SN));
-#endif
+    /* Board Manufacturer */
+    board_ptr[i++] = (0x03 << 6) | ((strlen(manuf)+1) & 0x3F);
+    strcpy((char *) &board_ptr[i], manuf);
+    i += strlen(manuf) + 1;
 
-/* Product Serial Num */
-    product_info->asset_tag_type = 0x03;
-    product_info->asset_tag_len = (strlen(PRODUCT_ASSET_TAG) & 0x3F);
-#ifdef PRODUCT_ASSET_TAG
-    strncpy((char*) &(product_info->asset_tag), PRODUCT_ASSET_TAG, strlen(PRODUCT_ASSET_TAG));
-#endif
+    /* Board Product Name */
+    board_ptr[i++] = (0x03 << 6) | ((strlen(name)+1) & 0x3F);
+    strcpy((char *) &board_ptr[i], name);
+    i += strlen(name) + 1;
 
-/* FRU File ID */
-    product_info->fru_file_id_type = 0x03;
-    product_info->fru_file_id_len = (strlen(FRU_FILE_ID) & 0x3F);
-#ifdef FRU_FILE_ID
-    strncpy((char*) &(product_info->fru_file_id), FRU_FILE_ID, strlen(FRU_FILE_ID));
-#endif
+    /* Board Serial Number */
+    board_ptr[i++] = (0x03 << 6) | ((strlen(sn)+1) & 0x3F);
+    strcpy((char *) &board_ptr[i], sn);
+    i += strlen(sn) + 1;
 
-    product_info->end_of_record = 0xC1;
+    /* Board Part Number */
+    board_ptr[i++] = (0x03 << 6) | ((strlen(pn)+1) & 0x3F);
+    strcpy((char *) &board_ptr[i], pn);
+    i += strlen(pn) + 1;
 
-    product_ptr->checksum = calculate_chksum((uint8_t *)product_info, PRODUCT_INFO_AREA_SIZE);
-#endif
+    /* FRU File ID */
+    board_ptr[i++] = (0x03 << 6) | ((strlen(file_id)+1) & 0x3F);
+    strcpy((char *) &board_ptr[i], file_id);
+    i += strlen(file_id) + 1;
+
+    /* No more info fields (End of record) */
+    board_ptr[i++] = 0xC1;
+
+    /* Checksum */
+    board_ptr[len-1] = calculate_chksum( (uint8_t *)board_ptr, len );
+
+    *buffer = &board_ptr[0];
+
+    return len;
 }
 
-void module_current_record_build( uint8_t * fru_buffer )
+uint8_t product_info_area_build( uint8_t **buffer, uint8_t lang, const char *manuf, const char *name, const char *part_model, const char *version, const char *serial, const char *asset_tag, const char *file_id )
 {
-#ifdef MODULE_CURRENT_RECORD
+    uint8_t i = 0;
+    uint8_t len = 11 + strlen(manuf) + strlen(name) + strlen(part_model) + strlen(version) + strlen(serial) + strlen(asset_tag) + strlen(file_id) + 7;
+    uint8_t *product_ptr;
 
-    t_module_current_record * module_current_record = (t_module_current_record *) fru_buffer;
+    /* Pad the size to align the region */
+    while (len%8) {
+        len++;
+    }
+
+    /* Allocate the needed memory region */
+    product_ptr = pvPortMalloc(len);
+
+    /* Clear the buffer */
+    memset(product_ptr, 0x00, len);
+
+    /* Format Version */
+    product_ptr[i++] = 1;
+
+    /* Record size in 8 bytes */
+    product_ptr[i++] = len/8;
+
+    /* Language code */
+    product_ptr[i++] = lang;
+
+    /* Product Manufacturer */
+    product_ptr[i++] = (0x03 << 6) | ((strlen(manuf)+1) & 0x3F);
+    strcpy((char *) &product_ptr[i], manuf);
+    i += strlen(manuf) + 1;
+
+    /* Product Name */
+    product_ptr[i++] = (0x03 << 6) | ((strlen(name)+1) & 0x3F);
+    strcpy((char *) &product_ptr[i], name);
+    i += strlen(name) + 1;
+
+    /* Product Part/Model Number type/length */
+    product_ptr[i++] = (0x03 << 6) | ((strlen(part_model)+1) & 0x3F);
+    strcpy((char *) &product_ptr[i], part_model);
+    i += strlen(part_model) + 1;
+
+    /* Product Version */
+    product_ptr[i++] = (0x03 << 6) | ((strlen(version)+1) & 0x3F);
+    strcpy((char *) &product_ptr[i], version);
+    i += strlen(version) + 1;
+
+    /* Product Serial Num */
+    product_ptr[i++] = (0x03 << 6) | ((strlen(serial)+1) & 0x3F);
+    strcpy((char *) &product_ptr[i], serial);
+    i += strlen(serial) + 1;
+
+    /* Product Asset Tag */
+    product_ptr[i++] = (0x03 << 6) | ((strlen(asset_tag)+1) & 0x3F);
+    strcpy((char *) &product_ptr[i], asset_tag);
+    i += strlen(asset_tag) + 1;
+
+    /* FRU File ID */
+    product_ptr[i++] = (0x03 << 6) | ((strlen(file_id)+1) & 0x3F);
+    strcpy((char *) &product_ptr[i], file_id);
+    i += strlen(file_id) + 1;
+
+    product_ptr[i++] = 0xC1;
+
+    /* Checksum */
+    product_ptr[len-1] = calculate_chksum( product_ptr, len );
+
+    *buffer = &product_ptr[0];
+
+    return len;
+}
+
+uint8_t module_current_record_build( uint8_t **buffer, uint8_t current )
+{
+    uint8_t len = sizeof(fru_module_current_record_t);
+    uint8_t *current_ptr;
+
+    /* Allocate the needed memory region */
+    current_ptr = pvPortMalloc(len);
+
+    /* Clear the buffer */
+    memset(current_ptr, 0x00, len);
+
+    fru_module_current_record_t *module_current = (fru_module_current_record_t *) current_ptr;
 
     /* Record Type ID */
-    module_current_record->hdr.record_type_id = 0xC0;    //OEM Record
-    module_current_record->hdr.eol = 0x01;    //Last Record
-    module_current_record->hdr.version = 0x02;    //Record format version
-    module_current_record->hdr.record_len = sizeof(t_module_current_record)-sizeof(t_multirecord_area_header);        //Record length
-    module_current_record->manuf_id[0] = 0x5A;
-    module_current_record->manuf_id[1] = 0x31;
-    module_current_record->manuf_id[2] = 0x00;   //Manufacturer ID (PICMG)
-    module_current_record->picmg_rec_id = 0x16;    //PICMG Record ID (19h - AMC Point to point connectivity)
-    module_current_record->rec_fmt_ver = 0x00;    //Record format version (0x00 for this version)
+    module_current->hdr.record_type_id = 0xC0;    //OEM Record
+    module_current->hdr.eol = 0x00;    //End of Records
+    module_current->hdr.version = 0x02;    //Record format version
+    module_current->hdr.record_len = len-sizeof(fru_multirecord_area_header_t);        //Record length
+    module_current->manuf_id[0] = 0x5A;
+    module_current->manuf_id[1] = 0x31;
+    module_current->manuf_id[2] = 0x00;   //Manufacturer ID (PICMG)
+    module_current->picmg_rec_id = 0x16;    //PICMG Record ID (19h - AMC Point to point connectivity)
+    module_current->rec_fmt_ver = 0x00;    //Record format version (0x00 for this version)
     /* Current Draw */
-    module_current_record->current = MODULE_CURRENT_RECORD;
+    module_current->current = current;
     /* Checksums */
 
     /* Record Checksum */
-    module_current_record->hdr.record_cksum = calculate_chksum( ((uint8_t *)module_current_record)+sizeof(t_multirecord_area_header), module_current_record->hdr.record_len);
+    module_current->hdr.record_chksum = calculate_chksum( ((uint8_t *)module_current)+sizeof(fru_multirecord_area_header_t), module_current->hdr.record_len);
     /* Header Checksum */
-    module_current_record->hdr.header_cksum = calculate_chksum( (uint8_t *)&(module_current_record->hdr), sizeof(t_multirecord_area_header));
-#endif
+    module_current->hdr.header_chksum = calculate_chksum( (uint8_t *)&(module_current->hdr), sizeof(fru_multirecord_area_header_t));
+
+    *buffer = &current_ptr[0];
+
+    return len;
 }
 
-void amc_point_to_point_record_build( uint8_t * fru_buffer )
+uint8_t amc_point_to_point_record_build( uint8_t **buffer, amc_p2p_descriptor_t * p2p_desc, uint8_t desc_count )
 {
+    uint8_t len = sizeof(amc_point_to_point_record_t) + sizeof(amc_p2p_descriptor_t)*desc_count;
+    uint8_t *p2p_ptr;
 
-#ifdef AMC_POINT_TO_POINT_RECORD_LIST
+    /* Allocate the needed memory region */
+    p2p_ptr = pvPortMalloc(len);
 
-#ifndef POINT_TO_POINT_OEM_GUID_CNT
-#define POINT_TO_POINT_OEM_GUID_CNT             0
-#endif
+    /* Clear the buffer */
+    memset(p2p_ptr, 0x00, len);
 
-    t_amc_point_to_point_record *p2p_record = (t_amc_point_to_point_record *) fru_buffer;
+    amc_point_to_point_record_t * p2p_record = (amc_point_to_point_record_t *) p2p_ptr;
 
     p2p_record->hdr.record_type_id = 0xC0;    //OEM Record
     p2p_record->hdr.eol = 0x00;    //Record format version
     p2p_record->hdr.version = 0x02;    //Record format version
-    p2p_record->hdr.record_len = sizeof(t_amc_point_to_point_record)-sizeof(t_multirecord_area_header);
+    p2p_record->hdr.record_len = len-sizeof(fru_multirecord_area_header_t);
 
     p2p_record->manuf_id[0] = 0x5A;
     p2p_record->manuf_id[1] = 0x31;
     p2p_record->manuf_id[2] = 0x00;   //Manufacturer ID (PICMG)
     p2p_record->picmg_rec_id = 0x19;    //PICMG Record ID (19h - AMC Point to point connectivity)
     p2p_record->rec_fmt_ver = 0x00;    //Record format version (0x00 for this version)
-    p2p_record->oem_guid_cnt = POINT_TO_POINT_OEM_GUID_CNT;     //OEM Guid cnt
 
-#ifdef POINT_TO_POINT_OEM_GUID_LIST
-    /* TODO: find a way to populate this list */
-    POINT_TO_POINT_OEM_GUID_LIST;
-#endif
+    p2p_record->oem_guid_cnt = 0;     //OEM Guid cnt -> Not implemented
 
     p2p_record->record_type = 0x01;    //AMC Module
 
-    AMC_POINT_TO_POINT_RECORD_LIST;
+    p2p_record->amc_channel_descriptor_cnt = desc_count;
+    /* Copy the descriptor list */
+    memcpy(&p2p_record->p2p_descriptor, p2p_desc, sizeof(amc_p2p_descriptor_t)*desc_count);
 
-    p2p_record->hdr.record_cksum = calculate_chksum( ((uint8_t *)p2p_record)+sizeof(t_multirecord_area_header), p2p_record->hdr.record_len); //record checksum
-    p2p_record->hdr.header_cksum = calculate_chksum( (uint8_t *)&(p2p_record->hdr), sizeof(t_multirecord_area_header)); //Header checksum
+    /* Record Checksum */
+    p2p_record->hdr.record_chksum = calculate_chksum( ((uint8_t *)p2p_record)+sizeof(fru_multirecord_area_header_t), p2p_record->hdr.record_len);
+    /* Header Checksum */
+    p2p_record->hdr.header_chksum = calculate_chksum( (uint8_t *)&(p2p_record->hdr), sizeof(fru_multirecord_area_header_t));
 
-#endif
+    *buffer = &p2p_ptr[0];
+
+    return len;
 }
 
-void point_to_point_clock_build( uint8_t * fru_buffer )
+uint8_t amc_point_to_point_clock_build( uint8_t **buffer, clock_config_descriptor_t * clk_desc, uint8_t desc_count )
 {
-#ifdef AMC_CLOCK_CONFIGURATION_LIST
+    uint8_t len = sizeof(amc_clock_config_record_t) + sizeof(clock_config_descriptor_t)*desc_count;
+    uint8_t *clk_ptr;
 
-    t_amc_clock_config_record * clock_cfg = (t_amc_clock_config_record *) fru_buffer;
+    /* Allocate the needed memory region */
+    clk_ptr = pvPortMalloc(len);
+
+    /* Clear the buffer */
+    memset(clk_ptr, 0x00, len);
+
+    amc_clock_config_record_t * clock_cfg = (amc_clock_config_record_t *) clk_ptr;
 
     clock_cfg->hdr.record_type_id = 0xC0;
     clock_cfg->hdr.eol = 0x00;
     clock_cfg->hdr.version = 0x02;
-    clock_cfg->hdr.record_len = sizeof(t_amc_clock_config_record)-sizeof(t_multirecord_area_header);
+    clock_cfg->hdr.record_len = len-sizeof(fru_multirecord_area_header_t);
     clock_cfg->manuf_id[0] = 0x5A;
     clock_cfg->manuf_id[1] = 0x31;
     clock_cfg->manuf_id[2] = 0x00;
@@ -271,29 +352,55 @@ void point_to_point_clock_build( uint8_t * fru_buffer )
 
     clock_cfg->resource_id = 0xFF;
 
-    clock_cfg->descriptor_cnt = AMC_CLOCK_CONFIGURATION_DESCRIPTORS_CNT;
+    clock_cfg->descriptor_cnt = desc_count;
 
-    AMC_CLOCK_CONFIGURATION_LIST_BUILD;
+    memcpy(&(clock_cfg->descriptors), clk_desc, sizeof(clock_config_descriptor_t)*desc_count);
 
-    memcpy(clock_cfg->descriptor, &clock_descriptor_list, sizeof(clock_cfg->descriptor));
+    clock_cfg->hdr.record_chksum = calculate_chksum( ((uint8_t *)clock_cfg)+sizeof(fru_multirecord_area_header_t), clock_cfg->hdr.record_len );
+    clock_cfg->hdr.header_chksum = calculate_chksum( (uint8_t *)&(clock_cfg->hdr), sizeof(fru_multirecord_area_header_t) );
 
-    clock_cfg->hdr.record_cksum = calculate_chksum( ((uint8_t *)clock_cfg)+sizeof(t_multirecord_area_header), clock_cfg->hdr.record_len );
-    clock_cfg->hdr.header_cksum = calculate_chksum( (uint8_t *)&(clock_cfg->hdr), sizeof(t_multirecord_area_header) );
-#endif
+    *buffer = &clk_ptr[0];
+
+    return len;
 }
 
-size_t fru_info_build( uint8_t *buffer )
+uint8_t zone3_compatibility_record_build( uint8_t **buffer, uint32_t compat_code )
 {
-    /* Zero initialize the buffer */
-    memset(&buffer[0], 0, (sizeof(buffer)/sizeof(buffer[0])));
+    uint8_t len = sizeof(zone3_compatibility_rec_t);
+    uint8_t *z3_ptr;
 
-    /* Populate the fru_buffer */
-    fru_header_build(&buffer[COMMON_HEADER_OFFSET]);
-    board_info_area_build(&buffer[BOARD_INFO_AREA_OFFSET]);
-    product_info_area_build(&buffer[PRODUCT_INFO_AREA_OFFSET]);
-    amc_point_to_point_record_build(&buffer[AMC_POINT_TO_POINT_RECORD_OFFSET]);
-    point_to_point_clock_build(&buffer[AMC_CLOCK_CONFIG_RECORD_OFFSET]);
-    module_current_record_build(&buffer[MODULE_CURRENT_RECORD_OFFSET]);
+    /* Allocate the needed memory region */
+    z3_ptr = pvPortMalloc(len);
 
-    return FRU_SIZE;
+    /* Clear the buffer */
+    memset(z3_ptr, 0x00, len);
+
+    zone3_compatibility_rec_t *zone3_compat = (zone3_compatibility_rec_t *) z3_ptr;
+
+    zone3_compat->hdr.record_type_id = 0xC0;
+    zone3_compat->hdr.eol = 0x01;
+    zone3_compat->hdr.version = 0x02;
+    zone3_compat->hdr.record_len = len-sizeof(fru_multirecord_area_header_t);
+    zone3_compat->manuf_id[0] = 0x5A;
+    zone3_compat->manuf_id[1] = 0x31;
+    zone3_compat->manuf_id[2] = 0x00;
+    zone3_compat->picmg_rec_id = 0x30;
+    zone3_compat->rec_fmt_ver = 0x01;
+
+    zone3_compat->interface_id_type = 0x03;
+    zone3_compat->user_manuf_id[0] = 0x5A;
+    zone3_compat->user_manuf_id[1] = 0x31;
+    zone3_compat->user_manuf_id[2] = 0x00;
+
+    zone3_compat->compat_designator[0] = (compat_code & 0x000000FF) >> 0;
+    zone3_compat->compat_designator[1] = (compat_code & 0x0000FF00) >> 8;
+    zone3_compat->compat_designator[2] = (compat_code & 0x00FF0000) >> 16;
+    zone3_compat->compat_designator[3] = (compat_code & 0xFF000000) >> 24;
+
+    zone3_compat->hdr.record_chksum = calculate_chksum( ((uint8_t *)zone3_compat)+sizeof(fru_multirecord_area_header_t), zone3_compat->hdr.record_len );
+    zone3_compat->hdr.header_chksum = calculate_chksum( (uint8_t *)&(zone3_compat->hdr), sizeof(fru_multirecord_area_header_t) );
+
+    *buffer = &z3_ptr[0];
+
+    return len;
 }

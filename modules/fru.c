@@ -38,7 +38,7 @@
 void fru_init( void )
 {
 #ifdef FRU_WRITE_EEPROM
-    amc_fru_info_size = amc_fru_info_build( amc_fru_info );
+    amc_fru_info_size = amc_fru_info_build( &amc_fru_info );
     at24mac_write( CHIP_ID_EEPROM, 0x00, &amc_fru_info[0], sizeof(amc_fru_info), 0 );
 #endif
 #ifdef MODULE_EEPROM_AT24MAC
@@ -54,7 +54,7 @@ void fru_init( void )
     }
 #endif
     /* Could not access the SEEPROM, create a runtime fru info */
-    amc_fru_info_size = amc_fru_info_build( amc_fru_info );
+    amc_fru_info_size = amc_fru_info_build( &amc_fru_info );
     fru_runtime = true;
 }
 
@@ -67,8 +67,8 @@ size_t fru_read( uint8_t *rx_buff, uint16_t offset, size_t len )
 
     if (fru_runtime) {
         for (i = 0; i < len; i++, j++ ) {
-            if (j < (sizeof(fru_info)/sizeof(fru_info[0]))) {
-                rx_buff[i] = fru_info[j];
+            if (j < (sizeof(amc_fru_info)/sizeof(amc_fru_info[0]))) {
+                rx_buff[i] = amc_fru_info[j];
             } else {
                 rx_buff[i] = 0xFF;
             }
@@ -89,7 +89,7 @@ size_t fru_write( uint8_t *tx_buff, uint16_t offset, size_t len )
     if ( fru_runtime ) {
         uint8_t i;
         for (i = 0; i < len; i++) {
-            fru_info[offset+i] = tx_buff[i];
+            amc_fru_info[offset+i] = tx_buff[i];
         }
         ret_val = i;
     } else {
@@ -111,8 +111,8 @@ IPMI_HANDLER(ipmi_storage_get_fru_info, NETFN_STORAGE, IPMI_GET_FRU_INVENTORY_AR
     rsp->completion_code = IPMI_CC_OK;
 
     if (fru_id == 0) {
-        rsp->data[len++] = FRU_INFO_SIZE & 0xFF;
-        rsp->data[len++] = FRU_INFO_SIZE & 0xFF00;
+        rsp->data[len++] = amc_fru_info_size & 0xFF;
+        rsp->data[len++] = (amc_fru_info_size & 0xFF00) >> 8;
         rsp->data[len++] = 0x00; /* Device accessed by bytes */
     } else if (fru_id == 1) {
         /* RTM FRU - Not implemented yet */
@@ -138,7 +138,7 @@ IPMI_HANDLER(ipmi_storage_read_fru_data_cmd, NETFN_STORAGE, IPMI_READ_FRU_DATA_C
     offset = (req->data[2] << 8) | (req->data[1]);
 
 
-    count = fru_read( &(rsp->data[len+1]), offset, count );
+    count = fru_read( CHIP_ID_EEPROM, &(rsp->data[len+1]), offset, count );
     rsp->data[len++] = count;
 
     rsp->data_len = len + count;
@@ -154,9 +154,9 @@ IPMI_HANDLER(ipmi_storage_write_fru_data_cmd, NETFN_STORAGE, IPMI_WRITE_FRU_DATA
     rsp->completion_code = IPMI_CC_OK;
 
     /* Use signed comparison here in case offset + data_len < 3 */
-    if ((offset + req->data_len - 3) < (int16_t)FRU_INFO_SIZE) {
+    if ((offset + req->data_len - 3) < (int16_t)amc_fru_info_size) {
         /* Write data to the FRU */
-        count = fru_write( &req->data[3], offset, req->data_len - 3);
+        count = fru_write( CHIP_ID_EEPROM, &req->data[3], offset, req->data_len - 3);
 
         /* Count written (1 based) */
         rsp->data[len++] = count +1;

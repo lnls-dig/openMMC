@@ -23,11 +23,16 @@
 #ifndef FRU_H_
 #define FRU_H_
 
-/* 2kbit SEEPROM size */
-#define FRU_INFO_SIZE 0xFF
-
 bool fru_runtime;
-uint8_t fru_info[FRU_INFO_SIZE];
+bool fru_rtm_runtime;
+
+size_t amc_fru_info_size;
+uint8_t *amc_fru_info;
+
+#ifdef MODULE_RTM
+size_t rtm_fru_info_size;
+uint8_t *rtm_fru_info;
+#endif
 
 void fru_init( void );
 size_t fru_read( uint8_t *rx_buff, uint16_t offset, size_t len );
