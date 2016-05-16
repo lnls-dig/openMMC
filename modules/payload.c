@@ -166,6 +166,7 @@ void payload_init( void )
     Chip_IOCON_PinMux(LPC_IOCON, GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN, IOCON_MODE_INACT, IOCON_FUNC1);
     irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1 );
     irq_enable( EINT2_IRQn );
+    gpio_set_pin_dir(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, OUTPUT);
 
     if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
         /* Flash CS Mux */
