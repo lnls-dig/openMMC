@@ -1,3 +1,5 @@
+#include "i2c.h"
+
 #define I2CMODE_POOLING         1
 #define I2CMODE_INTERRUPT       0
 #define SPEED_100KHZ            100000
@@ -55,3 +57,11 @@ enum {
     CHIP_ID_RTM_LM75_0,
     CHIP_ID_RTM_LM75_1
 };
+
+#define I2C_MUX_CNT    2
+#define I2C_BUS_CNT    7
+#define I2C_CHIP_CNT   28
+
+i2c_mux_state_t i2c_mux[I2C_MUX_CNT];
+i2c_bus_mapping_t i2c_bus_map[I2C_BUS_CNT];
+i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT];

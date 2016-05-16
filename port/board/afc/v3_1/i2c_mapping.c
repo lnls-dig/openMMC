@@ -2,13 +2,12 @@
 #include "i2c_mapping.h"
 #include "port.h"
 
-i2c_mux_state_t i2c_mux[] = {
+i2c_mux_state_t i2c_mux[I2C_MUX_CNT] = {
     { I2C1, -1, 0 },
-    { I2C2, -1, 0 },
-    { 0, 0, 0 }
+    { I2C2, -1, 0 }
 };
 
-i2c_bus_mapping_t i2c_bus_map[] = {
+i2c_bus_mapping_t i2c_bus_map[I2C_BUS_CNT] = {
     { I2C_BUS_UNKNOWN_ID, I2C1, -1, 0 },
     { I2C_BUS_FMC1_ID,    I2C2,  0, 1 },
     { I2C_BUS_FMC2_ID,    I2C2,  1, 1 },
@@ -18,7 +17,7 @@ i2c_bus_mapping_t i2c_bus_map[] = {
     { I2C_BUS_FPGA_ID,    I2C2, -1, 1 },
 };
 
-i2c_chip_mapping_t i2c_chip_map[] = {
+i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT] = {
     { CHIP_ID_MUX,           I2C_BUS_FPGA_ID,    0x70},
     { CHIP_ID_LM75AIM_0,     I2C_BUS_CPU_ID,     0x4C},
     { CHIP_ID_LM75AIM_1,     I2C_BUS_CPU_ID,     0x4D},
