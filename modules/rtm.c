@@ -51,11 +51,11 @@ void RTM_Manage( void * Parameters )
 
 		rtm_hardware_init();
 
-                /* Include RTM sensors in the SDR table */
-                rtm_insert_sdr_entries();
+                /* Activate RTM sensors in the SDR table */
+		//sdr_activate_sensors(); /* Not implemented yet */
 
             } else if ( ps_new_state == RTM_PS_ABSENT ) {
-                rtm_remove_sdr_entries();
+                //sdr_disable_sensors(); /* Not implemented yet */
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_URTM_ABSENT_MASK );
             }
             ps_old_state = ps_new_state;
