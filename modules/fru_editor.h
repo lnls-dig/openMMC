@@ -375,5 +375,8 @@ uint8_t module_current_record_build( uint8_t **buffer, uint8_t current );
 uint8_t zone3_compatibility_record_build( uint8_t **buffer, uint32_t compat_code );
 
 size_t amc_fru_info_build( uint8_t **buffer );
+#ifdef MODULE_RTM
+size_t rtm_fru_info_build( uint8_t **buffer );
+#endif
 
 #endif

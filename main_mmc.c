@@ -72,7 +72,10 @@ int main(void)
     i2c_init();
 
 #ifdef MODULE_FRU
-    fru_init();
+    fru_init(FRU_AMC);
+#ifdef MODULE_RTM
+    //fru_init(FRU_RTM);
+#endif
 #endif
 
     ipmb_addr = get_ipmb_addr();
