@@ -34,16 +34,13 @@ static uint8_t pca9554_read_reg ( uint8_t reg )
 {
     uint8_t i2c_addr;
     uint8_t i2c_id;
-    uint8_t read_val;
+    uint8_t rx = 0;
 
-    /* Stop here waiting for semaphore? */
-    while( i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_id, (TickType_t) 10) == pdFALSE ) {}
-
-    xI2CMasterWriteRead(i2c_id, i2c_addr, reg, &read_val, sizeof(read_val));
-
-    i2c_give(i2c_id);
-
-    return read_val;
+    if( i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
+	xI2CMasterWriteRead(i2c_id, i2c_addr, reg, &rx, 1);
+	i2c_give(i2c_id);
+    }
+    return rx;
 }
 
 static void pca9554_write_reg ( uint8_t reg, uint8_t data )
@@ -52,12 +49,10 @@ static void pca9554_write_reg ( uint8_t reg, uint8_t data )
     uint8_t i2c_id;
     uint8_t cmd_data[2] = {reg, data};
 
-    /* Stop here waiting for semaphore? */
-    while( i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_id, (TickType_t) 10) == pdFALSE ) {}
-
-    xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
-
-    i2c_give(i2c_id);
+    if( i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
+	xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
+	i2c_give(i2c_id);
+    }
 }
 
 /* Pins Read/Write */
