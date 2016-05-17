@@ -26,6 +26,7 @@
 #include "pca9554.h"
 #include "pin_mapping.h"
 #include "hotswap.h"
+#include "i2c_mapping.h"
 
 /* RTM Management functions */
 
@@ -57,8 +58,26 @@ uint8_t rtm_get_hotswap_handle_status( void )
 
 uint8_t rtm_check_presence( void )
 {
-    rtm_disable_i2c();
-    return gpio_read_pin( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN );
+    /* Due to a hardware limitation in the AFC board, we can't rely on reading the PS signal
+       since this pin doesn't have a pull-up resistor, it's always read as 0.
+       A very dirty workaround is to 'ping' the RTM IO Expander(PCA9554), if it responds, then the board is connected */
+    rtm_enable_i2c();
+
+    uint8_t i2c_addr, i2c_interface;
+    uint8_t status = RTM_PS_ABSENT;
+    uint8_t dumb;
+
+    if (i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_interface, 0)) {
+        if (xI2CMasterRead( i2c_interface, i2c_addr, &dumb, 1)) {
+            status = RTM_PS_PRESENT;
+        } else {
+            status = RTM_PS_ABSENT;
+        }
+        i2c_give(i2c_interface);
+    }
+    return status;
+
+    //return gpio_read_pin( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN );
 }
 
 void rtm_hardware_init( void )
