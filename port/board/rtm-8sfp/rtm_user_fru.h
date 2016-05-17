@@ -20,23 +20,21 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+#include "fru_editor.h"
+
 /*********************************************
  * Common defines
  *********************************************/
 #define RTM_LANG_CODE               0
 #define RTM_FRU_FILE_ID             "RTMFRU"       //Allows knowing the source of the FRU present in the memory
 
-#define RTM_BOARD_INFO_AREA_ENABLE
-#define RTM_PRODUCT_INFO_AREA_ENABLE
-#define RTM_MULTIRECORD_AREA_ENABLE
-#define RTM_ZONE3_COMPATIBILITY_REC_ENABLE
-
 /*********************************************
  * Board information area
  *********************************************/
+#define RTM_BOARD_MANUFACTURING_TIME 10463040               /* Amount of minutes since 0:00 1/1/96 */
 #define RTM_BOARD_MANUFACTURER      "Creotech"
 #define RTM_BOARD_NAME              "RTM-8-SFP"
-#define RTM_BOARD_SN                "000000001"
+#define RTM_BOARD_SN                ""
 #define RTM_BOARD_PN                "RTM-8-SFP"
 
 /*********************************************
@@ -45,16 +43,11 @@
 #define RTM_PRODUCT_MANUFACTURER    "LNLS"
 #define RTM_PRODUCT_NAME            "AFC SFP Module"
 #define RTM_PRODUCT_PN              "00001"
-#define RTM_PRODUCT_VERSION         "1"
-#define RTM_PRODUCT_SN              "00001"
+#define RTM_PRODUCT_VERSION         "v1.0"
+#define RTM_PRODUCT_SN              ""
 #define RTM_PRODUCT_ASSET_TAG       "No tag"
 
 /*********************************************
  * RTM Compatibility Record
  *********************************************/
 #define RTM_COMPATIBILITY_CODE               0x11223344
-
-/**********************************************
- * PICMG: Module current record
- **********************************************/
-#define RTM_MODULE_CURRENT_RECORD            current_in_ma(2000)
