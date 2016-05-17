@@ -1084,5 +1084,13 @@ void user_sdr_init( void )
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_CLOCK_SWITCH, &vTaskLM75_Handle, 0, 0x4D );
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_DCDC, &vTaskLM75_Handle, 0, 0x4E );
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RAM, &vTaskLM75_Handle, 0, 0x4F );
+#ifdef MODULE_RTM
+    extern const SDR_type_01h_t SDR_LM75_RTM_1;
+    extern const SDR_type_01h_t SDR_LM75_RTM_2;
+
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_1, &vTaskLM75_Handle, 0, 0x48 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_2, &vTaskLM75_Handle, 0, 0x49 );
+#endif
+
 #endif
 }

@@ -23,8 +23,7 @@
 #include "sdr.h"
 #include "utils.h"
 
-/* Sensors includes */
-#include "lm75.h"
+/* Rename file to sdr_mapping.c */
 
 #ifdef MODULE_TEMPERATURE_SENSOR
 const SDR_type_01h_t SDR_LM75_RTM_1 = {
@@ -139,24 +138,3 @@ const SDR_type_01h_t SDR_LM75_RTM_2 = {
     .IDstring = "TEMP RTM2" /* sensor string */
 };
 #endif
-
-void rtm_insert_sdr_entries( void )
-{
-#ifdef MODULE_TEMPERATURE_SENSOR
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_1, &vTaskLM75_Handle, 0, 0x48 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_2, &vTaskLM75_Handle, 0, 0x49 );
-#endif
-}
-
-void rtm_remove_sdr_entries( void )
-{
-#ifdef MODULE_TEMPERATURE_SENSOR
-    sensor_t * rtm_sdr;
-
-    rtm_sdr = find_sensor_by_sdr( (void *) &SDR_LM75_RTM_1 );
-    sdr_remove_entry( rtm_sdr );
-
-    rtm_sdr = find_sensor_by_sdr( (void *) &SDR_LM75_RTM_2 );
-    sdr_remove_entry( rtm_sdr );
-#endif
-}
