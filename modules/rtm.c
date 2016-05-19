@@ -42,7 +42,7 @@ void RTM_Manage( void * Parameters )
     for ( ;; ) {
         vTaskDelay(100);
 
-        ps_new_state = rtm_check_presence();
+        rtm_check_presence( &ps_new_state );
 
         if ( ps_new_state ^ ps_old_state ) {
             if ( ps_new_state == HOTSWAP_STATE_URTM_PRSENT ) {

@@ -36,6 +36,7 @@ void rtm_enable_payload_power( void )
 {
     gpio_set_pin_state(GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 1 );
     /* Debug LEDs */
+    pca9554_write_pin( RTM_GPIO_LED_RED, 1 );
     pca9554_write_pin( RTM_GPIO_LED_BLUE, 1 );
     pca9554_write_pin( RTM_GPIO_LED_GREEN, 0 );
 }
@@ -44,6 +45,7 @@ void rtm_disable_payload_power( void )
 {
     gpio_set_pin_state(GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 0 );
     /* Debug LEDs */
+    pca9554_write_pin( RTM_GPIO_LED_RED, 0 );
     pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
     pca9554_write_pin( RTM_GPIO_LED_GREEN, 1 );
 }
@@ -54,7 +56,7 @@ uint8_t rtm_get_hotswap_handle_status( void )
     return pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE );
 }
 
-uint8_t rtm_check_presence( void )
+void rtm_check_presence( uint8_t *status )
 {
     /* Due to a hardware limitation in the AFC board, we can't rely on reading the PS signal
        since this pin doesn't have a pull-up resistor, it's always read as 0.
@@ -62,18 +64,16 @@ uint8_t rtm_check_presence( void )
     rtm_enable_i2c();
 
     uint8_t i2c_addr, i2c_interface;
-    uint8_t status = RTM_PS_ABSENT;
     uint8_t dumb;
 
     if (i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_interface, 0)) {
         if (xI2CMasterRead( i2c_interface, i2c_addr, &dumb, 1)) {
-            status = RTM_PS_PRESENT;
+            *status = HOTSWAP_STATE_URTM_PRSENT;
         } else {
-            status = RTM_PS_ABSENT;
+            *status = HOTSWAP_STATE_URTM_ABSENT;
         }
         i2c_give(i2c_interface);
     }
-    return status;
 
     //return gpio_read_pin( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN );
 }
