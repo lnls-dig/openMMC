@@ -26,11 +26,14 @@
 #include "rtm.h"
 #include "port.h"
 #include "rtm_user.h"
-#include "ipmb.h"
+#include "ipmi.h"
 #include "hotswap.h"
 #include "sdr.h"
 #include "task_priorities.h"
 #include "pin_mapping.h"
+#include "fru.h"
+
+volatile uint8_t rtm_power_level = 0;
 
 void RTM_Manage( void * Parameters )
 {
@@ -71,15 +74,11 @@ void RTM_Manage( void * Parameters )
             ps_old_state = ps_new_state;
         }
 
-        /* We should not be activating the controlling the RTM LEDs directly, wait for a command to do that */
-        if ( rtm_compatible ) {
-            if ( rtm_get_hotswap_handle_status() == HOTSWAP_STATE_HANDLE_CLOSED ) {
-                rtm_enable_payload_power();
-                continue;
-            }
+        if ( rtm_power_level == 0x01 ) {
+            rtm_enable_payload_power();
+        } else {
+            rtm_disable_payload_power();
         }
-
-        rtm_disable_payload_power();
     }
 }
 
@@ -89,5 +88,26 @@ void rtm_manage_init( void )
     gpio_set_pin_dir( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN, INPUT );
     gpio_set_pin_dir( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, INPUT );
 
+    rtm_power_level = 0;
+
     xTaskCreate( RTM_Manage, "RTM Manage", 100, (void *) NULL, tskRTM_MANAGE_PRIORITY, (TaskHandle_t *) NULL );
+}
+
+/* Set Power Level Request handler */
+
+IPMI_HANDLER(ipmi_picmg_set_power_level, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_POWER_LEVEL, ipmi_msg *req, ipmi_msg *rsp )
+{
+    int len = rsp->data_len = 0;
+    uint8_t fru_id = req->data[1];
+
+    if ( fru_id == FRU_RTM ) {
+        rtm_power_level = req->data[2];
+    }
+
+    rsp->completion_code = IPMI_CC_OK;
+
+    /* Return PICMG Identifier (0x00) */
+    rsp->data[len++] = 0x00;
+
+    rsp->data_len = len;
 }
