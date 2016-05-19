@@ -143,7 +143,6 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
     entry->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
     entry->readout_value = 0;
     entry->state = SENSOR_STATE_LOW_NON_REC;
-    entry->active = true;
 
     /* Link the sdr list */
     sdr_tail->next = entry;
