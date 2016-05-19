@@ -34,11 +34,7 @@
 
 static uint8_t hotswap_get_handle_status( void )
 {
-    if (gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN)) {
-        return HOTSWAP_MODULE_HANDLE_OPEN_MASK;
-    } else {
-        return HOTSWAP_MODULE_HANDLE_CLOSED_MASK;
-    }
+    return gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN);
 }
 
 SDR_type_02h_t * hotswap_amc_pSDR;
@@ -110,7 +106,8 @@ void vTaskHotSwap( void *Parameters )
 
         if ( new_state_amc ^ old_state_amc ) {
             if ( hotswap_send_event( hotswap_amc_sensor, new_state_amc ) == ipmb_error_success ) {
-                hotswap_set_mask_bit( HOTSWAP_AMC, new_state_amc );
+                hotswap_set_mask_bit( HOTSWAP_AMC, 1 << new_state_amc );
+                hotswap_clear_mask_bit( HOTSWAP_AMC, 1 << (!new_state_amc) );
                 old_state_amc = new_state_amc;
             }
         }
@@ -120,7 +117,8 @@ void vTaskHotSwap( void *Parameters )
 
         if ( new_state_rtm ^ old_state_rtm ) {
             if ( hotswap_send_event( hotswap_rtm_sensor, new_state_rtm ) == ipmb_error_success ) {
-                hotswap_set_mask_bit( HOTSWAP_RTM, new_state_rtm );
+                hotswap_set_mask_bit( HOTSWAP_RTM, 1 << new_state_rtm );
+                hotswap_clear_mask_bit( HOTSWAP_RTM, 1 << (!new_state_rtm) );
                 old_state_rtm = new_state_rtm;
             }
         }
@@ -130,10 +128,7 @@ void vTaskHotSwap( void *Parameters )
 
 ipmb_error hotswap_send_event( sensor_t *sensor, uint8_t evt )
 {
-    uint8_t evt_msg;
-
-    evt_msg = evt >> 1;
-    return ipmi_event_send( sensor, ASSERTION_EVENT, &evt_msg, sizeof( evt_msg ) );
+    return ipmi_event_send( sensor, ASSERTION_EVENT, &evt, sizeof( evt ) );
 }
 
 void hotswap_clear_mask_bit( uint8_t fru, uint8_t mask )

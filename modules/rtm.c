@@ -48,7 +48,7 @@ void RTM_Manage( void * Parameters )
             if ( ps_new_state == HOTSWAP_STATE_URTM_PRSENT ) {
 
                 /* RTM Present */
-                hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_URTM_PRESENT_MASK );
+                hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_PRSENT );
 
                 /* Check the Zone3 compatibility records */
                 rtm_compatible = rtm_compatibility_check();
@@ -64,9 +64,9 @@ void RTM_Manage( void * Parameters )
                 /* Activate RTM sensors in the SDR table */
                 //sdr_activate_sensors(); /* Not implemented yet */
 
-            } else if ( ps_new_state == RTM_PS_ABSENT ) {
+            } else if ( ps_new_state == HOTSWAP_STATE_URTM_ABSENT ) {
                 //sdr_disable_sensors(); /* Not implemented yet */
-                hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_URTM_ABSENT_MASK );
+                hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_ABSENT );
             }
             ps_old_state = ps_new_state;
         }

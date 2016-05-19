@@ -33,7 +33,7 @@
 void rtm_enable_payload_power( void );
 void rtm_disable_payload_power( void );
 uint8_t rtm_get_hotswap_handle_status( void );
-uint8_t rtm_check_presence( void );
+void rtm_check_presence( uint8_t *status );
 void rtm_hardware_init( void );
 
 /* User defined functions */

@@ -51,11 +51,7 @@ void rtm_disable_payload_power( void )
 uint8_t rtm_get_hotswap_handle_status( void )
 {
     rtm_enable_i2c();
-    if ( pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE ) ) {
-        return HOTSWAP_MODULE_HANDLE_OPEN_MASK;
-    } else {
-        return HOTSWAP_MODULE_HANDLE_CLOSED_MASK;
-    }
+    return pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE );
 }
 
 uint8_t rtm_check_presence( void )
