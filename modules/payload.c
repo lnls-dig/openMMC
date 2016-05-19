@@ -221,14 +221,14 @@ void vTaskPayload(void *pvParameters)
             case PAYLOAD_MESSAGE_QUIESCED:
                 QUIESCED_req = 1;
                 break;
-	    case PAYLOAD_MESSAGE_COLD_RST:
-		state = PAYLOAD_SWITCHING_OFF;
-		break;
-	    case PAYLOAD_MESSAGE_REBOOT:
-		gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
-		asm("NOP");
-		gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
-		break;
+            case PAYLOAD_MESSAGE_COLD_RST:
+                state = PAYLOAD_SWITCHING_OFF;
+                break;
+            case PAYLOAD_MESSAGE_REBOOT:
+                gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+                asm("NOP");
+                gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+                break;
             }
         }
 
@@ -249,9 +249,9 @@ void vTaskPayload(void *pvParameters)
             break;
 
         case PAYLOAD_POWER_GOOD_WAIT:
-	    hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
-	    hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_FAILURE_MASK );
-	    if (QUIESCED_req) {
+            hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
+            hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_FAILURE_MASK );
+            if (QUIESCED_req) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (P1V0_good == 1) {
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
@@ -286,11 +286,11 @@ void vTaskPayload(void *pvParameters)
             hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
             if ( hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_QUIESCED ) == ipmb_error_success ) {
                 QUIESCED_req = 0;
-		/* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
-		P12V_good = 0;
-		P1V0_good = 0;
+                /* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
+                P12V_good = 0;
+                P1V0_good = 0;
                 new_state = PAYLOAD_NO_POWER;
-		hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
+                hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
             }
             break;
 
