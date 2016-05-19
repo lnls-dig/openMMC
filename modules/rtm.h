@@ -1,7 +1,6 @@
 /*
  *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   Copyright (C) 2015  Julian Mendez  <julian.mendez@cern.ch>
  *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -20,26 +19,12 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef FRU_H_
-#define FRU_H_
+#ifndef RTM_H_
+#define RTM_H_
 
-enum {
-    FRU_AMC,
-    FRU_RTM
-};
-
-bool fru_amc_runtime;
-size_t amc_fru_info_size;
-uint8_t *amc_fru_info;
-
-#ifdef MODULE_RTM
-bool fru_rtm_runtime;
-size_t rtm_fru_info_size;
-uint8_t *rtm_fru_info;
-#endif
-
-void fru_init( uint8_t id );
-size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len );
-size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len );
+void rtm_manage_init( void );
+void rtm_enable_payload_power( void );
+uint8_t rtm_get_hotswap_handle_status( void );
+Bool rtm_compatibility_check( void );
 
 #endif

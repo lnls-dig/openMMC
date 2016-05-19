@@ -1,7 +1,7 @@
 #Select which microcontroller and board are being used
-set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller" FORCE) 
+set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller" FORCE)
 
-set(TARGET_BOARD_NAME  "AFC Timing" CACHE STRING "Board Name" FORCE)
+set(TARGET_BOARD_NAME  "AFC 3.0" CACHE STRING "Board Name" FORCE)
 
 #List all modules used by this board
 set(TARGET_MODULES
@@ -11,27 +11,28 @@ set(TARGET_MODULES
   "WATCHDOG"
   "JTAG_SWITCH"
   "CLOCK_SWITCH"
+  "FPGA_SPI"
   "DAC_AD84XX"
-  "HOTSWAP_SENSOR"
   "EEPROM_AT24MAC"
+  "HOTSWAP_SENSOR"
   "TEMPERATURE_SENSOR"
   "VOLTAGE_SENSOR"
+  "CURRENT_SENSOR"
   "HPM"
-  "RTM"
   )
 
 set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 #Include the modules sources
 ##Sensors SDR list
-set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c )
-set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/i2c_mapping.c )
+set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c)
+set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/i2c_mapping.c)
 
 #Extra definitions
-if (WRITE_ID_EEPROM)
-  message(STATUS "EEPROM ID writing enabled!")
-  add_definitions(-DWRITE_ID_EEPROM)
-  set(WRITE_ID_EEPROM false CACHE BOOL "Set this flag to enable writing the board ID on the EEPROM" FORCE)
+if (FRU_WRITE_EEPROM)
+  message(STATUS "FRU EEPROM will be written if no valid data is found!")
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DFRU_WRITE_EEPROM")
+  set(FRU_WRITE_EEPROM false CACHE BOOL "Set this flag to enable writing the board ID on the EEPROM" FORCE)
 endif()
 
 #Set the variables in the main scope

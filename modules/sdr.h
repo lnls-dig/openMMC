@@ -25,7 +25,7 @@
 
 #include "ipmb.h"
 
-#define NUM_SENSOR                      17      /* Number of sensors */
+#define NUM_SENSOR                      21      /* Number of sensors */
 #define NUM_SDR                         (NUM_SENSOR+1)  /* Number of SDRs */
 
 /* Sensor Types */
@@ -172,7 +172,7 @@ typedef struct {
     char IDstring[16];
 } SDR_type_12h_t;
 
-typedef struct {
+typedef struct sensor_t {
     uint8_t num;
     SDR_TYPE sdr_type;
     void * sdr;
@@ -200,22 +200,30 @@ typedef struct {
         uint16_t lower_non_critical_go_high:1;
         uint16_t lower_non_critical_go_low:1;
     } asserted_event;
+    struct sensor_t *next;
 } sensor_t;
 
-extern sensor_t *sensor_array;
-extern uint8_t sdr_count;
+extern volatile uint8_t sdr_count;
+sensor_t *sdr_head;
+sensor_t *sdr_tail;
 
 const SDR_type_12h_t SDR0;
+const SDR_type_12h_t SDR_RTM_DEV_LOCATOR;
 
 #define GET_SENSOR_TYPE(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
 
 #define GET_EVENT_TYPE_CODE(n)      ((SDR_type_01h_t *)sensor->sdr)->event_reading_type
 
 void initializeDCDC( void );
+
 void sdr_init( void );
-void sensor_init( void );
-void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr );
-void check_sensor_event( sensor_t * sensor );
 void user_sdr_init( void );
+void sensor_init( void );
+void check_sensor_event( sensor_t * sensor );
+
+sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr);
+void sdr_remove_entry( sensor_t * entry );
+sensor_t * find_sensor_by_sdr( void * sdr );
+sensor_t * find_sensor_by_id( uint8_t id );
 
 #endif

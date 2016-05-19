@@ -29,7 +29,6 @@
 /* Project Includes */
 #include "port.h"
 #include "payload.h"
-#include "board_version.h"
 #include "pin_mapping.h"
 #include "ipmi.h"
 #include "task_priorities.h"
@@ -37,6 +36,7 @@
 #include "ad84xx.h"
 #include "hotswap.h"
 #include "utils.h"
+#include "fru.h"
 
 /* payload states
  *   0 - no power
@@ -109,8 +109,6 @@ void setDC_DC_ConvertersON( bool on )
     gpio_set_pin_state( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, _on);
     gpio_set_pin_state( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, _on);
     gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, _on);
-
-    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, _on);
 }
 
 void initializeDCDC( void )
@@ -130,8 +128,6 @@ void initializeDCDC( void )
     gpio_set_pin_dir( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, OUTPUT);
     gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, OUTPUT);
-
-    gpio_set_pin_dir( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, OUTPUT);
 }
 
 
@@ -168,20 +164,18 @@ void payload_init( void )
     irq_enable( EINT2_IRQn );
     gpio_set_pin_dir(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, OUTPUT);
 
-    if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
-        /* Flash CS Mux */
-        /* 0 = FPGA reads bitstream from Program memory
-         * 1 = FPGA reads bitstream from User memory
-         */
-        gpio_set_pin_dir(0, 19, OUTPUT);
-        gpio_set_pin_state(0, 19, LOW);
+    /* Flash CS Mux - Only valid to AFC v3.1 */
+    /* 0 = FPGA reads bitstream from Program memory
+     * 1 = FPGA reads bitstream from User memory
+     */
+    gpio_set_pin_dir(0, 19, OUTPUT);
+    gpio_set_pin_state(0, 19, LOW);
 
-        /* Init_B */
-        /* TODO: Check Init_b pin for error on initialization, then use it as output control */
+    /* Init_B */
+    /* TODO: Check Init_b pin for error on initialization, then use it as output control */
 
-        gpio_set_pin_dir(0, 20, OUTPUT);
-        gpio_set_pin_state(0, 20, HIGH);
-    }
+    gpio_set_pin_dir(0, 20, OUTPUT);
+    gpio_set_pin_state(0, 20, HIGH);
 }
 
 void vTaskPayload(void *pvParameters)
@@ -195,6 +189,8 @@ void vTaskPayload(void *pvParameters)
     uint8_t QUIESCED_req = 0;
 
     uint8_t current_message;
+
+    extern sensor_t * hotswap_amc_sensor;
 
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
@@ -226,14 +222,14 @@ void vTaskPayload(void *pvParameters)
             case PAYLOAD_MESSAGE_QUIESCED:
                 QUIESCED_req = 1;
                 break;
-	    case PAYLOAD_MESSAGE_COLD_RST:
-		state = PAYLOAD_SWITCHING_OFF;
-		break;
-	    case PAYLOAD_MESSAGE_REBOOT:
-		gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
-		asm("NOP");
-		gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
-		break;
+            case PAYLOAD_MESSAGE_COLD_RST:
+                state = PAYLOAD_SWITCHING_OFF;
+                break;
+            case PAYLOAD_MESSAGE_REBOOT:
+                gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+                asm("NOP");
+                gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+                break;
             }
         }
 
@@ -254,9 +250,9 @@ void vTaskPayload(void *pvParameters)
             break;
 
         case PAYLOAD_POWER_GOOD_WAIT:
-	    hotswap_clear_mask_bit( HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
-	    hotswap_clear_mask_bit( HOTSWAP_BACKEND_PWR_FAILURE_MASK );
-	    if (QUIESCED_req) {
+            hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
+            hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_FAILURE_MASK );
+            if (QUIESCED_req) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if (P1V0_good == 1) {
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
@@ -286,18 +282,16 @@ void vTaskPayload(void *pvParameters)
 
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON(false);
-	    /*
-	    hotswap_set_mask_bit( HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
-	    hotswap_send_event( HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
-	    */
-	    hotswap_set_mask_bit( HOTSWAP_QUIESCED_MASK );
-	    if ( hotswap_send_event( HOTSWAP_QUIESCED_MASK ) == ipmb_error_success ) {
+            hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
+            hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_BP_SDOWN );
+            hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
+            if ( hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_QUIESCED ) == ipmb_error_success ) {
                 QUIESCED_req = 0;
-		/* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
-		P12V_good = 0;
-		P1V0_good = 0;
+                /* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
+                P12V_good = 0;
+                P1V0_good = 0;
                 new_state = PAYLOAD_NO_POWER;
-		hotswap_clear_mask_bit( HOTSWAP_QUIESCED_MASK );
+                hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
             }
             break;
 
@@ -313,27 +307,29 @@ void vTaskPayload(void *pvParameters)
 IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL, ipmi_msg *req, ipmi_msg *rsp)
 {
     uint8_t len = rsp->data_len = 0;
+    uint8_t fru_id = req->data[1];
     uint8_t fru_ctl = req->data[2];
 
     rsp->completion_code = IPMI_CC_OK;
 
-    switch (fru_ctl) {
-    case FRU_CTLCODE_COLD_RST:
-	payload_send_message(PAYLOAD_MESSAGE_COLD_RST);
-	break;
-    case FRU_CTLCODE_WARM_RST:
-	payload_send_message(PAYLOAD_MESSAGE_WARM_RST);
-	break;
-    case FRU_CTLCODE_REBOOT:
-	payload_send_message(PAYLOAD_MESSAGE_REBOOT);
-	break;
-    case FRU_CTLCODE_QUIESCE:
-	payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
-	break;
-
-    default:
-	rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
-	break;
+    if (fru_id == FRU_AMC) {
+        switch (fru_ctl) {
+        case FRU_CTLCODE_COLD_RST:
+            payload_send_message(PAYLOAD_MESSAGE_COLD_RST);
+            break;
+        case FRU_CTLCODE_WARM_RST:
+            payload_send_message(PAYLOAD_MESSAGE_WARM_RST);
+            break;
+        case FRU_CTLCODE_REBOOT:
+            payload_send_message(PAYLOAD_MESSAGE_REBOOT);
+            break;
+        case FRU_CTLCODE_QUIESCE:
+            payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
+            break;
+        default:
+            rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+            break;
+        }
     }
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
@@ -355,7 +351,6 @@ IPMI_HANDLER(ipmi_picmg_cmd_get_fru_control_capabilities, NETFN_GRPEXT, IPMI_PIC
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }
-
 
 IPMI_HANDLER(ipmi_picmg_cmd_set_fru_activation_policy, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_ACTIVATION_POLICY, ipmi_msg *req, ipmi_msg *rsp)
 {

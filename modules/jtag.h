@@ -33,6 +33,6 @@
 #define SCANSTA_ADDR6_PIN	6
 #define SCANSTA_RST_PIN		7
 
-void init_scansta( void );
+void scansta_init( void );
 
 #endif

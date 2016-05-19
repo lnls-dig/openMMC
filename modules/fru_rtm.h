@@ -20,26 +20,11 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef FRU_H_
-#define FRU_H_
+/*! @file rtm_fru.h
+ * Creation of FRU information binary
+ * Based on Julian Mendez implementation for CERN MMC
+ */
 
-enum {
-    FRU_AMC,
-    FRU_RTM
-};
+#ifdef 
 
-bool fru_amc_runtime;
-size_t amc_fru_info_size;
-uint8_t *amc_fru_info;
-
-#ifdef MODULE_RTM
-bool fru_rtm_runtime;
-size_t rtm_fru_info_size;
-uint8_t *rtm_fru_info;
-#endif
-
-void fru_init( uint8_t id );
-size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len );
-size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len );
-
-#endif
+#include "fru.h"

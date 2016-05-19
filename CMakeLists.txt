@@ -52,6 +52,7 @@ if(NOT CMAKE_BUILD_TYPE)
     "Choose the type of build, options are: none Debug Release Trace."
     FORCE)
 endif()
+message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 
 # Include board specific code
 set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat -Wno-unused-parameter -Wno-missing-field-initializers")
@@ -81,7 +82,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Trace")
   add_subdirectory(trace)
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DTARGET_BOARD_NAME=${TARGET_BOARD_NAME} -DTARGET_BOARD_MAJOR=${TARGET_BOARD_MAJOR} -DTARGET_BOARD_MINOR=${TARGET_BOARD_MINOR} ")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DTARGET_BOARD_NAME=\"${TARGET_BOARD_NAME}\" ")
 
 
 # Libraries path

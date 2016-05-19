@@ -19,23 +19,30 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef AT24MAC_H_
-#define AT24MAC_H_
+#ifndef PCA9554_H_
+#define PCA9554_H_
 
-//#define AT24_MAC402
-#define AT24MAC602
+#define PCA9554_INPUT_REG	0
+#define PCA9554_OUTPUT_REG	1
+#define PCA9554_POLARITY_REG	2
+#define PCA9554_CFG_REG		3
 
-#define AT24MAC_ID_ADDR 0x80
+/* Pins Read/Write */
+uint8_t pca9554_read_port( void );
+uint8_t pca9554_read_pin( uint8_t pin );
+void pca9554_write_port( uint8_t data );
+void pca9554_write_pin( uint8_t pin, uint8_t data );
 
-#if defined(AT24MAC402)
-#define AT24MAC_EUI_ADDR 0x9A
-#elif defined(AT24MAC602)
-#define AT24MAC_EUI_ADDR 0x98
-#endif
+/* Polarity Control */
+void pca9554_set_port_pol( uint8_t pol );
+void pca9554_set_pin_pol( uint8_t pin, uint8_t pol );
+uint8_t pca9554_get_port_pol( void );
+uint8_t pca9554_get_pin_pol( uint8_t pin );
 
-size_t at24mac_read( uint8_t id, uint8_t address, uint8_t *rx_data, size_t buf_len, uint8_t timeout );
-size_t at24mac_read_serial_num( uint8_t id, uint8_t *rx_data, size_t buf_len, uint8_t timeout );
-size_t at24mac_read_eui( uint8_t id, uint8_t *rx_data, size_t buf_len, uint8_t timeout );
-size_t at24mac_write( uint8_t id, uint8_t address, uint8_t *tx_data, size_t buf_len, uint8_t timeout );
+/* Pins direction (output/input) */
+void pca9554_set_port_dir( uint8_t dir );
+void pca9554_set_pin_dir( uint8_t pin, uint8_t dir );
+uint8_t pca9554_get_port_dir( void );
+uint8_t pca9554_get_pin_dir( uint8_t pin );
 
 #endif

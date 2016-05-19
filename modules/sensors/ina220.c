@@ -35,7 +35,8 @@
 #include "port.h"
 #include "sdr.h"
 #include "task_priorities.h"
-#include "board_version.h"
+#include "i2c.h"
+#include "i2c_mapping.h"
 #include "payload.h"
 #include "ina220.h"
 #include "fpga_spi.h"
@@ -99,9 +100,9 @@ void vTaskINA220( void *Parameters )
 #ifdef MODULE_PAYLOAD
             if( ina220_sensor->sdr == &SDR_FMC1_12V ) {
                 /* Check if the Payload power is in an acceptable zone */
-		SDR_type_01h_t * ina220_sdr = ( SDR_type_01h_t * ) ina220_sensor->sdr;
+                SDR_type_01h_t * ina220_sdr = ( SDR_type_01h_t * ) ina220_sensor->sdr;
                 if ( ( ina220_sensor->readout_value >= (ina220_sdr->lower_critical_thr ) ) &&
-		     ( ina220_sensor->readout_value <= (ina220_sdr->upper_critical_thr ) ) ) {
+                     ( ina220_sensor->readout_value <= (ina220_sdr->upper_critical_thr ) ) ) {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
                 } else {
                     payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
@@ -189,26 +190,26 @@ Bool ina220_calibrate( t_ina220_data * data )
 
 void ina220_init( void )
 {
-    uint8_t i, j;
-    i = 0;
+    sensor_t *temp_sensor;
+    uint8_t i = 0;
 
     xTaskCreate( vTaskINA220, "INA220", 100, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
 
-    for ( j = 0; j < sdr_count; j++ ) {
-        /* Update their SDR */
-        /* Check if the handle pointer is not NULL */
-        if (sensor_array[j].task_handle == NULL) {
+    /* Iterate through the SDR Table to find all the INA220 entries */
+    for ( temp_sensor = sdr_head; temp_sensor != NULL; temp_sensor = temp_sensor->next) {
+
+        if ( temp_sensor->task_handle == NULL ) {
             continue;
         }
 
         /* Check if this task should update the selected SDR */
-        if ( *(sensor_array[j].task_handle) != vTaskINA220_Handle ) {
+        if ( *(temp_sensor->task_handle) != vTaskINA220_Handle ) {
             continue;
         }
 
         if (i < MAX_INA220_COUNT ) {
-            ina220_data[i].sensor = &sensor_array[j];
-            ina220_data[i].i2c_id = sensor_array[j].slave_addr;
+            ina220_data[i].sensor = temp_sensor;
+            ina220_data[i].i2c_id = temp_sensor->slave_addr;
             ina220_config( ina220_data[i].i2c_id, &ina220_data[i] );
             ina220_calibrate( &ina220_data[i] );
             ina220_data[i].sensor->signed_flag = 0;

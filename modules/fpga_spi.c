@@ -27,7 +27,8 @@
 #include "task_priorities.h"
 #include "string.h"
 #include "led.h"
-#include "board_version.h"
+#include "i2c.h"
+#include "sdr.h"
 
 #define FPGA_SPI_BITRATE                10000000
 #define FPGA_SPI_FRAME_SIZE             8
@@ -82,7 +83,8 @@ static void read_fpga_buffer( uint32_t * buffer, uint32_t buffer_len )
 
 static void init_diag_struct( board_diagnostic * diag )
 {
-    uint8_t i,j;
+    uint8_t i;
+    sensor_t * temp_sensor;
 
     /* Card ID */
     diag->cardID[0] = 0;
@@ -101,11 +103,11 @@ static void init_diag_struct( board_diagnostic * diag )
     diag->data_valid = 0x55555555;
 
     /* Sensors Readings */
-    for (i = 0, j = 0; i <= NUM_SENSOR; i++) {
-        if (sensor_array[i].diag_devID != NO_DIAG) {
-            diag->sensor[j].dev_id = sensor_array[i].diag_devID;
-            diag->sensor[j].measure = sensor_array[i].readout_value;
-            j++;
+    for ( i = 0, temp_sensor = sdr_head; (temp_sensor != NULL) && (i <= NUM_SENSOR); temp_sensor = temp_sensor->next) {
+        if (temp_sensor->diag_devID != NO_DIAG) {
+            diag->sensor[i].dev_id = temp_sensor->diag_devID;
+            diag->sensor[i].measure = temp_sensor->readout_value;
+            i++;
         }
     }
 
@@ -122,6 +124,8 @@ void vTaskFPGA_COMM( void * Parameters )
 {
     t_board_diagnostic diag_struct;
     board_diagnostic * diag = &(diag_struct.info);
+    uint8_t i;
+    sensor_t * temp_sensor;
 
     /* Zero fill the diag struct */
     memset( &(diag_struct.buffer[0]), 0, sizeof(diag_struct.buffer));
@@ -134,9 +138,9 @@ void vTaskFPGA_COMM( void * Parameters )
         vTaskDelay(FPGA_UPDATE_RATE);
     }
 
-    if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
+    //if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
         gpio_set_pin_state(0, 19, HIGH);
-    }
+	//}
 
     ssp_init( FPGA_SPI, FPGA_SPI_BITRATE, FPGA_SPI_FRAME_SIZE, SSP_MASTER, SSP_POLLING );
 
@@ -147,11 +151,12 @@ void vTaskFPGA_COMM( void * Parameters )
         diag->data_valid = 0x55555555;
 
         /* Update Sensors Readings */
-        for (uint8_t i = 0, j = 0; i < sdr_count; i++) {
-            if (sensor_array[i].diag_devID != NO_DIAG) {
-                diag->sensor[j].dev_id = sensor_array[i].diag_devID;
-                diag->sensor[j].measure = sensor_array[i].readout_value;
-                j++;
+
+        for ( i = 0, temp_sensor = sdr_head; (temp_sensor != NULL) && (i <= NUM_SENSOR); temp_sensor = temp_sensor->next) {
+        	if (temp_sensor->diag_devID != NO_DIAG) {
+                diag->sensor[i].dev_id = temp_sensor->diag_devID;
+                diag->sensor[i].measure = temp_sensor->readout_value;
+                i++;
             }
         }
 
@@ -189,7 +194,7 @@ void vTaskFPGA_COMM( void * Parameters )
     }
 }
 
-void init_fpga_spi( void )
+void fpga_spi_init( void )
 {
     xTaskCreate(vTaskFPGA_COMM, "FPGA_COMM", 150, NULL, tskFPGA_COMM_PRIORITY, (TaskHandle_t *) NULL);
 }

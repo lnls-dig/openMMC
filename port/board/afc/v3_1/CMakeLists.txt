@@ -1,9 +1,7 @@
 #Select which microcontroller and board are being used
-set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller")
+set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller" FORCE)
 
-set(TARGET_BOARD_NAME  "AFC3_1" CACHE STRING "Board Name")
-set(TARGET_BOARD_MAJOR 3 CACHE STRING "Board Major Version")
-set(TARGET_BOARD_MINOR 1 CACHE STRING "Board Minor Version")
+set(TARGET_BOARD_NAME  "AFC 3.1" CACHE STRING "Board Name" FORCE)
 
 #List all modules used by this board
 set(TARGET_MODULES
@@ -19,14 +17,17 @@ set(TARGET_MODULES
   "HOTSWAP_SENSOR"
   "TEMPERATURE_SENSOR"
   "VOLTAGE_SENSOR"
+  "CURRENT_SENSOR"
   "HPM"
+  "RTM"
   )
 
 set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 #Include the modules sources
 ##Sensors SDR list
-set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c )
+set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c)
+set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/i2c_mapping.c)
 
 #Extra definitions
 if (FRU_WRITE_EEPROM)

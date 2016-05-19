@@ -97,6 +97,6 @@ typedef union {
 } t_board_diagnostic;
 
 void vTaskFPGA_COMM( void * Parameters );
-void init_fpga_spi( void );
+void fpga_spi_init( void );
 
 #endif

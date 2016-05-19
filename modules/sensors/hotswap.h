@@ -19,31 +19,40 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+#include "sdr.h"
+
 #define DEBOUNCE_TIME 250
 
 /* Module handle sensor status */
-#define HOT_SWAP_STATE_HANDLE_CLOSED            0x00
-#define HOT_SWAP_STATE_HANDLE_OPENED            0x01
-#define HOT_SWAP_STATE_QUIESCED                 0x02
-#define HOT_SWAP_STATE_BP_FAIL                  0x03
-#define HOT_SWAP_STATE_BP_SDOWN                 0x04
-#define HOT_SWAP_STATE_URTM_PRSENT              0x05
-#define HOT_SWAP_STATE_URTM_ABSENT              0x06
-#define HOT_SWAP_STATE_URTM_COMPATIBLE          0x07
-#define HOT_SWAP_STATE_URTM_INCOMPATIBLE        0x08
+#define HOTSWAP_STATE_HANDLE_CLOSED             0x00
+#define HOTSWAP_STATE_HANDLE_OPENED             0x01
+#define HOTSWAP_STATE_QUIESCED                  0x02
+#define HOTSWAP_STATE_BP_FAIL                   0x03
+#define HOTSWAP_STATE_BP_SDOWN                  0x04
+#define HOTSWAP_STATE_URTM_PRSENT               0x05
+#define HOTSWAP_STATE_URTM_ABSENT               0x06
+#define HOTSWAP_STATE_URTM_COMPATIBLE           0x07
+#define HOTSWAP_STATE_URTM_INCOMPATIBLE         0x08
 
 #define HOTSWAP_MODULE_HANDLE_CLOSED_MASK       0x01
 #define HOTSWAP_MODULE_HANDLE_OPEN_MASK         0x02
 #define HOTSWAP_QUIESCED_MASK                   0x04
 #define HOTSWAP_BACKEND_PWR_FAILURE_MASK        0x08
 #define HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK       0x10
+#define HOTSWAP_URTM_PRESENT_MASK		0x20
+#define HOTSWAP_URTM_ABSENT_MASK		0x40
+#define HOTSWAP_URTM_COMPATIBLE_MASK		0x80
+#define HOTSWAP_URTM_INCOMPATIBLE_MASK		0x100 /* This will be cropped to 0x00 */
+
+enum {
+    HOTSWAP_AMC,
+    HOTSWAP_RTM
+};
 
 TaskHandle_t vTaskHotSwap_Handle;
 
-extern const SDR_type_02h_t SDR_HOT_SWAP;
-
 void vTaskHotSwap( void *Parameters );
 void hotswap_init( void );
-ipmb_error hotswap_send_event( uint8_t evt );
-void hotswap_set_mask_bit( uint8_t mask );
-void hotswap_clear_mask_bit( uint8_t mask );
+ipmb_error hotswap_send_event( sensor_t *sensor, uint8_t evt );
+void hotswap_set_mask_bit( uint8_t fru, uint8_t mask );
+void hotswap_clear_mask_bit( uint8_t fru, uint8_t mask );

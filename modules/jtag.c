@@ -22,7 +22,7 @@
 #include "port.h"
 #include "jtag.h"
 
-void init_scansta( void )
+void scansta_init( void )
 {
     gpio_set_pin_dir(SCANSTA_PORT, SCANSTA_ADDR0_PIN, OUTPUT);
     gpio_set_pin_dir(SCANSTA_PORT, SCANSTA_ADDR1_PIN, OUTPUT);

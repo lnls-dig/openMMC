@@ -1,7 +1,6 @@
 /*
  *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   Copyright (C) 2015  Julian Mendez  <julian.mendez@cern.ch>
  *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -20,26 +19,25 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef FRU_H_
-#define FRU_H_
+#ifndef RTM_USER_H_
+#define RTM_USER_H_
 
-enum {
-    FRU_AMC,
-    FRU_RTM
-};
+/* PCA9554 outputs */
+#define RTM_GPIO_HOTSWAP_HANDLE		0
+#define RTM_GPIO_OVERTEMP_SHUTDOWN	4
+#define RTM_GPIO_LED_RED		5
+#define RTM_GPIO_LED_GREEN		6
+#define RTM_GPIO_LED_BLUE		7
 
-bool fru_amc_runtime;
-size_t amc_fru_info_size;
-uint8_t *amc_fru_info;
+/* Mandatory RTM module functions */
+void rtm_enable_payload_power( void );
+void rtm_disable_payload_power( void );
+uint8_t rtm_get_hotswap_handle_status( void );
+void rtm_check_presence( uint8_t *status );
+void rtm_hardware_init( void );
 
-#ifdef MODULE_RTM
-bool fru_rtm_runtime;
-size_t rtm_fru_info_size;
-uint8_t *rtm_fru_info;
-#endif
-
-void fru_init( uint8_t id );
-size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len );
-size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len );
+/* User defined functions */
+void rtm_enable_i2c( void );
+void rtm_disable_i2c( void );
 
 #endif

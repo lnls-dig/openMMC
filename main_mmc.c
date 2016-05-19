@@ -27,17 +27,18 @@
 #include "semphr.h"
 
 /* Project includes */
-#include "chip.h"
+#include "port.h"
 #include "pin_mapping.h"
 #include "led.h"
 #include "ipmi.h"
 #include "sdr.h"
 #include "payload.h"
-#include "board_version.h"
+#include "i2c.h"
 #include "fru.h"
 #include "jtag.h"
 #include "fpga_spi.h"
 #include "watchdog.h"
+#include "rtm.h"
 
 //#define HEAP_TEST
 //#define STOP_TEST
@@ -68,16 +69,14 @@ int main(void)
 #endif
 
     LED_init();
-
-    portENABLE_INTERRUPTS();
-    board_i2c_init();
+    i2c_init();
 
 #ifdef MODULE_FRU
-    fru_init();
+    fru_init(FRU_AMC);
+#ifdef MODULE_RTM
+    fru_init(FRU_RTM);
 #endif
-
-    board_discover();
-    portDISABLE_INTERRUPTS();
+#endif
 
     ipmb_addr = get_ipmb_addr();
 #ifdef MODULE_SDR
@@ -90,10 +89,13 @@ int main(void)
     payload_init();
 #endif
 #ifdef MODULE_JTAG_SWITCH
-    init_scansta();
+    scansta_init();
 #endif
 #ifdef MODULE_FPGA_SPI
-    init_fpga_spi();
+    fpga_spi_init();
+#endif
+#ifdef MODULE_RTM
+    rtm_manage_init();
 #endif
     /*  Init IPMI interface */
     /* NOTE: ipmb_init() is called inside this function */
