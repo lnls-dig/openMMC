@@ -27,6 +27,8 @@
 #include "pin_mapping.h"
 #include "hotswap.h"
 #include "i2c_mapping.h"
+#include "fru.h"
+#include "utils.h"
 
 /* RTM Management functions */
 
@@ -103,4 +105,51 @@ void rtm_disable_i2c( void )
 {
     gpio_set_pin_dir( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN, INPUT );
     gpio_set_pin_dir( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, INPUT );
+}
+
+Bool rtm_compatibility_check( void )
+{
+    uint8_t i;
+    size_t rec_sz[2];
+    uint8_t *z3_compat_recs[2] = { NULL, NULL };
+    uint8_t cmn_hdr[8], multirec_hdr[5];
+    uint8_t multirec_off;
+    bool z3rec_found;
+
+    for ( i = 0; i < 2; i++ ) {
+	/* Read FRU Common Header */
+	fru_read( i, cmn_hdr, 0, 8 );
+	/* The offsets are divided by 8 in the common header */
+	multirec_off = cmn_hdr[5]*8;
+
+	do {
+	    /* Read Multirecord header */
+	    fru_read( i, multirec_hdr, multirec_off, 10 );
+
+	    if (multirec_hdr[8] == 0x30) {
+		z3rec_found = true;
+		break;
+	    }
+	    /* Advance the offset pointer, adding the record length field to it */
+	    multirec_off += multirec_hdr[2]+5;
+
+	} while ( (multirec_hdr[1] >> 7) != 1 );
+
+	if ( z3rec_found ) {
+	    /* Read the Zone3 Compatibility Record, including the Multirecord header */
+	    rec_sz[i] = multirec_hdr[2]+5;
+	    z3_compat_recs[i] = pvPortMalloc( rec_sz[i] );
+	    fru_read( i, z3_compat_recs[i], multirec_off, rec_sz[i] );
+	}
+
+    }
+
+    if ( !cmpBuffs( z3_compat_recs[0], rec_sz[0], z3_compat_recs[1], rec_sz[1] ) ) {
+	return true;
+    }
+
+    vPortFree(z3_compat_recs[0]);
+    vPortFree(z3_compat_recs[1]);
+
+    return false;
 }

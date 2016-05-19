@@ -36,7 +36,7 @@ void RTM_Manage( void * Parameters )
 {
     uint8_t ps_old_state = 0xFF;
     uint8_t ps_new_state;
-
+    Bool rtm_compatible;
     extern sensor_t * hotswap_rtm_sensor;
 
     for ( ;; ) {
@@ -45,14 +45,24 @@ void RTM_Manage( void * Parameters )
         ps_new_state = rtm_check_presence();
 
         if ( ps_new_state ^ ps_old_state ) {
-            if ( ps_new_state == RTM_PS_PRESENT ) {
+            if ( ps_new_state == HOTSWAP_STATE_URTM_PRSENT ) {
+
                 /* RTM Present */
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_URTM_PRESENT_MASK );
 
-		rtm_hardware_init();
+                /* Check the Zone3 compatibility records */
+                rtm_compatible = rtm_compatibility_check();
+                if ( rtm_compatible ) {
+                    /* Send RTM Compatible message */
+                    hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_COMPATIBLE );
+                    rtm_hardware_init();
+                } else {
+                    /* Send RTM Incompatible message */
+                    hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_INCOMPATIBLE );
+                }
 
                 /* Activate RTM sensors in the SDR table */
-		//sdr_activate_sensors(); /* Not implemented yet */
+                //sdr_activate_sensors(); /* Not implemented yet */
 
             } else if ( ps_new_state == RTM_PS_ABSENT ) {
                 //sdr_disable_sensors(); /* Not implemented yet */
@@ -62,11 +72,14 @@ void RTM_Manage( void * Parameters )
         }
 
         /* We should not be activating the controlling the RTM LEDs directly, wait for a command to do that */
-        if ( rtm_get_hotswap_handle_status() == HOTSWAP_MODULE_HANDLE_CLOSED_MASK ) {
-            rtm_enable_payload_power();
-        } else {
-            rtm_disable_payload_power();
+        if ( rtm_compatible ) {
+            if ( rtm_get_hotswap_handle_status() == HOTSWAP_STATE_HANDLE_CLOSED ) {
+                rtm_enable_payload_power();
+                continue;
+            }
         }
+
+        rtm_disable_payload_power();
     }
 }
 
