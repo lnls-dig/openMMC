@@ -281,12 +281,10 @@ void vTaskPayload(void *pvParameters)
 
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON(false);
-	    /*
-	    hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
-	    hotswap_send_event( hotswap_amc_sensor, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
-	    */
-	    hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
-	    if ( hotswap_send_event( hotswap_amc_sensor, HOTSWAP_QUIESCED_MASK ) == ipmb_error_success ) {
+            hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
+            hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_BP_SDOWN );
+            hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
+            if ( hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_QUIESCED ) == ipmb_error_success ) {
                 QUIESCED_req = 0;
 		/* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
 		P12V_good = 0;
