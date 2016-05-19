@@ -125,7 +125,7 @@ void sdr_init( void )
 #endif
 }
 
-void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr)
+sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr)
 {
     uint8_t index = sdr_count;
     uint8_t sdr_len = sdr_get_size_by_type(type);
@@ -143,6 +143,7 @@ void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, ui
     entry->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
     entry->readout_value = 0;
     entry->state = SENSOR_STATE_LOW_NON_REC;
+    entry->active = true;
 
     /* Link the sdr list */
     sdr_tail->next = entry;
@@ -151,6 +152,8 @@ void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, ui
 
     sdr_count++;
     sdr_change_count++;
+
+    return entry;
 }
 
 sensor_t * find_sensor_by_sdr( void * sdr )

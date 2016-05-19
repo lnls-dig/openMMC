@@ -215,13 +215,15 @@ const SDR_type_12h_t SDR_RTM_DEV_LOCATOR;
 #define GET_EVENT_TYPE_CODE(n)      ((SDR_type_01h_t *)sensor->sdr)->event_reading_type
 
 void initializeDCDC( void );
+
 void sdr_init( void );
-void sensor_init( void );
-void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr );
-void check_sensor_event( sensor_t * sensor );
 void user_sdr_init( void );
-sensor_t * find_sensor_by_sdr( void * sdr );
+void sensor_init( void );
+void check_sensor_event( sensor_t * sensor );
+
+sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr);
 void sdr_remove_entry( sensor_t * entry );
+sensor_t * find_sensor_by_sdr( void * sdr );
 sensor_t * find_sensor_by_id( uint8_t id );
 
 #endif
