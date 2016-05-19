@@ -108,7 +108,7 @@ Bool rtm_compatibility_check( void )
     uint8_t i;
     size_t rec_sz[2];
     uint8_t *z3_compat_recs[2] = { NULL, NULL };
-    uint8_t cmn_hdr[8], multirec_hdr[5];
+    uint8_t cmn_hdr[8], multirec_hdr[10];
     uint8_t multirec_off;
     bool z3rec_found;
 
