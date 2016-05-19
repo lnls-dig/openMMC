@@ -4,8 +4,7 @@
 
 i2c_mux_state_t i2c_mux[I2C_MUX_CNT] = {
     { I2C1, -1, 0 },
-    { I2C2, -1, 0 },
-    { 0, 0, 0 }
+    { I2C2, -1, 0 }
 };
 
 i2c_bus_mapping_t i2c_bus_map[I2C_BUS_CNT] = {
