@@ -1,7 +1,7 @@
 #Select which microcontroller and board are being used
-set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller")
+set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller" FORCE)
 
-set(TARGET_BOARD_NAME  "AFC 3.0" CACHE STRING "Board Name")
+set(TARGET_BOARD_NAME  "AFC 3.0" CACHE STRING "Board Name" FORCE)
 
 #List all modules used by this board
 set(TARGET_MODULES
