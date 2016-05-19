@@ -22,14 +22,9 @@
 #ifndef RTM_H_
 #define RTM_H_
 
-#define RTM_PS_PRESENT    0
-#define RTM_PS_ABSENT     1
-
 void rtm_manage_init( void );
 void rtm_enable_payload_power( void );
-
 uint8_t rtm_get_hotswap_handle_status( void );
-void rtm_insert_sdr_entries( void );
-void rtm_remove_sdr_entries( void );
+Bool rtm_compatibility_check( void );
 
 #endif
