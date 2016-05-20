@@ -23,6 +23,8 @@
 #ifndef IPMI_PAYLOAD_H_
 #define IPMI_PAYLOAD_H_
 
+#include "event_groups.h"
+
 typedef enum {
     PAYLOAD_NO_POWER = 0,
     PAYLOAD_SWITCHING_ON,
@@ -38,25 +40,23 @@ typedef enum {
     PAYLOAD_POWER_FAIL = 255
 } payload_state;
 
-typedef enum {
-    PAYLOAD_MESSAGE_P12GOOD,
-    PAYLOAD_MESSAGE_P12GOODn,
-    PAYLOAD_MESSAGE_PGOOD,
-    PAYLOAD_MESSAGE_PGOODn,
-    PAYLOAD_MESSAGE_COLD_RST,
-    PAYLOAD_MESSAGE_WARM_RST,
-    PAYLOAD_MESSAGE_REBOOT,
-    PAYLOAD_MESSAGE_QUIESCED
-} payload_message;
+#define PAYLOAD_MESSAGE_P12GOOD         (1 << 0)
+#define PAYLOAD_MESSAGE_P12GOODn        (1 << 1)
+#define PAYLOAD_MESSAGE_PGOOD           (1 << 2)
+#define PAYLOAD_MESSAGE_PGOODn          (1 << 3)
+#define PAYLOAD_MESSAGE_COLD_RST        (1 << 4)
+#define PAYLOAD_MESSAGE_WARM_RST        (1 << 5)
+#define PAYLOAD_MESSAGE_REBOOT          (1 << 6)
+#define PAYLOAD_MESSAGE_QUIESCED        (1 << 7)
 
-#define FRU_CTLCODE_COLD_RST          (0)       // FRU Control command cold reset code
-#define FRU_CTLCODE_WARM_RST          (1)       // FRU Control command warm reset code
-#define FRU_CTLCODE_REBOOT            (2)       // FRU Control command reboot code
-#define FRU_CTLCODE_QUIESCE           (4)       // FRU Control command quiesce code
+#define FRU_CTLCODE_COLD_RST            (0)
+#define FRU_CTLCODE_WARM_RST            (1)
+#define FRU_CTLCODE_REBOOT              (2)
+#define FRU_CTLCODE_QUIESCE             (4)
 
 #define PAYLOAD_BASE_DELAY 100
 
-void payload_send_message(uint8_t msg);
+void payload_send_message( uint8_t fru_id, EventBits_t msg);
 void vTaskPayload(void *pvParameters);
 void payload_init(void);
 

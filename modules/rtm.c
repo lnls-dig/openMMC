@@ -21,10 +21,11 @@
 
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
+#include "event_groups.h"
 
 /* Project includes */
-#include "rtm.h"
 #include "port.h"
+#include "rtm.h"
 #include "rtm_user.h"
 #include "ipmi.h"
 #include "hotswap.h"
@@ -33,8 +34,10 @@
 #include "pin_mapping.h"
 #include "fru.h"
 #include "hotswap.h"
+#include "payload.h"
 
 volatile uint8_t rtm_power_level = 0;
+extern EventGroupHandle_t rtm_payload_evt;
 
 void RTM_Manage( void * Parameters )
 {
@@ -42,6 +45,8 @@ void RTM_Manage( void * Parameters )
     uint8_t ps_new_state;
     Bool rtm_compatible;
     extern sensor_t * hotswap_rtm_sensor;
+
+    EventBits_t current_evt;
 
     /* A local copy of rtm_power_level to check if it's changed status */
     uint8_t rtm_pwr_lvl_change = rtm_power_level;
@@ -97,6 +102,13 @@ void RTM_Manage( void * Parameters )
 		rtm_enable_payload_power();
 	    } else {
 		rtm_disable_payload_power();
+	    }
+	}
+
+	current_evt = xEventGroupGetBits( rtm_payload_evt );
+
+	if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
+	    if ( rtm_quiesce() ) {
 		/* Quiesced event */
 		hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
 		hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_QUIESCED );

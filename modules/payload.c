@@ -23,8 +23,8 @@
 /* FreeRTOS Includes */
 #include "FreeRTOS.h"
 #include "task.h"
-#include "queue.h"
 #include "semphr.h"
+#include "event_groups.h"
 
 /* Project Includes */
 #include "port.h"
@@ -130,13 +130,19 @@ void initializeDCDC( void )
     gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, OUTPUT);
 }
 
+EventGroupHandle_t amc_payload_evt = NULL;
+#ifdef MODULE_RTM
+EventGroupHandle_t rtm_payload_evt = NULL;
+#endif
 
-QueueHandle_t queue_payload_handle = 0;
-
-void payload_send_message(uint8_t msg)
+void payload_send_message( uint8_t fru_id, EventBits_t msg)
 {
-    if (queue_payload_handle) {
-        xQueueSend(queue_payload_handle, &msg, (TickType_t) 0);
+    if ( (fru_id == FRU_AMC) && amc_payload_evt ) {
+        xEventGroupSetBits( amc_payload_evt, msg );
+#ifdef MODULE_RTM
+    } else if ( (fru_id == FRU_RTM) && rtm_payload_evt ) {
+        xEventGroupSetBits( rtm_payload_evt, msg );
+#endif
     }
 }
 
@@ -146,8 +152,10 @@ void payload_init( void )
 {
     xTaskCreate(vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
 
-    /** @todo: Use event groups instead of queues here */
-    queue_payload_handle = xQueueCreate(5, sizeof(uint8_t));
+    amc_payload_evt = xEventGroupCreate();
+#ifdef MODULE_RTM
+    rtm_payload_evt = xEventGroupCreate();
+#endif
 
     initializeDCDC();
 
@@ -188,7 +196,7 @@ void vTaskPayload(void *pvParameters)
     uint8_t FPGA_boot_DONE = 0;
     uint8_t QUIESCED_req = 0;
 
-    uint8_t current_message;
+    EventBits_t current_evt;
 
     extern sensor_t * hotswap_amc_sensor;
 
@@ -204,37 +212,28 @@ void vTaskPayload(void *pvParameters)
 
         new_state = state;
 
-        /* Read all messages from the queue */
-        while(xQueueReceive(queue_payload_handle, &current_message, (TickType_t) 0 )) {
-            switch (current_message) {
-            case PAYLOAD_MESSAGE_P12GOOD:
-                P12V_good = 1;
-                break;
-            case PAYLOAD_MESSAGE_P12GOODn:
-                P12V_good = 0;
-                break;
-            case PAYLOAD_MESSAGE_PGOOD:
-                P1V0_good = 1;
-                break;
-            case PAYLOAD_MESSAGE_PGOODn:
-                P1V0_good = 0;
-                break;
-            case PAYLOAD_MESSAGE_QUIESCED:
-                QUIESCED_req = 1;
-                break;
-            case PAYLOAD_MESSAGE_COLD_RST:
-                state = PAYLOAD_SWITCHING_OFF;
-                break;
-            case PAYLOAD_MESSAGE_REBOOT:
-                gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
-                asm("NOP");
-                gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
-                break;
-            }
+        current_evt = xEventGroupGetBits( amc_payload_evt );
+
+        if ( current_evt & PAYLOAD_MESSAGE_P12GOOD ) {
+            P12V_good = 1;
+        } else if ( current_evt & PAYLOAD_MESSAGE_P12GOODn ) {
+            P12V_good = 0;
+        } else if ( current_evt & PAYLOAD_MESSAGE_PGOOD ) {
+            P1V0_good = 1;
+        } else if ( current_evt & PAYLOAD_MESSAGE_PGOODn ) {
+            P1V0_good = 0;
+        } else if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
+            QUIESCED_req = 1;
+        } else if ( current_evt & PAYLOAD_MESSAGE_COLD_RST ) {
+            state = PAYLOAD_SWITCHING_OFF;
+        } else if ( current_evt & PAYLOAD_MESSAGE_REBOOT ) {
+            gpio_clr_pin( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
+            asm("NOP");
+            gpio_set_pin( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
         }
 
-        FPGA_boot_DONE = gpio_read_pin( GPIO_DONE_B_PORT, GPIO_DONE_B_PIN);
-        P1V0_good = gpio_read_pin( GPIO_PGOOD_P1V0_PORT,GPIO_PGOOD_P1V0_PIN);
+        FPGA_boot_DONE = gpio_read_pin( GPIO_DONE_B_PORT, GPIO_DONE_B_PIN );
+        P1V0_good = gpio_read_pin( GPIO_PGOOD_P1V0_PORT,GPIO_PGOOD_P1V0_PIN );
 
         switch(state) {
         case PAYLOAD_NO_POWER:
@@ -312,24 +311,22 @@ IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTRO
 
     rsp->completion_code = IPMI_CC_OK;
 
-    if (fru_id == FRU_AMC) {
-        switch (fru_ctl) {
-        case FRU_CTLCODE_COLD_RST:
-            payload_send_message(PAYLOAD_MESSAGE_COLD_RST);
-            break;
-        case FRU_CTLCODE_WARM_RST:
-            payload_send_message(PAYLOAD_MESSAGE_WARM_RST);
-            break;
-        case FRU_CTLCODE_REBOOT:
-            payload_send_message(PAYLOAD_MESSAGE_REBOOT);
-            break;
-        case FRU_CTLCODE_QUIESCE:
-            payload_send_message(PAYLOAD_MESSAGE_QUIESCED);
-            break;
-        default:
-            rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
-            break;
-        }
+    switch (fru_ctl) {
+    case FRU_CTLCODE_COLD_RST:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_COLD_RST);
+        break;
+    case FRU_CTLCODE_WARM_RST:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_WARM_RST);
+        break;
+    case FRU_CTLCODE_REBOOT:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_REBOOT);
+        break;
+    case FRU_CTLCODE_QUIESCE:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_QUIESCED);
+        break;
+    default:
+        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+        break;
     }
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
