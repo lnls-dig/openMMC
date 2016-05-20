@@ -73,9 +73,6 @@ int main(void)
 
 #ifdef MODULE_FRU
     fru_init(FRU_AMC);
-#ifdef MODULE_RTM
-    fru_init(FRU_RTM);
-#endif
 #endif
 
     ipmb_addr = get_ipmb_addr();

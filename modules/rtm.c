@@ -62,6 +62,9 @@ void RTM_Manage( void * Parameters )
         if ( ps_new_state ^ ps_old_state ) {
             if ( ps_new_state == HOTSWAP_STATE_URTM_PRSENT ) {
 
+		/* Create/Read the RTM FRU info before sending the hotswap event */
+		fru_init(FRU_RTM);
+
                 /* RTM Present event */
 		hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_PRESENT_MASK );
 		hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_ABSENT_MASK );
