@@ -149,3 +149,9 @@ Bool rtm_compatibility_check( void )
 
     return false;
 }
+
+Bool rtm_quiesce( void )
+{
+    /* In this board, no action is needed to quiesce */
+    return true;
+}
