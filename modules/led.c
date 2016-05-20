@@ -44,6 +44,7 @@
 #include "led.h"
 #include "pin_mapping.h"
 #include "task_priorities.h"
+#include "fru.h"
 
 //extern LED_state_rec_t LEDstate[LED_CNT];
 
@@ -242,11 +243,21 @@ led_error LED_update( uint8_t led_num, const LED_activity_desc_t * pLEDact )
 
 IPMI_HANDLER(ipmi_picmg_set_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_LED_STATE, ipmi_msg *req, ipmi_msg *rsp )
 {
+    uint8_t fru_id = req->data[1];
+
     led_error error;
     const LED_activity_desc_t * pLEDact;
     LED_activity_desc_t LEDact;
     pLEDact = &LEDact;
     /* We use this pointer assignment, so we can also set it to NULL if we need */
+
+    if ( fru_id == FRU_RTM )  {
+	/* RTM LEDs control are not implemented yet, just return an OK */
+	rsp->completion_code = IPMI_CC_OK;
+	rsp->data_len = 0;
+	rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
+	return;
+    }
 
     switch (req->data[3]) {
     case 0x00:
