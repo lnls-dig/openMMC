@@ -50,18 +50,23 @@ void RTM_Manage( void * Parameters )
         if ( ps_new_state ^ ps_old_state ) {
             if ( ps_new_state == HOTSWAP_STATE_URTM_PRSENT ) {
 
-                /* RTM Present */
-                hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_PRSENT );
+                /* RTM Present event */
+		hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_PRESENT_MASK );
+		hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_ABSENT_MASK );
+		hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_PRSENT );
 
                 /* Check the Zone3 compatibility records */
                 rtm_compatible = rtm_compatibility_check();
                 if ( rtm_compatible ) {
                     /* Send RTM Compatible message */
                     hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_COMPATIBLE );
+		    hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
+
                     rtm_hardware_init();
                 } else {
                     /* Send RTM Incompatible message */
                     hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_INCOMPATIBLE );
+		    hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
                 }
 
                 /* Activate RTM sensors in the SDR table */
@@ -69,6 +74,9 @@ void RTM_Manage( void * Parameters )
 
             } else if ( ps_new_state == HOTSWAP_STATE_URTM_ABSENT ) {
                 //sdr_disable_sensors(); /* Not implemented yet */
+
+		hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_ABSENT_MASK );
+		hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_PRESENT_MASK );
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_ABSENT );
             }
             ps_old_state = ps_new_state;
