@@ -32,6 +32,7 @@
 #include "task_priorities.h"
 #include "pin_mapping.h"
 #include "fru.h"
+#include "hotswap.h"
 
 volatile uint8_t rtm_power_level = 0;
 
@@ -41,6 +42,12 @@ void RTM_Manage( void * Parameters )
     uint8_t ps_new_state;
     Bool rtm_compatible;
     extern sensor_t * hotswap_rtm_sensor;
+
+    /* A local copy of rtm_power_level to check if it's changed status */
+    uint8_t rtm_pwr_lvl_change = rtm_power_level;
+
+    /* Start with RTM payload disabled */
+    rtm_disable_payload_power();
 
     for ( ;; ) {
         vTaskDelay(100);
@@ -82,11 +89,19 @@ void RTM_Manage( void * Parameters )
             ps_old_state = ps_new_state;
         }
 
-        if ( rtm_power_level == 0x01 ) {
-            rtm_enable_payload_power();
-        } else {
-            rtm_disable_payload_power();
-        }
+	if ( rtm_pwr_lvl_change ^ rtm_power_level ) {
+	    rtm_pwr_lvl_change = rtm_power_level;
+
+	    if ( rtm_power_level == 0x01 ) {
+		hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
+		rtm_enable_payload_power();
+	    } else {
+		rtm_disable_payload_power();
+		/* Quiesced event */
+		hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
+		hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_QUIESCED );
+	    }
+	}
     }
 }
 
