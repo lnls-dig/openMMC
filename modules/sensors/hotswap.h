@@ -19,6 +19,9 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+#ifndef _HOTSWAP_H_
+#define _HOTSWAP_H_
+
 #include "sdr.h"
 
 #define DEBOUNCE_TIME 250
@@ -55,3 +58,5 @@ void hotswap_init( void );
 ipmb_error hotswap_send_event( sensor_t *sensor, uint8_t evt );
 void hotswap_set_mask_bit( uint8_t fru, uint8_t mask );
 void hotswap_clear_mask_bit( uint8_t fru, uint8_t mask );
+
+#endif
