@@ -29,6 +29,7 @@
 #include "task_priorities.h"
 #include "ipmi.h"
 #include "led.h"
+#include "fru.h"
 #include "utils.h"
 #include "rtm.h"
 
@@ -83,17 +84,19 @@ void vTaskHotSwap( void *Parameters )
     /* Init old_state with a different value, so that the uC always send its state on startup */
     static uint8_t old_state_amc = 0xFF;
     static uint8_t new_state_amc;
+#ifdef MODULE_RTM
     static uint8_t old_state_rtm = 0xFF;
     static uint8_t new_state_rtm;
+#endif
 
     TickType_t xLastWakeTime;
     const TickType_t xFrequency = 50;
 
     /* Override Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
     if ( gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN) == 0 ) {
-        LED_update( LED_BLUE, &LED_Off_Activity );
+	LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
     } else {
-        LED_update( LED_BLUE, &LED_On_Activity );
+	LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
     }
 
     /* Initialise the xLastWakeTime variable with the current time. */

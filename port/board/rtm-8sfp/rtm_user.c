@@ -29,6 +29,7 @@
 #include "i2c_mapping.h"
 #include "fru.h"
 #include "utils.h"
+#include "led_new.h"
 
 /* RTM Management functions */
 
@@ -154,4 +155,52 @@ Bool rtm_quiesce( void )
 {
     /* In this board, no action is needed to quiesce */
     return true;
+}
+
+void rtm_ctrl_led( uint8_t id, uint8_t state )
+{
+    uint8_t pca_pin;
+
+    switch( id ) {
+    case LED0_BLUE:
+	pca_pin = RTM_GPIO_LED_BLUE;
+	break;
+
+    case LED1:
+	pca_pin = RTM_GPIO_LED_RED;
+	break;
+
+    case LED2:
+	pca_pin = RTM_GPIO_LED_GREEN;
+	break;
+
+    default:
+	return;
+    }
+
+    pca9554_write_pin( pca_pin, state );
+}
+
+uint8_t rtm_read_led( uint8_t id )
+{
+    uint8_t pca_pin;
+
+    switch( id ) {
+    case LED0_BLUE:
+	pca_pin = RTM_GPIO_LED_BLUE;
+	break;
+
+    case LED1:
+	pca_pin = RTM_GPIO_LED_RED;
+	break;
+
+    case LED2:
+	pca_pin = RTM_GPIO_LED_GREEN;
+	break;
+
+    default:
+	return 1;
+    }
+
+    return pca9554_read_pin( pca_pin );
 }
