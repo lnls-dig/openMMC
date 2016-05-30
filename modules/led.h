@@ -28,6 +28,8 @@
 #define LEDCONFIG_SIZE 1
 #endif
 
+#include "port.h"
+
 enum LED_ID {
     LED_BLUE = 0,
     LED1, /* Red */
@@ -55,9 +57,9 @@ enum LEDState {
 };
 
 enum LEDAct {
-    LEDACT_TURN_ON,
-    LEDACT_TURN_OFF,
-    LEDACT_TOGGLE
+    LEDACT_TURN_ON = 0x00,
+    LEDACT_TOGGLE,
+    LEDACT_TURN_OFF = 0xFF
 };
 
 enum LEDMode {
@@ -71,7 +73,7 @@ enum LEDMode {
 typedef void (* led_act_func_t)( uint8_t id, uint8_t action );
 
 typedef struct {
-    Bool active;
+    bool active;
     uint8_t init_status;
     uint16_t t_init;
     uint16_t t_toggle;

@@ -209,14 +209,16 @@ void LED_Task( void *Parameters )
 void LEDManage( LEDConfig_t *led_cfg )
 {
     uint8_t mode = led_cfg->mode;
-    uint8_t status = led_cfg->mode_cfg[mode].init_status;
+    uint8_t status;
     uint16_t counter_cmp, counter_tog;
 
     /* Reload counter */
     if ( led_cfg->state == LEDSTATE_INIT ) {
+        status = led_cfg->mode_cfg[mode].init_status;
         counter_cmp = led_cfg->mode_cfg[mode].t_init;
         counter_tog = led_cfg->mode_cfg[mode].t_toggle;
     } else {
+        status = ~(led_cfg->mode_cfg[mode].init_status);
         counter_cmp = led_cfg->mode_cfg[mode].t_toggle;
         counter_tog = led_cfg->mode_cfg[mode].t_init;
     }
@@ -239,7 +241,7 @@ void LEDManage( LEDConfig_t *led_cfg )
             led_cfg->counter = 0;
         }
     } else {
-        /* Stay in the actual state and increment counter */
+        /* Stay in the current state and increment counter */
         led_cfg->act_func( led_cfg->id, status );
         led_cfg->counter++;
     }
@@ -407,8 +409,8 @@ IPMI_HANDLER(ipmi_picmg_get_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_FRU_
      * [1] Override state enabled
      * [0] Local control enabled */
     rsp->data[len++] = ( (cfg->mode_cfg[LEDMODE_LAMPTEST].active) << 2 ) |
-	( ( cfg->mode_cfg[LEDMODE_OVERRIDE].active ) << 1 ) |
-	( ( cfg->mode_cfg[LEDMODE_LOCAL].active ) << 0 );
+        ( ( cfg->mode_cfg[LEDMODE_OVERRIDE].active ) << 1 ) |
+        ( ( cfg->mode_cfg[LEDMODE_LOCAL].active ) << 0 );
 
     /* Local Control LED function */
     rsp->data[len++] = cfg->mode_cfg[LEDMODE_LOCAL].t_init;
@@ -416,18 +418,18 @@ IPMI_HANDLER(ipmi_picmg_get_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_FRU_
     rsp->data[len++] = cfg->color;
 
     if ( cfg->mode_cfg[LEDMODE_OVERRIDE].active ) {
-	if ( cfg->mode_cfg[LEDMODE_OVERRIDE].init_status == LEDINIT_OFF ) {
-	    rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_init;
-	    rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_toggle;
-	} else {
-	    rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_toggle;
-	    rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_init;
-	}
-	rsp->data[len++] = cfg->color;
+        if ( cfg->mode_cfg[LEDMODE_OVERRIDE].init_status == LEDINIT_OFF ) {
+            rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_init;
+            rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_toggle;
+        } else {
+            rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_toggle;
+            rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_init;
+        }
+        rsp->data[len++] = cfg->color;
     }
 
     if ( cfg->mode_cfg[LEDMODE_LAMPTEST].active ) {
-	rsp->data[len++] = cfg->mode_cfg[LEDMODE_LAMPTEST].t_init;
+        rsp->data[len++] = cfg->mode_cfg[LEDMODE_LAMPTEST].t_init;
     }
 
     rsp->data_len = len;
