@@ -37,7 +37,7 @@ i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT] = {
     { CHIP_ID_INA_4,         I2C_BUS_CPU_ID,     0x44},
     { CHIP_ID_INA_5,         I2C_BUS_CPU_ID,     0x45},
 
-    { CHIP_ID_ADN,           I2C_BUS_CLOCK_ID,   0x4B},
+    { CHIP_ID_ADN,           I2C_BUS_CPU_ID,     0x4B},
     { CHIP_ID_SI57x,         I2C_BUS_CLOCK_ID,   0x30},
 
     { CHIP_ID_FMC1_EEPROM,   I2C_BUS_FMC1_ID,    0x50},
