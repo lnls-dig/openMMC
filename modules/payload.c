@@ -171,6 +171,8 @@ void payload_init( void )
     irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1 );
     irq_enable( EINT2_IRQn );
     gpio_set_pin_dir(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, OUTPUT);
+    gpio_set_pin_state(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, HIGH);
+
 
     /* Flash CS Mux - Only valid to AFC v3.1 */
     /* 0 = FPGA reads bitstream from Program memory
