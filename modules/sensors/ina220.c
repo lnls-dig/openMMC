@@ -82,6 +82,10 @@ void vTaskINA220( void *Parameters )
             ina220_sensor = ina220_data[i].sensor;
             data_ptr = &ina220_data[i];
 
+            if (ina220_sensor == NULL) {
+                continue;
+            }
+
             switch ((GET_SENSOR_TYPE(ina220_sensor))) {
             case SENSOR_TYPE_VOLTAGE:
                 ina220_sensor->readout_value = (data_ptr->regs[INA220_BUS_VOLTAGE] >> data_ptr->config->bus_voltage_shift)/16;
