@@ -29,7 +29,7 @@
 #include "i2c_mapping.h"
 #include "fru.h"
 #include "utils.h"
-#include "led_new.h"
+#include "led.h"
 
 /* RTM Management functions */
 
@@ -162,7 +162,7 @@ void rtm_ctrl_led( uint8_t id, uint8_t state )
     uint8_t pca_pin;
 
     switch( id ) {
-    case LED0_BLUE:
+    case LED_BLUE:
 	pca_pin = RTM_GPIO_LED_BLUE;
 	break;
 
@@ -186,7 +186,7 @@ uint8_t rtm_read_led( uint8_t id )
     uint8_t pca_pin;
 
     switch( id ) {
-    case LED0_BLUE:
+    case LED_BLUE:
 	pca_pin = RTM_GPIO_LED_BLUE;
 	break;
 
