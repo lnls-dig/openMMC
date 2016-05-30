@@ -157,9 +157,9 @@ void LED_init( void )
 
     led_update_queue = xQueueCreate( 3, sizeof(LEDUpdate_t) );
 
-    memcpy( led_config[0], &amc_leds_config, sizeof(amc_leds_config) );
+    memcpy( &led_config[0], &amc_leds_config, sizeof(amc_leds_config) );
 #ifdef MODULE_RTM
-    memcpy( led_config[1], &rtm_leds_config, sizeof(rtm_leds_config) );
+    memcpy( &led_config[1], &rtm_leds_config, sizeof(rtm_leds_config) );
 #endif
 
     xTaskCreate( LED_Task, (const char *) "LED Task", 80, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
