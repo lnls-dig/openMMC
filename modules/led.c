@@ -89,7 +89,7 @@ LEDConfig_t amc_leds_config[LED_CNT] = {
         .mode_cfg = {
             [LEDMODE_LOCAL] = {
                 .t_init = 5,
-                .t_toggle = 0,
+                .t_toggle = 5,
                 .init_status = LEDINIT_ON,
             }
         }
@@ -134,7 +134,7 @@ LEDConfig_t rtm_leds_config[LED_CNT] = {
         .mode_cfg = {
             [LEDMODE_LOCAL] = {
                 .t_init = 5,
-                .t_toggle = 0,
+                .t_toggle = 5,
                 .init_status = LEDINIT_ON,
             }
         }
