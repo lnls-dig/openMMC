@@ -54,6 +54,11 @@ void RTM_Manage( void * Parameters )
     /* Start with RTM payload disabled */
     rtm_disable_payload_power();
 
+#ifdef BENCH_TEST
+    rtm_power_level = 0x01;
+    rtm_pwr_lvl_change = 0x00;
+#endif
+
     for ( ;; ) {
         vTaskDelay(100);
 
