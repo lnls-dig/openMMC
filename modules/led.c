@@ -290,6 +290,9 @@ void amc_led_act( uint8_t id, uint8_t action )
 }
 
 #ifdef MODULE_RTM
+
+#include "rtm_user.h"
+
 void rtm_led_act( uint8_t id, uint8_t action )
 {
     uint8_t curr_state;
