@@ -126,9 +126,9 @@ void heap_test ( void* param)
 
     for (;;) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-	water_mark = uxTaskGetStackHighWaterMark(NULL);
-	used_heap = configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize();
-	vTaskGetRunTimeStats(stats);
+        water_mark = uxTaskGetStackHighWaterMark(NULL);
+        used_heap = configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize();
+        vTaskGetRunTimeStats(stats);
     }
 }
 #endif

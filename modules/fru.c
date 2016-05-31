@@ -165,7 +165,7 @@ IPMI_HANDLER(ipmi_storage_get_fru_info, NETFN_STORAGE, IPMI_GET_FRU_INVENTORY_AR
         rsp->data[len++] = (rtm_fru_info_size & 0xFF00) >> 8;
         rsp->data[len++] = 0x00; /* Device accessed by bytes */
 #else
-	rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
 #endif
     }
     rsp->data_len = len;

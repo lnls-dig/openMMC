@@ -25,38 +25,38 @@
 typedef struct __attribute__((__packed__)) {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     uint8_t out1:4,
-	out0:4;
+        out0:4;
     uint8_t out3:4,
-	out2:4;
+        out2:4;
     uint8_t out5:4,
-	out4:4;
+        out4:4;
     uint8_t out7:4,
-	out6:4;
+        out6:4;
     uint8_t out9:4,
-	out8:4;
+        out8:4;
     uint8_t out11:4,
-	out10:4;
+        out10:4;
     uint8_t out13:4,
-	out12:4;
+        out12:4;
     uint8_t out15:4,
-	out14:4;
+        out14:4;
 #else
     uint8_t out0:4,
-	out1:4;
+        out1:4;
     uint8_t out2:4,
-	out3:4;
+        out3:4;
     uint8_t out4:4,
-	out5:4;
+        out5:4;
     uint8_t out6:4,
-	out7:4;
+        out7:4;
     uint8_t out8:4,
-	out9:4;
+        out9:4;
     uint8_t out10:4,
-	out11:4;
+        out11:4;
     uint8_t out12:4,
-	out13:4;
+        out13:4;
     uint8_t out14:4,
-	out15:4;
+        out15:4;
 #endif
 } t_adn_connect_map;
 
@@ -65,16 +65,16 @@ typedef struct {
     t_adn_connect_map map_connect;
 } t_adn_connect_cfg;
 
-#define ADN_XPT_MAP0_CON_REG		0x90
-#define ADN_XPT_MAP1_CON_REG		0x98
+#define ADN_XPT_MAP0_CON_REG            0x90
+#define ADN_XPT_MAP1_CON_REG            0x98
 
-#define ADN_XPT_UPDATE_REG 		0x80
-#define ADN_XPT_MAP_TABLE_SEL_REG 	0x81
+#define ADN_XPT_UPDATE_REG              0x80
+#define ADN_XPT_MAP_TABLE_SEL_REG       0x81
 
-#define ADN_XPT_MAP0			0x00
-#define ADN_XPT_MAP1			0x01
+#define ADN_XPT_MAP0                    0x00
+#define ADN_XPT_MAP1                    0x01
 
-#define ADN_XPT_BROADCAST		0x82
+#define ADN_XPT_BROADCAST               0x82
 
 #define ADN_TX_CON_OUT0                 0x20
 

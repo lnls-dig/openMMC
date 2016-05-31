@@ -74,9 +74,9 @@ Bool i2c_take_by_busid( uint8_t bus_id, uint8_t *i2c_interface, TickType_t timeo
 
     /* This bus mux is in correct state */
     if (p_i2c_mux->state != p_i2c_bus->mux_bus) {
-	if (i2c_mux_bus( bus_id, p_i2c_mux, p_i2c_bus->mux_bus ) == false) {
-	    return false;
-	}
+        if (i2c_mux_bus( bus_id, p_i2c_mux, p_i2c_bus->mux_bus ) == false) {
+            return false;
+        }
     }
     *i2c_interface = p_i2c_mux->i2c_interface;
     portENABLE_INTERRUPTS();
@@ -101,9 +101,9 @@ void i2c_give(uint8_t i2c_interface)
 {
     i2c_mux_state_t *mux;
     for (mux = i2c_mux; mux != NULL; mux++) {
-	if (mux->i2c_interface == i2c_interface) {
-	    xSemaphoreGive(mux->semaphore);
-	    break;
-	}
+        if (mux->i2c_interface == i2c_interface) {
+            xSemaphoreGive(mux->semaphore);
+            break;
+        }
     }
 }

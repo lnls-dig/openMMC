@@ -114,35 +114,35 @@ Bool rtm_compatibility_check( void )
     bool z3rec_found;
 
     for ( i = 0; i < 2; i++ ) {
-	/* Read FRU Common Header */
-	fru_read( i, cmn_hdr, 0, 8 );
-	/* The offsets are divided by 8 in the common header */
-	multirec_off = cmn_hdr[5]*8;
+        /* Read FRU Common Header */
+        fru_read( i, cmn_hdr, 0, 8 );
+        /* The offsets are divided by 8 in the common header */
+        multirec_off = cmn_hdr[5]*8;
 
-	do {
-	    /* Read Multirecord header */
-	    fru_read( i, multirec_hdr, multirec_off, 10 );
+        do {
+            /* Read Multirecord header */
+            fru_read( i, multirec_hdr, multirec_off, 10 );
 
-	    if (multirec_hdr[8] == 0x30) {
-		z3rec_found = true;
-		break;
-	    }
-	    /* Advance the offset pointer, adding the record length field to it */
-	    multirec_off += multirec_hdr[2]+5;
+            if (multirec_hdr[8] == 0x30) {
+                z3rec_found = true;
+                break;
+            }
+            /* Advance the offset pointer, adding the record length field to it */
+            multirec_off += multirec_hdr[2]+5;
 
-	} while ( (multirec_hdr[1] >> 7) != 1 );
+        } while ( (multirec_hdr[1] >> 7) != 1 );
 
-	if ( z3rec_found ) {
-	    /* Read the Zone3 Compatibility Record, including the Multirecord header */
-	    rec_sz[i] = multirec_hdr[2]+5;
-	    z3_compat_recs[i] = pvPortMalloc( rec_sz[i] );
-	    fru_read( i, z3_compat_recs[i], multirec_off, rec_sz[i] );
-	}
+        if ( z3rec_found ) {
+            /* Read the Zone3 Compatibility Record, including the Multirecord header */
+            rec_sz[i] = multirec_hdr[2]+5;
+            z3_compat_recs[i] = pvPortMalloc( rec_sz[i] );
+            fru_read( i, z3_compat_recs[i], multirec_off, rec_sz[i] );
+        }
 
     }
 
     if ( !cmpBuffs( z3_compat_recs[0], rec_sz[0], z3_compat_recs[1], rec_sz[1] ) ) {
-	return true;
+        return true;
     }
 
     vPortFree(z3_compat_recs[0]);
@@ -163,19 +163,19 @@ void rtm_ctrl_led( uint8_t id, uint8_t state )
 
     switch( id ) {
     case LED_BLUE:
-	pca_pin = RTM_GPIO_LED_BLUE;
-	break;
+        pca_pin = RTM_GPIO_LED_BLUE;
+        break;
 
     case LED1:
-	pca_pin = RTM_GPIO_LED_RED;
-	break;
+        pca_pin = RTM_GPIO_LED_RED;
+        break;
 
     case LED2:
-	pca_pin = RTM_GPIO_LED_GREEN;
-	break;
+        pca_pin = RTM_GPIO_LED_GREEN;
+        break;
 
     default:
-	return;
+        return;
     }
 
     pca9554_write_pin( pca_pin, state );
@@ -187,19 +187,19 @@ uint8_t rtm_read_led( uint8_t id )
 
     switch( id ) {
     case LED_BLUE:
-	pca_pin = RTM_GPIO_LED_BLUE;
-	break;
+        pca_pin = RTM_GPIO_LED_BLUE;
+        break;
 
     case LED1:
-	pca_pin = RTM_GPIO_LED_RED;
-	break;
+        pca_pin = RTM_GPIO_LED_RED;
+        break;
 
     case LED2:
-	pca_pin = RTM_GPIO_LED_GREEN;
-	break;
+        pca_pin = RTM_GPIO_LED_GREEN;
+        break;
 
     default:
-	return 1;
+        return 1;
     }
 
     return pca9554_read_pin( pca_pin );

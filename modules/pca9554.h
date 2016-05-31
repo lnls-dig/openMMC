@@ -22,10 +22,10 @@
 #ifndef PCA9554_H_
 #define PCA9554_H_
 
-#define PCA9554_INPUT_REG	0
-#define PCA9554_OUTPUT_REG	1
-#define PCA9554_POLARITY_REG	2
-#define PCA9554_CFG_REG		3
+#define PCA9554_INPUT_REG       0
+#define PCA9554_OUTPUT_REG      1
+#define PCA9554_POLARITY_REG    2
+#define PCA9554_CFG_REG         3
 
 /* Pins Read/Write */
 uint8_t pca9554_read_port( void );

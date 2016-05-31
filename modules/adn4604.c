@@ -38,22 +38,22 @@ void adn4604_setup(void)
     t_adn_connect_cfg cfg;
 
     uint16_t out_enable_flag = {
-	ADN4604_EN_OUT_0 << 0 |
-	ADN4604_EN_OUT_1 << 1 |
-	ADN4604_EN_OUT_2 << 2 |
-	ADN4604_EN_OUT_3 << 3 |
-	ADN4604_EN_OUT_4 << 4 |
-	ADN4604_EN_OUT_5 << 5 |
-	ADN4604_EN_OUT_6 << 6 |
-	ADN4604_EN_OUT_7 << 7 |
-	ADN4604_EN_OUT_8 << 8 |
-	ADN4604_EN_OUT_9 << 9 |
-	ADN4604_EN_OUT_10 << 10 |
-	ADN4604_EN_OUT_11 << 11 |
-	ADN4604_EN_OUT_12 << 12 |
-	ADN4604_EN_OUT_13 << 13 |
-	ADN4604_EN_OUT_14 << 14 |
-	ADN4604_EN_OUT_15 << 15
+        ADN4604_EN_OUT_0 << 0 |
+        ADN4604_EN_OUT_1 << 1 |
+        ADN4604_EN_OUT_2 << 2 |
+        ADN4604_EN_OUT_3 << 3 |
+        ADN4604_EN_OUT_4 << 4 |
+        ADN4604_EN_OUT_5 << 5 |
+        ADN4604_EN_OUT_6 << 6 |
+        ADN4604_EN_OUT_7 << 7 |
+        ADN4604_EN_OUT_8 << 8 |
+        ADN4604_EN_OUT_9 << 9 |
+        ADN4604_EN_OUT_10 << 10 |
+        ADN4604_EN_OUT_11 << 11 |
+        ADN4604_EN_OUT_12 << 12 |
+        ADN4604_EN_OUT_13 << 13 |
+        ADN4604_EN_OUT_14 << 14 |
+        ADN4604_EN_OUT_15 << 15
     };
 
     /* Disable UPDATE' pin by pulling it HIGH */
@@ -101,9 +101,9 @@ void adn4604_setup(void)
 
     /* Enable desired outputs */
     for (uint8_t i = 0; i < 16; i++) {
-	if ( (out_enable_flag >> i) & 0x1 ) {
-	    adn4604_tx_enable(i2c_interf, i2c_addr, i);
-	}
+        if ( (out_enable_flag >> i) & 0x1 ) {
+            adn4604_tx_enable(i2c_interf, i2c_addr, i);
+        }
     }
 
     adn4604_update( i2c_interf, i2c_addr );

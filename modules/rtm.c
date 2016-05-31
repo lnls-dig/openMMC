@@ -67,26 +67,26 @@ void RTM_Manage( void * Parameters )
         if ( ps_new_state ^ ps_old_state ) {
             if ( ps_new_state == HOTSWAP_STATE_URTM_PRSENT ) {
 
-		/* Create/Read the RTM FRU info before sending the hotswap event */
-		fru_init(FRU_RTM);
+                /* Create/Read the RTM FRU info before sending the hotswap event */
+                fru_init(FRU_RTM);
 
                 /* RTM Present event */
-		hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_PRESENT_MASK );
-		hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_ABSENT_MASK );
-		hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_PRSENT );
+                hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_PRESENT_MASK );
+                hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_ABSENT_MASK );
+                hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_PRSENT );
 
                 /* Check the Zone3 compatibility records */
                 rtm_compatible = rtm_compatibility_check();
                 if ( rtm_compatible ) {
                     /* Send RTM Compatible message */
                     hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_COMPATIBLE );
-		    hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
+                    hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
 
                     rtm_hardware_init();
                 } else {
                     /* Send RTM Incompatible message */
                     hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_INCOMPATIBLE );
-		    hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
+                    hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
                 }
 
                 /* Activate RTM sensors in the SDR table */
@@ -95,33 +95,33 @@ void RTM_Manage( void * Parameters )
             } else if ( ps_new_state == HOTSWAP_STATE_URTM_ABSENT ) {
                 //sdr_disable_sensors(); /* Not implemented yet */
 
-		hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_ABSENT_MASK );
-		hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_PRESENT_MASK );
+                hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_ABSENT_MASK );
+                hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_PRESENT_MASK );
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_ABSENT );
             }
             ps_old_state = ps_new_state;
         }
 
-	if ( rtm_pwr_lvl_change ^ rtm_power_level ) {
-	    rtm_pwr_lvl_change = rtm_power_level;
+        if ( rtm_pwr_lvl_change ^ rtm_power_level ) {
+            rtm_pwr_lvl_change = rtm_power_level;
 
-	    if ( rtm_power_level == 0x01 ) {
-		hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
-		rtm_enable_payload_power();
-	    } else {
-		rtm_disable_payload_power();
-	    }
-	}
+            if ( rtm_power_level == 0x01 ) {
+                hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
+                rtm_enable_payload_power();
+            } else {
+                rtm_disable_payload_power();
+            }
+        }
 
-	current_evt = xEventGroupGetBits( rtm_payload_evt );
+        current_evt = xEventGroupGetBits( rtm_payload_evt );
 
-	if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
-	    if ( rtm_quiesce() ) {
-		/* Quiesced event */
-		hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
-		hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_QUIESCED );
-	    }
-	}
+        if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
+            if ( rtm_quiesce() ) {
+                /* Quiesced event */
+                hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
+                hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_QUIESCED );
+            }
+        }
     }
 }
 

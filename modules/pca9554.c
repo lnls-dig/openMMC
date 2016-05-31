@@ -37,8 +37,8 @@ static uint8_t pca9554_read_reg ( uint8_t reg )
     uint8_t rx = 0;
 
     if( i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-	xI2CMasterWriteRead(i2c_id, i2c_addr, reg, &rx, 1);
-	i2c_give(i2c_id);
+        xI2CMasterWriteRead(i2c_id, i2c_addr, reg, &rx, 1);
+        i2c_give(i2c_id);
     }
     return rx;
 }
@@ -50,8 +50,8 @@ static void pca9554_write_reg ( uint8_t reg, uint8_t data )
     uint8_t cmd_data[2] = {reg, data};
 
     if( i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-	xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
-	i2c_give(i2c_id);
+        xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
+        i2c_give(i2c_id);
     }
 }
 

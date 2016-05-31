@@ -55,26 +55,26 @@ void hotswap_init( void )
     /* Iterate through the SDR Table to find all the Hotswap entries */
     for ( hotswap_sensor = sdr_head; hotswap_sensor != NULL; hotswap_sensor = hotswap_sensor->next) {
 
-	if ( hotswap_sensor->task_handle == NULL ) {
-	    continue;
-	}
+        if ( hotswap_sensor->task_handle == NULL ) {
+            continue;
+        }
 
-	/* Check if this task should update the selected SDR */
-	if ( *(hotswap_sensor->task_handle) != vTaskHotSwap_Handle ) {
-	    continue;
-	}
+        /* Check if this task should update the selected SDR */
+        if ( *(hotswap_sensor->task_handle) != vTaskHotSwap_Handle ) {
+            continue;
+        }
 
         hotswap_pSDR = (SDR_type_02h_t *) hotswap_sensor->sdr;
 
-	if ( hotswap_pSDR->entityID == 0xC1 ) {
-	    hotswap_amc_sensor = hotswap_sensor;
-	    hotswap_amc_pSDR = hotswap_pSDR;
-	} else if ( hotswap_pSDR->entityID == 0xC0 ) {
+        if ( hotswap_pSDR->entityID == 0xC1 ) {
+            hotswap_amc_sensor = hotswap_sensor;
+            hotswap_amc_pSDR = hotswap_pSDR;
+        } else if ( hotswap_pSDR->entityID == 0xC0 ) {
 #ifdef MODULE_RTM
-	    hotswap_rtm_sensor = hotswap_sensor;
-	    hotswap_rtm_pSDR = hotswap_pSDR;
+            hotswap_rtm_sensor = hotswap_sensor;
+            hotswap_rtm_pSDR = hotswap_pSDR;
 #endif
-	}
+        }
 
     }
 }
@@ -94,9 +94,9 @@ void vTaskHotSwap( void *Parameters )
 
     /* Override Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
     if ( gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN) == 0 ) {
-	LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
+        LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
     } else {
-	LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
+        LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
     }
 
     /* Initialise the xLastWakeTime variable with the current time. */

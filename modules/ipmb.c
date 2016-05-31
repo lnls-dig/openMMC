@@ -78,7 +78,7 @@ void IPMB_TXTask ( void * pvParameters )
 
             /* Encode the message buffer to the IPMB format */
             ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx.buffer );
-	    uint8_t resp_tx_size = current_msg_tx.buffer.data_len + IPMB_RESP_HEADER_LENGTH;
+            uint8_t resp_tx_size = current_msg_tx.buffer.data_len + IPMB_RESP_HEADER_LENGTH;
             if ( xI2CMasterWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], resp_tx_size ) < resp_tx_size ) {
                 /* Message couldn't be transmitted right now, increase retry counter and try again later */
                 current_msg_tx.retries++;
@@ -101,7 +101,7 @@ void IPMB_TXTask ( void * pvParameters )
             }
 
             ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx.buffer );
-	    uint8_t req_tx_size = current_msg_tx.buffer.data_len + IPMB_REQ_HEADER_LENGTH;
+            uint8_t req_tx_size = current_msg_tx.buffer.data_len + IPMB_REQ_HEADER_LENGTH;
             if ( xI2CMasterWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], req_tx_size ) < req_tx_size) {
 
                 current_msg_tx.retries++;
@@ -253,7 +253,7 @@ ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
 {
     configASSERT( client_queue );
     configASSERT( msg_cfg != NULL );
-        /* Sends only the ipmi msg, not the control struct */
+    /* Sends only the ipmi msg, not the control struct */
     if (!IS_RESPONSE(msg_cfg->buffer)) {
         if ( xQueueSend( client_queue, &(msg_cfg->buffer), CLIENT_NOTIFY_TIMEOUT ) == pdFALSE ) {
             return ipmb_error_timeout;

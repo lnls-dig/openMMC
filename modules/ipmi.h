@@ -36,16 +36,16 @@
 #define FRU_DEVICE_ID          0x00
 
 /* Known NetFn codes (even request codes only) */
-#define NETFN_CHASSIS						0x00
-#define NETFN_BRIDGE						0x02
-#define NETFN_SE						0x04
-#define NETFN_APP						0x06
-#define NETFN_FIRMWARE						0x08
-#define NETFN_STORAGE						0x0a
-#define NETFN_TRANSPORT						0x0c
-#define NETFN_GRPEXT						0x2c
+#define NETFN_CHASSIS                                           0x00
+#define NETFN_BRIDGE                                            0x02
+#define NETFN_SE                                                0x04
+#define NETFN_APP                                               0x06
+#define NETFN_FIRMWARE                                          0x08
+#define NETFN_STORAGE                                           0x0a
+#define NETFN_TRANSPORT                                         0x0c
+#define NETFN_GRPEXT                                            0x2c
 /* Custom extension for UWHEP MMC functions */
-#define NETFN_CUSTOM						0x32
+#define NETFN_CUSTOM                                            0x32
 
 /* IPMI commands */
 /* Chassis netfn (0x00) */
@@ -307,29 +307,29 @@
 typedef void (* t_req_handler)(ipmi_msg * req, ipmi_msg * resp);
 
 typedef struct{
-  uint8_t netfn;
-  uint8_t cmd;
-  t_req_handler req_handler;
+    uint8_t netfn;
+    uint8_t cmd;
+    t_req_handler req_handler;
 } t_req_handler_record;
 
 /*
  * WARNING!!! Using IPMI_HANDLER_ALIAS and IPMI_HANDLER required to have .ipmi_handlers section in linker script
  * .ipmi_handlers : ALIGN(4)
  * {
- * 	 _ipmi_handlers = .;
- * 	 KEEP(*(.ipmi_handlers))
+ *       _ipmi_handlers = .;
+ *       KEEP(*(.ipmi_handlers))
  *   _eipmi_handlers = .;
  * } >FLASHAREA
-*/
+ */
 
 extern const t_req_handler_record *_ipmi_handlers;
 extern const t_req_handler_record *_eipmi_handlers;
 
-#define IPMI_HANDLER_ALIAS(handler_fn, netfn_id, cmd_id) \
+#define IPMI_HANDLER_ALIAS(handler_fn, netfn_id, cmd_id)                \
     const t_req_handler_record __attribute__ ((section (".ipmi_handlers"))) ipmi_handler_##netfn_id##__##cmd_id##_s = { .req_handler = handler_fn , .netfn = netfn_id, .cmd = cmd_id }
 
-#define IPMI_HANDLER(name, netfn_id, cmd_id, args...) \
-    void ipmi_handler_##netfn_id##__##cmd_id##_f(args);			\
+#define IPMI_HANDLER(name, netfn_id, cmd_id, args...)                   \
+    void ipmi_handler_##netfn_id##__##cmd_id##_f(args);                 \
     const t_req_handler_record __attribute__ ((section (".ipmi_handlers"))) ipmi_handler_##netfn_id##__##cmd_id##_s = { .req_handler = ipmi_handler_##netfn_id##__##cmd_id##_f , .netfn = netfn_id, .cmd = cmd_id }; \
     void ipmi_handler_##netfn_id##__##cmd_id##_f(args)
 

@@ -56,11 +56,11 @@ void WatchdogTask (void * Parameters)
 {
     wdt_start();
     for ( ;; ) {
-	if (xSemaphoreTake(watchdog_smphr, 0)) {
-		NVIC_SystemReset();
-	}
-	wdt_feed();
-	vTaskDelay(WATCHDOG_FEED_DELAY);
+        if (xSemaphoreTake(watchdog_smphr, 0)) {
+            NVIC_SystemReset();
+        }
+        wdt_feed();
+        vTaskDelay(WATCHDOG_FEED_DELAY);
     }
 }
 

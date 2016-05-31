@@ -64,8 +64,8 @@ Bool i2c_mux_bus( uint8_t bus_id, i2c_mux_state_t *i2c_mux, int8_t new_state )
 
     /* Select desired channel in the I2C switch */
     if (xI2CMasterWrite(i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface, i2c_chip_map[CHIP_ID_MUX].i2c_address, &pca_channel, 1 ) != 0) {
-	i2c_mux->state = new_state;
-	return true;
+        i2c_mux->state = new_state;
+        return true;
     }
 
     xSemaphoreGive(i2c_mux->semaphore);

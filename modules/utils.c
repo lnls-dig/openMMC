@@ -91,6 +91,5 @@ uint8_t cmpBuffs( uint8_t *bufa, size_t len_a, uint8_t *bufb, size_t len_b )
 
 uint8_t isPowerOfTwo( uint8_t x )
 {
-  return ((x != 0) && !(x & (x - 1)));
+    return ((x != 0) && !(x & (x - 1)));
 }
-

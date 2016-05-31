@@ -46,7 +46,7 @@ void IPMITask( void * pvParameters )
     for ( ;; ) {
 
         if( xQueueReceive( ipmi_rxqueue, &req_received , portMAX_DELAY ) == pdFALSE) {
-	    /* Should no return pdFALSE */
+            /* Should no return pdFALSE */
             configASSERT(pdFALSE);
             continue;
         }
@@ -60,7 +60,7 @@ void IPMITask( void * pvParameters )
             response.data_len = 0;
 
             /* Call user-defined function, give request data and retrieve required response */
-	    /* WARNING: Since IPMI task have a high priority, this handler function should not wait other tasks to unblock */
+            /* WARNING: Since IPMI task have a high priority, this handler function should not wait other tasks to unblock */
             req_handler(&req_received, &response);
 
             error_code = ipmb_send_response(&req_received, &response);
@@ -117,7 +117,7 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd)
             handler = p_ptr->req_handler;
             break;
         }
-	p_ptr++;
+        p_ptr++;
     }
 
     return handler;
@@ -242,4 +242,3 @@ IPMI_HANDLER(ipmi_get_device_locator_record, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_DE
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }
-

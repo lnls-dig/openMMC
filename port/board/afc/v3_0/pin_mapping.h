@@ -78,32 +78,32 @@
 
 /* DCDC converters */
 #define GPIO_EN_P1V2_PORT       0
-#define GPIO_EN_P1V2_PIN	23
+#define GPIO_EN_P1V2_PIN        23
 #define GPIO_EN_P1V8_PORT       0
-#define GPIO_EN_P1V8_PIN	24
+#define GPIO_EN_P1V8_PIN        24
 
 #define GPIO_EN_FMC1_P12V_PORT  0
 #define GPIO_EN_FMC1_P12V_PIN   4
 #define GPIO_EN_FMC1_P3V3_PORT  0
-#define GPIO_EN_FMC1_P3V3_PIN	25
+#define GPIO_EN_FMC1_P3V3_PIN   25
 #define GPIO_EN_FMC1_PVADJ_PORT 1
 #define GPIO_EN_FMC1_PVADJ_PIN  31
 
 #define GPIO_EN_FMC2_P12V_PORT  0
 #define GPIO_EN_FMC2_P12V_PIN   5
 #define GPIO_EN_FMC2_P3V3_PORT  0
-#define GPIO_EN_FMC2_P3V3_PIN	26
+#define GPIO_EN_FMC2_P3V3_PIN   26
 #define GPIO_EN_FMC2_PVADJ_PORT 1
-#define GPIO_EN_FMC2_PVADJ_PIN	28
+#define GPIO_EN_FMC2_PVADJ_PIN  28
 
 #define GPIO_EN_P3V3_PORT       1
-#define GPIO_EN_P3V3_PIN	27
+#define GPIO_EN_P3V3_PIN        27
 #define GPIO_EN_1V5_VTT_PORT    1
-#define GPIO_EN_1V5_VTT_PIN	29
+#define GPIO_EN_1V5_VTT_PIN     29
 #define GPIO_EN_P1V0_PORT       3
-#define GPIO_EN_P1V0_PIN	25
+#define GPIO_EN_P1V0_PIN        25
 #define GPIO_PGOOD_P1V0_PORT    3
-#define GPIO_PGOOD_P1V0_PIN	26
+#define GPIO_PGOOD_P1V0_PIN     26
 
 /* RTM */
 #define GPIO_EN_RTM_PWR_PORT    1
@@ -116,9 +116,9 @@
 
 /* FPGA Control */
 #define GPIO_PROGRAM_B_PORT     0
-#define GPIO_PROGRAM_B_PIN	17
+#define GPIO_PROGRAM_B_PIN      17
 #define GPIO_DONE_B_PORT        0
-#define GPIO_DONE_B_PIN		22
+#define GPIO_DONE_B_PIN         22
 #define GPIO_FPGA_RESET_PORT    2
 #define GPIO_FPGA_RESET_PIN     9
 

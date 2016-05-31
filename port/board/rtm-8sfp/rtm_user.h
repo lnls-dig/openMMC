@@ -23,11 +23,11 @@
 #define RTM_USER_H_
 
 /* PCA9554 outputs */
-#define RTM_GPIO_HOTSWAP_HANDLE		0
-#define RTM_GPIO_OVERTEMP_SHUTDOWN	4
-#define RTM_GPIO_LED_RED		5
-#define RTM_GPIO_LED_GREEN		6
-#define RTM_GPIO_LED_BLUE		7
+#define RTM_GPIO_HOTSWAP_HANDLE         0
+#define RTM_GPIO_OVERTEMP_SHUTDOWN      4
+#define RTM_GPIO_LED_RED                5
+#define RTM_GPIO_LED_GREEN              6
+#define RTM_GPIO_LED_BLUE               7
 
 /* Mandatory RTM module functions */
 void rtm_enable_payload_power( void );

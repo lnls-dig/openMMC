@@ -30,7 +30,7 @@
 #ifndef LM75_H_
 #define LM75_H_
 
-#define LM75_UPDATE_RATE	500
+#define LM75_UPDATE_RATE        500
 
 TaskHandle_t vTaskLM75_Handle;
 

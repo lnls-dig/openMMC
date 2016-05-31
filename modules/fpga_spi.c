@@ -139,8 +139,8 @@ void vTaskFPGA_COMM( void * Parameters )
     }
 
     //if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
-        gpio_set_pin_state(0, 19, HIGH);
-	//}
+    gpio_set_pin_state(0, 19, HIGH);
+    //}
 
     ssp_init( FPGA_SPI, FPGA_SPI_BITRATE, FPGA_SPI_FRAME_SIZE, SSP_MASTER, SSP_POLLING );
 
@@ -153,7 +153,7 @@ void vTaskFPGA_COMM( void * Parameters )
         /* Update Sensors Readings */
 
         for ( i = 0, temp_sensor = sdr_head; (temp_sensor != NULL) && (i <= NUM_SENSOR); temp_sensor = temp_sensor->next) {
-        	if (temp_sensor->diag_devID != NO_DIAG) {
+            if (temp_sensor->diag_devID != NO_DIAG) {
                 diag->sensor[i].dev_id = temp_sensor->diag_devID;
                 diag->sensor[i].measure = temp_sensor->readout_value;
                 i++;
@@ -174,12 +174,12 @@ void vTaskFPGA_COMM( void * Parameters )
          * being returned correctly */
 
 #if SSP_TESTS
-	uint32_t rx_trace[FPGA_MEM_ADDR_MAX] = {0};
+        uint32_t rx_trace[FPGA_MEM_ADDR_MAX] = {0};
         read_fpga_buffer( &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) );
 
-	uint32_t data;
+        uint32_t data;
 
-	if( cmpBuffs( &(diag_struct.buffer[0]), sizeof(diag_struct.buffer)/sizeof(diag_struct.buffer[0]), &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) != 0 ) ) {
+        if( cmpBuffs( &(diag_struct.buffer[0]), sizeof(diag_struct.buffer)/sizeof(diag_struct.buffer[0]), &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) != 0 ) ) {
             data = 0xAAAAAAAA;
             LED_update(LED_RED, &LED_2Hz_Blink_Activity);
         } else {
