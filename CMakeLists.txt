@@ -1,29 +1,14 @@
 # Define minimal required version of CMake.
 cmake_minimum_required(VERSION 2.8.7)
 
+#Include text color definitions
+include( ${CMAKE_SOURCE_DIR}/toolchain/colors.cmake )
+
+#Prevent in-source builds
+include( ${CMAKE_SOURCE_DIR}/toolchain/PreventInSourceBuilds.cmake )
+
 # Project definition
 project(openMMC C CXX ASM)
-
-# Color definitions
-if(NOT WIN32)
-  string(ASCII 27 Esc)
-  set(ColourReset "${Esc}[m")
-  set(ColourBold  "${Esc}[1m")
-  set(Red         "${Esc}[31m")
-  set(Green       "${Esc}[32m")
-  set(Yellow      "${Esc}[33m")
-  set(Blue        "${Esc}[34m")
-  set(Magenta     "${Esc}[35m")
-  set(Cyan        "${Esc}[36m")
-  set(White       "${Esc}[37m")
-  set(BoldRed     "${Esc}[1;31m")
-  set(BoldGreen   "${Esc}[1;32m")
-  set(BoldYellow  "${Esc}[1;33m")
-  set(BoldBlue    "${Esc}[1;34m")
-  set(BoldMagenta "${Esc}[1;35m")
-  set(BoldCyan    "${Esc}[1;36m")
-  set(BoldWhite   "${Esc}[1;37m")
-endif()
 
 ##
 # CMake environment settings
@@ -33,7 +18,7 @@ endif()
 if(NOT CMAKE_TOOLCHAIN_FILE)
   message(WARNING "${Yellow}No toolchain configuration file specified. Using default option!${ColourReset}")
 
-  include(toolchain/toolchain-arm-none-eabi.cmake)
+  include(${CMAKE_SOURCE_DIR}/toolchain/toolchain-arm-none-eabi.cmake)
 
 endif()
 
