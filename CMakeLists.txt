@@ -71,6 +71,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DT
 
 if(BENCH_TEST)
   set(MODULES_FLAGS "${MODULES_FLAGS} -DBENCH_TEST")
+  message( STATUS "${Magenta}Bench mode activated! ${ColourReset}")
 endif()
 
 # Libraries path
