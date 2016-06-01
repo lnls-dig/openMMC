@@ -152,7 +152,7 @@ else()
     COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${LPCXPRESSO_PATH}/bin/LPCXpressoWIN.enc || true
     #Write application and bootloader firmwares
     COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -flash-mass-erase
-    COMMAND make -C ${CMAKE_SOURCE_DIR} program_boot
-    COMMAND make -C ${CMAKE_SOURCE_DIR} program_app
+    COMMAND make -C ${CMAKE_BINARY_DIR} program_boot
+    COMMAND make -C ${CMAKE_BINARY_DIR} program_app
     )
 endif()
