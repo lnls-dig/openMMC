@@ -101,11 +101,11 @@ add_executable(bootloader ${BOOT_SRCS} ${LPC17_SRCS})
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
   SUFFIX ".axf"
-  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/lpc1764_app.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/lpc1764_app.map" )
+  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.map" )
 
 set_target_properties(bootloader PROPERTIES
   SUFFIX ".axf"
-  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/lpc1764_boot.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/lpc1764_boot.map")
+  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.map")
 
 
 # Headers path

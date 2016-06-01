@@ -1,7 +1,11 @@
 #Select which microcontroller and board are being used
-set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller" FORCE) 
+if (NOT TARGET_CONTROLLER)
+  set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller")
+endif()
 
-set(TARGET_BOARD_NAME  "AFC Timing" CACHE STRING "Board Name" FORCE)
+if (NOT TARGET_BOARD_NAME)
+  set(TARGET_BOARD_NAME "AFC Timing" CACHE STRING "Board Name")
+endif()
 
 #List all modules used by this board
 set(TARGET_MODULES
