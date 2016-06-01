@@ -117,43 +117,45 @@ add_custom_command(TARGET bootloader POST_BUILD
 
 
 ##Program command
-set(LPCXPRESSO_PATH /usr/local/lpcxpresso_7.8.0_426/lpcxpresso/)
+set(LPCXPRESSO_INSTALL_PATH /usr/local/)
 
 find_program(DFU_UTIL dfu-util)
-find_program(NXP_PROG crt_emu_cm3_nxp PATHS ${LPCXPRESSO_PATH}/bin NO_DEFAULT_PATH)
-
 if(NOT DFU_UTIL)
   message(WARNING "${ColourBold}${Red}Dfu-util not found! Can't boot the LPCLink board!${ColourReset}")
-elseif(NOT NXP_PROG)
+endif()
+
+find_program(NXP_PROG crt_emu_cm3_nxp PATHS ${LPCXPRESSO_INSTALL_PATH})
+if(NOT NXP_PROG)
   message(WARNING "${ColourBold}${Red}crt_emu_cm3_nxp not found! Can't program the LPC chip!${ColourReset}")
 else()
-
-  # Program the chip (available only for LPC1764 so far)
-  add_custom_target(program_boot
-    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
-    DEPENDS bootloader
-    #Boot the programmer
-    COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${LPCXPRESSO_PATH}/bin/LPCXpressoWIN.enc || true
-    #Write bootloader firmware
-    COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load=bootloader.bin -load-base=0x0000
-    )
-
-  add_custom_target(program_app
-    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
-    DEPENDS ${CMAKE_PROJECT_NAME}
-    #Boot the programmer
-    COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${LPCXPRESSO_PATH}/bin/LPCXpressoWIN.enc || true
-    #Write application firmware
-    COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load-exec=${CMAKE_PROJECT_NAME}.bin -load-base=0x2000
-    )
-
-  add_custom_target(program_all
-    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
-    DEPENDS ${CMAKE_PROJECT_NAME} bootloader
-    COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${LPCXPRESSO_PATH}/bin/LPCXpressoWIN.enc || true
-    #Write application and bootloader firmwares
-    COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -flash-mass-erase
-    COMMAND make -C ${CMAKE_BINARY_DIR} program_boot
-    COMMAND make -C ${CMAKE_BINARY_DIR} program_app
-    )
+  get_filename_component( DFU_FIRMWARE_PATH ${NXP_PROG} DIRECTORY )
 endif()
+
+# Program the chip (available only for LPC1764 so far)
+add_custom_target(program_boot
+  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
+  DEPENDS bootloader
+  #Boot the programmer
+  COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  #Write bootloader firmware
+  COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load=bootloader.bin -load-base=0x0000
+  )
+
+add_custom_target(program_app
+  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
+  DEPENDS ${CMAKE_PROJECT_NAME}
+  #Boot the programmer
+  COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  #Write application firmware
+  COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load-exec=${CMAKE_PROJECT_NAME}.bin -load-base=0x2000
+  )
+
+add_custom_target(program_all
+  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
+  DEPENDS ${CMAKE_PROJECT_NAME} bootloader
+  COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  #Write application and bootloader firmwares
+  COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -flash-mass-erase
+  COMMAND make -C ${CMAKE_BINARY_DIR} program_boot
+  COMMAND make -C ${CMAKE_BINARY_DIR} program_app
+  )
