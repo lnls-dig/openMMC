@@ -3,14 +3,14 @@ MEMORY
   /* Define each memory region */
   /* First 8kB are reserved for bootloader */
   /* Last 2 sectors (32kB each) are reserved for firmware upgrade */
-  MFlash128 (rx) : ORIGIN = 0x2000, LENGTH = 0xE000 /* 56K bytes */
-  RamLoc16 (rwx) : ORIGIN = 0x10000000, LENGTH = 0x4000 /* 16K bytes */
-  RamAHB16 (rwx) : ORIGIN = 0x2007c000, LENGTH = 0x4000 /* 16K bytes */
+  MFlash128 (rx) : ORIGIN = 0x2000, LENGTH = 56K /* 56K bytes */
+  RamLoc16 (rwx) : ORIGIN = 0x10000000, LENGTH = 16K /* 16K bytes */
+  RamAHB16 (rwx) : ORIGIN = 0x2007c000, LENGTH = 16K /* 16K bytes */
 }
   /* Define a symbol for the top of each memory region */
-  __top_MFlash128 = 0x2000 + 0xE000;
-  __top_RamLoc16 = 0x10000000 + 0x4000;
-  __top_RamAHB16 = 0x2007c000 + 0x4000;
+  __top_MFlash128 = 0x2000 + 56K;
+  __top_RamLoc16 = 0x10000000 + 16K;
+  __top_RamAHB16 = 0x2007c000 + 16K;
 
 ENTRY(ResetISR)
 
