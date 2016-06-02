@@ -39,6 +39,7 @@
 #include "fpga_spi.h"
 #include "watchdog.h"
 #include "rtm.h"
+#include "uart_debug.h"
 
 //#define HEAP_TEST
 //#define STOP_TEST
@@ -62,6 +63,12 @@ int main( void )
     while (test == 0)
     {}
 #endif
+
+#ifdef MODULE_UART_DEBUG
+    uart_debug_init( 115200 );
+    DEBUG_MSG(" openMMC Starting! \n");
+#endif
+
 #ifdef MODULE_WATCHDOG
     watchdog_init();
 #endif

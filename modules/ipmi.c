@@ -29,6 +29,7 @@
 #include "task_priorities.h"
 #include "led.h"
 #include "payload.h"
+#include "uart_debug.h"
 
 /* Local variables */
 QueueHandle_t ipmi_rxqueue = NULL;
@@ -50,6 +51,8 @@ void IPMITask( void * pvParameters )
             configASSERT(pdFALSE);
             continue;
         }
+
+	DEBUG_MSG(" IPMI Message Received! \n ");
 
         req_handler = (t_req_handler) 0;
         req_handler = ipmi_retrieve_handler(req_received.netfn, req_received.cmd);

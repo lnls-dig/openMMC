@@ -27,6 +27,9 @@
 #define FLASH_SPI       1
 #define DAC_VADJ_SPI    2
 
+/* UART Interfaces */
+#define UART_DEBUG      3
+
 /* I2C Pins definitions */
 #define I2C0_PORT       0
 #define I2C0_SDA_PIN    27
@@ -132,5 +135,10 @@
 #define GPIO_ADN_UPDATE_PIN     26
 #define GPIO_ADN_RESETN_PORT    1
 #define GPIO_ADN_RESETN_PIN     22
+
+/* UART Debug */
+#define UART_DEBUG_PORT         4
+#define UART_DEBUG_TXD_PIN      28
+#define UART_DEBUG_RXD_PIN      29
 
 #endif
