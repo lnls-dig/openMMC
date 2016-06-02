@@ -50,10 +50,8 @@ TaskHandle_t heap_handle;
 
 uint8_t ipmb_addr = 0xFF;
 
-int main(void)
+int main( void )
 {
-    /* Update clock register value - LPC specific */
-    SystemCoreClockUpdate();
 
 #if (configGENERATE_RUN_TIME_STATS == 1)
     vConfigureTimerForRunTimeStats();
