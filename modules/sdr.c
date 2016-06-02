@@ -186,7 +186,7 @@ void sdr_remove_entry( sensor_t * entry )
     sensor_t * prev = NULL;
 
     if (entry == sdr_head) {
-        //sdr_pop();
+        sdr_pop();
     }
 
     while (cur != entry) {
@@ -206,6 +206,17 @@ void sdr_remove_entry( sensor_t * entry )
 
     /* Free the entry */
     vPortFree(cur);
+}
+
+void sdr_pop( void )
+{
+    sensor_t * new_head;
+
+    if ( sdr_head ) {
+	new_head = sdr_head->next;
+	vPortFree( sdr_head );
+	sdr_head = new_head;
+    }
 }
 
 /******************************/
