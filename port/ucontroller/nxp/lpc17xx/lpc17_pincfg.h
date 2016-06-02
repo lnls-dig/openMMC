@@ -18,27 +18,17 @@
  */
 
 /*!
- * @file port.h
+ * @file lpc17_pincfg.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
+ * @date June 2016
  *
- * @brief Port layer (includes all portable functions headers)
+ * @brief
  */
+#ifndef LPC17_PINCFG_H_
+#define LPC17_PINCFG_H_
 
-#ifndef PORT_H_
-#define PORT_H_
+#include "port.h"
 
-/* List of all LPC17xx specific headers to be included */
-
-#include "chip_lpc175x_6x.h"
-#include "lpc17_gpio.h"
-#include "lpc17_i2c.h"
-#include "lpc17_ssp.h"
-#include "lpc17_spi.h"
-#include "lpc17_watchdog.h"
-#include "lpc17_interruptions.h"
-#include "lpc17_hpm.h"
-#include "lpc17_power.h"
-#include "lpc17_pincfg.h"
+#define pin_config(port, pin, cfg) Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin, cfg)
 
 #endif
