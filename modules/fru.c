@@ -62,6 +62,8 @@ void fru_init( uint8_t fru_id )
         at24mac_write( eeprom_id, 0x00, *fru_info, *fru_size, 0 );
 #endif
 #endif
+    } else {
+	return;
     }
 
 #ifdef MODULE_EEPROM_AT24MAC

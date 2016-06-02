@@ -183,7 +183,7 @@ sensor_t * find_sensor_by_id( uint8_t id )
 void sdr_remove_entry( sensor_t * entry )
 {
     sensor_t * cur = sdr_head;
-    sensor_t * prev;
+    sensor_t * prev = NULL;
 
     if (entry == sdr_head) {
         //sdr_pop();

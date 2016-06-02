@@ -108,7 +108,7 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed )
 	irq = I2C2_IRQn;
 	break;
     default:
-	break;
+	return;
     }
 
     Board_I2C_Init(id);
