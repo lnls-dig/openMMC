@@ -1,7 +1,7 @@
 /*
- *   openMMC  --
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   Copyright (C) 2015  Henrique Silva  <henrique.silva@lnls.br>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -15,30 +15,21 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
 /*!
- * @file port.h
+ * @file uart_debug.c
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
+ * @date May 2016
  *
- * @brief Port layer (includes all portable functions headers)
+ * @brief UART interface implementation
  */
 
-#ifndef PORT_H_
-#define PORT_H_
+#include "pin_mapping.h"
+#include "string.h"
 
-/* List of all LPC17xx specific headers to be included */
+#define DEBUG_MSG( msg ) uart_send( UART_DEBUG, msg, strlen(msg)+1 )
 
-#include "chip_lpc175x_6x.h"
-#include "lpc17_gpio.h"
-#include "lpc17_i2c.h"
-#include "lpc17_ssp.h"
-#include "lpc17_spi.h"
-#include "lpc17_watchdog.h"
-#include "lpc17_interruptions.h"
-#include "lpc17_hpm.h"
-#include "lpc17_power.h"
-#include "lpc17_uart.h"
-
-#endif
+void uart_debug_init( uint32_t baud );

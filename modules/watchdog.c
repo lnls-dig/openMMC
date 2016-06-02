@@ -36,6 +36,7 @@
 #include "port.h"
 #include "watchdog.h"
 #include "task_priorities.h"
+#include "uart_debug.h"
 
 #define WATCHDOG_CLK_FREQ 8000000
 #define WATCHDOG_TIMEOUT 1000 /* in milisseconds */
@@ -60,6 +61,7 @@ void WatchdogTask (void * Parameters)
             NVIC_SystemReset();
         }
         wdt_feed();
+	DEBUG_MSG(" Watchdog fed (again) \n ");
         vTaskDelay(WATCHDOG_FEED_DELAY);
     }
 }

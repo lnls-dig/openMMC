@@ -9,6 +9,11 @@ set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/ipmb.c ${MODULE_PATH}/ipmi.c)
 
 message(STATUS "Selected modules to compile: ${TARGET_MODULES}")
 
+if (";${TARGET_MODULES};" MATCHES ";UART_DEBUG;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/uart_debug.c)
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_UART_DEBUG")
+endif()
+
 if (";${TARGET_MODULES};" MATCHES ";FRU;")
   set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/fru.c )
   set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/amc_fru.c )

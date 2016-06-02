@@ -12,6 +12,7 @@ if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
     ${LPC17XX_PATH}/lpc17_spi.c
     ${LPC17XX_PATH}/lpc17_ssp.c
     ${LPC17XX_PATH}/lpc17_hpm.c
+    ${LPC17XX_PATH}/lpc17_uart.c
     )
 
   set(LPC17_SRCS ${LPC17_SRCS}

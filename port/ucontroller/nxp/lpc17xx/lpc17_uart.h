@@ -18,27 +18,21 @@
  */
 
 /*!
- * @file port.h
+ * @file gpio.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
  * @date September 2015
  *
- * @brief Port layer (includes all portable functions headers)
+ * @brief Definitions of GPIO driver implementation for LPC17xx
  */
 
-#ifndef PORT_H_
-#define PORT_H_
+#ifndef LPC17_UART_H_
+#define LPC17_UART_H_
 
-/* List of all LPC17xx specific headers to be included */
-
-#include "chip_lpc175x_6x.h"
-#include "lpc17_gpio.h"
-#include "lpc17_i2c.h"
-#include "lpc17_ssp.h"
-#include "lpc17_spi.h"
-#include "lpc17_watchdog.h"
-#include "lpc17_interruptions.h"
-#include "lpc17_hpm.h"
-#include "lpc17_power.h"
-#include "lpc17_uart.h"
+void uart_init( uint8_t id );
+void uart_set_baud( uint8_t id, uint32_t baud );
+void uart_tx_enable( uint8_t id );
+void uart_tx_disable( uint8_t id );
+size_t uart_send( uint8_t id, char *tx_data, size_t len );
+size_t uart_read( uint8_t id, char *rx_data, size_t len );
 
 #endif
