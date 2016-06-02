@@ -33,7 +33,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING
+  set(CMAKE_BUILD_TYPE Release CACHE STRING
     "Choose the type of build, options are: none Debug Release Trace."
     FORCE)
 endif()
