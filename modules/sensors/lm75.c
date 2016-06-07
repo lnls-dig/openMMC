@@ -62,7 +62,7 @@ void vTaskLM75( void* Parameters )
 
                 /* Update the temperature reading */
                 if (xI2CMasterRead( i2c_bus_id, temp_sensor->slave_addr, &temp[0], 2) == 2) {
-                    converted_temp = ((temp[0] << 1) | ((temp[1]>>8)));
+                    converted_temp = ((temp[0] << 1) | ((temp[1]>>7)));
                     temp_sensor->readout_value = converted_temp;
                 }
                 /* Check for threshold events */
