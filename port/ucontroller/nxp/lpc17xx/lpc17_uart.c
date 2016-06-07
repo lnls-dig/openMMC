@@ -20,61 +20,109 @@
 /*!
  * @file lpc17_uart.c
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
+ * @date June 2016
  *
  * @brief
  */
 
+#include "FreeRTOS.h"
 #include "port.h"
+#include "string.h"
 
-static LPC_USART_T * get_lpc_usart( uint8_t id )
+volatile lpc_uart_cfg_t usart_cfg[4] = {
+    {LPC_UART0, UART0_IRQn, NULL, NULL, 0},
+    {LPC_UART1, UART1_IRQn, NULL, NULL, 0},
+    {LPC_UART2, UART2_IRQn, NULL, NULL, 0},
+    {LPC_UART3, UART3_IRQn, NULL, NULL, 0}
+};
+
+void uart_handler( uint8_t id )
 {
-    switch( id ) {
-    case 0:
-	return LPC_UART0;
-    case 1:
-	return LPC_UART0;
-    case 2:
-	return LPC_UART0;
-    case 3:
-	return LPC_UART0;
+    uint32_t int_id = Chip_UART_ReadIntIDReg( usart_cfg[id].ptr );
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    if ( int_id & UART_IIR_INTID_THRE ) {
+        if ( usart_cfg[id].tx_str[usart_cfg[id].sent_bytes] != '\0' ) {
+            Chip_UART_SendByte( usart_cfg[id].ptr, usart_cfg[id].tx_str[usart_cfg[id].sent_bytes] );
+            usart_cfg[id].sent_bytes++;
+        } else {
+            xSemaphoreGiveFromISR( usart_cfg[id].smphr, &xHigherPriorityTaskWoken );
+            usart_cfg[id].sent_bytes = 0;
+            vPortFreeFromISR( usart_cfg[id].tx_str );
+        }
     }
 
-    return NULL;
+    /* If xHigherPriorityTaskWoken was set to true we should yield. */
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+}
+
+void UART0_IRQHandler(void)
+{
+    uart_handler( 0 );
+}
+
+void UART1_IRQHandler(void)
+{
+    uart_handler( 1 );
+}
+
+void UART2_IRQHandler(void)
+{
+    uart_handler( 2 );
+}
+
+void UART3_IRQHandler(void)
+{
+    uart_handler( 3 );
 }
 
 void uart_init( uint8_t id )
 {
-    LPC_USART_T *pUART = get_lpc_usart( id );
-    Chip_UART_Init( pUART );
-}
+    Chip_UART_Init( usart_cfg[id].ptr );
 
-void uart_set_baud( uint8_t id, uint32_t baud )
-{
-    LPC_USART_T *pUART = get_lpc_usart( id );
-    Chip_UART_SetBaud( pUART, baud );
-}
+    usart_cfg[id].smphr = xSemaphoreCreateBinary();
+    xSemaphoreGive( usart_cfg[id].smphr );
 
-void uart_tx_enable( uint8_t id )
-{
-    LPC_USART_T *pUART = get_lpc_usart( id );
-    Chip_UART_TXEnable( pUART );
-}
+    /* THR Interrupt enable */
+    uart_int_enable( id, UART_IER_THREINT );
 
-void uart_tx_disable( uint8_t id )
-{
-    LPC_USART_T *pUART = get_lpc_usart( id );
-    Chip_UART_TXDisable( pUART );
+    /* Enable UARTn interruptions */
+    NVIC_SetPriority( usart_cfg[id].irq, configMAX_SYSCALL_INTERRUPT_PRIORITY+5 );
+    NVIC_EnableIRQ( usart_cfg[id].irq );
 }
 
 size_t uart_send( uint8_t id, char *tx_data, size_t len )
 {
-    LPC_USART_T *pUART = get_lpc_usart( id );
-    return Chip_UART_Send( pUART, tx_data, len );
+    uint8_t i;
+
+    if ( xSemaphoreTake( usart_cfg[id].smphr, USART_SMPHR_TIMEOUT ) ) {
+        usart_cfg[id].sent_bytes = 0;
+
+        /* TX FIFO Reset */
+        Chip_UART_SetupFIFOS( usart_cfg[id].ptr, UART_FCR_TX_RS );
+
+        /* Fill TX FIFO */
+        for ( i = 0; ( ( i < UART_TX_FIFO_SIZE ) && ( i < len ) ); i++, usart_cfg[id].sent_bytes++ ) {
+            Chip_UART_SendByte( usart_cfg[id].ptr, *tx_data++ );
+        }
+
+        /* FIFO is full, save the rest of the data in a buffer */
+        usart_cfg[id].tx_str = pvPortMalloc( len - usart_cfg[id].sent_bytes );
+        if ( usart_cfg[id].tx_str ) {
+            memcpy( usart_cfg[id].tx_str, tx_data, len - usart_cfg[id].sent_bytes );
+        }
+        usart_cfg[id].sent_bytes = 0;
+
+        return len;
+    } else {
+        return 0;
+    }
 }
 
+#if 0
 size_t uart_read( uint8_t id, char *rx_data, size_t len )
 {
     LPC_USART_T *pUART = get_lpc_usart( id );
     return Chip_UART_Read( pUART, rx_data, len );
 }
+#endif

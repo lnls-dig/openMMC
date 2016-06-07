@@ -28,11 +28,33 @@
 #ifndef LPC17_UART_H_
 #define LPC17_UART_H_
 
-void uart_init( uint8_t id );
-void uart_set_baud( uint8_t id, uint32_t baud );
-void uart_tx_enable( uint8_t id );
-void uart_tx_disable( uint8_t id );
-size_t uart_send( uint8_t id, char *tx_data, size_t len );
-size_t uart_read( uint8_t id, char *rx_data, size_t len );
+#include "semphr.h"
+#include "string.h"
+#include "stdio.h"
 
+#define USART_SMPHR_TIMEOUT 5
+
+typedef struct lpc_uart_cfg {
+    LPC_USART_T * ptr;
+    IRQn_Type irq;
+    SemaphoreHandle_t smphr;
+    uint8_t *tx_str;
+    volatile uint16_t sent_bytes;
+} lpc_uart_cfg_t;
+
+volatile lpc_uart_cfg_t usart_cfg[4];
+
+#define uart_set_baud( id, baud ) Chip_UART_SetBaud( usart_cfg[id].ptr, baud )
+#define uart_config_data( id, cfg ) Chip_UART_ConfigData( usart_cfg[id].ptr, cfg )
+#define uart_tx_enable( id ) Chip_UART_TXEnable( usart_cfg[id].ptr )
+#define uart_tx_disable( id ) Chip_UART_TXDisable( usart_cfg[id].ptr )
+#define uart_int_enable( id, mask ) Chip_UART_IntEnable( usart_cfg[id].ptr, mask )
+#define uart_int_disable( id, mask ) Chip_UART_IntDisable( usart_cfg[id].ptr, mask )
+#define uart_send_char( id, ch ) Chip_UART_SendByte( usart_cfg[id].ptr, ch )
+#define uart_read_char( id ) Chip_UART_ReadByte( usart_cfg[id].ptr )
+void uart_init( uint8_t id );
+
+size_t uart_send( uint8_t id, char *tx_data, size_t len );
+
+//size_t uart_read( uint8_t id, char *rx_data, size_t len );
 #endif
