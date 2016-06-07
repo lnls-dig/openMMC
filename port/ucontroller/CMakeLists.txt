@@ -1,5 +1,7 @@
 message(STATUS "Selected Controller: ${TARGET_CONTROLLER}")
 
+add_compile_options( -Wno-switch -Wno-unused-but-set-variable )
+
 if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
   set(LPC17XX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/nxp/lpc17xx)
   set(LPCOPEN_SRCPATH ${LPC17XX_PATH}/lpcopen/src)
