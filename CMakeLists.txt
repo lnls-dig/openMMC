@@ -98,7 +98,7 @@ set_target_properties(bootloader PROPERTIES
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
 target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
 # Link libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} gcc c m FreeRTOS lpcopen)
+target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS c gcc m lpcopen)
 target_link_libraries(bootloader gcc c m lpcopen)
 
 ##Generate .hex file
