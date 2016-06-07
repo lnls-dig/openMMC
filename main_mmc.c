@@ -65,9 +65,10 @@ int main( void )
 #endif
 
 #ifdef MODULE_UART_DEBUG
-    uart_debug_init( 115200 );
-    DEBUG_MSG(" openMMC Starting! \n");
+    uart_debug_init( 9600 );
 #endif
+
+    DEBUG_MSG("openMMC Starting!\n");
 
 #ifdef MODULE_WATCHDOG
     watchdog_init();
