@@ -31,6 +31,7 @@
 #include "i2c_mapping.h"
 #include "lm75.h"
 #include "utils.h"
+#include "uart_debug.h"
 
 TaskHandle_t vTaskLM75_Handle;
 
