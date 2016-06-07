@@ -25,7 +25,7 @@
 /* Project includes */
 #include "FreeRTOS.h"
 #include "ipmi.h"
-#include "pin_mapping.h"
+#include "port.h"
 #include "task_priorities.h"
 #include "led.h"
 #include "payload.h"

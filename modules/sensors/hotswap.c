@@ -24,7 +24,6 @@
 #include "semphr.h"
 #include "port.h"
 #include "sdr.h"
-#include "pin_mapping.h"
 #include "hotswap.h"
 #include "task_priorities.h"
 #include "ipmi.h"

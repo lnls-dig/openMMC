@@ -26,7 +26,6 @@
 #include "port.h"
 #include "adn4604.h"
 #include "adn4604_usercfg.h"
-#include "pin_mapping.h"
 #include "i2c.h"
 #include "i2c_mapping.h"
 

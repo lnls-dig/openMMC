@@ -31,7 +31,6 @@
 #include "hotswap.h"
 #include "sdr.h"
 #include "task_priorities.h"
-#include "pin_mapping.h"
 #include "fru.h"
 #include "hotswap.h"
 #include "payload.h"

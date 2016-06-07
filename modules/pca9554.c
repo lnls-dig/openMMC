@@ -24,7 +24,6 @@
 
 /* Project Includes */
 #include "port.h"
-#include "pin_mapping.h"
 #include "pca9554.h"
 #include "i2c.h"
 #include "i2c_mapping.h"

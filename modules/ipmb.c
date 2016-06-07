@@ -32,7 +32,6 @@
 #include "utils.h"
 #include "ipmb.h"
 #include "ipmi.h"
-#include "pin_mapping.h"
 #include "led.h"
 #include "port.h"
 #include "task_priorities.h"

@@ -21,7 +21,6 @@
 
 /* Project Includes */
 #include "port.h"
-#include "pin_mapping.h"
 #include "ad84xx.h"
 
 #define DAC_VADJ_SPI_BITRATE    10000000

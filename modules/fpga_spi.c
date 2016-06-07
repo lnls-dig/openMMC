@@ -23,7 +23,6 @@
 #include "task.h"
 #include "port.h"
 #include "fpga_spi.h"
-#include "pin_mapping.h"
 #include "task_priorities.h"
 #include "string.h"
 #include "led.h"

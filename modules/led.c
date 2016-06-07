@@ -27,7 +27,6 @@
 #include "queue.h"
 #include "ipmi.h"
 #include "port.h"
-#include "pin_mapping.h"
 #include "led.h"
 #include "string.h"
 #include "task_priorities.h"

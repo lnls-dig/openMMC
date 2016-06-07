@@ -42,4 +42,5 @@
 #include "lpc17_pincfg.h"
 #include "lpc17_uart.h"
 
+#include "pin_mapping.h"
 #endif
