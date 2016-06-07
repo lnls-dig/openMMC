@@ -27,9 +27,14 @@
  * @brief UART interface implementation
  */
 
-#include "pin_mapping.h"
-#include "string.h"
+#include "port.h"
 
-#define DEBUG_MSG( msg ) uart_send( UART_DEBUG, msg, strlen(msg)+1 )
+#ifndef MODULE_UART_DEBUG
+#undef DEBUG_MSG
+#undef DEBUG_CH
+
+#define DEBUG_MSG(...) (void)0
+#define DEBUG_CH(...) (void)0
+#endif
 
 void uart_debug_init( uint32_t baud );

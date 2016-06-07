@@ -52,6 +52,10 @@ volatile lpc_uart_cfg_t usart_cfg[4];
 #define uart_int_disable( id, mask ) Chip_UART_IntDisable( usart_cfg[id].ptr, mask )
 #define uart_send_char( id, ch ) Chip_UART_SendByte( usart_cfg[id].ptr, ch )
 #define uart_read_char( id ) Chip_UART_ReadByte( usart_cfg[id].ptr )
+
+#define DEBUG_MSG( msg ) uart_send( UART_DEBUG, msg, strlen(msg)+1 )
+#define DEBUG_CH( ch ) uart_send_char( UART_DEBUG, ch )
+
 void uart_init( uint8_t id );
 
 size_t uart_send( uint8_t id, char *tx_data, size_t len );
