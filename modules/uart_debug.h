@@ -23,18 +23,25 @@
  * @file uart_debug.c
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
  * @date May 2016
- *
  * @brief UART interface implementation
  */
 
 #include "port.h"
 
-#ifndef MODULE_UART_DEBUG
+void uart_debug_init( uint32_t baud );
+void uart_printf( uint8_t id, const char *format, ... );
+
+#ifdef MODULE_UART_DEBUG
+
+#define DEBUG_MSG(msg, ...) uart_printf(UART_DEBUG, msg, ##__VA_ARGS__)
+#define DEBUG_CH(ch) uart_send_char(UART_DEBUG, ch)
+
+#else
+
 #undef DEBUG_MSG
 #undef DEBUG_CH
 
 #define DEBUG_MSG(...) (void)0
 #define DEBUG_CH(...) (void)0
-#endif
 
-void uart_debug_init( uint32_t baud );
+#endif

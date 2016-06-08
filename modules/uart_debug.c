@@ -30,7 +30,9 @@
 /* Project includes */
 #include "port.h"
 #include "uart_debug.h"
+#include "stdarg.h"
 
+char debug_buf[100];
 
 void uart_debug_init( uint32_t baud )
 {
@@ -45,4 +47,14 @@ void uart_debug_init( uint32_t baud )
     uart_config_data( UART_DEBUG, ( UART_LCR_WLEN8 | UART_LCR_SBS_1BIT | UART_LCR_PARITY_DIS ) );
 
     uart_tx_enable ( UART_DEBUG );
+}
+
+void uart_printf( uint8_t id, const char *format, ... )
+{
+    va_list args;
+
+    va_start( args, format );
+    ( void )vsprintf( debug_buf, format, args );
+
+    uart_send( id, debug_buf, strlen(debug_buf)+1 );
 }

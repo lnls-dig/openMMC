@@ -24,13 +24,11 @@
 #include <stdarg.h>
 #include "stdio.h"
 
-#include "port.h"
-
 #undef printf
 #undef sprintf
 #undef putchar
 
-#define putchar(c) DEBUG_CH(c)
+#define putchar(c) (void)0
 
 static void printchar(char **str, int c)
 {
@@ -192,6 +190,11 @@ int printf(const char *format, ...)
     return print( 0, format, args );
 }
 
+int vprintf(const char *format, va_list args)
+{
+    return print( 0, format, args );
+}
+
 int sprintf(char *out, const char *format, ...)
 {
     va_list args;
@@ -200,6 +203,10 @@ int sprintf(char *out, const char *format, ...)
     return print( &out, format, args );
 }
 
+int vsprintf( char *buf, const char *format, va_list args )
+{
+    return print( &buf, format, args );
+}
 
 int snprintf( char *buf, unsigned int count, const char *format, ... )
 {
@@ -210,7 +217,6 @@ int snprintf( char *buf, unsigned int count, const char *format, ... )
     va_start( args, format );
     return print( &buf, format, args );
 }
-
 
 #ifdef TEST_PRINTF
 int main(void)
