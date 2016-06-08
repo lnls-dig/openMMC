@@ -25,18 +25,21 @@
 
 enum {
     FRU_AMC,
-    FRU_RTM
+#ifdef MODULE_RTM
+    FRU_RTM,
+#endif
+    FRU_COUNT
 };
 
-bool fru_amc_runtime;
-size_t amc_fru_info_size;
-uint8_t *amc_fru_info;
+typedef size_t (* fru_build_t)(uint8_t **buffer);
 
-#ifdef MODULE_RTM
-bool fru_rtm_runtime;
-size_t rtm_fru_info_size;
-uint8_t *rtm_fru_info;
-#endif
+typedef struct fru_data {
+    uint8_t eeprom_id;
+    uint8_t *buffer;
+    size_t fru_size;
+    bool runtime;
+    fru_build_t build_func;
+} fru_data_t;
 
 void fru_init( uint8_t id );
 size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len );

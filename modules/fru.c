@@ -22,71 +22,62 @@
 /*! @file fru.c
  */
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <string.h>
-
 #include "FreeRTOS.h"
 
 #include "fru.h"
+#include "fru_editor.h"
 #include "at24mac.h"
 #include "utils.h"
 #include "ipmi.h"
-#include "fru_editor.h"
 #include "i2c_mapping.h"
+#include "uart_debug.h"
 
-void fru_init( uint8_t fru_id )
-{
-    uint8_t eeprom_id;
-    uint8_t **fru_info;
-    size_t *fru_size;
-    bool *fru_runtime;
-
-    if( fru_id == FRU_AMC ) {
-        eeprom_id = CHIP_ID_EEPROM;
-        fru_info = &amc_fru_info;
-        fru_size = &amc_fru_info_size;
-        fru_runtime = &fru_amc_runtime;
-#ifdef FRU_WRITE_EEPROM
-        *fru_size = amc_fru_info_build( fru_info );
-        at24mac_write( eeprom_id, 0x00, *fru_info, *fru_size, 0 );
-#endif
+fru_data_t fru[FRU_COUNT] = {
+    [FRU_AMC] = {
+	.eeprom_id = CHIP_ID_EEPROM,
+	.build_func = amc_fru_info_build,
+	.runtime = true
+    },
 #ifdef MODULE_RTM
-    } else if ( fru_id == FRU_RTM ) {
-        eeprom_id = CHIP_ID_RTM_EEPROM;
-        fru_info = &rtm_fru_info;
-        fru_size = &rtm_fru_info_size;
-        fru_runtime = &fru_rtm_runtime;
-#ifdef FRU_WRITE_EEPROM
-        *fru_size = rtm_fru_info_build( fru_info );
-        at24mac_write( eeprom_id, 0x00, *fru_info, *fru_size, 0 );
+    [FRU_RTM] = {
+	.eeprom_id = CHIP_ID_RTM_EEPROM,
+	.build_func = rtm_fru_info_build,
+	.runtime = true
+    }
 #endif
-#endif
-    } else {
+};
+
+void fru_init( uint8_t id )
+{
+    if ( id >= FRU_COUNT ) {
 	return;
     }
+
+#ifdef FRU_WRITE_EEPROM
+    DEBUG_MSG(">FRU_WRITE_EEPROM flag enabled! Building FRU info...");
+    fru[id].fru_size = fru[id].build_func( &fru[id].buffer );
+
+    DEBUG_MSG(" Writing FRU info to EEPROM... \n");
+    at24mac_write( fru[id].eeprom_id, 0x00, fru[id].buffer, fru[id].size, 0 );
+#endif
 
 #ifdef MODULE_EEPROM_AT24MAC
     /* Read FRU info Common Header */
     uint8_t common_header[8];
 
-    if ( at24mac_read( eeprom_id, 0x00, &common_header[0], 8, 0 ) == 8 ) {
+    if ( at24mac_read( fru[id].eeprom_id, 0x00, &common_header[0], 8, 0 ) == 8 ) {
         if ( (calculate_chksum( &common_header[0], 7 ) == common_header[7]) && common_header[0] == 1 ) {
             /* We have a valid FRU image in the SEEPROM */
-            *fru_runtime = false;
+	    DEBUG_MSG("FRU information found in EEPROM!\n");
+	    fru[id].runtime = false;
             return;
         }
     }
 #endif
     /* Could not access the SEEPROM, create a runtime fru info */
-    if ( fru_id == FRU_AMC ) {
-        *fru_size = amc_fru_info_build( fru_info );
-#ifdef MODULE_RTM
-    } else if ( fru_id == FRU_RTM ) {
-        *fru_size = rtm_fru_info_build( fru_info );
-#endif
-    }
-    *fru_runtime = true;
+    DEBUG_MSG("Could not find FRU information in EEPROM, building a runtime info...\n");
+    fru[id].fru_size = fru[id].build_func( &fru[id].buffer );
+    fru[id].runtime = true;
 }
 
 size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len )
@@ -96,28 +87,22 @@ size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len )
 
     size_t ret_val = 0;
 
-    if ( fru_amc_runtime ) {
-        for (i = 0; i < len; i++, j++ ) {
-            if ( id == FRU_AMC ) {
-                if (j < amc_fru_info_size) {
-                    rx_buff[i] = amc_fru_info[j];
-                } else {
-                    rx_buff[i] = 0xFF;
-                }
-#ifdef MODULE_RTM
-            } else if ( id == FRU_RTM ) {
-                if (j < rtm_fru_info_size) {
-                    rx_buff[i] = rtm_fru_info[j];
-                } else {
-                    rx_buff[i] = 0xFF;
-                }
-#endif
-            }
-        }
-        ret_val = i;
+    if ( id >= FRU_COUNT ) {
+	return 0;
+    }
+
+    if ( fru[id].runtime ) {
+	for ( i = 0; i < len; i++, j++ ) {
+	    if ( j < fru[id].fru_size ) {
+		rx_buff[i] = fru[id].buffer[j];
+	    } else {
+		rx_buff[i] = 0xFF;
+	    }
+	}
+	ret_val = i;
     } else {
 #ifdef MODULE_EEPROM_AT24MAC
-        ret_val = at24mac_read( CHIP_ID_EEPROM, offset, rx_buff, len, 0 );
+        ret_val = at24mac_read( fru[id].eeprom_id, offset, rx_buff, len, 0 );
 #endif
     }
     return ret_val;
@@ -127,49 +112,38 @@ size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len )
 {
     size_t ret_val = 0;
 
-    if ( fru_amc_runtime ) {
-        uint8_t i;
-        for (i = 0; i < len; i++) {
-            if ( id == FRU_AMC ) {
-                amc_fru_info[offset+i] = tx_buff[i];
-#ifdef MODULE_RTM
-            } else if ( id == FRU_RTM ) {
-                rtm_fru_info[offset+i] = tx_buff[i];
-#endif
-            }
-        }
-        ret_val = i;
+    if ( id >= FRU_COUNT ) {
+	return 0;
+    }
+
+    if ( fru[id].runtime ) {
+	memcpy( &fru[id].buffer[offset], tx_buff, len );
+        ret_val = len;
     } else {
 #ifdef MODULE_EEPROM_AT24MAC
-        ret_val = at24mac_write( CHIP_ID_EEPROM, offset, tx_buff, len, 0 );
+        ret_val = at24mac_write( fru[id].eeprom_id, offset, tx_buff, len, 0 );
 #endif
     }
     return ret_val;
 }
-
 
 /* IPMI Handlers */
 IPMI_HANDLER(ipmi_storage_get_fru_info, NETFN_STORAGE, IPMI_GET_FRU_INVENTORY_AREA_INFO_CMD, ipmi_msg * req, ipmi_msg * rsp )
 {
     uint8_t len = rsp->data_len = 0;
 
-    uint8_t fru_id = req->data[0];
+    uint8_t id = req->data[0];
 
-    rsp->completion_code = IPMI_CC_OK;
+    if ( id < FRU_COUNT ) {
+	rsp->data[len++] = fru[id].fru_size & 0xFF;
+	rsp->data[len++] = (fru[id].fru_size & 0xFF00) >> 8;
+	rsp->data[len++] = 0x00; /* Device accessed by bytes */
 
-    if (fru_id == 0) {
-        rsp->data[len++] = amc_fru_info_size & 0xFF;
-        rsp->data[len++] = (amc_fru_info_size & 0xFF00) >> 8;
-        rsp->data[len++] = 0x00; /* Device accessed by bytes */
-    } else if (fru_id == 1) {
-#ifdef MODULE_RTM
-        rsp->data[len++] = rtm_fru_info_size & 0xFF;
-        rsp->data[len++] = (rtm_fru_info_size & 0xFF00) >> 8;
-        rsp->data[len++] = 0x00; /* Device accessed by bytes */
-#else
-        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
-#endif
+	rsp->completion_code = IPMI_CC_OK;
+    } else {
+	rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
     }
+
     rsp->data_len = len;
 }
 
@@ -189,7 +163,6 @@ IPMI_HANDLER(ipmi_storage_read_fru_data_cmd, NETFN_STORAGE, IPMI_READ_FRU_DATA_C
 
     offset = (req->data[2] << 8) | (req->data[1]);
 
-
     count = fru_read( fru_id, &(rsp->data[len+1]), offset, count );
     rsp->data[len++] = count;
 
@@ -201,15 +174,15 @@ IPMI_HANDLER(ipmi_storage_write_fru_data_cmd, NETFN_STORAGE, IPMI_WRITE_FRU_DATA
 {
     uint8_t len = rsp->data_len = 0;
     uint16_t offset =  (req->data[2] << 8) | (req->data[1]);
-    uint8_t fru_id = req->data[0];
+    uint8_t id = req->data[0];
     uint8_t count;
 
     rsp->completion_code = IPMI_CC_OK;
 
     /* Use signed comparison here in case offset + data_len < 3 */
-    if ((offset + req->data_len - 3) < (int16_t)amc_fru_info_size) {
+    if ((offset + req->data_len - 3) < (int16_t)fru[id].fru_size) {
         /* Write data to the FRU */
-        count = fru_write( fru_id, &req->data[3], offset, req->data_len - 3);
+        count = fru_write( id, &req->data[3], offset, req->data_len - 3);
 
         /* Count written (1 based) */
         rsp->data[len++] = count +1;
