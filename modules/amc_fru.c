@@ -1,4 +1,6 @@
 #include "user_amc_fru.h"
+#include "utils.h"
+#include "uart_debug.h"
 
 size_t amc_fru_info_build( uint8_t **buffer )
 {
@@ -7,25 +9,56 @@ size_t amc_fru_info_build( uint8_t **buffer )
     size_t int_use_sz = 0, chassis_sz = 0, board_sz = 0, product_sz = 0, current_sz = 0, p2p_sz = 0, clk_sz = 0, z3_compat_sz = 0;
     size_t offset = 0;
 
+    DEBUG_MSG(">AMC FRU Information:\n");
+
     /* Skip the common header */
     offset += 8;
 
     /* Board Information Area */
     board_off = offset;
     board_sz = board_info_area_build( &board_ptr, AMC_LANG_CODE, AMC_BOARD_MANUFACTURING_TIME, AMC_BOARD_MANUFACTURER, AMC_BOARD_NAME, AMC_BOARD_SN, AMC_BOARD_PN, AMC_FRU_FILE_ID );
+    DEBUG_MSG("\t-Board info area:\n");
+    DEBUG_MSG("\t\t-Language Code: "STR(AMC_LANG_CODE)"\n");
+    DEBUG_MSG("\t\t-Manuf time: "STR(AMC_BOARD_MANUFACTURING_TIME)"\n");
+    DEBUG_MSG("\t\t-Manufacturer: "STR(AMC_BOARD_MANUFACTURER)"\n");
+    DEBUG_MSG("\t\t-Name: "STR(AMC_BOARD_NAME)"\n");
+    DEBUG_MSG("\t\t-Serial Number: "STR(AMC_BOARD_SN)"\n");
+    DEBUG_MSG("\t\t-Part Number: "STR(AMC_BOARD_PN)"\n");
+    DEBUG_MSG("\t\t-File ID: "STR(AMC_FRU_FILE_ID)"\n");
     offset += board_sz;
+
+    /* Chassis Information Area */
+    /* Not needed in AMC boards */
+    DEBUG_MSG("No Chassis info area\n");
+    offset += chassis_sz;
+
+    /* Internal Use Area */
+    /* To be implemented by user */
+    DEBUG_MSG("No internal use area\n");
+    offset += int_use_sz;
 
     /* Product Information Area */
     product_off = offset;
     product_sz = product_info_area_build( &product_ptr, AMC_LANG_CODE, AMC_PRODUCT_MANUFACTURER, AMC_PRODUCT_NAME, AMC_PRODUCT_PN, AMC_PRODUCT_VERSION, AMC_PRODUCT_SN, AMC_PRODUCT_ASSET_TAG, AMC_FRU_FILE_ID );
+    DEBUG_MSG("\t-Product info area:\n");
+    DEBUG_MSG("\t\t-Language Code: "STR(AMC_LANG_CODE)"\n");
+    DEBUG_MSG("\t\t-Manufacturer: "STR(AMC_PRODUCT_MANUFACTURER)"\n");
+    DEBUG_MSG("\t\t-Name: "STR(AMC_PRODUCT_NAME)"\n");
+    DEBUG_MSG("\t\t-Part Number: "STR(AMC_PRODUCT_PN)"\n");
+    DEBUG_MSG("\t\t-Version: "STR(AMC_PRODUCT_VERSION)"\n");
+    DEBUG_MSG("\t\t-Asset Tag: "STR(AMC_PRODUCT_ASSET_TAG)"\n");
+    DEBUG_MSG("\t\t-Serial Number: "STR(AMC_PRODUCT_SN)"\n");
+    DEBUG_MSG("\t\t-File ID: "STR(AMC_FRU_FILE_ID)"\n");
     offset += product_sz;
 
     /* Multirecord Area */
     multirec_off = offset;
+    DEBUG_MSG("\t-Multirecord Area: \n");
 
     /* Board Current requirement */
     current_off = offset;
     current_sz += module_current_record_build( &current_ptr, AMC_MODULE_CURRENT_RECORD );
+    DEBUG_MSG("\t\t-Module Current: "STR(AMC_MODULE_CURRENT_RECORD)" A\n");
     offset += current_sz;
 
     /* Clock Point-to-Point Conectivity */
@@ -42,6 +75,7 @@ size_t amc_fru_info_build( uint8_t **buffer )
 
     /* Zone3 Connector Compatibility */
     z3_compat_off = offset;
+    DEBUG_MSG("\t\t-Zone3 Compatibility code: "STR(AMC_COMPATIBILITY_CODE)"\n");
     z3_compat_sz += zone3_compatibility_record_build( &z3_ptr, AMC_COMPATIBILITY_CODE );
     offset += z3_compat_sz;
 

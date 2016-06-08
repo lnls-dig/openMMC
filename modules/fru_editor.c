@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include "fru_editor.h"
+#include "uart_debug.h"
 #include "utils.h"
 
 uint8_t fru_header_build( uint8_t **buffer, size_t int_use_off, size_t chassis_off, size_t board_off, size_t product_off, size_t multirecord_off )
