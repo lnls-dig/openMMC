@@ -39,6 +39,10 @@ if (FRU_WRITE_EEPROM)
   set(FRU_WRITE_EEPROM false CACHE BOOL "Set this flag to enable writing the board ID on the EEPROM" FORCE)
 endif()
 
+if (";${TARGET_MODULES};" MATCHES ";RTM;")
+  message(WARNING "${BoldRed} WARNING: RTM Module is not tested for AFC v3.0 boards!${ColourReset}")
+endif()
+
 #Set the variables in the main scope
 set(TARGET_MODULES ${TARGET_MODULES} PARENT_SCOPE)
 set(MODULES_FLAGS ${MODULES_FLAGS} PARENT_SCOPE)
