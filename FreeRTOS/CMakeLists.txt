@@ -25,7 +25,7 @@ set(LIBFREERTOS_SRCS ${LIBFREERTOS_SRCS}
   printf-stdarg.c
   )
 
-include_directories(${PROJ_HDRS})
+include_directories(${UCONTROLLER_HDRS})
 include_directories(${FREERTOS_INC})
 set(PROJ_HDRS ${PROJ_HDRS} ${FREERTOS_INC} PARENT_SCOPE)
 

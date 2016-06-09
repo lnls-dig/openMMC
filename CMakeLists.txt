@@ -67,6 +67,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Trace")
   add_subdirectory(trace)
 endif()
 
+include_directories( ${UCONTROLLER_HDRS} ${PROJ_HDRS} )
+
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DTARGET_BOARD_NAME=\"${TARGET_BOARD_NAME}\" ")
 
 if(BENCH_TEST)
@@ -78,10 +80,10 @@ endif()
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 ## Create executable
-add_executable(${CMAKE_PROJECT_NAME} ${LPC17_SRCS} ${PROJ_SRCS})
+add_executable(${CMAKE_PROJECT_NAME} ${UCONTROLLER_SRCS} ${PROJ_SRCS})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${MODULES_FLAGS})
 
-add_executable(bootloader ${BOOT_SRCS} ${LPC17_SRCS})
+add_executable(bootloader ${BOOT_SRCS} ${UCONTROLLER_SRCS})
 
 # Linker flags
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
@@ -99,7 +101,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
 target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
 # Link libraries
 target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS c gcc m lpcopen)
-target_link_libraries(bootloader gcc c m lpcopen)
+target_link_libraries(bootloader gcc c m FreeRTOS lpcopen)
 
 ##Generate .hex file
 
