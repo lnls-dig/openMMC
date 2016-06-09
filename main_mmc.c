@@ -142,18 +142,6 @@ void heap_test ( void* param)
 /*-----------------------------------------------------------*/
 /* FreeRTOS Debug Functions */
 
-#if (configCHECK_FOR_STACK_OVERFLOW == 1)
-void vApplicationStackOverflowHook ( TaskHandle_t pxTask, signed char * pcTaskName){
-    (void) pxTask;
-    (void) pcTaskName;
-    taskDISABLE_INTERRUPTS();
-    /* Place a breakpoint here, so we know when there's a stack overflow */
-    for ( ; ; ) {
-        uxTaskGetStackHighWaterMark(pxTask);
-    }
-}
-#endif
-
 #if (configGENERATE_RUN_TIME_STATS == 1)
 void vConfigureTimerForRunTimeStats( void )
 {
@@ -172,16 +160,5 @@ void vConfigureTimerForRunTimeStats( void )
 
     /* Start the counter. */
     LPC_TIMER0->TCR = TCR_COUNT_ENABLE;
-}
-#endif
-
-void vAssertCalled( char* file, uint32_t line) {
-    taskDISABLE_INTERRUPTS();
-    for( ;; );
-}
-
-#if (configUSE_MALLOC_FAILED_HOOK == 1)
-void vApplicationMallocFailedHook( void ) {
-
 }
 #endif

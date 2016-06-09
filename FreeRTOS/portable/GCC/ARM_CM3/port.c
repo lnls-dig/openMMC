@@ -725,10 +725,32 @@ __attribute__(( weak )) void vPortSetupTimerInterrupt( void )
 		configASSERT( ( portAIRCR_REG & portPRIORITY_GROUP_MASK ) <= ulMaxPRIGROUPValue );
 	}
 
+	void vAssertCalled( char* file, uint32_t line)
+	{
+		taskDISABLE_INTERRUPTS();
+		for( ;; );
+	}
+
 #endif /* configASSERT_DEFINED */
 
+#if (configUSE_MALLOC_FAILED_HOOK == 1)
+	void vApplicationMallocFailedHook( void )
+	{
+	}
+#endif
 
-
+#if (configCHECK_FOR_STACK_OVERFLOW == 1)
+	void vApplicationStackOverflowHook ( TaskHandle_t pxTask, signed char * pcTaskName)
+	{
+		(void) pxTask;
+		(void) pcTaskName;
+		taskDISABLE_INTERRUPTS();
+		/* Place a breakpoint here, so we know when there's a stack overflow */
+		for ( ; ; ) {
+			uxTaskGetStackHighWaterMark(pxTask);
+		}
+	}
+#endif
 
 
 
