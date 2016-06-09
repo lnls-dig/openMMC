@@ -58,7 +58,7 @@ void fru_init( uint8_t id )
     fru[id].fru_size = fru[id].build_func( &fru[id].buffer );
 
     DEBUG_MSG(" Writing FRU info to EEPROM... \n");
-    at24mac_write( fru[id].eeprom_id, 0x00, fru[id].buffer, fru[id].size, 0 );
+    at24mac_write( fru[id].eeprom_id, 0x00, fru[id].buffer, fru[id].fru_size, 0 );
 #endif
 
 #ifdef MODULE_EEPROM_AT24MAC
