@@ -36,6 +36,8 @@ char debug_buf[100];
 
 void uart_debug_init( uint32_t baud )
 {
+    Chip_Clock_SetPCLKDiv( SYSCTL_PCLK_UART3, SYSCTL_CLKDIV_2 );
+
     uart_init( UART_DEBUG );
 
     pin_config( UART_DEBUG_PORT, UART_DEBUG_TXD_PIN, ( IOCON_MODE_INACT | IOCON_FUNC3 ) );
