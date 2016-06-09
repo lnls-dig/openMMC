@@ -37,7 +37,9 @@ typedef struct lpc_uart_cfg {
     IRQn_Type irq;
 } lpc_uart_cfg_t;
 
-const lpc_uart_cfg_t usart_cfg[4];
+volatile lpc_uart_cfg_t usart_cfg[4];
+
+RINGBUFF_T rxring, txring;
 
 #define uart_set_baud( id, baud ) Chip_UART_SetBaud( usart_cfg[id].ptr, baud )
 #define uart_config_data( id, cfg ) Chip_UART_ConfigData( usart_cfg[id].ptr, cfg )
@@ -47,9 +49,8 @@ const lpc_uart_cfg_t usart_cfg[4];
 #define uart_int_disable( id, mask ) Chip_UART_IntDisable( usart_cfg[id].ptr, mask )
 #define uart_send_char( id, ch ) Chip_UART_SendByte( usart_cfg[id].ptr, ch )
 #define uart_read_char( id ) Chip_UART_ReadByte( usart_cfg[id].ptr )
-#define uart_send( id, msg, len ) Chip_UART_SendBlocking( usart_cfg[id].ptr, msg, len )
-#define uart_read( id, buf, len ) Chip_UART_ReadBlocking( usart_cfg[id].ptr, buf, len )
-
-#define uart_init( id ) Chip_UART_Init( usart_cfg[id].ptr )
+#define uart_send( id, msg, len ) Chip_UART_SendRB( usart_cfg[id].ptr, &txring, msg, len )
+#define uart_read( id, buf, len ) Chip_UART_ReadRB( usart_cfg[id].ptr, &rxring, buf, len )
+void uart_init( uint8_t id );
 
 #endif

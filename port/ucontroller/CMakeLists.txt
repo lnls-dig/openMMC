@@ -14,7 +14,6 @@ if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
     ${LPC17XX_PATH}/lpc17_spi.c
     ${LPC17XX_PATH}/lpc17_ssp.c
     ${LPC17XX_PATH}/lpc17_hpm.c
-    ${LPC17XX_PATH}/lpc17_uart.c
     )
 
   set(LPC17_SRCS ${LPC17_SRCS}
@@ -43,6 +42,14 @@ if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
     ${LPCOPEN_SRCPATH}/uart_17xx_40xx.c
     ${LPCOPEN_SRCPATH}/wwdt_17xx_40xx.c
     )
+
+  if( UART_RINGBUFFER )
+    set(PROJ_SRCS ${PROJ_SRCS} ${LPC17XX_PATH}/lpc17_uartrb.c)
+    set(LIBLPCOPEN_SRCS ${LIBLPCOPEN_SRCS} ${LPCOPEN_SRCPATH}/ring_buffer.c)
+    set(MODULES_FLAGS ${MODULES_FLAGS} -DUART_RINGBUFFER PARENT_SCOPE)
+  else()
+    set(PROJ_SRCS ${PROJ_SRCS} ${LPC17XX_PATH}/lpc17_uart.c)
+  endif()
 
   include_directories(${LPCOPEN_INCPATH})
 
