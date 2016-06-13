@@ -25,5 +25,6 @@
 #include "ina220.h"
 #include "hotswap.h"
 #include "lm75.h"
+#include "max6642.h"
 
 #endif

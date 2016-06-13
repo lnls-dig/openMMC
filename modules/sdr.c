@@ -74,6 +74,9 @@ void sensor_init( void )
 #ifdef MODULE_LM75
     LM75_init();
 #endif
+#ifdef MODULE_MAX6642
+    MAX6642_init();
+#endif
 #if defined(MODULE_INA220_CURRENT) || defined(MODULE_INA220_VOLTAGE)
     ina220_init();
 #endif
