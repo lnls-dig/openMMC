@@ -42,7 +42,7 @@
 #include "fpga_spi.h"
 #include "fru.h"
 
-const t_ina220_config ina220_cfg = {
+const ina220_config_t ina220_cfg = {
     .config_reg_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
                                        .pga_gain = INA220_PGA_GAIN_40MV,
                                        .bus_adc_resolution = INA220_RES_SAMPLES_12BIT,
@@ -57,7 +57,7 @@ const t_ina220_config ina220_cfg = {
     .power_lsb = 20
 };
 
-static t_ina220_data ina220_data[MAX_INA220_COUNT];
+static ina220_data_t ina220_data[MAX_INA220_COUNT];
 
 void vTaskINA220( void *Parameters )
 {
@@ -69,7 +69,7 @@ void vTaskINA220( void *Parameters )
     extern const SDR_type_01h_t SDR_FMC1_12V;
 
     sensor_t * ina220_sensor;
-    t_ina220_data * data_ptr;
+    ina220_data_t * data_ptr;
 
     /* Initialise the xLastWakeTime variable with the current time. */
     xLastWakeTime = xTaskGetTickCount();
