@@ -39,38 +39,37 @@ void vTaskLM75( void* Parameters )
 {
     const TickType_t xFrequency = LM75_UPDATE_RATE;
 
-    uint8_t i2c_bus_id;
+    uint8_t i2c_addr, i2c_interf;
     sensor_t * temp_sensor;
     uint8_t temp[2];
     uint16_t converted_temp;
 
     for ( ;; ) {
-        /* Try to gain the I2C bus */
-        if (i2c_take_by_busid(I2C_BUS_CPU_ID, &i2c_bus_id, (TickType_t)100) == pdTRUE) {
+	/* Iterate through the SDR Table to find all the LM75 entries */
 
-            /* Iterate through the SDR Table to find all the LM75 entries */
+	for ( temp_sensor = sdr_head; temp_sensor != NULL; temp_sensor = temp_sensor->next) {
 
-            for ( temp_sensor = sdr_head; temp_sensor != NULL; temp_sensor = temp_sensor->next) {
+	    if ( temp_sensor->task_handle == NULL ) {
+		continue;
+	    }
 
-                if ( temp_sensor->task_handle == NULL ) {
-                    continue;
-                }
+	    /* Check if this task should update the selected SDR */
+	    if ( *(temp_sensor->task_handle) != xTaskGetCurrentTaskHandle() ) {
+		continue;
+	    }
 
-                /* Check if this task should update the selected SDR */
-                if ( *(temp_sensor->task_handle) != xTaskGetCurrentTaskHandle() ) {
-                    continue;
-                }
+	    /* Try to gain the I2C bus */
+	    if ( i2c_take_by_chipid( temp_sensor->chipid, &i2c_addr, &i2c_interf, 50 ) == pdTRUE ) {
 
                 /* Update the temperature reading */
-                if (xI2CMasterRead( i2c_bus_id, temp_sensor->slave_addr, &temp[0], 2) == 2) {
+                if (xI2CMasterRead( i2c_interf, i2c_addr, &temp[0], 2) == 2) {
                     converted_temp = ((temp[0] << 1) | ((temp[1]>>7)));
                     temp_sensor->readout_value = converted_temp;
                 }
                 /* Check for threshold events */
                 check_sensor_event(temp_sensor);
-
+		i2c_give(i2c_interf);
             }
-            i2c_give(i2c_bus_id);
         }
         vTaskDelay(xFrequency);
     }

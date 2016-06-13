@@ -122,7 +122,6 @@ typedef struct {
 } t_ina220_config;
 
 typedef struct {
-    uint8_t i2c_id;
     sensor_t * sensor;
     const t_ina220_config * config;
     uint32_t rshunt;

@@ -119,12 +119,12 @@ void vTaskINA220( void *Parameters )
     }
 }
 
-uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
+uint8_t ina220_config( ina220_data_t * data )
 {
-    uint8_t i2c_bus;
+    uint8_t i2c_interf, i2c_addr;
 
     data->config = &ina220_cfg;
-    data->i2c_id = i2c_id;
+
     if ((data->rshunt == 0) || (data->rshunt > data->config->calibration_factor)) {
         data->rshunt = INA220_RSHUNT_DEFAULT;
     } else {
@@ -132,40 +132,34 @@ uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
     }
     data->curr_reg_config = data->config->config_reg_default;
 
-    /* @todo Change to 'i2c_take_by_chipid', which is more generic */
-    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
-        return -1;
+    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, (TickType_t) 10) == pdTRUE ) {
+
+        uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_reg_config.cfg_word >> 8) , ( data->curr_reg_config.cfg_word & 0xFFFF) };
+
+        xI2CMasterWrite( i2c_interf, i2c_addr, cfg_buff, sizeof(cfg_buff)/sizeof(cfg_buff[0]) );
+
+        i2c_give( i2c_interf );
+        return 0;
     }
-
-    uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_reg_config.cfg_word >> 8) , ( data->curr_reg_config.cfg_word & 0xFFFF) };
-
-    portENABLE_INTERRUPTS();
-    xI2CMasterWrite( i2c_bus, data->i2c_id, cfg_buff, sizeof(cfg_buff)/sizeof(cfg_buff[0]) );
-    portDISABLE_INTERRUPTS();
-
-    i2c_give(i2c_bus);
-
-    return 0;
+    return -1;
 }
 
-uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg )
+uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg )
 {
-    uint8_t i2c_bus;
-    uint8_t val[2];
+    uint8_t i2c_interf, i2c_addr;
+    uint8_t val[2] = {0};
 
-    /*! @todo: Change to 'i2c_take_by_chipid', which is more generic */
-    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
-        return -1;
+    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, (TickType_t) 10) == pdTRUE ) {
+
+        xI2CMasterWriteRead( i2c_interf, i2c_addr, reg, &val[0], sizeof(val)/sizeof(val[0]) );
+
+        i2c_give( i2c_interf );
     }
-
-    xI2CMasterWriteRead( i2c_bus, data->i2c_id, reg, &val[0], sizeof(val)/sizeof(val[0]) );
-
-    i2c_give( i2c_bus );
 
     return ( (val[0] << 8) | (val[1]) );
 }
 
-void ina220_readall( t_ina220_data * data )
+void ina220_readall( ina220_data_t * data )
 {
     /* Read all INA220 Registers */
     for ( uint8_t i = 0; i < INA220_REGISTERS; i++ ) {
@@ -173,24 +167,21 @@ void ina220_readall( t_ina220_data * data )
     }
 }
 
-Bool ina220_calibrate( t_ina220_data * data )
+Bool ina220_calibrate( ina220_data_t * data )
 {
-    uint8_t i2c_bus;
+    uint8_t i2c_interf, i2c_addr;
     uint16_t cal = data->config->calibration_reg;
     uint8_t cal_reg[3] = { INA220_CALIBRATION, (cal >> 8), (cal & 0xFFFF) };
 
-    /*! @todo: Change to 'i2c_take_by_chipid', which is more generic */
-    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
-        return false;
+    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, (TickType_t) 10) == pdTRUE ) {
+
+        xI2CMasterWrite( i2c_interf, i2c_addr, &cal_reg[0], sizeof(cal_reg)/sizeof(cal_reg[0]) );
+
+        i2c_give( i2c_interf );
+        return true;
     }
 
-    portENABLE_INTERRUPTS();
-    xI2CMasterWrite( i2c_bus, data->i2c_id, &cal_reg[0], sizeof(cal_reg)/sizeof(cal_reg[0]) );
-    portDISABLE_INTERRUPTS();
-
-    i2c_give( i2c_bus );
-
-    return true;
+    return false;
 }
 
 void ina220_init( void )
@@ -214,8 +205,7 @@ void ina220_init( void )
 
         if (i < MAX_INA220_COUNT ) {
             ina220_data[i].sensor = temp_sensor;
-            ina220_data[i].i2c_id = temp_sensor->slave_addr;
-            ina220_config( ina220_data[i].i2c_id, &ina220_data[i] );
+            ina220_config( &ina220_data[i] );
             ina220_calibrate( &ina220_data[i] );
             ina220_data[i].sensor->signed_flag = 0;
 

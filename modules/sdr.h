@@ -181,7 +181,7 @@ typedef struct sensor_t {
     uint8_t state;
     uint8_t old_state;
     uint16_t readout_value;
-    uint8_t slave_addr;
+    uint8_t chipid;
     uint8_t signed_flag;
     uint8_t ownerID; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
     uint8_t entityinstance; /* This field is repeated here because its value is assigned during initialization, so it can't be const */

@@ -95,7 +95,6 @@ void sdr_init( void )
     sdr_head->sdr_length = sizeof(SDR0);
     sdr_head->task_handle = NULL;
     sdr_head->diag_devID = NO_DIAG;
-    sdr_head->slave_addr = ipmb_addr;
     sdr_head->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
 
     sdr_head->next = NULL;
@@ -112,7 +111,6 @@ void sdr_init( void )
     entry->sdr_length = sizeof(SDR_RTM_DEV_LOCATOR);
     entry->task_handle = NULL;
     entry->diag_devID = NO_DIAG;
-    entry->slave_addr = ipmb_addr;
     entry->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
 
     /* Link the sdr list */
@@ -125,7 +123,7 @@ void sdr_init( void )
 #endif
 }
 
-sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr)
+sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t chipid )
 {
     uint8_t index = sdr_count;
     uint8_t sdr_len = sdr_get_size_by_type(type);
@@ -138,7 +136,7 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
     entry->sdr_length = sdr_len;
     entry->task_handle = monitor_task;
     entry->diag_devID = diag_id;
-    entry->slave_addr = slave_addr;
+    entry->chipid = chipid;
     entry->ownerID = ipmb_addr;
     entry->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
     entry->readout_value = 0;
