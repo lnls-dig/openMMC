@@ -1057,40 +1057,44 @@ void user_sdr_init( void )
     /* INA220 sensors */
 #ifdef MODULE_INA220_VOLTAGE
     /* FMC1 Voltage */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V, &vTaskINA220_Handle, FMC1_12V_DEVID, 0x45 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ, &vTaskINA220_Handle, FMC1_VADJ_DEVID, 0x41 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3, &vTaskINA220_Handle, FMC1_P3V3_DEVID, 0x43 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V, &vTaskINA220_Handle, FMC1_12V_DEVID, CHIP_ID_INA_5 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ, &vTaskINA220_Handle, FMC1_VADJ_DEVID, CHIP_ID_INA_1 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3, &vTaskINA220_Handle, FMC1_P3V3_DEVID, CHIP_ID_INA_3 );
 
     /* FMC2 Voltage */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V, &vTaskINA220_Handle, FMC2_12V_DEVID, 0x40 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ, &vTaskINA220_Handle, FMC2_VADJ_DEVID, 0x42 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3, &vTaskINA220_Handle, FMC2_P3V3_DEVID, 0x44 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V, &vTaskINA220_Handle, FMC2_12V_DEVID, CHIP_ID_INA_0 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ, &vTaskINA220_Handle, FMC2_VADJ_DEVID, CHIP_ID_INA_2 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3, &vTaskINA220_Handle, FMC2_P3V3_DEVID, CHIP_ID_INA_4 );
 #endif
 
 #ifdef MODULE_INA220_CURRENT
     /* FMC1 Current */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V_CURR, &vTaskINA220_Handle, FMC1_12V_CURR_DEVID, 0x45 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ_CURR, &vTaskINA220_Handle, FMC1_VADJ_CURR_DEVID, 0x41 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3_CURR, &vTaskINA220_Handle, FMC1_P3V3_CURR_DEVID, 0x43 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V_CURR, &vTaskINA220_Handle, FMC1_12V_CURR_DEVID, CHIP_ID_INA_5 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ_CURR, &vTaskINA220_Handle, FMC1_VADJ_CURR_DEVID, CHIP_ID_INA_1 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3_CURR, &vTaskINA220_Handle, FMC1_P3V3_CURR_DEVID, CHIP_ID_INA_3 );
 
     /* FMC2 Current */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V_CURR, &vTaskINA220_Handle, FMC2_12V_CURR_DEVID, 0x40 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ_CURR, &vTaskINA220_Handle, FMC2_VADJ_CURR_DEVID, 0x42 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3_CURR, &vTaskINA220_Handle, FMC2_P3V3_CURR_DEVID, 0x44 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V_CURR, &vTaskINA220_Handle, FMC2_12V_CURR_DEVID, CHIP_ID_INA_0 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ_CURR, &vTaskINA220_Handle, FMC2_VADJ_CURR_DEVID, CHIP_ID_INA_2 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3_CURR, &vTaskINA220_Handle, FMC2_P3V3_CURR_DEVID, CHIP_ID_INA_4 );
+#endif
+
+#ifdef MODULE_MAX6642
+    sdr_insert_entry( TYPE_01, (void *) &SDR_MAX6642_FPGA, &vTaskMAX6642_Handle, 0, CHIP_ID_MAX6642 );
 #endif
 
 #ifdef MODULE_LM75
     /* Board Temperature */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_uC, &vTaskLM75_Handle, 0, 0x4C );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_CLOCK_SWITCH, &vTaskLM75_Handle, 0, 0x4D );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_DCDC, &vTaskLM75_Handle, 0, 0x4E );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RAM, &vTaskLM75_Handle, 0, 0x4F );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_uC, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_0 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_CLOCK_SWITCH, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_1 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_DCDC, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_2 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RAM, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_3 );
 #ifdef MODULE_RTM
     extern const SDR_type_01h_t SDR_LM75_RTM_1;
     extern const SDR_type_01h_t SDR_LM75_RTM_2;
 
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_1, &vTaskLM75_Handle, 0, 0x48 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_2, &vTaskLM75_Handle, 0, 0x49 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_1, &vTaskLM75_Handle, 0, CHIP_ID_RTM_LM75_0 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_2, &vTaskLM75_Handle, 0, CHIP_ID_RTM_LM75_1 );
 #endif
 #endif
 }
