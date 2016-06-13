@@ -71,10 +71,10 @@ void sensor_init( void )
 #ifdef MODULE_HOTSWAP
     hotswap_init();
 #endif
-#ifdef MODULE_TEMPERATURE_SENSOR
+#ifdef MODULE_LM75
     LM75_init();
 #endif
-#if defined(MODULE_CURRENT_SENSOR) || defined(MODULE_VOLTAGE_SENSOR)
+#if defined(MODULE_INA220_CURRENT) || defined(MODULE_INA220_VOLTAGE)
     ina220_init();
 #endif
 }

@@ -23,9 +23,9 @@
 #include "sdr.h"
 #include "utils.h"
 
-/* Rename file to sdr_mapping.c */
+/* Rename file to sdr_list.c */
 
-#ifdef MODULE_TEMPERATURE_SENSOR
+#ifdef MODULE_LM75
 const SDR_type_01h_t SDR_LM75_RTM_1 = {
 
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */

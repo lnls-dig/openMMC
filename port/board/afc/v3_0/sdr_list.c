@@ -29,7 +29,7 @@
 #include "lm75.h"
 
 /* SDR List */
-#ifdef MODULE_VOLTAGE_SENSOR
+#ifdef MODULE_INA220_VOLTAGE
 #include "ina220.h"
 #define SDR_FMC1_12V_ID        "FMC1 +12V"
 #define SDR_FMC1_VADJ_ID       "FMC1 VADJ"
@@ -38,7 +38,7 @@
 #define SDR_FMC2_VADJ_ID       "FMC2 VADJ"
 #define SDR_FMC2_P3V3_ID       "FMC2 +3.3V"
 #endif
-#ifdef MODULE_CURRENT_SENSOR
+#ifdef MODULE_INA220_CURRENT
 #include "ina220.h"
 #define SDR_FMC1_VADJ_CURR_ID  "FMC1 +12V Curr"
 #define SDR_FMC1_12V_CURR_ID   "FMC1 VADJ Curr"
@@ -133,7 +133,7 @@ const SDR_type_02h_t SDR_HOTSWAP_RTM = {
 #endif
 #endif
 
-#ifdef MODULE_VOLTAGE_SENSOR
+#ifdef MODULE_INA220_VOLTAGE
 /* FMC1 12V */
 const SDR_type_01h_t SDR_FMC1_12V = {
 
@@ -476,7 +476,7 @@ const SDR_type_01h_t SDR_FMC2_P3V3 = {
 };
 #endif
 
-#ifdef MODULE_CURRENT_SENSOR
+#ifdef MODULE_INA220_CURRENT
 /* FMC1 12V Current */
 const SDR_type_01h_t SDR_FMC1_12V_CURR = {
 
@@ -818,7 +818,7 @@ const SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
 };
 #endif
 
-#ifdef MODULE_TEMPERATURE_SENSOR
+#ifdef MODULE_LM75
 /* LM75 SDR List */
 const SDR_type_01h_t SDR_LM75_uC = {
 
@@ -1054,7 +1054,7 @@ void user_sdr_init( void )
 #endif
 
     /* INA220 sensors */
-#ifdef MODULE_VOLTAGE_SENSOR
+#ifdef MODULE_INA220_VOLTAGE
     /* FMC1 Voltage */
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V, &vTaskINA220_Handle, FMC1_12V_DEVID, 0x45 );
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ, &vTaskINA220_Handle, FMC1_VADJ_DEVID, 0x41 );
@@ -1066,7 +1066,7 @@ void user_sdr_init( void )
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3, &vTaskINA220_Handle, FMC2_P3V3_DEVID, 0x44 );
 #endif
 
-#ifdef MODULE_CURRENT_SENSOR
+#ifdef MODULE_INA220_CURRENT
     /* FMC1 Current */
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V_CURR, &vTaskINA220_Handle, FMC1_12V_CURR_DEVID, 0x45 );
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ_CURR, &vTaskINA220_Handle, FMC1_VADJ_CURR_DEVID, 0x41 );
@@ -1078,7 +1078,7 @@ void user_sdr_init( void )
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3_CURR, &vTaskINA220_Handle, FMC2_P3V3_CURR_DEVID, 0x44 );
 #endif
 
-#ifdef MODULE_TEMPERATURE_SENSOR
+#ifdef MODULE_LM75
     /* Board Temperature */
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_uC, &vTaskLM75_Handle, 0, 0x4C );
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_CLOCK_SWITCH, &vTaskLM75_Handle, 0, 0x4D );
