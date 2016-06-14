@@ -20,8 +20,8 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef IPMI_PAYLOAD_H_
-#define IPMI_PAYLOAD_H_
+#ifndef PAYLOAD_H_
+#define PAYLOAD_H_
 
 #include "event_groups.h"
 
@@ -56,9 +56,9 @@ typedef enum {
 
 #define PAYLOAD_BASE_DELAY 100
 
-void payload_send_message( uint8_t fru_id, EventBits_t msg);
-void vTaskPayload(void *pvParameters);
-void payload_init(void);
+void payload_send_message( uint8_t fru_id, EventBits_t msg );
+void vTaskPayload( void *pvParameters );
+void payload_init( void );
 
 #ifdef MODULE_HPM
 uint8_t payload_hpm_prepare_comp( void );

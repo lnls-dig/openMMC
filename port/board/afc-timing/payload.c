@@ -94,39 +94,39 @@ void setDC_DC_ConvertersON( bool on )
     bool _on_fmc1 = false | on;
     bool _on_fmc2 = false | on;
 
-    gpio_set_pin_state( GPIO_EN_FMC1_PVADJ_PORT, GPIO_EN_FMC1_PVADJ_PIN, _on_fmc1);
-    //gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, _on_fmc1);
-    gpio_set_pin_state( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, _on_fmc1);
+    gpio_set_pin_state( GPIO_EN_FMC1_PVADJ_PORT, GPIO_EN_FMC1_PVADJ_PIN, _on_fmc1 );
+    //gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, _on_fmc1 );
+    gpio_set_pin_state( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, _on_fmc1 );
 
-    gpio_set_pin_state( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, _on_fmc2);
-    gpio_set_pin_state( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, _on_fmc2);
-    gpio_set_pin_state( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, _on_fmc2);
+    gpio_set_pin_state( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, _on_fmc2 );
+    gpio_set_pin_state( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, _on_fmc2 );
+    gpio_set_pin_state( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, _on_fmc2 );
 
 
-    gpio_set_pin_state( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, _on);
-    gpio_set_pin_state( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, _on); // <- this one causes problems if not switched off before power loss
-    gpio_set_pin_state( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, _on);
-    gpio_set_pin_state( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, _on);
-    gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, _on);
+    gpio_set_pin_state( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, _on );
+    gpio_set_pin_state( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, _on ); // <- this one causes problems if not switched off before power loss
+    gpio_set_pin_state( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, _on );
+    gpio_set_pin_state( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, _on );
+    gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, _on );
 }
 
 void initializeDCDC( void )
 {
     setDC_DC_ConvertersON(false);
-    gpio_set_pin_dir( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, OUTPUT);
-    gpio_set_pin_dir( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, OUTPUT );
+    gpio_set_pin_dir( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, OUTPUT );
 
-    gpio_set_pin_dir( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, OUTPUT);
-    gpio_set_pin_dir( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, OUTPUT);
-    gpio_set_pin_dir( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, OUTPUT );
+    gpio_set_pin_dir( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, OUTPUT );
+    gpio_set_pin_dir( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, OUTPUT );
 
-    gpio_set_pin_dir( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, OUTPUT);
-    gpio_set_pin_dir( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, OUTPUT);
-    gpio_set_pin_dir( GPIO_EN_FMC1_PVADJ_PORT,  GPIO_EN_FMC1_PVADJ_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, OUTPUT );
+    gpio_set_pin_dir( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, OUTPUT );
+    gpio_set_pin_dir( GPIO_EN_FMC1_PVADJ_PORT,  GPIO_EN_FMC1_PVADJ_PIN, OUTPUT );
 
-    gpio_set_pin_dir( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, OUTPUT);
-    gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, OUTPUT);
-    gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, OUTPUT);
+    gpio_set_pin_dir( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, OUTPUT );
+    gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, OUTPUT );
+    gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, OUTPUT );
 }
 
 EventGroupHandle_t amc_payload_evt = NULL;
@@ -149,7 +149,7 @@ TaskHandle_t vTaskPayload_Handle;
 
 void payload_init( void )
 {
-    xTaskCreate(vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
+    xTaskCreate( vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
 
     amc_payload_evt = xEventGroupCreate();
 #ifdef MODULE_RTM
@@ -169,8 +169,8 @@ void payload_init( void )
     pin_config( GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN, (IOCON_MODE_INACT | IOCON_FUNC1) );
     irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1 );
     irq_enable( EINT2_IRQn );
-    gpio_set_pin_dir(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, OUTPUT);
-    gpio_set_pin_state(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, HIGH);
+    gpio_set_pin_dir( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, OUTPUT );
+    gpio_set_pin_state( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, HIGH );
 
 
     /* Flash CS Mux - Only valid to AFC v3.1 */
@@ -187,7 +187,7 @@ void payload_init( void )
     gpio_set_pin_state(0, 20, HIGH);
 }
 
-void vTaskPayload(void *pvParameters)
+void vTaskPayload( void *pvParameters )
 {
     payload_state state = PAYLOAD_NO_POWER;
     payload_state new_state = PAYLOAD_STATE_NO_CHANGE;
@@ -204,12 +204,12 @@ void vTaskPayload(void *pvParameters)
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
 
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH);
+    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH );
 
     for ( ;; ) {
 
         /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
-        gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, HIGH);
+        gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, HIGH );
 
         new_state = state;
 
@@ -245,7 +245,7 @@ void vTaskPayload(void *pvParameters)
             break;
 
         case PAYLOAD_SWITCHING_ON:
-            setDC_DC_ConvertersON(true);
+            setDC_DC_ConvertersON( true );
             new_state = PAYLOAD_POWER_GOOD_WAIT;
             break;
 
@@ -281,7 +281,7 @@ void vTaskPayload(void *pvParameters)
             break;
 
         case PAYLOAD_SWITCHING_OFF:
-            setDC_DC_ConvertersON(false);
+            setDC_DC_ConvertersON( false );
             hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
             hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_BP_SDOWN );
             hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
@@ -304,65 +304,6 @@ void vTaskPayload(void *pvParameters)
     }
 }
 
-IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL, ipmi_msg *req, ipmi_msg *rsp)
-{
-    uint8_t len = rsp->data_len = 0;
-    uint8_t fru_id = req->data[1];
-    uint8_t fru_ctl = req->data[2];
-
-    rsp->completion_code = IPMI_CC_OK;
-
-    switch (fru_ctl) {
-    case FRU_CTLCODE_COLD_RST:
-        payload_send_message( fru_id, PAYLOAD_MESSAGE_COLD_RST);
-        break;
-    case FRU_CTLCODE_WARM_RST:
-        payload_send_message( fru_id, PAYLOAD_MESSAGE_WARM_RST);
-        break;
-    case FRU_CTLCODE_REBOOT:
-        payload_send_message( fru_id, PAYLOAD_MESSAGE_REBOOT);
-        break;
-    case FRU_CTLCODE_QUIESCE:
-        payload_send_message( fru_id, PAYLOAD_MESSAGE_QUIESCED);
-        break;
-    default:
-        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
-        break;
-    }
-
-    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
-    rsp->data_len = len;
-}
-
-IPMI_HANDLER(ipmi_picmg_cmd_get_fru_control_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL_CAPABILITIES, ipmi_msg *req, ipmi_msg *rsp)
-{
-    uint8_t len = rsp->data_len = 0;
-
-    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
-
-    /* FRU Control Capabilities Mask:
-     * [7:4] Reserved
-     * [3] - Capable of issuing a diagnostic interrupt
-     * [2] - Capable of issuing a graceful reboot
-     * [1] - Capable of issuing a warm reset */
-    rsp->data[len++] = 0x06; /* Graceful reboot and Warm reset */
-    rsp->data_len = len;
-    rsp->completion_code = IPMI_CC_OK;
-}
-
-IPMI_HANDLER(ipmi_picmg_cmd_set_fru_activation_policy, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_ACTIVATION_POLICY, ipmi_msg *req, ipmi_msg *rsp)
-{
-    uint8_t len = rsp->data_len = 0;
-
-    /* FRU Activation Policy Mask */
-    uint8_t fru_actv_mask = req->data[2];
-    uint8_t fru_actv_bits = req->data[3];
-
-    /* TODO: Implement FRU activation policy */
-    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
-    rsp->data_len = len;
-    rsp->completion_code = IPMI_CC_OK;
-}
 
 /* HPM Functions */
 #ifdef MODULE_HPM
@@ -385,11 +326,11 @@ uint8_t payload_hpm_prepare_comp( void )
     ssp_init( FLASH_SPI, FLASH_SPI_BITRATE, FLASH_SPI_FRAME_SIZE, SSP_MASTER, SSP_INTERRUPT );
 
     /* Prevent the FPGA from accessing the Flash to configure itself now */
-    gpio_set_pin_dir( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, OUTPUT);
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH);
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW);
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH);
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW);
+    gpio_set_pin_dir( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, OUTPUT );
+    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH );
+    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW );
+    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH );
+    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW );
 
     /* Erase FLASH */
     flash_bulk_erase();
@@ -402,7 +343,7 @@ uint8_t payload_hpm_upload_block( uint8_t * block, uint16_t size )
     /* TODO: Check DONE pin before accessing the SPI bus, since the FPGA may be reading it in order to boot */
     uint8_t remaining_bytes_start;
 
-    if ( sizeof(hpm_page) - hpm_pg_index > size) {
+    if ( sizeof(hpm_page) - hpm_pg_index > size ) {
         /* Our page is not full yet, just append the new data */
         memcpy(&hpm_page[hpm_pg_index], block, size);
         hpm_pg_index += size;

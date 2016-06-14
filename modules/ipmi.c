@@ -245,3 +245,63 @@ IPMI_HANDLER(ipmi_get_device_locator_record, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_DE
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }
+
+IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL, ipmi_msg *req, ipmi_msg *rsp)
+{
+    uint8_t len = rsp->data_len = 0;
+    uint8_t fru_id = req->data[1];
+    uint8_t fru_ctl = req->data[2];
+
+    rsp->completion_code = IPMI_CC_OK;
+
+    switch (fru_ctl) {
+    case FRU_CTLCODE_COLD_RST:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_COLD_RST);
+        break;
+    case FRU_CTLCODE_WARM_RST:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_WARM_RST);
+        break;
+    case FRU_CTLCODE_REBOOT:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_REBOOT);
+        break;
+    case FRU_CTLCODE_QUIESCE:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_QUIESCED);
+        break;
+    default:
+        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+        break;
+    }
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+    rsp->data_len = len;
+}
+
+IPMI_HANDLER(ipmi_picmg_cmd_get_fru_control_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL_CAPABILITIES, ipmi_msg *req, ipmi_msg *rsp)
+{
+    uint8_t len = rsp->data_len = 0;
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+
+    /* FRU Control Capabilities Mask:
+     * [7:4] Reserved
+     * [3] - Capable of issuing a diagnostic interrupt
+     * [2] - Capable of issuing a graceful reboot
+     * [1] - Capable of issuing a warm reset */
+    rsp->data[len++] = 0x06; /* Graceful reboot and Warm reset */
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}
+
+IPMI_HANDLER(ipmi_picmg_cmd_set_fru_activation_policy, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_ACTIVATION_POLICY, ipmi_msg *req, ipmi_msg *rsp)
+{
+    uint8_t len = rsp->data_len = 0;
+
+    /* FRU Activation Policy Mask */
+    uint8_t fru_actv_mask = req->data[2];
+    uint8_t fru_actv_bits = req->data[3];
+
+    /* TODO: Implement FRU activation policy */
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}

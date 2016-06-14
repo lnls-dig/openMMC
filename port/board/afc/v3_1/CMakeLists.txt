@@ -31,9 +31,13 @@ set(TARGET_MODULES
 set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 #Include the modules sources
-##Sensors SDR list
 set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/i2c_mapping.c)
+
+if (";${TARGET_MODULES};" MATCHES ";PAYLOAD;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/payload.c)
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_PAYLOAD")
+endif()
 
 #Extra definitions
 if (FRU_WRITE_EEPROM)
