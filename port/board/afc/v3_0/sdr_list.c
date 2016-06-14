@@ -22,11 +22,11 @@
 /* Project Includes */
 #include "sdr.h"
 #include "utils.h"
+#include "i2c_mapping.h"
 
 /* Sensors includes */
 #include "sensors.h"
 #include "fpga_spi.h"
-
 
 /* SDR List */
 #ifdef MODULE_INA220_VOLTAGE
