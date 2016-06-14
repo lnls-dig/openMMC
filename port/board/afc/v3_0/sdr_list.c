@@ -24,9 +24,9 @@
 #include "utils.h"
 
 /* Sensors includes */
-#include "hotswap.h"
+#include "sensors.h"
 #include "fpga_spi.h"
-#include "lm75.h"
+
 
 /* SDR List */
 #ifdef MODULE_INA220_VOLTAGE

@@ -22,11 +22,11 @@
 /* Project Includes */
 #include "sdr.h"
 #include "utils.h"
+#include "i2c_mapping.h"
 
 /* Sensors includes */
-#include "hotswap.h"
+#include "sensors.h"
 #include "fpga_spi.h"
-#include "lm75.h"
 
 /* SDR List */
 #ifdef MODULE_INA220_VOLTAGE
@@ -476,7 +476,7 @@ const SDR_type_01h_t SDR_FMC2_P3V3 = {
 };
 #endif
 
-#ifdef MODULE_CURRENT_SENSOR
+#ifdef MODULE_INA220_CURRENT
 /* FMC1 12V Current */
 const SDR_type_01h_t SDR_FMC1_12V_CURR = {
 
@@ -818,7 +818,7 @@ const SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
 };
 #endif
 
-#ifdef MODULE_TEMPERATURE_SENSOR
+#ifdef MODULE_LM75
 /* LM75 SDR List */
 const SDR_type_01h_t SDR_LM75_uC = {
 
