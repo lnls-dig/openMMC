@@ -86,4 +86,6 @@ void SystemInit(void)
 	/* Setup system clocking and muxing */
 	Board_SystemInit();
 #endif
+	/* Update clock register value */
+	SystemCoreClockUpdate();
 }

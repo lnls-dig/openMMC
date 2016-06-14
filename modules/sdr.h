@@ -25,7 +25,7 @@
 
 #include "ipmb.h"
 
-#define NUM_SENSOR                      17      /* Number of sensors */
+#define NUM_SENSOR                      21      /* Number of sensors */
 #define NUM_SDR                         (NUM_SENSOR+1)  /* Number of SDRs */
 
 /* Sensor Types */
@@ -42,28 +42,28 @@
 #define DEASSERTION_EVENT               0x80
 
 /* Sensor States */
-#define SENSOR_STATE_NORMAL             0x00	// temperature is in normal range
-#define SENSOR_STATE_LOW                0x01	// temperature is below lower non critical
-#define SENSOR_STATE_LOW_CRIT           0x02	// temperature is below lower critical
-#define SENSOR_STATE_LOW_NON_REC        0x04	// temperature is below lower non recoverable
-#define SENSOR_STATE_HIGH               0x08	// temperature is higher upper non critical
-#define SENSOR_STATE_HIGH_CRIT          0x10	// temperature is higher upper critical
-#define SENSOR_STATE_HIGH_NON_REC       0x20	// temperature is higher high non recoverable
+#define SENSOR_STATE_NORMAL             0x00    // temperature is in normal range
+#define SENSOR_STATE_LOW                0x01    // temperature is below lower non critical
+#define SENSOR_STATE_LOW_CRIT           0x02    // temperature is below lower critical
+#define SENSOR_STATE_LOW_NON_REC        0x04    // temperature is below lower non recoverable
+#define SENSOR_STATE_HIGH               0x08    // temperature is higher upper non critical
+#define SENSOR_STATE_HIGH_CRIT          0x10    // temperature is higher upper critical
+#define SENSOR_STATE_HIGH_NON_REC       0x20    // temperature is higher high non recoverable
 
 
 /* IPMI Sensor Events */
-#define IPMI_THRESHOLD_LNC_GL           0x00	// lower non critical going low
-#define IPMI_THRESHOLD_LNC_GH           0x01	// lower non critical going high
-#define IPMI_THRESHOLD_LC_GL            0x02	// lower critical going low
-#define IPMI_THRESHOLD_LC_GH            0x03	// lower critical going HIGH
-#define IPMI_THRESHOLD_LNR_GL           0x04	// lower non recoverable going low
-#define IPMI_THRESHOLD_LNR_GH           0x05	// lower non recoverable going high
-#define IPMI_THRESHOLD_UNC_GL           0x06	// upper non critical going low
-#define IPMI_THRESHOLD_UNC_GH           0x07	// upper non critical going high
-#define IPMI_THRESHOLD_UC_GL            0x08	// upper critical going low
-#define IPMI_THRESHOLD_UC_GH            0x09	// upper critical going HIGH
-#define IPMI_THRESHOLD_UNR_GL           0x0A	// upper non recoverable going low
-#define IPMI_THRESHOLD_UNR_GH           0x0B	// upper non recoverable going high
+#define IPMI_THRESHOLD_LNC_GL           0x00    // lower non critical going low
+#define IPMI_THRESHOLD_LNC_GH           0x01    // lower non critical going high
+#define IPMI_THRESHOLD_LC_GL            0x02    // lower critical going low
+#define IPMI_THRESHOLD_LC_GH            0x03    // lower critical going HIGH
+#define IPMI_THRESHOLD_LNR_GL           0x04    // lower non recoverable going low
+#define IPMI_THRESHOLD_LNR_GH           0x05    // lower non recoverable going high
+#define IPMI_THRESHOLD_UNC_GL           0x06    // upper non critical going low
+#define IPMI_THRESHOLD_UNC_GH           0x07    // upper non critical going high
+#define IPMI_THRESHOLD_UC_GL            0x08    // upper critical going low
+#define IPMI_THRESHOLD_UC_GH            0x09    // upper critical going HIGH
+#define IPMI_THRESHOLD_UNR_GL           0x0A    // upper non recoverable going low
+#define IPMI_THRESHOLD_UNR_GH           0x0B    // upper non recoverable going high
 
 
 typedef enum {
@@ -172,7 +172,7 @@ typedef struct {
     char IDstring[16];
 } SDR_type_12h_t;
 
-typedef struct {
+typedef struct sensor_t {
     uint8_t num;
     SDR_TYPE sdr_type;
     void * sdr;
@@ -181,7 +181,7 @@ typedef struct {
     uint8_t state;
     uint8_t old_state;
     uint16_t readout_value;
-    uint8_t slave_addr;
+    uint8_t chipid;
     uint8_t signed_flag;
     uint8_t ownerID; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
     uint8_t entityinstance; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
@@ -200,21 +200,31 @@ typedef struct {
         uint16_t lower_non_critical_go_high:1;
         uint16_t lower_non_critical_go_low:1;
     } asserted_event;
+    struct sensor_t *next;
 } sensor_t;
 
-extern sensor_t *sensor_array;
-extern uint8_t sdr_count;
+extern volatile uint8_t sdr_count;
+sensor_t *sdr_head;
+sensor_t *sdr_tail;
 
 const SDR_type_12h_t SDR0;
+const SDR_type_12h_t SDR_RTM_DEV_LOCATOR;
 
 #define GET_SENSOR_TYPE(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
 
 #define GET_EVENT_TYPE_CODE(n)      ((SDR_type_01h_t *)sensor->sdr)->event_reading_type
 
 void initializeDCDC( void );
+
 void sdr_init( void );
+void user_sdr_init( void );
 void sensor_init( void );
-void sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr );
 void check_sensor_event( sensor_t * sensor );
+
+sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr);
+void sdr_remove_entry( sensor_t * entry );
+void sdr_pop( void );
+sensor_t * find_sensor_by_sdr( void * sdr );
+sensor_t * find_sensor_by_id( uint8_t id );
 
 #endif

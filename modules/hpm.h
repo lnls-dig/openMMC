@@ -36,10 +36,6 @@
 #define HPM_ROLLBACK_TIMEOUT 10 /* in 5 seconds counts */
 #define HPM_INACCESSIBILITY_TIMEOUT 10 /* in 5 seconds counts */
 
-#define IPMC_UPDATE_SECTOR_START 0x10
-#define IPMC_UPDATE_SECTOR_END   0x11
-#define IPMC_UPDATE_ADDRESS_OFFSET (IPMC_UPDATE_SECTOR_START << 12)
-
 #define HPM_BLOCK_SIZE 20
 
 /* Components ID */

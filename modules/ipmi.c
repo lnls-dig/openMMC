@@ -25,10 +25,11 @@
 /* Project includes */
 #include "FreeRTOS.h"
 #include "ipmi.h"
-#include "pin_mapping.h"
+#include "port.h"
 #include "task_priorities.h"
 #include "led.h"
 #include "payload.h"
+#include "uart_debug.h"
 
 /* Local variables */
 QueueHandle_t ipmi_rxqueue = NULL;
@@ -46,10 +47,12 @@ void IPMITask( void * pvParameters )
     for ( ;; ) {
 
         if( xQueueReceive( ipmi_rxqueue, &req_received , portMAX_DELAY ) == pdFALSE) {
-	    /* Should no return pdFALSE */
+            /* Should no return pdFALSE */
             configASSERT(pdFALSE);
             continue;
         }
+
+	DEBUG_MSG(" IPMI Message Received! \n ");
 
         req_handler = (t_req_handler) 0;
         req_handler = ipmi_retrieve_handler(req_received.netfn, req_received.cmd);
@@ -60,7 +63,7 @@ void IPMITask( void * pvParameters )
             response.data_len = 0;
 
             /* Call user-defined function, give request data and retrieve required response */
-	    /* WARNING: Since IPMI task have a high priority, this handler function should not wait other tasks to unblock */
+            /* WARNING: Since IPMI task have a high priority, this handler function should not wait other tasks to unblock */
             req_handler(&req_received, &response);
 
             error_code = ipmb_send_response(&req_received, &response);
@@ -95,7 +98,7 @@ void ipmi_init ( void )
 {
     ipmb_init();
     ipmb_register_rxqueue( &ipmi_rxqueue );
-    xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", configMINIMAL_STACK_SIZE*2, ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle );
+    xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", 100, ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle );
 }
 
 /*!
@@ -117,7 +120,7 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd)
             handler = p_ptr->req_handler;
             break;
         }
-	p_ptr++;
+        p_ptr++;
     }
 
     return handler;
@@ -218,7 +221,7 @@ IPMI_HANDLER(ipmi_picmg_get_properties, NETFN_GRPEXT,IPMI_PICMG_CMD_GET_PROPERTI
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
     rsp->data[len++] = IPMI_EXTENSION_VERSION;
-    /* MMCs must report MAX_FRU_ID and FRU_DEVICE_ID both as 0 - AMC.0 Table 3-1 */
+    /* MMCs must report MAX_FRU_ID and FRU_DEVICE_ID both as 0 (if uRTM is implemented, MAX_FRU_ID must be set to 1) - AMC.0 Table 3-1 */
     rsp->data[len++] = MAX_FRU_ID;
     rsp->data[len++] = FRU_DEVICE_ID;
     rsp->data_len = len;
@@ -243,3 +246,62 @@ IPMI_HANDLER(ipmi_get_device_locator_record, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_DE
     rsp->completion_code = IPMI_CC_OK;
 }
 
+IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL, ipmi_msg *req, ipmi_msg *rsp)
+{
+    uint8_t len = rsp->data_len = 0;
+    uint8_t fru_id = req->data[1];
+    uint8_t fru_ctl = req->data[2];
+
+    rsp->completion_code = IPMI_CC_OK;
+
+    switch (fru_ctl) {
+    case FRU_CTLCODE_COLD_RST:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_COLD_RST);
+        break;
+    case FRU_CTLCODE_WARM_RST:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_WARM_RST);
+        break;
+    case FRU_CTLCODE_REBOOT:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_REBOOT);
+        break;
+    case FRU_CTLCODE_QUIESCE:
+        payload_send_message( fru_id, PAYLOAD_MESSAGE_QUIESCED);
+        break;
+    default:
+        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+        break;
+    }
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+    rsp->data_len = len;
+}
+
+IPMI_HANDLER(ipmi_picmg_cmd_get_fru_control_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTROL_CAPABILITIES, ipmi_msg *req, ipmi_msg *rsp)
+{
+    uint8_t len = rsp->data_len = 0;
+
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+
+    /* FRU Control Capabilities Mask:
+     * [7:4] Reserved
+     * [3] - Capable of issuing a diagnostic interrupt
+     * [2] - Capable of issuing a graceful reboot
+     * [1] - Capable of issuing a warm reset */
+    rsp->data[len++] = 0x06; /* Graceful reboot and Warm reset */
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}
+
+IPMI_HANDLER(ipmi_picmg_cmd_set_fru_activation_policy, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_ACTIVATION_POLICY, ipmi_msg *req, ipmi_msg *rsp)
+{
+    uint8_t len = rsp->data_len = 0;
+
+    /* FRU Activation Policy Mask */
+    uint8_t fru_actv_mask = req->data[2];
+    uint8_t fru_actv_bits = req->data[3];
+
+    /* TODO: Implement FRU activation policy */
+    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}

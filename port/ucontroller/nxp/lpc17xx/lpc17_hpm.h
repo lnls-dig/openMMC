@@ -30,7 +30,9 @@
 #endif
 #define LPC17_HPM_H_
 
-#include "hpm.h"
+#define IPMC_UPDATE_SECTOR_START 0x10
+#define IPMC_UPDATE_SECTOR_END   0x11
+#define IPMC_UPDATE_ADDRESS_OFFSET (IPMC_UPDATE_SECTOR_START << 12)
 
 uint8_t ipmc_hpm_prepare_comp( void );
 uint8_t ipmc_hpm_upload_block( uint8_t * block, uint16_t size );

@@ -35,12 +35,14 @@
 #include "port.h"
 #include "sdr.h"
 #include "task_priorities.h"
-#include "board_version.h"
+#include "i2c.h"
+#include "i2c_mapping.h"
 #include "payload.h"
 #include "ina220.h"
 #include "fpga_spi.h"
+#include "fru.h"
 
-const t_ina220_config ina220_cfg = {
+const ina220_config_t ina220_cfg = {
     .config_reg_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
                                        .pga_gain = INA220_PGA_GAIN_40MV,
                                        .bus_adc_resolution = INA220_RES_SAMPLES_12BIT,
@@ -55,17 +57,19 @@ const t_ina220_config ina220_cfg = {
     .power_lsb = 20
 };
 
-static t_ina220_data ina220_data[MAX_INA220_COUNT];
+static ina220_data_t ina220_data[MAX_INA220_COUNT];
 
 void vTaskINA220( void *Parameters )
 {
     uint8_t i;
-
     TickType_t xLastWakeTime;
     /* Task will run every 100ms */
     const TickType_t xFrequency = INA220_UPDATE_RATE / portTICK_PERIOD_MS;
+
+    extern const SDR_type_01h_t SDR_FMC1_12V;
+
     sensor_t * ina220_sensor;
-    t_ina220_data * data_ptr;
+    ina220_data_t * data_ptr;
 
     /* Initialise the xLastWakeTime variable with the current time. */
     xLastWakeTime = xTaskGetTickCount();
@@ -77,6 +81,10 @@ void vTaskINA220( void *Parameters )
 
             ina220_sensor = ina220_data[i].sensor;
             data_ptr = &ina220_data[i];
+
+            if (ina220_sensor == NULL) {
+                continue;
+            }
 
             switch ((GET_SENSOR_TYPE(ina220_sensor))) {
             case SENSOR_TYPE_VOLTAGE:
@@ -94,28 +102,29 @@ void vTaskINA220( void *Parameters )
             /* Check for threshold events */
             check_sensor_event(ina220_sensor);
 
+#ifdef MODULE_PAYLOAD
             if( ina220_sensor->sdr == &SDR_FMC1_12V ) {
                 /* Check if the Payload power is in an acceptable zone */
-		SDR_type_01h_t * ina220_sdr = ( SDR_type_01h_t * ) ina220_sensor->sdr;
+                SDR_type_01h_t * ina220_sdr = ( SDR_type_01h_t * ) ina220_sensor->sdr;
                 if ( ( ina220_sensor->readout_value >= (ina220_sdr->lower_critical_thr ) ) &&
-		     ( ina220_sensor->readout_value <= (ina220_sdr->upper_critical_thr ) ) ) {
-                    payload_send_message(PAYLOAD_MESSAGE_P12GOOD);
+                     ( ina220_sensor->readout_value <= (ina220_sdr->upper_critical_thr ) ) ) {
+                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_P12GOOD );
                 } else {
-                    payload_send_message(PAYLOAD_MESSAGE_P12GOODn);
+                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_P12GOODn );
                 }
             }
-
+#endif
             vTaskDelayUntil( &xLastWakeTime, xFrequency );
         }
     }
 }
 
-uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
+uint8_t ina220_config( ina220_data_t * data )
 {
-    uint8_t i2c_bus;
+    uint8_t i2c_interf, i2c_addr;
 
     data->config = &ina220_cfg;
-    data->i2c_id = i2c_id;
+
     if ((data->rshunt == 0) || (data->rshunt > data->config->calibration_factor)) {
         data->rshunt = INA220_RSHUNT_DEFAULT;
     } else {
@@ -123,40 +132,34 @@ uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data)
     }
     data->curr_reg_config = data->config->config_reg_default;
 
-    /* @todo Change to 'i2c_take_by_chipid', which is more generic */
-    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
-        return -1;
+    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, (TickType_t) 10) == pdTRUE ) {
+
+        uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_reg_config.cfg_word >> 8) , ( data->curr_reg_config.cfg_word & 0xFFFF) };
+
+        xI2CMasterWrite( i2c_interf, i2c_addr, cfg_buff, sizeof(cfg_buff)/sizeof(cfg_buff[0]) );
+
+        i2c_give( i2c_interf );
+        return 0;
     }
-
-    uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_reg_config.cfg_word >> 8) , ( data->curr_reg_config.cfg_word & 0xFFFF) };
-
-    portENABLE_INTERRUPTS();
-    xI2CMasterWrite( i2c_bus, data->i2c_id, cfg_buff, sizeof(cfg_buff)/sizeof(cfg_buff[0]) );
-    portDISABLE_INTERRUPTS();
-
-    i2c_give(i2c_bus);
-
-    return 0;
+    return -1;
 }
 
-uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg )
+uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg )
 {
-    uint8_t i2c_bus;
-    uint8_t val[2];
+    uint8_t i2c_interf, i2c_addr;
+    uint8_t val[2] = {0};
 
-    /*! @todo: Change to 'i2c_take_by_chipid', which is more generic */
-    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
-        return -1;
+    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, (TickType_t) 10) == pdTRUE ) {
+
+        xI2CMasterWriteRead( i2c_interf, i2c_addr, reg, &val[0], sizeof(val)/sizeof(val[0]) );
+
+        i2c_give( i2c_interf );
     }
-
-    xI2CMasterWriteRead( i2c_bus, data->i2c_id, reg, &val[0], sizeof(val)/sizeof(val[0]) );
-
-    i2c_give( i2c_bus );
 
     return ( (val[0] << 8) | (val[1]) );
 }
 
-void ina220_readall( t_ina220_data * data )
+void ina220_readall( ina220_data_t * data )
 {
     /* Read all INA220 Registers */
     for ( uint8_t i = 0; i < INA220_REGISTERS; i++ ) {
@@ -164,68 +167,45 @@ void ina220_readall( t_ina220_data * data )
     }
 }
 
-Bool ina220_calibrate( t_ina220_data * data )
+Bool ina220_calibrate( ina220_data_t * data )
 {
-    uint8_t i2c_bus;
+    uint8_t i2c_interf, i2c_addr;
     uint16_t cal = data->config->calibration_reg;
     uint8_t cal_reg[3] = { INA220_CALIBRATION, (cal >> 8), (cal & 0xFFFF) };
 
-    /*! @todo: Change to 'i2c_take_by_chipid', which is more generic */
-    if( i2c_take_by_busid( I2C_BUS_CPU_ID, &(i2c_bus), (TickType_t) 10) == pdFALSE ) {
-        return false;
+    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, (TickType_t) 10) == pdTRUE ) {
+
+        xI2CMasterWrite( i2c_interf, i2c_addr, &cal_reg[0], sizeof(cal_reg)/sizeof(cal_reg[0]) );
+
+        i2c_give( i2c_interf );
+        return true;
     }
 
-    portENABLE_INTERRUPTS();
-    xI2CMasterWrite( i2c_bus, data->i2c_id, &cal_reg[0], sizeof(cal_reg)/sizeof(cal_reg[0]) );
-    portDISABLE_INTERRUPTS();
-
-    i2c_give( i2c_bus );
-
-    return true;
+    return false;
 }
 
 void ina220_init( void )
 {
-    uint8_t i, j;
-    i = 0;
+    sensor_t *temp_sensor;
+    uint8_t i = 0;
 
-    xTaskCreate( vTaskINA220, "INA220", 400, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
+    xTaskCreate( vTaskINA220, "INA220", 100, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
 
-    /* FMC1 Voltage */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V, &vTaskINA220_Handle, FMC1_12V_DEVID, 0x45 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ, &vTaskINA220_Handle, FMC1_VADJ_DEVID, 0x41 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3, &vTaskINA220_Handle, FMC1_P3V3_DEVID, 0x43 );
-    /* FMC1 Current */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V_CURR, &vTaskINA220_Handle, FMC1_12V_CURR_DEVID, 0x45 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ_CURR, &vTaskINA220_Handle, FMC1_VADJ_CURR_DEVID, 0x41 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3_CURR, &vTaskINA220_Handle, FMC1_P3V3_CURR_DEVID, 0x43 );
+    /* Iterate through the SDR Table to find all the INA220 entries */
+    for ( temp_sensor = sdr_head; temp_sensor != NULL; temp_sensor = temp_sensor->next) {
 
-    /* FMC2 Voltage */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V, &vTaskINA220_Handle, FMC2_12V_DEVID, 0x40 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ, &vTaskINA220_Handle, FMC2_VADJ_DEVID, 0x42 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3, &vTaskINA220_Handle, FMC2_P3V3_DEVID, 0x44 );
-    /* FMC2 Current */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V_CURR, &vTaskINA220_Handle, FMC2_12V_CURR_DEVID, 0x40 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ_CURR, &vTaskINA220_Handle, FMC2_VADJ_CURR_DEVID, 0x42 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3_CURR, &vTaskINA220_Handle, FMC2_P3V3_CURR_DEVID, 0x44 );
-
-
-    for ( j = 0; j < sdr_count; j++ ) {
-        /* Update their SDR */
-        /* Check if the handle pointer is not NULL */
-        if (sensor_array[j].task_handle == NULL) {
+        if ( temp_sensor->task_handle == NULL ) {
             continue;
         }
 
         /* Check if this task should update the selected SDR */
-        if ( *(sensor_array[j].task_handle) != vTaskINA220_Handle ) {
+        if ( *(temp_sensor->task_handle) != vTaskINA220_Handle ) {
             continue;
         }
 
         if (i < MAX_INA220_COUNT ) {
-            ina220_data[i].sensor = &sensor_array[j];
-            ina220_data[i].i2c_id = sensor_array[j].slave_addr;
-            ina220_config( ina220_data[i].i2c_id, &ina220_data[i] );
+            ina220_data[i].sensor = temp_sensor;
+            ina220_config( &ina220_data[i] );
             ina220_calibrate( &ina220_data[i] );
             ina220_data[i].sensor->signed_flag = 0;
 

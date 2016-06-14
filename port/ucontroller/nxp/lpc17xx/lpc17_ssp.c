@@ -29,7 +29,7 @@
 #include "string.h"
 #include "pin_mapping.h"
 
-const t_ssp_pin ssp_pins[MAX_SSP_INTERFACES] = {
+const ssp_pin_t ssp_pins[MAX_SSP_INTERFACES] = {
     [FPGA_SPI] = {
         .port = 1,
         .sck_pin = 20,
@@ -66,7 +66,7 @@ const t_ssp_pin ssp_pins[MAX_SSP_INTERFACES] = {
     }
 };
 
-static t_ssp_config ssp_cfg[MAX_SSP_INTERFACES] = {
+static ssp_config_t ssp_cfg[MAX_SSP_INTERFACES] = {
     [FPGA_SPI] = {
         .lpc_id = LPC_SSP0,
         .irq = SSP0_IRQn,
@@ -98,6 +98,8 @@ static void ssp_irq_handler( LPC_SSP_T * ssp_id )
     } else if (ssp_id == LPC_SSP1) {
         /* The only component in SPI1 is the Flash memory */
         ssp_cfg_index = FLASH_SPI;
+    } else {
+	return;
     }
 
     xf_setup = &ssp_cfg[ssp_cfg_index].xf_setup;
@@ -139,7 +141,7 @@ void SSP1_IRQHandler( void )
 /*! @brief Function that controls the Slave Select (SSEL) signal
  * This pin is controlled manually because the internal SSP driver resets the SSEL pin every 8 bits that are transfered
  */
-void ssp_ssel_control( uint8_t id, t_ssel_state state )
+void ssp_ssel_control( uint8_t id, uint8_t state )
 {
     gpio_set_pin_state( ssp_pins[id].port, ssp_pins[id].ssel_pin, state );
 }

@@ -22,80 +22,93 @@
 #ifndef LED_H_
 #define LED_H_
 
-#include "ipmi.h"
+#ifdef MODULE_RTM
+#define LEDCONFIG_SIZE 2
+#else
+#define LEDCONFIG_SIZE 1
+#endif
 
-/* LEDs Pin and port definitions */
-#define LED_OFF_STATE		(1)
-#define LED_ON_STATE		(0)
+#include "port.h"
 
-/* PICMG-defined color codes for set/get LED state commands */
-#define LEDCOLOR_BLUE		(1)
-#define LEDCOLOR_RED		(2)
-#define LEDCOLOR_GREEN		(3)
-#define LEDCOLOR_AMBER		(4)
-#define LEDCOLOR_ORANGE		(5)
-#define LEDCOLOR_WHITE		(6)
-#define LEDCOLOR_NOCHANGE	(0xE)
-#define LEDCOLOR_DEFAULT	(0xF)
-
-typedef enum {
-    LED_BLUE,
-    LED_GREEN,
-    LED_RED,
+enum LED_ID {
+    LED_BLUE = 0,
+    LED1, /* Red */
+    LED2,  /* Green */
     LED_CNT
-} LED_id;
+};
+
+enum LEDColor {
+    LEDCOLOR_BLUE = 1,
+    LEDCOLOR_RED,
+    LEDCOLOR_GREEN,
+    LEDCOLOR_AMBER,
+    LEDCOLOR_ORANGE,
+    LEDCOLOR_WHITE
+};
+
+enum LEDInit_status {
+    LEDINIT_ON = 0x00,
+    LEDINIT_OFF = 0xFF
+};
+
+enum LEDState {
+    LEDSTATE_INIT,
+    LEDSTATE_TOGGLED
+};
+
+enum LEDAct {
+    LEDACT_TURN_ON = 0x00,
+    LEDACT_TOGGLE,
+    LEDACT_TURN_OFF = 0xFF
+};
+
+enum LEDMode {
+    LEDMODE_LOCAL,
+    LEDMODE_OVERRIDE,
+    LEDMODE_LAMPTEST,
+    LEDMODE_CNT
+};
+
+/* LED Acting Function signature */
+typedef void (* led_act_func_t)( uint8_t id, uint8_t action );
 
 typedef struct {
+    bool active;
+    uint8_t init_status;
+    uint16_t t_init;
+    uint16_t t_toggle;
+} LEDState_t;
+
+typedef struct LEDConfig {
+    uint8_t id;
+    uint8_t color;
+    led_act_func_t act_func;
+    uint8_t state;
+    uint8_t mode;
+    LEDState_t mode_cfg[LEDMODE_CNT];
+    uint16_t counter;
+} LEDConfig_t;
+
+typedef struct LEDUpdate {
+    uint8_t fru_id;
+    uint8_t led_num;
+    uint8_t mode;
+    LEDState_t new_state;
+} LEDUpdate_t;
+
+typedef struct LEDPincfg {
     uint8_t port;
     uint8_t pin;
     uint8_t func;
 } LEDPincfg_t;
 
-typedef enum {
-    LED_ACTV_ON=0,
-    LED_ACTV_OFF,
-    LED_ACTV_BLINK
-} LEDactivity_t;
 
-typedef struct {
-    LEDactivity_t action;
-    uint8_t initstate;	   // initial state, either LEDOFF or LEDON
-    uint32_t delay_init;        // period in initial state in 10ms units
-    uint32_t delay_tog;        // period in opposite state in 10ms units, 0=skip
-} LED_activity_desc_t;
-
-typedef struct {
-    LED_activity_desc_t cur_cfg;
-    LED_activity_desc_t last_cfg;
-    LED_activity_desc_t const * local_ptr;
-    uint32_t counter;
-    uint8_t Color;
-    LEDPincfg_t pin_cfg;
-    QueueHandle_t queue;
-} LED_state_rec_t;
-
-typedef enum {
-    led_success = 0,
-    led_unspecified_error,
-    led_invalid_argument
-} led_error;
-
-extern const LED_activity_desc_t LED_Off_Activity;
-extern const LED_activity_desc_t LED_On_Activity;
-extern const LED_activity_desc_t LED_Short_Blink_Activity;
-extern const LED_activity_desc_t LED_Long_Blink_Activity;
-extern const LED_activity_desc_t LED_3sec_Lamp_Test_Activity;
-
-#define LED_on(cfg)		       gpio_clr_pin(cfg.port, cfg.pin)
-#define LED_off(cfg)		       gpio_set_pin(cfg.port, cfg.pin)
-#define LED_toggle(cfg)		       gpio_pin_toggle(cfg.port, cfg.pin)
-#define LED_is_off(cfg)		       gpio_read_pin(cfg.port, cfg.pin)
-#define LED_is_on(cfg)		       !gpio_read_pin(cfg.port, cfg.pin)
-#define LED_get_state(cfg)	       gpio_read_pin(cfg.port, cfg.pin)
-#define LED_set_state(cfg, state)      gpio_set_pin_state(cfg.port, cfg.pin, state)
-
-void LED_init(void);
-led_error LED_update( uint8_t led_num, const LED_activity_desc_t * pLEDact );
-void ipmi_picmg_set_led(ipmi_msg *req, ipmi_msg *rsp);
+void LED_init( void );
+void LED_Task( void *Parameters );
+void LEDUpdate( uint8_t fru, uint8_t led_num, uint8_t mode, uint8_t init_status, uint16_t t_init, uint16_t t_toggle );
+void amc_led_act( uint8_t id, uint8_t action );
+#ifdef MODULE_RTM
+void rtm_led_act( uint8_t id, uint8_t action );
+#endif
 
 #endif /* LED_H_ */

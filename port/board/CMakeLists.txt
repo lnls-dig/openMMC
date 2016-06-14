@@ -1,14 +1,37 @@
 ##Include selected board files
 message(STATUS "Selected Board: ${BOARD}")
 if(NOT BOARD)
-  message(FATAL_ERROR "${BoldRed}Target board was not selected!${ColourReset}")
+  message(FATAL_ERROR "${BoldRed}Target board was not selected! You must pass the flag -DBOARD=<board_name>${ColourReset}")
 endif()
 
-#BUG: Regexp will match AFC and AFCK
-if(${BOARD} MATCHES "^(AFC)")
-  add_subdirectory(afc)
+if(${BOARD} MATCHES "^(AFC|afc)$")
+
+  if(NOT VERSION)
+    message(FATAL_ERROR "${BoldRed}AFC board version was not selected! You must pass the flag -DVERSION=<major>.<minor>${ColourReset}")
+  endif()
+
+  message(STATUS "Selected Board version: ${VERSION}")
+  if(${VERSION} MATCHES "(3.0)")
+    add_subdirectory(afc/v3_0)
+  elseif(${VERSION} MATCHES "(3.1)")
+    add_subdirectory(afc/v3_1)
+  endif()
+
+elseif(${BOARD} MATCHES "^(afc-timing)$" )
+  add_subdirectory(afc-timing)
+
 else()
   message(FATAL_ERROR "${BoldRed}Selected board \"${BOARD}\" is not implemented!${ColourReset}")
+endif()
+
+#RTM Board
+if(BOARD_RTM AND (";${TARGET_MODULES};" MATCHES ";RTM;"))
+  message(STATUS "Selected RTM Board support: ${BOARD_RTM}")
+  if(${BOARD_RTM} MATCHES "(8sfp)")
+    add_subdirectory(rtm-8sfp)
+  else()
+    message(FATAL_ERROR "${BoldRed}Selected RTM board \"${BOARD_RTM}\" is not implemented!${ColourReset}")
+  endif()
 endif()
 
 #Normalize strings to upper case

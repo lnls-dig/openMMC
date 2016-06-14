@@ -47,7 +47,7 @@ void flash_write_disable( void )
 void flash_read_id( uint8_t * id_buffer, uint8_t buff_size )
 {
     if ((buff_size < 3)|(id_buffer == NULL)) {
-	return;
+        return;
     }
 
     uint8_t tx_buff[1] = {FLASH_READ_ID};

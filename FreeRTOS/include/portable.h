@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.1 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -8,7 +8,7 @@
 
     FreeRTOS is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License (version 2) as published by the
-    Free Software Foundation >>!AND MODIFIED BY!<< the FreeRTOS exception.
+    Free Software Foundation >>>> AND MODIFIED BY <<<< the FreeRTOS exception.
 
     ***************************************************************************
     >>!   NOTE: The modification to the GPL is included to allow you to     !<<
@@ -94,6 +94,14 @@ must be set in the compiler's include path. */
 	#include "portmacro.h"
 #endif
 
+#if portBYTE_ALIGNMENT == 32
+	#define portBYTE_ALIGNMENT_MASK ( 0x001f )
+#endif
+
+#if portBYTE_ALIGNMENT == 16
+	#define portBYTE_ALIGNMENT_MASK ( 0x000f )
+#endif
+
 #if portBYTE_ALIGNMENT == 8
 	#define portBYTE_ALIGNMENT_MASK ( 0x0007 )
 #endif
@@ -154,16 +162,16 @@ typedef struct HeapRegion
  * terminated by a HeapRegions_t structure that has a size of 0.  The region
  * with the lowest start address must appear first in the array.
  */
-void vPortDefineHeapRegions( const HeapRegion_t * const pxHeapRegions );
+void vPortDefineHeapRegions( const HeapRegion_t * const pxHeapRegions ) PRIVILEGED_FUNCTION;
 
 
 /*
  * Map to the memory management routines required for the port.
  */
 void *pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
+void *pvPortMallocFromISR( size_t xWantedSize ) PRIVILEGED_FUNCTION;
 void vPortFree( void *pv ) PRIVILEGED_FUNCTION;
-void *pvPortCalloc(size_t count, size_t size) PRIVILEGED_FUNCTION;
-void *pvPortRealloc(void *mem, size_t newsize) PRIVILEGED_FUNCTION;
+void vPortFreeFromISR( void *pv ) PRIVILEGED_FUNCTION;
 void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;

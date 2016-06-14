@@ -22,9 +22,9 @@ Go to the repository folder
 
 	cd /path/to/repo/
 
-If this is the first time compiling this firmware, run CMake configuration scripts
+Run CMake passing the flag `-DBOARD=<board_name>` to configure the compilation scripts to your specific board hardware
 
-	cmake .
+	cmake -DBOARD=<board_name>
 
 You can set your board options in the file `build_cfg/config.cmake`. You can change the Controller, Board name, version and select which modules you want to be included in your compilation.
 
@@ -43,6 +43,12 @@ To clean the compilation files (binaries, objects and dependence files), just ru
 ## Programming LPC1764
 If you own a *LPCLink* board, you can use it to program the LPC1764 processor via its JTAG interface
 
+First, make sure that the LPCXpresso path is set correctly inside `<openMMC_root_folder>/CMakeLists.exe`
+
+	set(LPCXPRESSO_PATH <lpcxpresso_path>)
+
+*NOTE*: You can also use cmake-gui to set this option.
+
 To transfer only the application firmware, run
 
     make program_app
@@ -56,4 +62,5 @@ If you want to erase the whole Flash and copy both firmwares:
 	make program_all
 
 **NOTE**: In this case you must have the LPCXpresso installed in your machine, since we need to use some initialization scripts that they provide.
-**NOTE 2**: We only have linker scripts to LPC1764, so if you wish to compile to a different target, you'll have to change the `linker\lpc1764_boot.ld` and `linker\lpc1764_app.ld` files, which defines the memory regions, otherwise you'll run into some HardFault errors.
+
+**NOTE 2**: We only have linker scripts to LPC1764, so if you wish to compile to a different target, you'll have to change the `linker/lpc1764_boot.ld` and `linker/lpc1764_app.ld` files, which defines the memory regions, otherwise you'll run into some HardFault errors.

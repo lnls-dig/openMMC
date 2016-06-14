@@ -54,7 +54,7 @@ licensing and training services.
 #define configUSE_TICK_HOOK                     0
 #define configCPU_CLOCK_HZ                      ( ( unsigned long ) 8000000)
 #define configTICK_RATE_HZ                      ( ( portTickType ) 1000 )
-#define configMINIMAL_STACK_SIZE                ( ( unsigned short ) 150 )
+#define configMINIMAL_STACK_SIZE                ( ( unsigned short ) 80 )
 #define configTOTAL_HEAP_SIZE                   ( ( size_t ) ( 0x4000 ) )
 #define configMAX_TASK_NAME_LEN                 ( 12 )
 #define configUSE_TRACE_FACILITY                1
@@ -75,7 +75,6 @@ licensing and training services.
 #define configUSE_TASK_NOTIFICATIONS            1
 #define configUSE_STATS_FORMATTING_FUNCTIONS    0
 #define configAPPLICATION_ALLOCATED_HEAP        1
-#define USE_HEAP_4
 
 void vAssertCalled( char* file, uint32_t line);
 #define configASSERT( x )     if( ( x ) == 0 ) { vAssertCalled( __FILE__, __LINE__ );}

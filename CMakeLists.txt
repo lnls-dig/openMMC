@@ -1,29 +1,14 @@
 # Define minimal required version of CMake.
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 2.8.8)
+
+#Include text color definitions
+include( ${CMAKE_SOURCE_DIR}/toolchain/colors.cmake )
+
+#Prevent in-source builds
+include( ${CMAKE_SOURCE_DIR}/toolchain/PreventInSourceBuilds.cmake )
 
 # Project definition
 project(openMMC C CXX ASM)
-
-# Color definitions
-if(NOT WIN32)
-  string(ASCII 27 Esc)
-  set(ColourReset "${Esc}[m")
-  set(ColourBold  "${Esc}[1m")
-  set(Red         "${Esc}[31m")
-  set(Green       "${Esc}[32m")
-  set(Yellow      "${Esc}[33m")
-  set(Blue        "${Esc}[34m")
-  set(Magenta     "${Esc}[35m")
-  set(Cyan        "${Esc}[36m")
-  set(White       "${Esc}[37m")
-  set(BoldRed     "${Esc}[1;31m")
-  set(BoldGreen   "${Esc}[1;32m")
-  set(BoldYellow  "${Esc}[1;33m")
-  set(BoldBlue    "${Esc}[1;34m")
-  set(BoldMagenta "${Esc}[1;35m")
-  set(BoldCyan    "${Esc}[1;36m")
-  set(BoldWhite   "${Esc}[1;37m")
-endif()
 
 ##
 # CMake environment settings
@@ -33,14 +18,14 @@ endif()
 if(NOT CMAKE_TOOLCHAIN_FILE)
   message(WARNING "${Yellow}No toolchain configuration file specified. Using default option!${ColourReset}")
 
-  include(toolchain/toolchain-arm-none-eabi.cmake)
+  include(${CMAKE_SOURCE_DIR}/toolchain/toolchain-arm-none-eabi.cmake)
 
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build_cfg")
 
 set(CMAKE_COLOR_MAKEFILE ON)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/out)
@@ -48,10 +33,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING
+  set(CMAKE_BUILD_TYPE Release CACHE STRING
     "Choose the type of build, options are: none Debug Release Trace."
     FORCE)
 endif()
+message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 
 # Include board specific code
 set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat -Wno-unused-parameter -Wno-missing-field-initializers")
@@ -81,35 +67,41 @@ if(CMAKE_BUILD_TYPE STREQUAL "Trace")
   add_subdirectory(trace)
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DTARGET_BOARD_NAME=${TARGET_BOARD_NAME} -DTARGET_BOARD_MAJOR=${TARGET_BOARD_MAJOR} -DTARGET_BOARD_MINOR=${TARGET_BOARD_MINOR} ")
+include_directories( ${UCONTROLLER_HDRS} ${PROJ_HDRS} )
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DTARGET_BOARD_NAME=\"${TARGET_BOARD_NAME}\" ")
+
+if(BENCH_TEST)
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DBENCH_TEST")
+  message( STATUS "${Magenta}Bench mode activated! ${ColourReset}")
+endif()
 
 # Libraries path
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 ## Create executable
-add_executable(${CMAKE_PROJECT_NAME} ${LPC17_SRCS} ${PROJ_SRCS})
+add_executable(${CMAKE_PROJECT_NAME} ${UCONTROLLER_SRCS} ${PROJ_SRCS})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${MODULES_FLAGS})
 
-add_executable(bootloader ${BOOT_SRCS} ${LPC17_SRCS})
+add_executable(bootloader ${BOOT_SRCS} ${UCONTROLLER_SRCS})
 
 # Linker flags
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
   SUFFIX ".axf"
-  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/lpc1764_app.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/lpc1764_app.map" )
+  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.map" )
 
 set_target_properties(bootloader PROPERTIES
   SUFFIX ".axf"
-  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/lpc1764_boot.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/lpc1764_boot.map")
+  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.map")
 
 
 # Headers path
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
 target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
 # Link libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} gcc c m FreeRTOS lpcopen)
-target_link_libraries(bootloader gcc c m lpcopen)
+target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS c gcc m lpcopen)
+target_link_libraries(bootloader gcc c m FreeRTOS lpcopen)
 
 ##Generate .hex file
 
@@ -127,40 +119,45 @@ add_custom_command(TARGET bootloader POST_BUILD
 
 
 ##Program command
-set(LPCXPRESSO_PATH /usr/local/lpcxpresso_7.8.0_426/lpcxpresso/)
+set(LPCXPRESSO_INSTALL_PATH /usr/local/)
 
 find_program(DFU_UTIL dfu-util)
-find_program(NXP_PROG crt_emu_cm3_nxp PATHS ${LPCXPRESSO_PATH}/bin NO_DEFAULT_PATH)
-
 if(NOT DFU_UTIL)
   message(WARNING "${ColourBold}${Red}Dfu-util not found! Can't boot the LPCLink board!${ColourReset}")
-elseif(NOT NXP_PROG)
+endif()
+
+find_program(NXP_PROG crt_emu_cm3_nxp PATHS ${LPCXPRESSO_INSTALL_PATH})
+if(NOT NXP_PROG)
   message(WARNING "${ColourBold}${Red}crt_emu_cm3_nxp not found! Can't program the LPC chip!${ColourReset}")
 else()
-  # Boot the programmer
-  execute_process(
-    COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${LPCXPRESSO_PATH}/bin/LPCXpressoWIN.enc
-    ERROR_QUIET
-    )
-
-  # Program the chip (available only for LPC1764 so far)
-  add_custom_target(program_boot
-    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
-    DEPENDS bootloader
-    COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load=bootloader.bin -load-base=0x0000
-    )
-
-  add_custom_target(program_app
-    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
-    DEPENDS ${CMAKE_PROJECT_NAME}
-    COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load-exec=${CMAKE_PROJECT_NAME}.bin -load-base=0x2000
-    )
-
-  add_custom_target(program_all
-    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
-    DEPENDS ${CMAKE_PROJECT_NAME} bootloader
-    COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -flash-mass-erase
-    COMMAND make -C ${CMAKE_SOURCE_DIR} program_boot
-    COMMAND make -C ${CMAKE_SOURCE_DIR} program_app
-    )
+  get_filename_component( DFU_FIRMWARE_PATH ${NXP_PROG} DIRECTORY )
 endif()
+
+# Program the chip (available only for LPC1764 so far)
+add_custom_target(program_boot
+  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
+  DEPENDS bootloader
+  #Boot the programmer
+  COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  #Write bootloader firmware
+  COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load=bootloader.bin -load-base=0x0000
+  )
+
+add_custom_target(program_app
+  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
+  DEPENDS ${CMAKE_PROJECT_NAME}
+  #Boot the programmer
+  COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  #Write application firmware
+  COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load-exec=${CMAKE_PROJECT_NAME}.bin -load-base=0x2000
+  )
+
+add_custom_target(program_all
+  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
+  DEPENDS ${CMAKE_PROJECT_NAME} bootloader
+  COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  #Write application and bootloader firmwares
+  COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -flash-mass-erase
+  COMMAND make -C ${CMAKE_BINARY_DIR} program_boot
+  COMMAND make -C ${CMAKE_BINARY_DIR} program_app
+  )

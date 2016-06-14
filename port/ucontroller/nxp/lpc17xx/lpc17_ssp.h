@@ -41,12 +41,12 @@
 #define SSP_INTERRUPT    0
 #define SSP_POLLING      1
 
-typedef enum {
+enum ssel_state {
     ASSERT = 0,
     DEASSERT
-} t_ssel_state;
+};
 
-typedef struct {
+typedef struct ssp_pin {
     uint8_t port;
     uint8_t sck_pin;
     uint8_t sck_mode;
@@ -60,22 +60,22 @@ typedef struct {
     uint8_t ssel_pin;
     uint8_t ssel_mode;
     uint8_t ssel_func;
-} t_ssp_pin;
+} ssp_pin_t;
 
-typedef struct {
+typedef struct ssp_config {
     LPC_SSP_T * lpc_id;
     IRQn_Type irq;
     uint32_t bitrate;
     uint8_t master_mode;
     uint8_t polling;
     uint8_t frame_size;
-    const t_ssp_pin * pin_cfg;
+    const ssp_pin_t * pin_cfg;
     Chip_SSP_DATA_SETUP_T xf_setup;
     TaskHandle_t caller_task;
-} t_ssp_config;
+} ssp_config_t;
 
 void ssp_init( uint8_t id, uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll );
-void ssp_ssel_control( uint8_t id, t_ssel_state state );
+void ssp_ssel_control( uint8_t id, uint8_t state );
 void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint32_t tx_len, uint8_t *rx_buf, uint32_t rx_len, uint32_t timeout );
 
 #define ssp_chip_init(id)                             Chip_SSP_Init(SSP(id))

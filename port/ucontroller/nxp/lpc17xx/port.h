@@ -39,5 +39,13 @@
 #include "lpc17_interruptions.h"
 #include "lpc17_hpm.h"
 #include "lpc17_power.h"
+#include "lpc17_pincfg.h"
+#include "pin_mapping.h"
+
+#ifdef UART_RINGBUFFER
+#include "lpc17_uartrb.h"
+#else
+#include "lpc17_uart.h"
+#endif
 
 #endif

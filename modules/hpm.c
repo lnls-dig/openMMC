@@ -98,7 +98,7 @@ t_component hpm_components[HPM_MAX_COMPONENTS] = {
         .hpm_upload_block_f = payload_hpm_upload_block,
         .hpm_finish_upload_f = payload_hpm_finish_upload,
         .hpm_get_upgrade_status_f = payload_hpm_get_upgrade_status,
-	.hpm_activate_firmware_f = payload_hpm_activate_firmware
+        .hpm_activate_firmware_f = payload_hpm_activate_firmware
     }
 };
 

@@ -108,10 +108,10 @@ typedef union {
 #endif
     } cfg_struct;
     uint16_t cfg_word;
-} t_ina220_config_reg;
+} ina220_config_reg_t;
 
 typedef struct {
-    t_ina220_config_reg config_reg_default;
+    ina220_config_reg_t config_reg_default;
     uint32_t calibration_factor;
     uint16_t calibration_reg;
     uint8_t registers;
@@ -119,16 +119,15 @@ typedef struct {
     uint8_t bus_voltage_shift;
     uint16_t bus_voltage_lsb;    /* uV */
     uint16_t power_lsb;          /* uW */
-} t_ina220_config;
+} ina220_config_t;
 
 typedef struct {
-    uint8_t i2c_id;
     sensor_t * sensor;
-    const t_ina220_config * config;
+    const ina220_config_t * config;
     uint32_t rshunt;
-    t_ina220_config_reg curr_reg_config;
+    ina220_config_reg_t curr_reg_config;
     uint16_t regs[INA220_REGISTERS];
-} t_ina220_data;
+} ina220_data_t;
 
 TaskHandle_t vTaskINA220_Handle;
 
@@ -146,11 +145,11 @@ extern const SDR_type_01h_t SDR_FMC2_VADJ_CURR;
 extern const SDR_type_01h_t SDR_FMC2_12V_CURR;
 extern const SDR_type_01h_t SDR_FMC2_P3V3_CURR;
 
-uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data);
-Bool ina220_calibrate( t_ina220_data * data );
-uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
-uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
-void ina220_readall( t_ina220_data * data );
+uint8_t ina220_config( ina220_data_t * data );
+Bool ina220_calibrate( ina220_data_t * data );
+uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg );
+uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg );
+void ina220_readall( ina220_data_t * data );
 void ina220_sdr_init ( TaskHandle_t handle );
 void ina220_init( void );
 

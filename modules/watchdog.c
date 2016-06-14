@@ -36,6 +36,7 @@
 #include "port.h"
 #include "watchdog.h"
 #include "task_priorities.h"
+#include "uart_debug.h"
 
 #define WATCHDOG_CLK_FREQ 8000000
 #define WATCHDOG_TIMEOUT 1000 /* in milisseconds */
@@ -49,18 +50,19 @@ void watchdog_init( void )
     wdt_config();
     wdt_set_timeout(((WATCHDOG_TIMEOUT/1000)*WATCHDOG_CLK_FREQ));
     watchdog_smphr = xSemaphoreCreateBinary();
-    xTaskCreate( WatchdogTask, (const char *) "Watchdog Task", configMINIMAL_STACK_SIZE, (void * ) NULL, tskWATCHDOG_PRIORITY, ( TaskHandle_t * ) NULL);
+    xTaskCreate( WatchdogTask, (const char *) "Watchdog Task", 60, (void * ) NULL, tskWATCHDOG_PRIORITY, ( TaskHandle_t * ) NULL);
 }
 
 void WatchdogTask (void * Parameters)
 {
     wdt_start();
     for ( ;; ) {
-	if (xSemaphoreTake(watchdog_smphr, 0)) {
-		NVIC_SystemReset();
-	}
-	wdt_feed();
-	vTaskDelay(WATCHDOG_FEED_DELAY);
+        if (xSemaphoreTake(watchdog_smphr, 0)) {
+            NVIC_SystemReset();
+        }
+        wdt_feed();
+	DEBUG_MSG(" Watchdog fed (again) \n ");
+        vTaskDelay(WATCHDOG_FEED_DELAY);
     }
 }
 

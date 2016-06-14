@@ -27,17 +27,19 @@
 #include "semphr.h"
 
 /* Project includes */
-#include "chip.h"
+#include "port.h"
 #include "pin_mapping.h"
 #include "led.h"
 #include "ipmi.h"
 #include "sdr.h"
 #include "payload.h"
-#include "board_version.h"
+#include "i2c.h"
 #include "fru.h"
 #include "jtag.h"
 #include "fpga_spi.h"
 #include "watchdog.h"
+#include "rtm.h"
+#include "uart_debug.h"
 
 //#define HEAP_TEST
 //#define STOP_TEST
@@ -49,10 +51,8 @@ TaskHandle_t heap_handle;
 
 uint8_t ipmb_addr = 0xFF;
 
-int main(void)
+int main( void )
 {
-    /* Update clock register value - LPC specific */
-    SystemCoreClockUpdate();
 
 #if (configGENERATE_RUN_TIME_STATS == 1)
     vConfigureTimerForRunTimeStats();
@@ -63,19 +63,23 @@ int main(void)
     while (test == 0)
     {}
 #endif
+
+#ifdef MODULE_UART_DEBUG
+    uart_debug_init( 19200 );
+#endif
+
+    DEBUG_MSG("openMMC Starting!\n");
+
 #ifdef MODULE_WATCHDOG
     watchdog_init();
 #endif
 
     LED_init();
-#ifdef MODULE_FRU
-    fru_init();
-#endif
+    i2c_init();
 
-    portENABLE_INTERRUPTS();
-    board_i2c_init();
-    board_discover();
-    portDISABLE_INTERRUPTS();
+#ifdef MODULE_FRU
+    fru_init(FRU_AMC);
+#endif
 
     ipmb_addr = get_ipmb_addr();
 #ifdef MODULE_SDR
@@ -88,10 +92,13 @@ int main(void)
     payload_init();
 #endif
 #ifdef MODULE_JTAG_SWITCH
-    init_scansta();
+    scansta_init();
 #endif
 #ifdef MODULE_FPGA_SPI
-    init_fpga_spi();
+    fpga_spi_init();
+#endif
+#ifdef MODULE_RTM
+    rtm_manage_init();
 #endif
     /*  Init IPMI interface */
     /* NOTE: ipmb_init() is called inside this function */
@@ -125,27 +132,15 @@ void heap_test ( void* param)
 
     for (;;) {
         ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-	water_mark = uxTaskGetStackHighWaterMark(NULL);
-	used_heap = configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize();
-	vTaskGetRunTimeStats(stats);
+        water_mark = uxTaskGetStackHighWaterMark(NULL);
+        used_heap = configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize();
+        vTaskGetRunTimeStats(stats);
     }
 }
 #endif
 
 /*-----------------------------------------------------------*/
 /* FreeRTOS Debug Functions */
-
-#if (configCHECK_FOR_STACK_OVERFLOW == 1)
-void vApplicationStackOverflowHook ( TaskHandle_t pxTask, signed char * pcTaskName){
-    (void) pxTask;
-    (void) pcTaskName;
-    taskDISABLE_INTERRUPTS();
-    /* Place a breakpoint here, so we know when there's a stack overflow */
-    for ( ; ; ) {
-        uxTaskGetStackHighWaterMark(pxTask);
-    }
-}
-#endif
 
 #if (configGENERATE_RUN_TIME_STATS == 1)
 void vConfigureTimerForRunTimeStats( void )
@@ -165,16 +160,5 @@ void vConfigureTimerForRunTimeStats( void )
 
     /* Start the counter. */
     LPC_TIMER0->TCR = TCR_COUNT_ENABLE;
-}
-#endif
-
-void vAssertCalled( char* file, uint32_t line) {
-    taskDISABLE_INTERRUPTS();
-    for( ;; );
-}
-
-#if (configUSE_MALLOC_FAILED_HOOK == 1)
-void vApplicationMallocFailedHook( void ) {
-
 }
 #endif

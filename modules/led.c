@@ -19,214 +19,307 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/*!
- * @file led.c
- * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
- *
- * @brief Module to control all boards LEDs
- * @todo Implement color selecting feature
- */
-
-/* FreeRTOS includes */
-#include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
-
 /* C Standard includes */
-#include "stdio.h"
 #include "string.h"
 
 /* Project includes */
-#include "chip.h"
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "ipmi.h"
 #include "port.h"
 #include "led.h"
-#include "pin_mapping.h"
+#include "string.h"
 #include "task_priorities.h"
 
-//extern LED_state_rec_t LEDstate[LED_CNT];
-
-const LED_activity_desc_t LED_Off_Activity = {LED_ACTV_OFF, LED_OFF_STATE, 0, 0};
-const LED_activity_desc_t LED_On_Activity = {LED_ACTV_ON, LED_ON_STATE, 0, 0};
-const LED_activity_desc_t LED_Short_Blink_Activity = {LED_ACTV_BLINK, LED_OFF_STATE, 9, 1};
-const LED_activity_desc_t LED_Long_Blink_Activity = {LED_ACTV_BLINK, LED_OFF_STATE, 1, 9};
-const LED_activity_desc_t LED_2Hz_Blink_Activity = {LED_ACTV_BLINK, LED_ON_STATE, 5, 5};
-const LED_activity_desc_t LED_3sec_Lamp_Test_Activity = {LED_ACTV_BLINK, LED_ON_STATE, 30, 0};
-
-LED_state_rec_t LEDstate[LED_CNT] = {
+const LEDPincfg_t amc_led_pincfg[LED_CNT] = {
     [LED_BLUE] = {
-        .local_ptr = &LED_On_Activity,
-        .counter = 0,
-        .Color = LEDCOLOR_BLUE,
-        .pin_cfg = {
-            .pin = LEDBLUE_PIN,
-            .port = LEDBLUE_PORT,
-            .func = LED_PIN_FUNC
-        }
+        .pin = LEDBLUE_PIN,
+        .port = LEDBLUE_PORT,
+        .func = LED_PIN_FUNC
     },
 
-    [LED_GREEN] = {
-        .local_ptr = &LED_2Hz_Blink_Activity,
-        .Color = LEDCOLOR_GREEN,
-        .counter = 0,
-        .pin_cfg = {
-            .pin = LEDGREEN_PIN,
-            .port = LEDGREEN_PORT,
-            .func = LED_PIN_FUNC
-        }
-
+    [LED1] = {
+        .pin = LEDRED_PIN,
+        .port = LEDRED_PORT,
+        .func = LED_PIN_FUNC
     },
 
-    [LED_RED] = {
-        .local_ptr = &LED_Off_Activity,
-        .Color = LEDCOLOR_RED,
-        .counter = 0,
-        .pin_cfg = {
-            .pin = LEDRED_PIN,
-            .port = LEDRED_PORT,
-            .func = LED_PIN_FUNC
-        }
+    [LED2] = {
+        .pin = LEDGREEN_PIN,
+        .port = LEDGREEN_PORT,
+        .func = LED_PIN_FUNC
     }
 };
 
-/* 1 LED cycle is 10 periods of 100ms */
-#define LED_CYCLE_COUNTER 10
-
-QueueHandle_t led_update_queue;
-
-void LEDTask( void * Parameters )
-{
-    uint8_t cycle = 0;
-    LED_activity_desc_t new_cfg;
-    LED_state_rec_t* pLED;
-    uint8_t led_id;
-    /* Task will run every 50ms */
-    TickType_t xFrequency = 100 / portTICK_PERIOD_MS;
-    TickType_t xLastWakeTime;
-
-    /* Initialise the xLastWakeTime variable with the current time. */
-    xLastWakeTime = xTaskGetTickCount();
-
-    for (;;) {
-        for (led_id = 0; led_id < LED_CNT; led_id++) {
-            pLED = &LEDstate[led_id];
-            /* Update the led configuration only after perfoming a full cycle on each action */
-            if (cycle == 0) {
-                if (xQueueReceive( pLED->queue, &new_cfg, 0 ) == pdTRUE) {
-                    /* Save the last config */
-                    memcpy(&(pLED->last_cfg), &(pLED->cur_cfg), sizeof(LED_activity_desc_t));
-
-                    /* Update the config struct */
-                    memcpy(&(pLED->cur_cfg), &new_cfg, sizeof(LED_activity_desc_t));
-                    LED_set_state(pLED->pin_cfg, pLED->cur_cfg.initstate);
-                    pLED->counter = pLED->cur_cfg.delay_init;
-                }
-            }
-
-            switch (pLED->cur_cfg.action) {
-            case LED_ACTV_ON:
-                LED_on(pLED->pin_cfg);
-                break;
-
-            case LED_ACTV_OFF:
-                LED_off(pLED->pin_cfg);
-                break;
-
-            case LED_ACTV_BLINK:
-                if (pLED->counter == 0) {
-                    if (pLED->cur_cfg.initstate == LED_get_state(pLED->pin_cfg)) {
-                        /* LED is in initial state */
-                        pLED->counter = pLED->cur_cfg.delay_tog;
-                    } else {
-                        /* LED is in toggled state */
-                        pLED->counter = pLED->cur_cfg.delay_init;
-                    }
-
-                    LED_toggle(pLED->pin_cfg);
-
-                    if ( pLED->counter == 0 ) {
-                        /* Loaded a zero prescale value--means the activity descriptor is a single-shot descriptor
-                         * that has expired--like a lamp test or a pulse.
-                         * Revert the LED to the last know state and stay in toggled state until next cycle
-                         */
-                        pLED->counter = cycle;
-                        memcpy(&(pLED->cur_cfg), &(pLED->last_cfg), sizeof(LED_activity_desc_t));
-                    }
-                } else {
-                    (pLED->counter)--;
-                }
-                break;
+LEDConfig_t amc_leds_config[LED_CNT] = {
+    [LED_BLUE] = {
+        .id = LED_BLUE,
+        .color = LEDCOLOR_BLUE,
+        .act_func = amc_led_act,
+        .mode = LEDMODE_LOCAL,
+        .mode_cfg = {
+            [LEDMODE_LOCAL] = {
+                .t_init = 0xFF,
+                .t_toggle = 0,
+                .init_status = LEDINIT_ON,
             }
         }
-        if (cycle == 0) {
-            /* Reload the cycle counter */
-            cycle = LED_CYCLE_COUNTER;
-        } else {
-            cycle--;
+    },
+
+    [LED1] = {
+        .id = LED1,
+        .color = LEDCOLOR_RED,
+        .act_func = amc_led_act,
+        .mode = LEDMODE_LOCAL,
+        .mode_cfg = {
+            [LEDMODE_LOCAL] = {
+                .t_init = 0,
+                .t_toggle = 0,
+                .init_status = LEDINIT_OFF,
+            }
+        }
+    },
+
+    [LED2] = {
+        .id = LED2,
+        .color = LEDCOLOR_GREEN,
+        .act_func = amc_led_act,
+        .mode = LEDMODE_LOCAL,
+        .mode_cfg = {
+            [LEDMODE_LOCAL] = {
+                .t_init = 5,
+                .t_toggle = 5,
+                .init_status = LEDINIT_ON,
+            }
+        }
+    },
+};
+
+#ifdef MODULE_RTM
+LEDConfig_t rtm_leds_config[LED_CNT] = {
+    [LED_BLUE] = {
+        .id = LED_BLUE,
+        .color = LEDCOLOR_BLUE,
+        .act_func = rtm_led_act,
+        .mode = LEDMODE_LOCAL,
+        .mode_cfg = {
+            [LEDMODE_LOCAL] = {
+                .t_init = 0xFF,
+                .t_toggle = 0,
+                .init_status = LEDINIT_ON,
+            }
+        }
+    },
+
+    [LED1] = {
+        .id = LED1,
+        .color = LEDCOLOR_RED,
+        .act_func = rtm_led_act,
+        .mode = LEDMODE_LOCAL,
+        .mode_cfg = {
+            [LEDMODE_LOCAL] = {
+                .t_init = 0,
+                .t_toggle = 0,
+                .init_status = LEDINIT_OFF,
+            }
+        }
+    },
+
+    [LED2] = {
+        .id = LED2,
+        .color = LEDCOLOR_GREEN,
+        .act_func = rtm_led_act,
+        .mode = LEDMODE_LOCAL,
+        .mode_cfg = {
+            [LEDMODE_LOCAL] = {
+                .t_init = 5,
+                .t_toggle = 5,
+                .init_status = LEDINIT_ON,
+            }
+        }
+    },
+};
+#endif
+
+void LEDManage( LEDConfig_t *led_cfg );
+
+LEDConfig_t led_config[LEDCONFIG_SIZE][LED_CNT];
+QueueHandle_t led_update_queue;
+
+void LED_init( void )
+{
+    /* AMC LED Pins initialization */
+    gpio_init();
+    for ( uint8_t id = 0; id < LED_CNT; id++ ) {
+        gpio_set_pin_dir( amc_led_pincfg[id].port, amc_led_pincfg[id].pin, OUTPUT );
+    }
+
+    led_update_queue = xQueueCreate( 3, sizeof(LEDUpdate_t) );
+
+    memcpy( &led_config[0], &amc_leds_config, sizeof(amc_leds_config) );
+#ifdef MODULE_RTM
+    memcpy( &led_config[1], &rtm_leds_config, sizeof(rtm_leds_config) );
+#endif
+
+    xTaskCreate( LED_Task, (const char *) "LED Task", 120, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
+}
+
+void LED_Task( void *Parameters )
+{
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xFrequency = pdMS_TO_TICKS(100);
+
+    LEDUpdate_t cfg;
+
+    uint8_t cycle = 0;
+
+    for ( ;; ) {
+        cycle++;
+
+        for ( int i=0; i < LEDCONFIG_SIZE; i++ ) {
+            for ( int j=0; j < LED_CNT; j++ ) {
+                LEDManage( &led_config[i][j] );
+            }
+        }
+
+        if ( cycle == 10 ) {
+            /* Check for state changes */
+            cycle = 0;
+            if ( xQueueReceive( led_update_queue, &cfg, 0 ) == pdTRUE ) {
+                uint8_t fru,num;
+
+                fru = cfg.fru_id;
+                num = cfg.led_num;
+                led_config[fru][num].mode = cfg.mode;
+                led_config[fru][num].mode_cfg[cfg.mode].active = true;
+                /* Only update the settings if its an override */
+                if ( cfg.mode != LEDMODE_LOCAL ) {
+                    led_config[fru][num].mode_cfg[cfg.mode].init_status = cfg.new_state.init_status;
+                    led_config[fru][num].mode_cfg[cfg.mode].t_init = cfg.new_state.t_init;
+                    led_config[fru][num].mode_cfg[cfg.mode].t_toggle = cfg.new_state.t_toggle;
+                }
+            }
         }
         vTaskDelayUntil( &xLastWakeTime, xFrequency );
     }
 
 }
 
-void LED_init(void)
+void LEDManage( LEDConfig_t *led_cfg )
 {
-    /* Init LED Pin */
-    gpio_init();
+    uint8_t mode = led_cfg->mode;
+    uint8_t status;
+    uint16_t counter_cmp, counter_tog;
 
-    /* Set pins as output */
-    gpio_set_pin_dir( LEDBLUE_PORT, LEDBLUE_PIN, OUTPUT);
-    gpio_set_pin_dir( LEDGREEN_PORT, LEDGREEN_PIN, OUTPUT);
-    gpio_set_pin_dir( LEDRED_PORT, LEDRED_PIN, OUTPUT);
-
-    LED_state_rec_t* pLED;
-    for (int i = 0; i<LED_CNT; i++){
-        pLED = &LEDstate[i];
-        pLED->queue = xQueueCreate( 2, sizeof(LED_activity_desc_t));
-        xQueueSend( pLED->queue, pLED->local_ptr, 0 );
-    }
-
-    xTaskCreate( LEDTask, (const char *) "LED Task", 120, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
-    /*! @todo Handle task creation error */
-}
-
-led_error LED_update( uint8_t led_num, const LED_activity_desc_t * pLEDact )
-{
-    volatile LED_state_rec_t* pLED;
-    uint8_t all_leds;
-    LED_activity_desc_t new_cfg;
-
-    if ((led_num >= LED_CNT) && (led_num != 0xFF)) {
-        /* Bad argument, we don't control the specified LED */
-        /* REQ 3.225 and REQ 3.228 */
-        return led_invalid_argument;
-    }
-
-    /* If the led id is 0xFF, we have to program all available LEDs (lamp test for example) */
-    if (led_num == 0xFF) {
-        all_leds = LED_CNT;
+    /* Reload counter */
+    if ( led_cfg->state == LEDSTATE_INIT ) {
+        status = led_cfg->mode_cfg[mode].init_status;
+        counter_cmp = led_cfg->mode_cfg[mode].t_init;
+        counter_tog = led_cfg->mode_cfg[mode].t_toggle;
     } else {
-        all_leds = 1;
+        status = ~(led_cfg->mode_cfg[mode].init_status);
+        counter_cmp = led_cfg->mode_cfg[mode].t_toggle;
+        counter_tog = led_cfg->mode_cfg[mode].t_init;
     }
 
-    for (int i = 0; i < all_leds; i++) {
+    if ( ( led_cfg->counter == counter_cmp ) && ( counter_tog != 0 ) ) {
+        /* Special case for lamp_test (we must return to the highest priority state */
+        if ( led_cfg->mode == LEDMODE_LAMPTEST ) {
+            led_cfg->mode_cfg[LEDMODE_LAMPTEST].active = false;
 
-        pLED = &LEDstate[led_num];
+            if ( led_cfg->mode_cfg[LEDMODE_OVERRIDE].active ) {
+                led_cfg->mode = LEDMODE_OVERRIDE;
+            } else {
+                led_cfg->mode = LEDMODE_LOCAL;
+            }
 
-        if (pLEDact == NULL) {
-            /* Update the local control pointer/prescaler */
-            new_cfg = *(pLED->local_ptr);
         } else {
-            new_cfg = *(pLEDact);
+            /* General case for blinking operation */
+            led_cfg->state = !(led_cfg->state);
+            led_cfg->act_func( led_cfg->id, LEDACT_TOGGLE );
+            led_cfg->counter = 0;
         }
-        /* Send the new config to the LED Task */
-        if (xQueueSend(pLED->queue, &new_cfg, 0) != pdTRUE) {
-            /* TODO: Handle error */
-        }
+    } else {
+        /* Stay in the current state and increment counter */
+        led_cfg->act_func( led_cfg->id, status );
+        led_cfg->counter++;
     }
-    return led_success;
 }
+
+void LEDUpdate( uint8_t fru, uint8_t led_num, uint8_t mode, uint8_t init_status, uint16_t t_init, uint16_t t_toggle )
+{
+    LEDUpdate_t new_config = {
+        .fru_id = fru,
+        .led_num = led_num,
+        .mode = mode,
+        .new_state = {
+            .init_status = init_status,
+            .t_init = t_init,
+            .t_toggle = t_toggle
+        }
+    };
+
+    if ( new_config.mode == LEDMODE_LOCAL ) {
+        led_config[fru][led_num].mode_cfg[LEDMODE_OVERRIDE].active = false;
+        led_config[fru][led_num].mode_cfg[LEDMODE_LAMPTEST].active = false;
+    }
+
+    if ( xQueueSend( led_update_queue, &new_config, 0 ) != pdTRUE ) {
+        /* TODO: Handle error */
+    }
+}
+
+/* AMC LED acting function */
+void amc_led_act( uint8_t id, uint8_t action )
+{
+    switch( action ) {
+    case LEDACT_TURN_ON:
+        gpio_clr_pin( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        break;
+
+    case LEDACT_TURN_OFF:
+        gpio_set_pin( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        break;
+
+    case LEDACT_TOGGLE:
+        gpio_pin_toggle( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        break;
+
+    default:
+        break;
+    }
+}
+
+#ifdef MODULE_RTM
+
+#include "rtm_user.h"
+
+void rtm_led_act( uint8_t id, uint8_t action )
+{
+    uint8_t curr_state;
+
+    switch( action ) {
+    case LEDACT_TURN_ON:
+        rtm_ctrl_led( id, 0 );
+        break;
+
+    case LEDACT_TURN_OFF:
+        rtm_ctrl_led( id, 1 );
+        break;
+
+    case LEDACT_TOGGLE:
+        curr_state = rtm_read_led( id );
+        rtm_ctrl_led( id, !curr_state );
+        break;
+
+    default:
+        break;
+    }
+}
+#endif
+
+
+/* IPMI Request handlers */
 
 /*!
  * @brief Handler for "Set FRU LED State"" request. Check IPMI 2.0
@@ -240,36 +333,28 @@ led_error LED_update( uint8_t led_num, const LED_activity_desc_t * pLEDact )
  * @return void
  */
 
-IPMI_HANDLER(ipmi_picmg_set_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_LED_STATE, ipmi_msg *req, ipmi_msg *rsp )
+IPMI_HANDLER(ipmi_picmg_set_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_LED_STATE, ipmi_msg *req, ipmi_msg *rsp)
 {
-    led_error error;
-    const LED_activity_desc_t * pLEDact;
-    LED_activity_desc_t LEDact;
-    pLEDact = &LEDact;
-    /* We use this pointer assignment, so we can also set it to NULL if we need */
+    uint8_t fru_id = req->data[1];
+    uint8_t led_num = req->data[2];
+    uint8_t function = req->data[3];
 
-    switch (req->data[3]) {
+    switch ( function ) {
     case 0x00:
         /* OFF override */
-        pLEDact = &LED_Off_Activity;
+        LEDUpdate( fru_id, led_num, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
         break;
     case 0xFF:
         /* ON override */
-        pLEDact = &LED_On_Activity;
+        LEDUpdate( fru_id, led_num, LEDMODE_OVERRIDE, LEDINIT_ON, 0xFF, 0 );
         break;
     case 0xFB:
         /* Lamp Test */
-        /*! @todo Put the lamp test as a higher priority action, not a type of override */
-        LEDact.action = LED_ACTV_BLINK;
-        LEDact.initstate = LED_ON_STATE;
-        /* On duration in 100ms units */
-        LEDact.delay_init = req->data[4] * 100;
-        /* Set the toggle delay to 0, so we know its a "single-shot" descriptor, so the LED module should revert to its override/local_control state later */
-        LEDact.delay_tog = 0;
+        LEDUpdate( fru_id, led_num, LEDMODE_LAMPTEST, LEDINIT_ON, req->data[4], 0 );
         break;
     case 0xFC:
-        /* Local state */
-        pLEDact = NULL;
+        /* Restore to Local Control state */
+        LEDUpdate( fru_id, led_num, LEDMODE_LOCAL, 0, 0, 0 );
         break;
     case 0xFD:
     case 0xFE:
@@ -277,28 +362,11 @@ IPMI_HANDLER(ipmi_picmg_set_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_
         break;
     default:
         /* Blink Override */
-        LEDact.action = LED_ACTV_BLINK;
-        LEDact.initstate = LED_ON_STATE;
-        /* On duration in 10ms units */
-        LEDact.delay_init = req->data[4] / 10;
-        /* Off duration in 10ms units*/
-        LEDact.delay_tog = req->data[3] / 10;
+        LEDUpdate( fru_id, led_num, LEDMODE_OVERRIDE, LEDINIT_ON, req->data[4]/10, req->data[3]/10 );
         break;
     }
 
-    error = LED_update( req->data[2], pLEDact );
-
-    switch (error) {
-    case led_success:
-        rsp->completion_code = IPMI_CC_OK;
-        break;
-    case led_invalid_argument:
-        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
-        break;
-    case led_unspecified_error:
-        rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
-        break;
-    }
+    rsp->completion_code = IPMI_CC_OK;
     rsp->data_len = 0;
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
@@ -306,10 +374,11 @@ IPMI_HANDLER(ipmi_picmg_set_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_
 IPMI_HANDLER(ipmi_picmg_get_fru_led_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_FRU_LED_PROPERTIES, ipmi_msg *req, ipmi_msg *rsp )
 {
     uint8_t len = rsp->data_len = 0;
+    uint8_t fru = req->data[1];
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
     /* FRU can control the BLUE LED, LED 1 (RED) and LED 2 (GREEN) */
-    rsp->data[len++] = 0x03;
+    rsp->data[len++] = sizeof(led_config[fru])/sizeof(led_config[fru][0]);
     /* Application specific LED count */
     rsp->data[len++] = 0x00;
 
@@ -320,60 +389,66 @@ IPMI_HANDLER(ipmi_picmg_get_fru_led_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_GET
 IPMI_HANDLER(ipmi_picmg_get_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_FRU_LED_STATE, ipmi_msg *req, ipmi_msg *rsp )
 {
     uint8_t len = rsp->data_len = 0;
-    uint8_t led_id = req->data[2];
+    uint8_t fru = req->data[1];
+    uint8_t id = req->data[2];
+    LEDConfig_t *cfg = &led_config[fru][id];
 
-    if (led_id > LED_CNT) {
-	rsp->data_len = len;
-	rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
-	return;
+    if ( id > ( sizeof( led_config[fru] )/sizeof( led_config[fru][0] )-1 ) ) {
+        rsp->data_len = len;
+        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+        return;
     }
+
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
 
     /* LED State:
      * [7:4] Reserved,
      * [3] LED has an unmet hardware restriction,
      * [2] Lamp Test enabled
-     * [2] Override state enabled
-     * [2] Local control enabled */
-    rsp->data[len++] = 0x01; // Reading not yet implemented
+     * [1] Override state enabled
+     * [0] Local control enabled */
+    rsp->data[len++] = ( (cfg->mode_cfg[LEDMODE_LAMPTEST].active) << 2 ) |
+        ( ( cfg->mode_cfg[LEDMODE_OVERRIDE].active ) << 1 ) |
+        ( ( cfg->mode_cfg[LEDMODE_LOCAL].active ) << 0 );
 
     /* Local Control LED function */
-    switch (LEDstate[led_id].cur_cfg.action) {
-    case LED_ACTV_OFF:
-	rsp->data[len++] = 0x00;
-	rsp->data[len++] = 0x00;
-	break;
-    case LED_ACTV_ON:
-	rsp->data[len++] = 0xFF;
-	rsp->data[len++] = 0x00;
-	break;
-    case LED_ACTV_BLINK:
-	rsp->data[len++] = LEDstate[led_id].cur_cfg.delay_init;
-	rsp->data[len++] = LEDstate[led_id].cur_cfg.delay_tog;
-	break;
+    rsp->data[len++] = cfg->mode_cfg[LEDMODE_LOCAL].t_init;
+    rsp->data[len++] = 0x00;
+    rsp->data[len++] = cfg->color;
+
+    if ( cfg->mode_cfg[LEDMODE_OVERRIDE].active ) {
+        if ( cfg->mode_cfg[LEDMODE_OVERRIDE].init_status == LEDINIT_OFF ) {
+            rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_init;
+            rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_toggle;
+        } else {
+            rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_toggle;
+            rsp->data[len++] = cfg->mode_cfg[LEDMODE_OVERRIDE].t_init;
+        }
+        rsp->data[len++] = cfg->color;
     }
 
-    /*  Local Control Color */
-    rsp->data[len++] = LEDstate[led_id].Color;
+    if ( cfg->mode_cfg[LEDMODE_LAMPTEST].active ) {
+        rsp->data[len++] = cfg->mode_cfg[LEDMODE_LAMPTEST].t_init;
+    }
 
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }
 
-
 IPMI_HANDLER(ipmi_picmg_get_led_color_capabilities, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_LED_COLOR_CAPABILITIES, ipmi_msg *req, ipmi_msg *rsp )
 {
     uint8_t len = rsp->data_len = 0;
+    uint8_t fru = req->data[1];
     uint8_t led_id = req->data[2];
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
 
     /* LED Color Capabilities */
-    rsp->data[len++] = LEDstate[led_id].Color;
+    rsp->data[len++] = led_config[fru][led_id].color;
     /* Default LED Color in Local Control State */
-    rsp->data[len++] = LEDstate[led_id].Color;
+    rsp->data[len++] = led_config[fru][led_id].color;
     /* Default LED Color in Override State */
-    rsp->data[len++] = LEDstate[led_id].Color;
+    rsp->data[len++] = led_config[fru][led_id].color;
     /* LED Flags:
      * [7:2] Reserved,
      * [1] LED has a hardware restriction,

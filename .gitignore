@@ -50,9 +50,12 @@ Debug/
 *.axf
 *.bin
 
-#Cmake file
+#Cmake files
 CMakeFiles/
 *.dir/*
 Makefile
 *cmake_install.cmake
 CMakeCache.txt
+
+#Output files
+out/*

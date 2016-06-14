@@ -27,7 +27,6 @@
 
 #include "port.h"
 #include "string.h"
-#include "board_version.h"
 
 #define SLAVE_MASK 0xFF
 
@@ -109,13 +108,13 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed )
 	irq = I2C2_IRQn;
 	break;
     default:
-	break;
+	return;
     }
 
     Board_I2C_Init(id);
     Chip_I2C_Init(id);
     Chip_I2C_SetClockRate(id, speed);
-    NVIC_SetPriority( irq, configMAX_SYSCALL_INTERRUPT_PRIORITY );
+    NVIC_SetPriority( irq, configMAX_SYSCALL_INTERRUPT_PRIORITY -1 );
     NVIC_EnableIRQ( irq );
     Chip_I2C_Enable( id );
 
