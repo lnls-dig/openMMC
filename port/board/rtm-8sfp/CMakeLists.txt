@@ -9,7 +9,7 @@ set(RTM_8SFP_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 ##Sensors SDR list
 set( PROJ_SRCS ${PROJ_SRCS}
   ${RTM_8SFP_PATH}/rtm_user.c
-  ${RTM_8SFP_PATH}/rtm_sdr.c
+  ${RTM_8SFP_PATH}/sdr_list.c
   )
 
 #Include headers path
