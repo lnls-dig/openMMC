@@ -104,12 +104,12 @@ void ipmi_init ( void )
 /*!
  * @brief Finds a handler associated with a given netfunction and command.
  *
- * @param netfn 8-bit network function code
- * @param cmd 8-bit command code
+ * @param[in] netfn 8-bit network function code
+ * @param[in] cmd 8-bit command code
  *
  * @return Pointer to the function which will handle this command, as defined in the netfn handler list.
  */
-t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd)
+t_req_handler ipmi_retrieve_handler( uint8_t netfn, uint8_t cmd )
 {
     t_req_handler handler = 0;
     t_req_handler_record * p_ptr = (t_req_handler_record *) ipmiEntries;
@@ -126,6 +126,18 @@ t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd)
     return handler;
 }
 
+/*!
+ * @brief Sends an event message via IPMB interface
+ *
+ * @param[in] sensor Pointer to sensor structure defined in sensor.h
+ * @param[in] assert_deassert Flag to indicate an (de)assertion event
+ * @param[in] evData Data buffer holding the event data, size indicated by \p length
+ * @param[in] length Lenght of \p evData buffer
+ *
+ * @return ipmb_error return value from #ipmb_send_request
+ *
+ * @see ipmb_send_request()
+ */
 ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t *evData, uint8_t length)
 {
     ipmi_msg evt;
@@ -148,14 +160,13 @@ ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t 
     return (ipmb_send_request( &evt ));
 }
 
-
 /*!
  * @brief Handler for GET Device ID command as in IPMI v2.0 section 20.1 for
  * more information.
  *
- * @param req pointer to request message
+ * @param req[in] pointer to request message
  *
- * @param rsp pointer to response message
+ * @param rsp[out] pointer to response message
  *
  * @return
  */
@@ -186,9 +197,9 @@ IPMI_HANDLER(ipmi_get_device_id,  NETFN_APP, IPMI_GET_DEVICE_ID_CMD, ipmi_msg *r
 /*!
  * @brief Handler for GET Device GUID command
  *
- * @param req pointer to request message
+ * @param[in] req pointer to request message
  *
- * @param rsp pointer to response message
+ * @param[out] rsp pointer to response message
  *
  * @return
  */
@@ -205,14 +216,14 @@ IPMI_HANDLER(ipmi_get_device_guid,  NETFN_APP, IPMI_GET_DEVICE_GUID_CMD, ipmi_ms
 }
 
 /*!
- * @brief handler for GET Properties request. To be called by IPMI
+ * @brief Handler for GET Properties request. To be called by IPMI
  *  request handler, it must obey the predefined function signature
  *  and protocol. Check IPMI 2.0 table 3-11 for more information.
  *
- * @param[in] request Request to be handled and answered. Unused in
+ * @param[in] req Request to be handled and answered. Unused in
  *  this particular function.
  *
- * @return ipmi_msg Message with data, data length and completion code.
+ * @param[out] rsp Message with data, data length and completion code.
  */
 IPMI_HANDLER(ipmi_picmg_get_properties, NETFN_GRPEXT,IPMI_PICMG_CMD_GET_PROPERTIES, ipmi_msg *req, ipmi_msg *rsp )
 {
@@ -227,6 +238,15 @@ IPMI_HANDLER(ipmi_picmg_get_properties, NETFN_GRPEXT,IPMI_PICMG_CMD_GET_PROPERTI
     rsp->data_len = len;
 }
 
+/*!
+ * @brief Handler for Set AMC Port state request.
+ * Check IPMI 2.0 table 3-11 for more information.
+ *
+ * @param[in] request Request to be handled and answered. Unused in
+ *  this particular function.
+ *
+ * @return ipmi_msg Message with data, data length and completion code.
+ */
 IPMI_HANDLER(ipmi_picmg_cmd_set_amc_port_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_AMC_PORT_STATE, ipmi_msg *req, ipmi_msg *rsp)
 {
     rsp->completion_code = IPMI_CC_OK;
