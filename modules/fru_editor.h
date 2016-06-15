@@ -64,7 +64,7 @@
 #define FCLKA                   (5)
 
 //PLL
-#define PLL                     (0x02)
+#define PLL_PRSNT               (0x02)
 #define NO_PLL                  (0x00)
 
 //Activation
