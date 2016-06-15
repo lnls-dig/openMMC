@@ -14,13 +14,13 @@ typedef struct i2c_chip_mapping {
 
 typedef struct i2c_bus_mapping {
     uint8_t bus_id;
-    I2C_ID_T i2c_interface;
+    uint8_t i2c_interface;
     int8_t mux_bus;
     uint8_t enabled;
 } i2c_bus_mapping_t;
 
 typedef struct i2c_mux_state {
-    I2C_ID_T i2c_interface;
+    uint8_t i2c_interface;
     int8_t state;
     SemaphoreHandle_t semaphore;
 } i2c_mux_state_t;
