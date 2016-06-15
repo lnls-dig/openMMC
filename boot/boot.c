@@ -6,7 +6,7 @@ int main (void)
 {
 	SystemCoreClockUpdate();
 
-    Bool upgrade = FALSE;
+    bool upgrade = FALSE;
     uint32_t upgr_fw_id, user_fw_id;
 
     Chip_GPIO_Init(LPC_GPIO);

@@ -147,7 +147,7 @@ extern const SDR_type_01h_t SDR_FMC2_12V_CURR;
 extern const SDR_type_01h_t SDR_FMC2_P3V3_CURR;
 
 uint8_t ina220_config(uint8_t i2c_id, t_ina220_data * data);
-Bool ina220_calibrate( t_ina220_data * data );
+bool ina220_calibrate( t_ina220_data * data );
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
 uint16_t ina220_readvalue( t_ina220_data * data, uint8_t reg );
 void ina220_readall( t_ina220_data * data );

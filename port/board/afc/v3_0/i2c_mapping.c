@@ -55,7 +55,7 @@ i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT] = {
     { CHIP_ID_RTM_LM75_1,    I2C_BUS_RTM_ID,     0x49},
 };
 
-Bool i2c_mux_bus( uint8_t bus_id, i2c_mux_state_t *i2c_mux, int8_t new_state )
+bool i2c_mux_bus( uint8_t bus_id, i2c_mux_state_t *i2c_mux, int8_t new_state )
 {
     /* Include enable bit (fourth bit) on channel selection byte */
     uint8_t pca_channel = new_state | (1 << 3);

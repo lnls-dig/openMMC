@@ -37,7 +37,7 @@ void i2c_init( void )
     }
 }
 
-Bool i2c_take_by_busid( uint8_t bus_id, uint8_t *i2c_interface, TickType_t timeout )
+bool i2c_take_by_busid( uint8_t bus_id, uint8_t *i2c_interface, TickType_t timeout )
 {
     i2c_mux_state_t *p_i2c_mux = NULL;
     i2c_bus_mapping_t *p_i2c_bus = &i2c_bus_map[bus_id];
@@ -83,7 +83,7 @@ Bool i2c_take_by_busid( uint8_t bus_id, uint8_t *i2c_interface, TickType_t timeo
     return true;
 }
 
-Bool i2c_take_by_chipid(uint8_t chip_id, uint8_t *i2c_address, uint8_t *i2c_interface,  uint32_t timeout)
+bool i2c_take_by_chipid(uint8_t chip_id, uint8_t *i2c_address, uint8_t *i2c_interface,  uint32_t timeout)
 {
     if (chip_id > I2C_CHIP_MAP_COUNT) {
         return false;
