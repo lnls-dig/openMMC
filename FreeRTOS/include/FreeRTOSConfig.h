@@ -68,7 +68,7 @@ licensing and training services.
 #define configCHECK_FOR_STACK_OVERFLOW          1
 #define configUSE_RECURSIVE_MUTEXES             0
 #define configQUEUE_REGISTRY_SIZE               3
-#define configGENERATE_RUN_TIME_STATS           1
+#define configGENERATE_RUN_TIME_STATS           0
 #define configUSE_MALLOC_FAILED_HOOK            0
 #define configENABLE_BACKWARD_COMPATIBILITY     1
 #define configUSE_APPLICATION_TASK_TAG          0
