@@ -68,6 +68,8 @@ typedef struct adn_connect_cfg{
 #define ADN_XPT_MAP0_CON_REG            0x90
 #define ADN_XPT_MAP1_CON_REG            0x98
 
+#define ADN_RESET_REG                   0x00
+
 #define ADN_XPT_UPDATE_REG              0x80
 #define ADN_XPT_MAP_TABLE_SEL_REG       0x81
 
@@ -89,9 +91,17 @@ enum adn4604_term_ctl {
     TXN_TERM       /* Output[15:8] (North) termination control */
 };
 
+enum adn4604_tx_ctl {
+	TX_DISABLED,
+	TX_STANDBY,
+	TX_SQUELCHED,
+	TX_ENABLED
+};
+
 void adn4604_init( void );
-void adn4604_tx_enable( uint8_t output );
+void adn4604_tx_control( uint8_t output, uint8_t tx_mode );
 void adn4604_update( void );
+void adn4604_reset( void );
 void adn4604_xpt_config( uint8_t map, adn_connect_map_t xpt_con );
 void adn4604_active_map( uint8_t map );
 adn_connect_map_t adn4604_out_status( void );
