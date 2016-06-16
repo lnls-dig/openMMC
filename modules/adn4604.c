@@ -97,7 +97,7 @@ void adn4604_init( void )
     adn4604_update();
 }
 
-void adn4604_tx_enable( uint8_t output )
+void adn4604_tx_control( uint8_t output, uint8_t tx_mode )
 {
     uint8_t i2c_addr, i2c_interf;
     uint8_t enable[2];
@@ -124,7 +124,7 @@ void adn4604_tx_enable( uint8_t output )
      *                       111: Table Entry 7
      *                   - If TX CTL SELECT = 1, PE[2:0] are ignored
      */
-    enable[1] = 0x30;
+    enable[1] = tx_mode << 4;
 
     if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) ) {
         xI2CMasterWrite( i2c_interf, i2c_addr, enable, sizeof(enable) );
