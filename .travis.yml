@@ -1,0 +1,23 @@
+notifications:
+  email: false
+
+#Test only in travis branch for now
+branches:
+  only:
+    - travis
+
+language: c
+
+before_script:
+  - sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu trusty main universe multiverse restricted'
+  - sudo apt-get update -qq
+  - sudo apt-get install -y gcc-arm-none-eabi
+
+env:
+  matrix:
+  - BOARD=afc         -VERSION='3.0' -RTM='rtm-8sfp'
+  - BOARD=afc         -VERSION='3.1' -RTM=''
+  - BOARD=afc-timing  -VERSION=''    -RTM='rtm-8sfp'
+
+script:
+  - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Debug
