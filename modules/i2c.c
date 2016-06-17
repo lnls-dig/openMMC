@@ -25,15 +25,15 @@
 #include "i2c.h"
 #include "i2c_mapping.h"
 
-#define I2C_MUX_COUNT (sizeof(i2c_mux) / sizeof(i2c_mux_state_t))
-#define I2C_CHIP_MAP_COUNT (sizeof(i2c_chip_map)/sizeof(i2c_chip_mapping_t))
+#define I2C_MUX_COUNT		(sizeof(i2c_mux)/sizeof(i2c_mux_state_t))
+#define I2C_CHIP_MAP_COUNT	(sizeof(i2c_chip_map)/sizeof(i2c_chip_mapping_t))
 
 void i2c_init( void )
 {
-    for (uint8_t i = 0; i < sizeof(i2c_mux)/sizeof(i2c_mux_state_t); i++) {
+    for ( uint8_t i = 0; i < sizeof(i2c_mux)/sizeof(i2c_mux_state_t); i++ ) {
         i2c_mux[i].semaphore = xSemaphoreCreateBinary();
-        vI2CConfig(i2c_mux[i].i2c_interface, SPEED_100KHZ);
-        xSemaphoreGive(i2c_mux[i].semaphore);
+        vI2CConfig( i2c_mux[i].i2c_interface, SPEED_100KHZ );
+        xSemaphoreGive( i2c_mux[i].semaphore );
     }
 }
 
@@ -44,29 +44,29 @@ bool i2c_take_by_busid( uint8_t bus_id, uint8_t *i2c_interface, TickType_t timeo
 
     uint8_t tmp_interface_id = i2c_bus_map[bus_id].i2c_interface;
 
-    for (p_i2c_mux = i2c_mux; p_i2c_mux != NULL; p_i2c_mux++) {
-        if (p_i2c_mux->i2c_interface == tmp_interface_id) {
+    for ( p_i2c_mux = i2c_mux; p_i2c_mux != NULL; p_i2c_mux++ ) {
+        if ( p_i2c_mux->i2c_interface == tmp_interface_id ) {
             break;
         }
     }
 
-    if (p_i2c_mux == NULL) {
+    if ( p_i2c_mux == NULL ) {
         return false;
     }
-    if (p_i2c_bus->enabled == 0) {
+    if ( p_i2c_bus->enabled == 0 ) {
         return false;
     }
-    if (p_i2c_mux->semaphore == 0) {
+    if ( p_i2c_mux->semaphore == 0 ) {
         return false;
     }
 
     /* Try to take the semaphore to win the bus */
-    if (xSemaphoreTake(p_i2c_mux->semaphore, timeout) == pdFALSE) {
+    if ( xSemaphoreTake( p_i2c_mux->semaphore, timeout ) == pdFALSE ) {
         return false;
     }
 
     /* This bus is not multiplexed, no action needed */
-    if (p_i2c_bus->mux_bus == -1) {
+    if ( p_i2c_bus->mux_bus == -1 ) {
         *i2c_interface = p_i2c_mux->i2c_interface;
         portENABLE_INTERRUPTS();
         return true;
@@ -86,26 +86,26 @@ bool i2c_take_by_busid( uint8_t bus_id, uint8_t *i2c_interface, TickType_t timeo
     return true;
 }
 
-bool i2c_take_by_chipid(uint8_t chip_id, uint8_t *i2c_address, uint8_t *i2c_interface,  uint32_t timeout)
+bool i2c_take_by_chipid( uint8_t chip_id, uint8_t *i2c_address, uint8_t *i2c_interface,  uint32_t timeout )
 {
-    if (chip_id > I2C_CHIP_MAP_COUNT) {
+    if ( chip_id > I2C_CHIP_MAP_COUNT ) {
         return false;
     }
 
     uint8_t bus_id = i2c_chip_map[chip_id].bus_id;
-    if (i2c_address != NULL) {
+    if ( i2c_address != NULL ) {
         *i2c_address = i2c_chip_map[chip_id].i2c_address;
     }
 
-    return i2c_take_by_busid(bus_id, i2c_interface, timeout);
+    return i2c_take_by_busid( bus_id, i2c_interface, timeout );
 }
 
-void i2c_give(uint8_t i2c_interface)
+void i2c_give( uint8_t i2c_interface )
 {
     i2c_mux_state_t *mux;
-    for (mux = i2c_mux; mux != NULL; mux++) {
-        if (mux->i2c_interface == i2c_interface) {
-            xSemaphoreGive(mux->semaphore);
+    for ( mux = i2c_mux; mux != NULL; mux++ ) {
+        if ( mux->i2c_interface == i2c_interface ) {
+            xSemaphoreGive( mux->semaphore );
             break;
         }
     }
