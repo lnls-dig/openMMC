@@ -208,6 +208,8 @@ void adn4604_termination_ctl( uint8_t cfg )
     }
 }
 
+#ifdef IPMI_OEM_CMD_CLOCK_CROSSBAR_SET
+/* This command may take a while to execute and hold the IPMI transaction */
 IPMI_HANDLER(ipmi_oem_clock_crossbar_set, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_CLOCK_CROSSBAR_SET, ipmi_msg *req, ipmi_msg* rsp)
 {
     int len = rsp->data_len = 0;
@@ -244,11 +246,14 @@ IPMI_HANDLER(ipmi_oem_clock_crossbar_set, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_CLOCK_C
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }
+#endif
 
-IPMI_HANDLER(ipmi_oem_clock_crossbar_reset, NETFN_CUSTOM_OEM, 0x06, ipmi_msg *req, ipmi_msg* rsp)
+#ifdef IPMI_OEM_CMD_CLOCK_CROSSBAR_RESET
+IPMI_HANDLER(ipmi_oem_clock_crossbar_reset, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_CLOCK_CROSSBAR_RESET, ipmi_msg *req, ipmi_msg* rsp)
 {
     adn4604_reset();
 
     rsp->data_len = 0;
     rsp->completion_code = IPMI_CC_OK;
 }
+#endif
