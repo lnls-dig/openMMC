@@ -28,13 +28,12 @@
 #include "adn4604_usercfg.h"
 #include "i2c.h"
 #include "i2c_mapping.h"
+#include "ipmi_oem.h"
 
-void adn4604_setup(void)
+adn_connect_map_t con;
+
+void adn4604_init( void )
 {
-    uint8_t i2c_addr;
-    uint8_t i2c_interf;
-    t_adn_connect_map con;
-    t_adn_connect_cfg cfg;
 
     uint16_t out_enable_flag = {
         ADN4604_EN_OUT_0 << 0 |
@@ -56,18 +55,14 @@ void adn4604_setup(void)
     };
 
     /* Disable UPDATE' pin by pulling it HIGH */
-    gpio_set_pin_dir(GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, OUTPUT);
-    gpio_set_pin_state( GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, HIGH);
+    gpio_set_pin_dir( GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, OUTPUT );
+    gpio_set_pin_state( GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, HIGH );
 
     /* There's a delay circuit in the Reset pin of the clock switch, we must wait until it clears out */
-    gpio_set_pin_dir( GPIO_ADN_RESETN_PORT, GPIO_ADN_RESETN_PIN, INPUT);
+    gpio_set_pin_dir( GPIO_ADN_RESETN_PORT, GPIO_ADN_RESETN_PIN, INPUT );
 
-    while( gpio_read_pin( GPIO_ADN_RESETN_PORT, GPIO_ADN_RESETN_PIN ) == 0) {
-        vTaskDelay(50);
-    }
-
-    if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) == pdFALSE) {
-        return;
+    while( gpio_read_pin( GPIO_ADN_RESETN_PORT, GPIO_ADN_RESETN_PIN ) == 0 ) {
+        vTaskDelay( 50 );
     }
 
     /* Configure the interconnects */
@@ -88,31 +83,25 @@ void adn4604_setup(void)
     con.out14 = ADN4604_CFG_OUT_14;
     con.out15 = ADN4604_CFG_OUT_15;
 
-    /* Select the desired MAP register to load the configuration */
-    cfg.map_reg = ADN_XPT_MAP0_CON_REG;
-    cfg.map_connect = con;
-
-    xI2CMasterWrite( i2c_interf, i2c_addr, (uint8_t *)&cfg, sizeof(cfg) );
-
-    /* Select the active map */
-    uint8_t map_sel[2] = { ADN_XPT_MAP_TABLE_SEL_REG, ADN_XPT_MAP0 };
-    xI2CMasterWrite( i2c_interf, i2c_addr, map_sel, sizeof(map_sel) );
+    adn4604_xpt_config( ADN_XPT_MAP0_CON_REG, con );
 
     /* Enable desired outputs */
-    for (uint8_t i = 0; i < 16; i++) {
-        if ( (out_enable_flag >> i) & 0x1 ) {
-            adn4604_tx_enable(i2c_interf, i2c_addr, i);
+    for ( uint8_t i = 0; i < 16; i++ ) {
+        if ( ( out_enable_flag >> i ) & 0x1 ) {
+            adn4604_tx_control( i, TX_ENABLED );
         }
     }
 
-    adn4604_update( i2c_interf, i2c_addr );
+    adn4604_active_map( ADN_XPT_MAP0 );
 
-    i2c_give(i2c_interf);
+    adn4604_update();
 }
 
-void adn4604_tx_enable( uint8_t i2c_interf, uint8_t i2c_addr, uint8_t output )
+void adn4604_tx_control( uint8_t output, uint8_t tx_mode )
 {
+    uint8_t i2c_addr, i2c_interf;
     uint8_t enable[2];
+
     /* TX Enable registers have an 0x20 offset from their value */
     enable[0] = 0x20 + output;
 
@@ -135,14 +124,136 @@ void adn4604_tx_enable( uint8_t i2c_interf, uint8_t i2c_addr, uint8_t output )
      *                       111: Table Entry 7
      *                   - If TX CTL SELECT = 1, PE[2:0] are ignored
      */
-    enable[1] = 0x30;
+    enable[1] = tx_mode << 4;
 
-    xI2CMasterWrite( i2c_interf, i2c_addr, enable, sizeof(enable) );
+    if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) ) {
+        xI2CMasterWrite( i2c_interf, i2c_addr, enable, sizeof(enable) );
+        i2c_give(i2c_interf);
+    }
 }
 
-void adn4604_update( uint8_t i2c_interf, uint8_t i2c_addr )
+void adn4604_update( void )
 {
+    uint8_t i2c_addr, i2c_interf;
     uint8_t update[2] = { ADN_XPT_UPDATE_REG, 0x01 };
 
-    xI2CMasterWrite( i2c_interf, i2c_addr, update, sizeof(update) );
+    if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) ) {
+        xI2CMasterWrite( i2c_interf, i2c_addr, update, sizeof(update) );
+        i2c_give(i2c_interf);
+    }
 }
+
+void adn4604_reset( void )
+{
+    uint8_t i2c_addr, i2c_interf;
+    uint8_t update[2] = { ADN_RESET_REG, 0x01 };
+
+    if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) ) {
+        xI2CMasterWrite( i2c_interf, i2c_addr, update, sizeof(update) );
+        i2c_give(i2c_interf);
+    }
+}
+
+void adn4604_xpt_config( uint8_t map, adn_connect_map_t xpt_con )
+{
+    uint8_t i2c_addr, i2c_interf;
+
+    adn_connect_cfg_t cfg = { map, xpt_con };
+
+    if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) ) {
+        xI2CMasterWrite( i2c_interf, i2c_addr, (uint8_t *)&cfg, sizeof(cfg) );
+        i2c_give(i2c_interf);
+    }
+}
+
+void adn4604_active_map( uint8_t map )
+{
+    uint8_t i2c_addr, i2c_interf;
+
+    /* Select the active map */
+    uint8_t map_sel[2] = { ADN_XPT_MAP_TABLE_SEL_REG, map };
+
+    if ( i2c_take_by_chipid( CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10 ) ) {
+        xI2CMasterWrite( i2c_interf, i2c_addr, map_sel, sizeof(map_sel) );
+        i2c_give( i2c_interf );
+    }
+}
+
+adn_connect_map_t adn4604_out_status( void )
+{
+    uint8_t i2c_addr, i2c_interf;
+    uint8_t i;
+    adn_connect_map_t stat_map = {0};
+
+    if ( i2c_take_by_chipid( CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10 ) ) {
+
+        /* Read all outputs status */
+        for ( i = 0; i < 8; i++ ) {
+            xI2CMasterWriteRead( i2c_interf, i2c_addr, ADN_XPT_STATUS_REG+i, (uint8_t *)(&stat_map)+i, 1 );
+        }
+        i2c_give( i2c_interf );
+    }
+
+    return stat_map;
+}
+
+void adn4604_termination_ctl( uint8_t cfg )
+{
+    uint8_t i2c_addr, i2c_interf;
+    uint8_t msg[2] = { ADN_TERMINATION_CTL_REG, (cfg & 0xF0) };
+
+    if ( i2c_take_by_chipid( CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10 ) ) {
+        xI2CMasterWrite( i2c_interf, i2c_addr, msg, sizeof(msg) );
+        i2c_give( i2c_interf );
+    }
+}
+
+#ifdef IPMI_OEM_CMD_CLOCK_CROSSBAR_SET
+/* This command may take a while to execute and hold the IPMI transaction */
+IPMI_HANDLER(ipmi_oem_clock_crossbar_set, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_CLOCK_CROSSBAR_SET, ipmi_msg *req, ipmi_msg* rsp)
+{
+    int len = rsp->data_len = 0;
+
+    uint8_t map;
+    uint8_t output = req->data[1];
+    uint8_t input = req->data[2];
+    uint8_t enable = req->data[3];
+
+    if (output % 2) {
+        *((uint8_t *)&con+(output/2)) &= 0x0F;
+        *((uint8_t *)&con+(output/2)) |= (input << 4) & 0xF0;
+    } else {
+        *((uint8_t *)&con+(output/2)) &= 0xF0;
+        *((uint8_t *)&con+(output/2)) |= input & 0x0F;
+    }
+
+    if ( req->data[0] == 0 ) {
+        map = ADN_XPT_MAP0_CON_REG;
+    } else {
+        map = ADN_XPT_MAP1_CON_REG;
+    }
+
+    adn4604_xpt_config( map , con );
+
+    if ( enable ) {
+        adn4604_tx_control( output, TX_ENABLED );
+    } else {
+        adn4604_tx_control( output, TX_DISABLED );
+    }
+
+    adn4604_update();
+
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}
+#endif
+
+#ifdef IPMI_OEM_CMD_CLOCK_CROSSBAR_RESET
+IPMI_HANDLER(ipmi_oem_clock_crossbar_reset, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_CLOCK_CROSSBAR_RESET, ipmi_msg *req, ipmi_msg* rsp)
+{
+    adn4604_reset();
+
+    rsp->data_len = 0;
+    rsp->completion_code = IPMI_CC_OK;
+}
+#endif

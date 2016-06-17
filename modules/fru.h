@@ -23,6 +23,9 @@
 #ifndef FRU_H_
 #define FRU_H_
 
+#include <stdint.h>
+#include <stdbool.h>
+
 enum {
     FRU_AMC,
 #ifdef MODULE_RTM

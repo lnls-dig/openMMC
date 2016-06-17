@@ -167,7 +167,7 @@ void ina220_readall( ina220_data_t * data )
     }
 }
 
-Bool ina220_calibrate( ina220_data_t * data )
+bool ina220_calibrate( ina220_data_t * data )
 {
     uint8_t i2c_interf, i2c_addr;
     uint16_t cal = data->config->calibration_reg;

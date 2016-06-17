@@ -1,4 +1,4 @@
-# openMMC
+# openMMC [![Build Status](https://travis-ci.org/lnls-dig/openMMC.svg?branch=devel)](https://travis-ci.org/lnls-dig/openMMC)
 Open Source modular IPM Controller firmware
 
 ## Installation:
@@ -18,21 +18,21 @@ Next step is to clone this repository into your workspace.
 
 ## Compilation
 
-Go to the repository folder
+Create a new folder wherever is suitable
 
-	cd /path/to/repo/
+	cd <build_folder>
 
-Run CMake passing the flag `-DBOARD=<board_name>` to configure the compilation scripts to your specific board hardware
+Run CMake using the path to the repository folder as an direct argument and the flag `-DBOARD=<board_name>` and `-DVERSION=<board_version>` to configure the compilation scripts to your specific board hardware
 
-	cmake -DBOARD=<board_name>
+	cmake <path_to_source> -DBOARD=<board_name> -DVERSION=<board_version>
 
-You can set your board options in the file `build_cfg/config.cmake`. You can change the Controller, Board name, version and select which modules you want to be included in your compilation.
+Example:
 
-After changing the desired options, run the CMake configuration command again (the CMakeCache file will not be edited by this command) and compile the firmware:
+	cmake ~/openmmc/ -DBOARD=afc -DVERSION=3.1
 
-	make -s
+After creating the build files with CMake, you can compile the firmware using `make`, optionally setting the VERBOSE flag to 1 if you wish to see all the compilation commands
 
-*NOTE: The compiler will return several warnings, most of them are regarding the LPCOpen libraries and do not affect the library functionality.*
+	make [VERBOSE=1]
 
 Both a `.axf` file and a `.bin` file will be generated in the `out` folder. You can use any one you prefer to program your processor.
 
@@ -43,7 +43,9 @@ To clean the compilation files (binaries, objects and dependence files), just ru
 ## Programming LPC1764
 If you own a *LPCLink* board, you can use it to program the LPC1764 processor via its JTAG interface
 
-First, make sure that the LPCXpresso path is set correctly inside `<openMMC_root_folder>/CMakeLists.exe`
+**NOTE**: You **must** have the LPCXpresso installed in your machine, since we need to use some installation binaries that they provide, which are not open source.
+
+The CMake script should be able to find LPCXpresso path, but if this is not possible, open the `<openMMC_root_folder>/CMakeLists.txt` and change the following line
 
 	set(LPCXPRESSO_PATH <lpcxpresso_path>)
 
@@ -61,6 +63,4 @@ If you want to erase the whole Flash and copy both firmwares:
 
 	make program_all
 
-**NOTE**: In this case you must have the LPCXpresso installed in your machine, since we need to use some initialization scripts that they provide.
-
-**NOTE 2**: We only have linker scripts to LPC1764, so if you wish to compile to a different target, you'll have to change the `linker/lpc1764_boot.ld` and `linker/lpc1764_app.ld` files, which defines the memory regions, otherwise you'll run into some HardFault errors.
+**NOTE 2**: We only have linker scripts to LPC1764 and LPC1769, so if you wish to compile to a different controller, you'll have to change the `linker/lpc1764_boot.ld` and `linker/lpc1764_app.ld` files, which defines the memory regions, otherwise you'll run into several HardFault errors.
