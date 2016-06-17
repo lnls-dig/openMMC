@@ -72,9 +72,12 @@ bool i2c_take_by_busid( uint8_t bus_id, uint8_t *i2c_interface, TickType_t timeo
         return true;
     }
 
+
+    p_i2c_mux->state = i2c_get_mux_bus( bus_id, p_i2c_mux );
+
     /* This bus mux is in correct state */
-    if (p_i2c_mux->state != p_i2c_bus->mux_bus) {
-        if (i2c_mux_bus( bus_id, p_i2c_mux, p_i2c_bus->mux_bus ) == false) {
+    if ( p_i2c_mux->state != p_i2c_bus->mux_bus ) {
+        if ( i2c_set_mux_bus( bus_id, p_i2c_mux, p_i2c_bus->mux_bus ) == false ) {
             return false;
         }
     }
