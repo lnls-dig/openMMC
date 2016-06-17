@@ -20,35 +20,31 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+#ifndef __IPMI_OEM_H_
+#define __IPMI_OEM_H_
+
+/*!
+ * @file ipmi_oem.h
+ * @brief Custom IPMI commands for AFC
+ */
+
+/*
+ * Following definitions by Piotr Miedzik in JAMMCI
+ * https://github.com/qermit/JAMMCI/blob/master/src/ipmi/ipmi_oem.h
+*/
+
 #include "ipmi.h"
-#include "ipmi_oem.h"
 
-#include "adn4604.h"
+/* Custom NetFn */
+#define NETFN_CUSTOM_OEM                    0x30
 
-IPMI_HANDLER(ipmi_afc_clock_crossbar_set, NETFN_CUSTOM_AFC, IPMI_AFC_CMD_CLOCK_CROSSBAR_SET, ipmi_msg *req, ipmi_msg* rsp)
-{
-    int len = rsp->data_len = 0;
+/* AFC Custom Commands */
+#define IPMI_OEM_CMD_I2C_TRANSFER           0x00
+#define IPMI_OEM_CMD_GPIO                   0x01
+#define IPMI_OEM_CMD_CLOCK_CROSSBAR_GET     0x02
+#define IPMI_OEM_CMD_CLOCK_CROSSBAR_SET     0x03
+#define IPMI_OEM_CMD_SSP_TRANSFER           0x04
+#define IPMI_OEM_CMD_SSP_TRANSFER_RAW       0x05
+#define IPMI_OEM_CMD_CLOCK_CROSSBAR_RESET   0x06
 
-    uint8_t map = req->data[0];
-    uint8_t output = req->data[1];
-    uint8_t input = req->data[2];
-    uint8_t enable = req->data[3];
-
-    adn_connect_map_t con = adn4604_out_status();
-
-    if (output % 2) {
-	*(&con+(output/2)) = (input << 4) & 0xF0;
-    } else {
-	*(&con+(output/2)) = input & 0x0F;
-    }
-
-    adn4604_xpt_config( map , con );
-
-    if (enable) {
-	adn4604_tx_enable( output );
-    }
-
-    adn4604_update();
-
-    rsp->completion_code = IPMI_CC_OK;
-}
+#endif
