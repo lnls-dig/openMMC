@@ -7,13 +7,11 @@
 #include <stdbool.h>
 
 typedef struct i2c_chip_mapping {
-    uint8_t chip_id;
     uint8_t bus_id;
     uint8_t i2c_address;
 } i2c_chip_mapping_t;
 
 typedef struct i2c_bus_mapping {
-    uint8_t bus_id;
     uint8_t i2c_interface;
     int8_t mux_bus;
     uint8_t enabled;
