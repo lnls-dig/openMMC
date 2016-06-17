@@ -42,7 +42,7 @@ void RTM_Manage( void * Parameters )
 {
     uint8_t ps_old_state = 0xFF;
     uint8_t ps_new_state;
-    Bool rtm_compatible;
+    bool rtm_compatible;
     extern sensor_t * hotswap_rtm_sensor;
 
     EventBits_t current_evt;

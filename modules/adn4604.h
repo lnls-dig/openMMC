@@ -58,15 +58,17 @@ typedef struct __attribute__((__packed__)) {
     uint8_t out14:4,
         out15:4;
 #endif
-} t_adn_connect_map;
+} adn_connect_map_t;
 
-typedef struct {
+typedef struct adn_connect_cfg{
     uint8_t map_reg;
-    t_adn_connect_map map_connect;
-} t_adn_connect_cfg;
+    adn_connect_map_t map_connect;
+} adn_connect_cfg_t;
 
 #define ADN_XPT_MAP0_CON_REG            0x90
 #define ADN_XPT_MAP1_CON_REG            0x98
+
+#define ADN_RESET_REG                   0x00
 
 #define ADN_XPT_UPDATE_REG              0x80
 #define ADN_XPT_MAP_TABLE_SEL_REG       0x81
@@ -76,10 +78,32 @@ typedef struct {
 
 #define ADN_XPT_BROADCAST               0x82
 
+#define ADN_XPT_STATUS_REG              0xB0
+
+#define ADN_TERMINATION_CTL_REG         0xF0
+
 #define ADN_TX_CON_OUT0                 0x20
 
-void adn4604_setup( void );
-void adn4604_tx_enable( uint8_t i2c_bus_id, uint8_t slave_addr, uint8_t output );
-void adn4604_update( uint8_t i2c_bus_id, uint8_t slave_addr );
+enum adn4604_term_ctl {
+    RXW_TERM = 0,  /* Input[7:0] (West) termination control */
+    RXE_TERM,      /* Input[15:8] (East) termination control */
+    TXS_TERM,      /* Output[7:0] (South) termination control */
+    TXN_TERM       /* Output[15:8] (North) termination control */
+};
 
+enum adn4604_tx_ctl {
+	TX_DISABLED,
+	TX_STANDBY,
+	TX_SQUELCHED,
+	TX_ENABLED
+};
+
+void adn4604_init( void );
+void adn4604_tx_control( uint8_t output, uint8_t tx_mode );
+void adn4604_update( void );
+void adn4604_reset( void );
+void adn4604_xpt_config( uint8_t map, adn_connect_map_t xpt_con );
+void adn4604_active_map( uint8_t map );
+adn_connect_map_t adn4604_out_status( void );
+void adn4604_termination_ctl( uint8_t cfg );
 #endif
