@@ -57,31 +57,36 @@ i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT] = {
 
 bool i2c_set_mux_bus( uint8_t bus_id, i2c_mux_state_t *i2c_mux, int8_t new_state )
 {
-    /* Include enable bit (fourth bit) on channel selection byte */
-    uint8_t pca_channel = new_state | (1 << 3);
-
     portENABLE_INTERRUPTS();
 
-    /* Select desired channel in the I2C switch */
-    if( xI2CMasterWrite( i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface, i2c_chip_map[CHIP_ID_MUX].i2c_address, &pca_channel, 1 ) != 0 ) {
-        i2c_mux->state = new_state;
-        return true;
+    if (i2c_mux->i2c_interface == i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface) {
+        /* Include enable bit (fourth bit) on channel selection byte */
+        uint8_t pca_channel = new_state | (1 << 3);
+
+        /* Select desired channel in the I2C switch */
+        if( xI2CMasterWrite( i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface, i2c_chip_map[CHIP_ID_MUX].i2c_address, &pca_channel, 1 ) != 0 ) {
+            /* We failed to configure the I2C Mux, release the semaphore */
+            xSemaphoreGive( i2c_mux->semaphore );
+            return false;
+        }
     }
 
-    /* We failed to configure the I2C Mux, release the semaphore */
-    xSemaphoreGive( i2c_mux->semaphore );
-    return false;
+    i2c_mux->state = new_state;
+    return true;
 }
 
 uint8_t i2c_get_mux_bus( uint8_t bus_id, i2c_mux_state_t *i2c_mux )
 {
-    /* Include enable bit (fourth bit) on channel selection byte */
-    uint8_t pca_channel;
+    if (i2c_mux->i2c_interface == i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface) {
+        /* Include enable bit (fourth bit) on channel selection byte */
+        uint8_t pca_channel;
 
-    portENABLE_INTERRUPTS();
+        portENABLE_INTERRUPTS();
+        /* Read bus state (other master on the bus may have switched it */
+        xI2CMasterRead( i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface, i2c_chip_map[CHIP_ID_MUX].i2c_address, &pca_channel, 1 );
 
-    /* Read bus state (other master on the bus may have switched it */
-    xI2CMasterRead( i2c_mux->i2c_interface, i2c_chip_map[CHIP_ID_MUX].i2c_address, &pca_channel, 1 );
-
-    return (pca_channel & 0x07);
+        return (pca_channel & 0x07);
+    } else {
+        return i2c_mux->state;
+    }
 }
