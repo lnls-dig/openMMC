@@ -4,7 +4,8 @@ notifications:
 #Test only in travis branch for now
 branches:
   only:
-    - travis
+    - master
+    - devel
 
 language: c
 
