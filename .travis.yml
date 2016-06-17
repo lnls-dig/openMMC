@@ -10,8 +10,11 @@ language: c
 
 before_script:
   - sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu trusty main universe multiverse restricted'
+  - sudo add-apt-repository ppa:george-edison55/cmake-3.x
   - sudo apt-get update -qq
   - sudo apt-get install -y gcc-arm-none-eabi
+  - sudo apt-get install cmake -qq
+  - sudo apt-get upgrade -qq
 
 env:
   matrix:
