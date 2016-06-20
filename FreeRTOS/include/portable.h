@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -169,9 +169,7 @@ void vPortDefineHeapRegions( const HeapRegion_t * const pxHeapRegions ) PRIVILEG
  * Map to the memory management routines required for the port.
  */
 void *pvPortMalloc( size_t xSize ) PRIVILEGED_FUNCTION;
-void *pvPortMallocFromISR( size_t xWantedSize ) PRIVILEGED_FUNCTION;
 void vPortFree( void *pv ) PRIVILEGED_FUNCTION;
-void vPortFreeFromISR( void *pv ) PRIVILEGED_FUNCTION;
 void vPortInitialiseBlocks( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetFreeHeapSize( void ) PRIVILEGED_FUNCTION;
 size_t xPortGetMinimumEverFreeHeapSize( void ) PRIVILEGED_FUNCTION;
@@ -198,7 +196,7 @@ void vPortEndScheduler( void ) PRIVILEGED_FUNCTION;
  */
 #if( portUSING_MPU_WRAPPERS == 1 )
 	struct xMEMORY_REGION;
-	void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMORY_REGION * const xRegions, StackType_t *pxBottomOfStack, uint16_t usStackDepth ) PRIVILEGED_FUNCTION;
+	void vPortStoreTaskMPUSettings( xMPU_SETTINGS *xMPUSettings, const struct xMEMORY_REGION * const xRegions, StackType_t *pxBottomOfStack, uint32_t ulStackDepth ) PRIVILEGED_FUNCTION;
 #endif
 
 #ifdef __cplusplus

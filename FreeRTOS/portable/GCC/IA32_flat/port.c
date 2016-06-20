@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -87,6 +87,10 @@
 
 #if( ( configMAX_API_CALL_INTERRUPT_PRIORITY > portMAX_PRIORITY ) || ( configMAX_API_CALL_INTERRUPT_PRIORITY < 2 ) )
 	#error configMAX_API_CALL_INTERRUPT_PRIORITY must be between 2 and 15
+#endif
+
+#if( ( configSUPPORT_FPU == 1 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 0 ) )
+	#error configSUPPORT_DYNAMIC_ALLOCATION must be set to 1 to use this port with an FPU
 #endif
 
 /* A critical section is exited when the critical section nesting count reaches
@@ -500,16 +504,16 @@ void vPortExitCritical( void )
 			#else
 			{
 				portAPIC_TASK_PRIORITY = 0;
-
-				/* If a yield was pended from within the critical section then
-				perform the yield now. */
-				if( ulPortYieldPending != pdFALSE )
-				{
-					ulPortYieldPending = pdFALSE;
-					__asm volatile( portYIELD_INTERRUPT );
-				}
 			}
 			#endif
+
+			/* If a yield was pended from within the critical section then
+			perform the yield now. */
+			if( ulPortYieldPending != pdFALSE )
+			{
+				ulPortYieldPending = pdFALSE;
+				__asm volatile( portYIELD_INTERRUPT );
+			}
 		}
 	}
 }
@@ -619,14 +623,14 @@ volatile uint32_t ulErrorStatus = 0;
 	{
 	BaseType_t xReturn;
 
-		if( prvCheckValidityOfVectorNumber( ulVectorNumber ) != pdFAIL )
+		xReturn = prvCheckValidityOfVectorNumber( ulVectorNumber );
+
+		if( xReturn != pdFAIL )
 		{
 			/* Save the handler passed in by the application in the vector number
 			passed in.  The addresses are then called from the central interrupt
 			handler. */
 			xInterruptHandlerTable[ ulVectorNumber ] = pxHandler;
-
-			xReturn = pdPASS;
 		}
 
 		return xReturn;
@@ -639,7 +643,9 @@ BaseType_t xPortInstallInterruptHandler( ISR_Handler_t pxHandler, uint32_t ulVec
 {
 BaseType_t xReturn;
 
-	if( prvCheckValidityOfVectorNumber( ulVectorNumber ) != pdFAIL )
+	xReturn = prvCheckValidityOfVectorNumber( ulVectorNumber );
+
+	if( xReturn != pdFAIL )
 	{
 		taskENTER_CRITICAL();
 		{
@@ -647,8 +653,6 @@ BaseType_t xReturn;
 			prvSetInterruptGate( ( uint8_t ) ulVectorNumber, ( ISR_Handler_t ) pxHandler, portIDT_FLAGS );
 		}
 		taskEXIT_CRITICAL();
-
-		xReturn = pdPASS;
 	}
 
 	return xReturn;

@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.2 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -8,7 +8,7 @@
 
     FreeRTOS is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License (version 2) as published by the
-    Free Software Foundation >>!AND MODIFIED BY!<< the FreeRTOS exception.
+    Free Software Foundation >>>> AND MODIFIED BY <<<< the FreeRTOS exception.
 
     ***************************************************************************
     >>!   NOTE: The modification to the GPL is included to allow you to     !<<
@@ -75,7 +75,6 @@
  * See heap_1.c, heap_2.c and heap_3.c for alternative implementations, and the
  * memory management pages of http://www.FreeRTOS.org for more information.
  */
-
 #include <stdlib.h>
 
 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
@@ -87,6 +86,10 @@ task.h is included from an application file. */
 #include "task.h"
 
 #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+
+#if( configSUPPORT_DYNAMIC_ALLOCATION == 0 )
+	#error This file must not be used if configSUPPORT_DYNAMIC_ALLOCATION is 0
+#endif
 
 /* Block sizes must not get too small. */
 #define heapMINIMUM_BLOCK_SIZE	( ( size_t ) ( xHeapStructSize << 1 ) )
@@ -238,7 +241,7 @@ void *pvReturn = NULL;
 						pxBlock->xBlockSize = xWantedSize;
 
 						/* Insert the new block into the list of free blocks. */
-						prvInsertBlockIntoFreeList( ( pxNewBlockLink ) );
+						prvInsertBlockIntoFreeList( pxNewBlockLink );
 					}
 					else
 					{
@@ -707,3 +710,4 @@ uint8_t *puc;
 		mtCOVERAGE_TEST_MARKER();
 	}
 }
+
