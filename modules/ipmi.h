@@ -304,6 +304,12 @@
 #define IPMI_CC_COMMAND_IN_PROGRESS                             0x80
 #define IPMI_CC_UNSPECIFIED_ERROR                               0xff
 
+/* FRU Control codes */
+#define FRU_CTLCODE_COLD_RST					(1 << 0)
+#define FRU_CTLCODE_WARM_RST					(1 << 1)
+#define FRU_CTLCODE_REBOOT					(1 << 2)
+#define FRU_CTLCODE_QUIESCE					(1 << 3)
+
 typedef void (* t_req_handler)(ipmi_msg * req, ipmi_msg * resp);
 
 typedef struct{

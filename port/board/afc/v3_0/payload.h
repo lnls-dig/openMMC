@@ -49,11 +49,6 @@ typedef enum {
 #define PAYLOAD_MESSAGE_REBOOT          (1 << 6)
 #define PAYLOAD_MESSAGE_QUIESCED        (1 << 7)
 
-#define FRU_CTLCODE_COLD_RST            (0)
-#define FRU_CTLCODE_WARM_RST            (1)
-#define FRU_CTLCODE_REBOOT              (2)
-#define FRU_CTLCODE_QUIESCE             (4)
-
 #define PAYLOAD_BASE_DELAY 100
 
 void payload_send_message( uint8_t fru_id, EventBits_t msg );
