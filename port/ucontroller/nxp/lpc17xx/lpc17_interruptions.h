@@ -17,10 +17,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*!
+/**
  * @file lpc17_interruptions.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date March 2016
  *
  * @brief Interruptions control
  */
@@ -32,11 +31,58 @@
 
 #include "core_cm3.h"
 
+/**
+ * @brief Set interruption priority
+ *
+ * @param [in] irq         Interrupt number
+ * @param [in] priority    Priority level
+ */
 #define irq_set_priority(irq, priority) NVIC_SetPriority( irq, priority )
+
+/**
+ * @brief Enable interruption
+ *
+ * @param [in] irq         Interrupt number
+ * @param [in] priority    Priority level
+ */
 #define irq_enable(irq)                 NVIC_EnableIRQ( irq )
+
+/**
+ * @brief Enable interruption
+ *
+ * @param [in] irq         Interrupt number
+ * @param [in] priority    Priority level
+ */
 #define irq_disable(irq)                NVIC_DisableIRQ( irq )
+
+/**
+ * @brief  Clear Pending Interrupt
+ *
+ * The function clears the pending bit of an external interrupt.
+ *
+ * @param [in] irq  External interrupt number. Value cannot be negative.
+ */
 #define irq_clear_pending(irq)          NVIC_ClearPendingIRQ( irq )
+
+/**
+ * @brief  Set Pending Interrupt
+ *
+ * The function sets the pending bit of an external interrupt.
+ *
+ * @param [in] irq  External interrupt number. Value cannot be negative.
+ */
 #define irq_set_pending(irq)            NVIC_SetPendingIRQ( irq )
+
+/**
+ * @brief  Get Active Interrupt
+ *
+ * The function reads the interruption status register and returns the active bit.
+ *
+ * @param [in] irq  Interrupt number.
+ *
+ * @return 0  Interrupt status is not active.
+ * @return 1  Interrupt status is active.
+ */
 #define irq_get_active(irq)             NVIC_GetActive( irq )
 
 #endif
