@@ -87,11 +87,6 @@ void IPMITask( void * pvParameters )
     }
 }
 
-/* Initializes the IPMI Dispatcher:
- * -> Initializes the IPMB Layer
- * -> Registers the RX queue for incoming requests
- * -> Creates the IPMI task
- */
 TaskHandle_t TaskIPMI_Handle;
 
 void ipmi_init ( void )
@@ -101,14 +96,6 @@ void ipmi_init ( void )
     xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", 100, ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle );
 }
 
-/*!
- * @brief Finds a handler associated with a given netfunction and command.
- *
- * @param netfn 8-bit network function code
- * @param cmd 8-bit command code
- *
- * @return Pointer to the function which will handle this command, as defined in the netfn handler list.
- */
 t_req_handler ipmi_retrieve_handler(uint8_t netfn, uint8_t cmd)
 {
     t_req_handler handler = 0;
