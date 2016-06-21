@@ -40,10 +40,39 @@
 #define gpio_init()                            Chip_GPIO_Init( LPC_GPIO )
 #define gpio_read_pin( port, pin )             Chip_GPIO_GetPinState( LPC_GPIO, port, pin )
 #define gpio_read_port( port )                 Chip_GPIO_GetPortValue( LPC_GPIO, port )
-#define gpio_set_pin( port, pin )              Chip_GPIO_SetPinOutHigh( LPC_GPIO, port, pin )
-#define gpio_set_port( port, mask )            Chip_GPIO_SetPortOutHigh( LPC_GPIO, port, mask )
-#define gpio_clr_pin( port, pin )              Chip_GPIO_SetPinOutLow( LPC_GPIO, port, pin )
-#define gpio_clr_port( port, mask )            Chip_GPIO_SetPortOutLow( LPC_GPIO, port, mask )
+
+/**
+ * @brief       Set an individual GPIO output pin to the high state
+ * @param       port    : GPIO Port number where pin is located
+ * @param       pin     : pin number
+ * @note        This commands only applies for pins selected as outputs. Writing '0' shouldn't affect the pin state
+ */
+#define gpio_set_pin_high( port, pin )         Chip_GPIO_SetPinOutHigh( LPC_GPIO, port, pin )
+
+/**
+ * @brief       Set selected GPIO output pins to the high state
+ * @param       port    : GPIO Port number where pin is located
+ * @param       mask    : Selected pins to set high
+ * @note        This commands only applies for pins selected as outputs. Writing '0' shouldn't affect the pin state
+ */
+#define gpio_set_port_high( port, mask )       Chip_GPIO_SetPortOutHigh( LPC_GPIO, port, mask )
+
+/**
+ * @brief       Set an individual GPIO output pin to the high state
+ * @param       port    : GPIO Port number where pin is located
+ * @param       pin     : pin number
+ * @note        This commands only applies for pins selected as outputs. Writing '0' shouldn't affect the pin state
+ */
+#define gpio_set_pin_low( port, pin )          Chip_GPIO_SetPinOutLow( LPC_GPIO, port, pin )
+
+/**
+ * @brief       Set selected GPIO output pins to the high state
+ * @param       port    : GPIO Port number where pin is located
+ * @param       mask    : Selected pins to set high
+ * @note        This commands only applies for pins selected as outputs. Writing '0' shouldn't affect the pin state
+ */
+#define gpio_set_port_low( port, mask )        Chip_GPIO_SetPortOutLow( LPC_GPIO, port, mask )
+
 #define gpio_pin_toggle( port, pin )           Chip_GPIO_SetPinToggle( LPC_GPIO, port, pin )
 #define gpio_set_pin_state( port, pin, state ) Chip_GPIO_SetPinState( LPC_GPIO, port, pin, state )
 #define gpio_set_pin_dir( port, pin, dir )     Chip_GPIO_SetPinDIR( LPC_GPIO, port, pin, dir )
