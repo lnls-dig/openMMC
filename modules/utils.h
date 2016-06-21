@@ -25,6 +25,8 @@
  * @author Henrique Silva
  */
 
+#include "FreeRTOS.h"
+
 /**
  * @brief Stringify a macro
  *
@@ -53,7 +55,7 @@
  *
  * @return Tick difference between arguments
  */
-uint32_t getTickDifference( uint32_t current_time, uint32_t start_time );
+TickType_t getTickDifference( TickType_t current_time, TickType_t start_time );
 
 /**
  * @brief Calculate a n-byte message 2's complement checksum.
