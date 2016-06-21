@@ -274,11 +274,11 @@ void amc_led_act( uint8_t id, uint8_t action )
 {
     switch( action ) {
     case LEDACT_TURN_ON:
-        gpio_clr_pin( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        gpio_set_pin_low( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
         break;
 
     case LEDACT_TURN_OFF:
-        gpio_set_pin( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        gpio_set_pin_high( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
         break;
 
     case LEDACT_TOGGLE:

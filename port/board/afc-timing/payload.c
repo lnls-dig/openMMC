@@ -75,10 +75,10 @@ void EINT2_IRQHandler( void )
 
     /* Simple debouncing routine */
     /* If the last interruption happened in the last 200ms, this one is only a bounce, ignore it and wait for the next interruption */
-    if (getTickDifference(current_time, last_time) > DEBOUNCE_TIME) {
-        gpio_clr_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+    if ( getTickDifference( current_time, last_time ) > DEBOUNCE_TIME ) {
+        gpio_set_pin_low( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
         asm("NOP");
-        gpio_set_pin(GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN);
+        gpio_set_pin_high( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
 
         last_time = current_time;
     }
@@ -88,26 +88,20 @@ void EINT2_IRQHandler( void )
 
 void setDC_DC_ConvertersON( bool on )
 {
-    bool _on = on;
+    gpio_set_pin_state( GPIO_EN_FMC1_PVADJ_PORT, GPIO_EN_FMC1_PVADJ_PIN, on );
+    //gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, on );
+    gpio_set_pin_state( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, on );
 
-    /* @todo: check vadj relationship */
-    bool _on_fmc1 = false | on;
-    bool _on_fmc2 = false | on;
-
-    gpio_set_pin_state( GPIO_EN_FMC1_PVADJ_PORT, GPIO_EN_FMC1_PVADJ_PIN, _on_fmc1 );
-    //gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, _on_fmc1 );
-    gpio_set_pin_state( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, _on_fmc1 );
-
-    gpio_set_pin_state( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, _on_fmc2 );
-    gpio_set_pin_state( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, _on_fmc2 );
-    gpio_set_pin_state( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, _on_fmc2 );
+    gpio_set_pin_state( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, on );
+    gpio_set_pin_state( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, on );
+    gpio_set_pin_state( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, on );
 
 
-    gpio_set_pin_state( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, _on );
-    gpio_set_pin_state( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, _on ); // <- this one causes problems if not switched off before power loss
-    gpio_set_pin_state( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, _on );
-    gpio_set_pin_state( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, _on );
-    gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, _on );
+    gpio_set_pin_state( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, on );
+    gpio_set_pin_state( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, on ); // <- this one causes problems if not switched off before power loss
+    gpio_set_pin_state( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, on );
+    gpio_set_pin_state( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, on );
+    gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, on );
 }
 
 void initializeDCDC( void )
@@ -228,9 +222,9 @@ void vTaskPayload( void *pvParameters )
         } else if ( current_evt & PAYLOAD_MESSAGE_COLD_RST ) {
             state = PAYLOAD_SWITCHING_OFF;
         } else if ( current_evt & PAYLOAD_MESSAGE_REBOOT ) {
-            gpio_clr_pin( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
+            gpio_set_pin_low( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
             asm("NOP");
-            gpio_set_pin( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
+            gpio_set_pin_high( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
         }
 
         FPGA_boot_DONE = gpio_read_pin( GPIO_DONE_B_PORT, GPIO_DONE_B_PIN );
