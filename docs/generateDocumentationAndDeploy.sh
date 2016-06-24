@@ -46,7 +46,7 @@ mkdir code_docs
 cd code_docs
 
 # Get the current gh-pages branch
-git clone -b gh-pages https://git@$GH_REPO_REF
+git clone -b gh-pages https://$GH_REPO_TOKEN@$GH_REPO_REF
 cd $GH_REPO_NAME
 
 ##### Configure git.
@@ -82,7 +82,7 @@ doxygen $DOXYFILE 2>&1 | tee doxygen.log
 # both exist. This is a good indication that Doxygen did it's work.
 if [ -d "html" ] && [ -f "html/index.html" ]; then
 
-    echo 'Uploading documentation to the gh-pages branch...'
+    #echo 'Uploading documentation to the gh-pages branch...'
     # Add everything in this directory (the Doxygen code documentation) to the
     # gh-pages branch.
     # GitHub is smart enough to know which files have changed and which files have
@@ -96,7 +96,7 @@ if [ -d "html" ] && [ -f "html/index.html" ]; then
     # Force push to the remote gh-pages branch.
     # The ouput is redirected to /dev/null to hide any sensitive credential data
     # that might otherwise be exposed.
-    git push --force "https://${GH_REPO_TOKEN}@${GH_REPO_REF}" > /dev/null 2>&1
+    git push -fq origin gh-pages > /dev/null 2>&1
 else
     echo '' >&2
     echo 'Warning: No documentation (html) files have been found!' >&2
