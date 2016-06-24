@@ -1,3 +1,5 @@
+sudo: false
+
 notifications:
   email: false
 
@@ -5,7 +7,6 @@ notifications:
 branches:
   only:
     - master
-    - devel
 
 language: c
 
@@ -17,10 +18,30 @@ before_script:
   - sudo apt-get install -y cmake -qq
 
 env:
+  global:
+    - GH_REPO_NAME: openmmc
+    - DOXYFILE: $TRAVIS_BUILD_DIR/docs/Doxyfile
+    - GH_REPO_REF: github.com/lnls-dig/openmmc.git
   matrix:
   - BOARD='afc'        -VERSION='3.0' -RTM=''
   - BOARD='afc'        -VERSION='3.1' -RTM='rtm-8sfp'
   - BOARD='afc-timing' -VERSION=''    -RTM='rtm-8sfp'
 
+# Install dependencies
+addons:
+  apt:
+    packages:
+      - doxygen
+      - doxygen-doc
+      - doxygen-latex
+      - doxygen-gui
+      - graphviz
+
 script:
   - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Release && make
+
+  # Generate and deploy documentation
+after_success:
+  - cd $TRAVIS_BUILD_DIR/docs
+  - chmod +x generateDocumentationAndDeploy.sh
+  - ./generateDocumentationAndDeploy.sh
