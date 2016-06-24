@@ -98,7 +98,6 @@ void ssp_write_read( uint8_t id, uint8_t *tx_buf, uint32_t tx_len, uint8_t *rx_b
 #define ssp_flush_rx(id)                              Chip_SSP_Int_FlushData(SSP(id))
 #define ssp_set_bitrate(id, bitrate)                  Chip_SSP_SetBitRate(SSP(id), bitrate)
 #define ssp_write(id, buffer, buffer_len)             ssp_write_read(id, buffer, buffer_len, NULL, 0, 0)
-#define ssp_read(id, buffer, buffer_lenm, timeout)    ssp_write_read(id, NULL, 0, buffer, buffer_len, timeout)
-
+#define ssp_read(id, buffer, buffer_len, timeout)     ssp_write_read(id, NULL, 0, buffer, buffer_len, timeout)
 
 #endif
