@@ -19,21 +19,52 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/*!
+/**
  * @file uart_debug.c
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date May 2016
+ *
  * @brief UART interface implementation
  */
 
 #include "port.h"
 
+/**
+ * @brief Initialize UART port to work as a Debug output
+ *
+ * @param baud Baud-rate to use in the UART port
+ *
+ * @return None
+ */
 void uart_debug_init( uint32_t baud );
+
+/**
+ * @brief Print formatted string to UART port
+ *
+ * @param id UART interface id
+ * @param format Formatted string
+ */
 void uart_printf( uint8_t id, const char *format, ... );
 
 #ifdef MODULE_UART_DEBUG
 
+/**
+ * @brief Macro to call uart debug printf function
+ *
+ * @warning When MODULE_UART_DEBUG is not defined, this macro simply throws out its args and do nothing
+ *
+ * @param msg Formatted string to print
+ *
+ */
 #define DEBUG_MSG(msg, ...) uart_printf(UART_DEBUG, msg, ##__VA_ARGS__)
+
+/**
+ * @brief Macro to call uart send char function
+ *
+ * @warning When MODULE_UART_DEBUG is not defined, this macro simply throws out its args and do nothing
+ *
+ * @param msg Char to print
+ *
+ */
 #define DEBUG_CH(ch) uart_send_char(UART_DEBUG, ch)
 
 #else

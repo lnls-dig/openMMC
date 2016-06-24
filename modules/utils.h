@@ -47,7 +47,7 @@
 /**
  * @brief Calculate the difference between 2 tick values
  *
- * Since he tick counter can overflow, we need to check if the current value is higher than the start time before performing any calculations.
+ * Since the tick counter can overflow, we need to check if the current value is higher than the start time before performing any calculations.
  * The Tick counter is expected to overflow at the portMAX_DELAY value
  *
  * @param current_time Current tick count

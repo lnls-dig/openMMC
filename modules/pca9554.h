@@ -19,30 +19,159 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file   pca9554.h
+ * @author Henrique Silva <henrique.silva@lnls.br>
+ *
+ * @brief  PCA9554 module interface functions declarations
+ *
+ * @ingroup PCA9554
+ */
+
 #ifndef PCA9554_H_
 #define PCA9554_H_
 
+/**
+ * @defgroup PCA9554 PCA9554 8-bit I2C/SMBus I/O Expander Module
+ */
+
+/**
+ * @defgroup PCA9554_REGS PCA9554 Registers
+ * @ingroup PCA9554
+ * @{
+ */
+
+/**
+ * @brief PCA9554 Input port status register (Read only)
+ * @note Default register value is not defined
+ */
 #define PCA9554_INPUT_REG       0
+
+/**
+ * @brief PCA9554 Output port register (Read/write)
+ * @note Default register value = 0xFF
+ */
 #define PCA9554_OUTPUT_REG      1
+
+/**
+ * @brief PCA9554 Polarity Inversion register (Read/write)
+ * @note Default register value = 0x00
+ */
 #define PCA9554_POLARITY_REG    2
+
+/**
+ * @brief PCA9554 Configuration register (Read/write)
+ * @note Default register value = 0xFF
+ */
 #define PCA9554_CFG_REG         3
 
+/**
+ * @}
+ */
+
+
 /* Pins Read/Write */
+/**
+ * @brief Read all pins status
+ *
+ * @return 8-bit value with the pins status
+ */
 uint8_t pca9554_read_port( void );
+
+/**
+ * @brief Read a pin status
+ *
+ * @param pin Selected pin to read
+ *
+ * @return Pin logical status
+ */
 uint8_t pca9554_read_pin( uint8_t pin );
+
+/**
+ * @brief Write all output pins
+ *
+ * @param data 8-bit value with the pins status
+ *
+ * @return None
+ */
 void pca9554_write_port( uint8_t data );
-void pca9554_write_pin( uint8_t pin, uint8_t data );
+
+/**
+ * @brief Write a output pin
+ *
+ * @param pin Selected pin to write
+ * @param data Logical status to be set
+ *
+ * @return None
+ */
+void pca9554_write_pin( uint8_t pin, bool data );
 
 /* Polarity Control */
+/**
+ * @brief Set all pins polarity
+ *
+ * @param pol Polarity (active-high/low)
+ */
 void pca9554_set_port_pol( uint8_t pol );
-void pca9554_set_pin_pol( uint8_t pin, uint8_t pol );
+
+/**
+ * @brief Set pin polarity
+ *
+ * @param pin Selected pin
+ * @param pol Pin Polarity (active-high/low)
+ */
+void pca9554_set_pin_pol( uint8_t pin, bool pol );
+
+/**
+ * @brief Read all pins polarity
+ *
+ * @return Pins polarity (active-high/low)
+ */
 uint8_t pca9554_get_port_pol( void );
-uint8_t pca9554_get_pin_pol( uint8_t pin );
+
+/**
+ * @brief Read pin polarity
+ *
+ * @param pin Selected pin
+ *
+ * @return Pin polarity value
+ */
+bool pca9554_get_pin_pol( uint8_t pin );
 
 /* Pins direction (output/input) */
+/**
+ * @brief Set all pins direction
+ *
+ * @param dir Pin direction ( 0-Output 1-Input )
+ *
+ * @return None
+ */
 void pca9554_set_port_dir( uint8_t dir );
-void pca9554_set_pin_dir( uint8_t pin, uint8_t dir );
+
+/**
+ * @brief Set pin direction
+ *
+ * @param pin Selected pin
+ * @param dir Pin direction ( 0-Output 1-Input )
+ *
+ * @return None
+ */
+void pca9554_set_pin_dir( uint8_t pin, bool dir );
+
+/**
+ * @brief Read all pins direction
+ *
+ * @return 8-bit value with the pins direction setup
+ */
 uint8_t pca9554_get_port_dir( void );
-uint8_t pca9554_get_pin_dir( uint8_t pin );
+
+/**
+ * @brief Read pin direction
+ *
+ * @param pin Selected pin
+ *
+ * @return Pin direction
+ */
+bool pca9554_get_pin_dir( uint8_t pin );
 
 #endif

@@ -33,6 +33,9 @@
 #define SCANSTA_ADDR6_PIN       6
 #define SCANSTA_RST_PIN         7
 
+/**
+ * @brief Initialize and configure SCANSTA addr pins
+ */
 void scansta_init( void );
 
 #endif

@@ -35,7 +35,7 @@
 
 void rtm_enable_payload_power( void )
 {
-    gpio_set_pin_state(GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 1 );
+    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 1 );
     /* Debug LEDs */
     pca9554_write_pin( RTM_GPIO_LED_RED, 1 );
     pca9554_write_pin( RTM_GPIO_LED_BLUE, 1 );
@@ -44,7 +44,7 @@ void rtm_enable_payload_power( void )
 
 void rtm_disable_payload_power( void )
 {
-    gpio_set_pin_state(GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 0 );
+    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 0 );
     /* Debug LEDs */
     pca9554_write_pin( RTM_GPIO_LED_RED, 0 );
     pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
@@ -104,7 +104,7 @@ void rtm_disable_i2c( void )
     gpio_set_pin_dir( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, INPUT );
 }
 
-Bool rtm_compatibility_check( void )
+bool rtm_compatibility_check( void )
 {
     uint8_t i;
     size_t rec_sz[2];
@@ -151,7 +151,7 @@ Bool rtm_compatibility_check( void )
     return false;
 }
 
-Bool rtm_quiesce( void )
+bool rtm_quiesce( void )
 {
     /* In this board, no action is needed to quiesce */
     return true;

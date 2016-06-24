@@ -23,6 +23,9 @@
 #define _HOTSWAP_H_
 
 #include "sdr.h"
+#ifdef MODULE_RTM
+#include "rtm_user.h"
+#endif
 
 #define DEBOUNCE_TIME 250
 

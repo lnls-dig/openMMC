@@ -65,6 +65,11 @@ typedef struct {
 #endif
 } LPC_IOCON_T;
 
+/** @defgroup IOCON_17XX_40XX_MODE_FUNC: LPC17xx/40xx I/O configuration mode and functions
+ * @ingroup IOCON_17XX_40XX CHIP
+ * @{
+ */
+
 /**
  * IOCON function and mode selection definitions
  * See the User Manual for specific modes and functions supoprted by the
@@ -142,6 +147,10 @@ typedef struct {
 #define FUNC6					0x6				/** Function 6	*/
 #define FUNC7					0x7				/** Function 7	*/
 #endif /* defined(CHIP_LPC175X_6X)*/
+
+/**
+ * @}
+ */
 
 /**
  * @brief	Initialize the IOCON peripheral

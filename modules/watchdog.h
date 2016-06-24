@@ -19,11 +19,56 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file   watchdog.h
+ * @author Henrique Silva <henrique.silva@lnls.br>
+ *
+ * @brief Watchdog module definitions
+ *
+ */
+
 #ifndef WATCHDOG_H_
 #define WATCHDOG_H_
 
+/**
+ * @brief Watchdog module clock frequency (in Hz)
+ */
+#define WATCHDOG_CLK_FREQ       8000000
+
+/**
+ * @brief Watchdog timer timeout (in ms)
+ */
+#define WATCHDOG_TIMEOUT        1000    /* in milisseconds */
+
+/**
+ * @brief Watchdog timer feed delay
+ *
+ * We reload the watchdog timer at 2/3 of the max count
+ */
+#define WATCHDOG_FEED_DELAY     (WATCHDOG_TIMEOUT/3)*2
+
+
+/**
+ * @brief Initializes and configures Watchdog timer
+ *
+ * @return None
+ */
 void watchdog_init( void );
-void WatchdogTask( void * Parameters );
+
+/**
+ * @brief Schedules a Reset on the next run of the Watchdog task
+ *
+ * @return None
+ */
 void watchdog_reset_mcu( void );
+
+/**
+ * @brief Periodically feed the Watchdog timer and checks if there's any Reset requests
+ *
+ * @param Parameters Pointer to a buffer of parameters passed to the task upon initialization
+ *
+ * @return None
+ */
+void WatchdogTask( void * Parameters );
 
 #endif

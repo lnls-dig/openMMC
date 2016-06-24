@@ -22,7 +22,19 @@
 #ifndef AD84XX_H_
 #define AD84XX_H_
 
+/**
+ * @brief Initializes AD84XX DAC interface
+ *
+ * @note This module uses legacy SPI and controls SSEL as a GPIO
+ */
 void dac_vadj_init( void );
+
+/**
+ * @brief Configure the output value of AD84XX
+ *
+ * @param addr Selects which potentiometer will be set
+ * @param val Value to be set
+ */
 void dac_vadj_config( uint8_t addr, uint8_t val );
 
 #endif

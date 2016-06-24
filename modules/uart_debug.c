@@ -19,10 +19,9 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/*!
+/**
  * @file uart_debug.c
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date May 2016
  *
  * @brief UART interface implementation
  */

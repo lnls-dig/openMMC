@@ -17,10 +17,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*!
+/**
  * @file lpc17_ssp.c
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date March 2016
  *
  * @brief SSP driver definitions for LPC17xx
  */
@@ -33,7 +32,14 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+/**
+ * @brief SSP Interfaces count in LPC17xx
+ */
 #define MAX_SSP_INTERFACES      3
+
+/**
+ * @brief Macro to retrieve the pointer to LPC_SSP registers based on id number
+ */
 #define SSP(n)                  LPC_SSP##n
 
 #define SSP_SLAVE        0
@@ -41,27 +47,36 @@
 #define SSP_INTERRUPT    0
 #define SSP_POLLING      1
 
+/**
+ * @brief Slave select states
+ */
 enum ssel_state {
     ASSERT = 0,
     DEASSERT
 };
 
+/**
+ * @brief SSP Pins configuration
+ */
 typedef struct ssp_pin {
-    uint8_t port;
-    uint8_t sck_pin;
-    uint8_t sck_mode;
-    uint8_t sck_func;
-    uint8_t mosi_pin;
-    uint8_t mosi_mode;
-    uint8_t mosi_func;
-    uint8_t miso_pin;
-    uint8_t miso_mode;
-    uint8_t miso_func;
-    uint8_t ssel_pin;
-    uint8_t ssel_mode;
-    uint8_t ssel_func;
+    uint8_t port;             /**< Port number where the SSP interface is located */
+    uint8_t sck_pin;          /**< Serial Clock (SCK) pin number */
+    uint8_t sck_mode;         /**< Serial Clock (SCK) pin mode */
+    uint8_t sck_func;         /**< Serial Clock (SCK) pin function */
+    uint8_t mosi_pin;         /**< Master Out Slave In (MOSI) pin number */
+    uint8_t mosi_mode;        /**< Master Out Slave In (MOSI) pin mode */
+    uint8_t mosi_func;        /**< Master Out Slave In (MOSI) pin function */
+    uint8_t miso_pin;         /**< Master In Slave Out (MISO) pin number */
+    uint8_t miso_mode;        /**< Master In Slave Out (MISO) pin mode */
+    uint8_t miso_func;        /**< Master In Slave Out (MISO) pin function */
+    uint8_t ssel_pin;         /**< Slave Select (SSEL) pin number */
+    uint8_t ssel_mode;        /**< Slave Select (SSEL) pin mode */
+    uint8_t ssel_func;        /**< Slave Select (SSEL) pin function */
 } ssp_pin_t;
 
+/**
+ * @brief SSP Interface config struct
+ */
 typedef struct ssp_config {
     LPC_SSP_T * lpc_id;
     IRQn_Type irq;

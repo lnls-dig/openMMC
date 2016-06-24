@@ -19,6 +19,15 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file   pca9554.c
+ * @author Henrique Silva <henrique.silva@lnls.br>
+ *
+ * @brief  PCA9554 module interface functions implementations
+ *
+ * @ingroup PCA9554
+ */
+
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
 
@@ -28,7 +37,13 @@
 #include "i2c.h"
 #include "i2c_mapping.h"
 
-/* General Register write/read */
+/**
+ * @brief  PCA9554 General register read
+ *
+ * @param  reg Selected register
+ *
+ * @return Register value
+ */
 static uint8_t pca9554_read_reg ( uint8_t reg )
 {
     uint8_t i2c_addr;
@@ -42,6 +57,14 @@ static uint8_t pca9554_read_reg ( uint8_t reg )
     return rx;
 }
 
+/**
+ * @brief PCA9554 General register write
+ *
+ * @param reg   Selected register
+ * @param data  Value to write to register
+ *
+ * @return None
+ */
 static void pca9554_write_reg ( uint8_t reg, uint8_t data )
 {
     uint8_t i2c_addr;
@@ -74,7 +97,7 @@ void pca9554_write_port( uint8_t data )
     pca9554_write_reg( PCA9554_OUTPUT_REG, data );
 }
 
-void pca9554_write_pin( uint8_t pin, uint8_t data )
+void pca9554_write_pin( uint8_t pin, bool data )
 {
     uint8_t output;
 
@@ -91,7 +114,7 @@ void pca9554_set_port_pol( uint8_t pol )
     pca9554_write_reg( PCA9554_POLARITY_REG, pol );
 }
 
-void pca9554_set_pin_pol( uint8_t pin, uint8_t pol )
+void pca9554_set_pin_pol( uint8_t pin, bool pol )
 {
     uint8_t pol_reg;
 
@@ -107,7 +130,7 @@ uint8_t pca9554_get_port_pol( void )
     return pca9554_read_reg( PCA9554_POLARITY_REG );
 }
 
-uint8_t pca9554_get_pin_pol( uint8_t pin )
+bool pca9554_get_pin_pol( uint8_t pin )
 {
     uint8_t port_pol;
 
@@ -122,7 +145,7 @@ void pca9554_set_port_dir( uint8_t dir )
     pca9554_write_reg( PCA9554_CFG_REG, dir );
 }
 
-void pca9554_set_pin_dir( uint8_t pin, uint8_t dir )
+void pca9554_set_pin_dir( uint8_t pin, bool dir )
 {
     uint8_t dir_reg;
 
@@ -138,7 +161,7 @@ uint8_t pca9554_get_port_dir( void )
     return pca9554_read_reg( PCA9554_CFG_REG );
 }
 
-uint8_t pca9554_get_pin_dir( uint8_t pin )
+bool pca9554_get_pin_dir( uint8_t pin )
 {
     uint8_t port_dir;
 
