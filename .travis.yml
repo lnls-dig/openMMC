@@ -20,7 +20,7 @@ before_script:
 env:
   global:
     - GH_REPO_NAME: openmmc
-    - DOXYFILE: $TRAVIS_BUILD_DIR/docs/Doxyfile
+    - DOXYFILE: $TRAVIS_BUILD_DIR/docs/Doxyfile.dox
     - GH_REPO_REF: github.com/lnls-dig/openmmc.git
   matrix:
   - BOARD='afc'        -VERSION='3.0' -RTM=''
