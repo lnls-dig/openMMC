@@ -37,6 +37,8 @@ void rtm_check_presence( uint8_t *status );
 void rtm_hardware_init( void );
 void rtm_ctrl_led( uint8_t id, uint8_t state );
 uint8_t rtm_read_led( uint8_t id );
+bool rtm_quiesce( void );
+bool rtm_compatibility_check( void );
 
 /* User defined functions */
 void rtm_enable_i2c( void );

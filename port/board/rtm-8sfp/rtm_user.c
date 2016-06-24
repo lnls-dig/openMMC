@@ -22,7 +22,6 @@
 /* Project includes */
 #include "port.h"
 #include "rtm.h"
-#include "rtm_user.h"
 #include "pca9554.h"
 #include "pin_mapping.h"
 #include "hotswap.h"

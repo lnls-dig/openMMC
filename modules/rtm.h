@@ -41,9 +41,5 @@
  * @return None
  */
 void rtm_manage_init( void );
-void rtm_enable_payload_power( void );
-uint8_t rtm_get_hotswap_handle_status( void );
-Bool rtm_compatibility_check( void );
-Bool rtm_quiesce( void );
 
 #endif
