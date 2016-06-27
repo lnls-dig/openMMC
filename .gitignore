@@ -61,5 +61,4 @@ CMakeCache.txt
 out/*
 
 #Doxygen output
-doc/
-*.html
+*html*
