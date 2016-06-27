@@ -19,6 +19,15 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file lm75.c
+ * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
+ *
+ * @brief Interface functions for LM75 I2C Temperature Sensor
+ *
+ * @ingroup LM75
+ */
+
 /* FreeRTOS Includes */
 #include "FreeRTOS.h"
 #include "task.h"

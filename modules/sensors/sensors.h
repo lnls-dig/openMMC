@@ -19,6 +19,19 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @defgroup SENSORS Sensors implementations
+ */
+
+/**
+ * @file sensors.h
+ * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
+ *
+ * @brief Shortcut to include all sensors headers (not mandatory, user can include each sensor separately)
+ *
+ * @ingroup SENSORS
+ */
+
 #ifndef SENSORS_H_
 #define SENSORS_H_
 

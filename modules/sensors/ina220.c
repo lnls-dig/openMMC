@@ -19,12 +19,13 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/*!
+/**
  * @file ina220.c
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
  *
- * @brief DCDCs Voltage reading using INA220 sensor
+ * @brief INA220 interface implementation
+ *
+ * @ingroup INA220
  */
 
 /* FreeRTOS Includes */

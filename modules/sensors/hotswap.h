@@ -19,6 +19,20 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @defgroup HOTSWAP Hotswap Sensor
+ * @ingroup SENSORS
+ */
+
+/**
+ * @file hotswap.h
+ * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
+ *
+ * @brief Hotswap sensors definitions
+ *
+ * @ingroup HOTSWAP
+ */
+
 #ifndef _HOTSWAP_H_
 #define _HOTSWAP_H_
 
@@ -54,12 +68,54 @@ enum {
     HOTSWAP_RTM
 };
 
+/**
+ * @brief Hotswap Task handle
+ */
 TaskHandle_t vTaskHotSwap_Handle;
 
+/**
+ * @brief Periodically reads the Hotswap sensor state and checks if its state has changed
+ *
+ * @param Parameters Pointer to parameter list passed to task upon initialization (not used here)
+ */
 void vTaskHotSwap( void *Parameters );
+
+/**
+ * @brief Initializes hotswap sensor informatiosn on SDR and creates #vTaskHotSwap
+ *
+ * @return None
+ */
 void hotswap_init( void );
+
+/**
+ * @brief Send a hotswap event via IPMB
+ *
+ * @param sensor Pointer to current Hotswap sensor structure
+ * @param evt Event to be sent
+ *
+ * @return IPMB layer error
+ * @see ipmb.c
+ */
 ipmb_error hotswap_send_event( sensor_t *sensor, uint8_t evt );
+
+/**
+ * @brief Sets the corresponding status bit in the Hotswap SDR readout value
+ *
+ * @param fru FRU ID that identifies the owner of the sensor
+ * @param mask Bit position to set
+ *
+ * @return None
+ */
 void hotswap_set_mask_bit( uint8_t fru, uint8_t mask );
+
+/**
+ * @brief Clears the corresponding status bit in the Hotswap SDR readout value
+ *
+ * @param fru FRU ID that identifies the owner of the sensor
+ * @param mask Bit position to clear
+ *
+ * @return None
+ */
 void hotswap_clear_mask_bit( uint8_t fru, uint8_t mask );
 
 #endif
