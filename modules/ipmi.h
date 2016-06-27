@@ -495,6 +495,12 @@
  * @}
  */
 
+/* FRU Control codes */
+#define FRU_CTLCODE_COLD_RST					(1 << 0)
+#define FRU_CTLCODE_WARM_RST					(1 << 1)
+#define FRU_CTLCODE_REBOOT					(1 << 2)
+#define FRU_CTLCODE_QUIESCE					(1 << 3)
+
 /**
  * @brief IPMI Handler function type definition
  *
