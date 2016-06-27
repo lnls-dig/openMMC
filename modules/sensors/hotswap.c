@@ -39,7 +39,6 @@
 #include "led.h"
 #include "fru.h"
 #include "utils.h"
-#include "rtm.h"
 
 static uint8_t hotswap_get_handle_status( void )
 {
