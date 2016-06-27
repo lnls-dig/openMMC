@@ -170,20 +170,16 @@ IPMI_HANDLER(ipmi_get_device_id,  NETFN_APP, IPMI_GET_DEVICE_ID_CMD, ipmi_msg *r
 
     rsp->completion_code = IPMI_CC_OK;
 
-    /*! @todo: several bits of hardcoded information. Organize it so it
-      makes more sense and is easier to modify. */
-
-    rsp->data[len++] = 0x0A; /* Dev ID */
-    rsp->data[len++] = 0x02; /* Dev Rev */
-    rsp->data[len++] = 0x05; /* Dev FW Rev UPPER */
-    rsp->data[len++] = 0x50; /* Dev FW Rev LOWER */
-    rsp->data[len++] = 0x02; /* IPMI Version 2.0 */
-    rsp->data[len++] = 0x3B; /* Dev Support */
-    rsp->data[len++] = 0x5A; /* Manufacturer ID LSB */
-    rsp->data[len++] = 0x31; /* Manufacturer ID MSB */
-    rsp->data[len++] = 0x00; /* ID MSB */
-    rsp->data[len++] = 0x01; /* Product ID LSB */
-    rsp->data[len++] = 0x01; /* Product ID MSB */
+    rsp->data[len++] = IPMI_APP_DEV_ID; /* Dev ID */
+    rsp->data[len++] = IPMI_APP_DEV_REV; /* Dev Rev */
+    rsp->data[len++] = IPMI_APP_DEV_FW_REV_UPPER; /* Dev FW Rev UPPER */
+    rsp->data[len++] = IPMI_APP_DEV_FW_REV_LOWER; /* Dev FW Rev LOWER */
+    rsp->data[len++] = IPMI_APP_IPMI_VERSION; /* IPMI Version 2.0 */
+    rsp->data[len++] = IPMI_APP_DEV_SUP; /* Dev Support */
+    rsp->data[len++] = IPMI_APP_MANUF_LSB; /* Manufacturer ID LSB */
+    rsp->data[len++] = IPMI_APP_MANUF_MSB; /* Manufacturer ID MSB */
+    rsp->data[len++] = IPMI_APP_PROD_ID_LSB; /* Product ID LSB */
+    rsp->data[len++] = IPMI_APP_PROD_ID_MSB; /* Product ID MSB */
 
     rsp->data_len = len;
 }

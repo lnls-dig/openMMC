@@ -43,6 +43,86 @@
 #define IPMI_MAX_DATA_LEN 24
 
 /**
+ * @brief Device ID - User-defined
+ * @note 00h: Unspecified
+ */
+#define IPMI_APP_DEV_ID                 0x00
+
+/**
+ * @brief Device Revision
+ *
+ * [7]   (1) = device provides Device SDRs <br>
+ *       (0) = device does not provide Device SDRs <br>
+ * [6:4] reserved. Return as 0. <br>
+ * [3:0] Device Revision, binary encoded.
+ */
+#define IPMI_APP_DEV_REV                0x80
+
+/**
+ * @brief Device Firmware Revision 1
+ *
+ *  [7] Device available: 0=normal operation, 1= device firmware, SDR  <br>
+ *      Repository update or self-initialization in progress. <br>
+ *  [6:0] Major Firmware Revision, binary encoded.
+ */
+#define IPMI_APP_DEV_FW_REV_UPPER       0x01
+
+/**
+ * @brief Device Firmware Revision 2
+ *
+ * Minor Firmware Revision. BCD encoded.
+ */
+#define IPMI_APP_DEV_FW_REV_LOWER       0x00
+
+/**
+ * @brief Supported IPMI Version ( BCD encoded )
+ *
+ * [7:4] Least Significant bits <br>
+ * [3:0] Most Significant bits
+ *
+ * @note 00h = reserved.
+ */
+#define IPMI_APP_IPMI_VERSION           0x02
+
+/**
+ * @brief Additional Device Support
+ *
+ * [7] Chassis Device (device functions as chassis device per ICMB spec.) <br>
+ * [6] Bridge (device responds to Bridge NetFn commands) <br>
+ * [5] IPMB Event Generator (device generates event messages [platform event request messages] onto the IPMB) <br>
+ * [4] IPMB Event Receiver (device accepts event messages [platform event request messages] from the IPMB) <br>
+ * [3] FRU Inventory Device <br>
+ * [2] SEL Device <br>
+ * [1] SDR Repository Device <br>
+ * [0] Sensor Device
+ */
+#define IPMI_APP_DEV_SUP                0x3B
+
+/**
+ * @brief Manufacturer ID LSB
+ *
+ * @note PICMG ID = 0x315A
+ */
+#define IPMI_APP_MANUF_LSB              0x5A
+
+/**
+ * @brief Manufacturer ID MSB
+ *
+ * @note PICMG ID = 0x315A
+ */
+#define IPMI_APP_MANUF_MSB              0x31
+
+/**
+ * @brief Product ID LSB (User-defined)
+ */
+#define IPMI_APP_PROD_ID_LSB            0x00
+
+/**
+ * @brief Product ID MSB (User-defined)
+ */
+#define IPMI_APP_PROD_ID_MSB            0x00
+
+/**
  * @brief PICMG Extension Version
  *
  * Indicates the version of PICMG extensions implemented by this IPM Controller.
