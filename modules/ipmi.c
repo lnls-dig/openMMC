@@ -19,6 +19,14 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file ipmi.c
+ * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
+ *
+ * @brief IPMI module implementation
+ * @ingroup IPMI
+ */
+
 /* C Standard includes */
 #include "string.h"
 
@@ -32,9 +40,19 @@
 #include "uart_debug.h"
 
 /* Local variables */
+/**
+ * @brief Queue that holds the incoming IPMI messages
+ */
 QueueHandle_t ipmi_rxqueue = NULL;
 
+/**
+ * @brief IPMI handlers list start address
+ */
 volatile const t_req_handler_record *ipmiEntries = (t_req_handler_record *) &_ipmi_handlers;
+
+/**
+ * @brief IPMI handlers list end address
+ */
 volatile const t_req_handler_record *ipmiEntries_end = (t_req_handler_record *) &_eipmi_handlers;
 
 void IPMITask( void * pvParameters )
@@ -62,21 +80,21 @@ void IPMITask( void * pvParameters )
             response.completion_code = IPMI_CC_UNSPECIFIED_ERROR;
             response.data_len = 0;
 
-            /* Call user-defined function, give request data and retrieve required response */
-            /* WARNING: Since IPMI task have a high priority, this handler function should not wait other tasks to unblock */
+            /// Call user-defined function, give request data and retrieve required response
+            /** @warning Since IPMI task have a high priority, this handler function should not wait other tasks to unblock */
             req_handler(&req_received, &response);
 
             error_code = ipmb_send_response(&req_received, &response);
 
-            /* In case of error during IPMB response, the MMC may wait for a
+            /** In case of error during IPMB response, the MMC may wait for a
                new command from the MCH. Check this for debugging purposes
                only. */
             configASSERT( (error_code == ipmb_error_success) );
 
         } else {
-            /* If there is no function handler, use data from received
-               message to send "invalid command" response (IPMI table 5-2,
-               page 44). */
+            /** If there is no function handler, use data from received
+	     *  message to send "invalid command" response (IPMI table 5-2,
+	     *  page 44). */
 
             response.completion_code = IPMI_CC_INV_CMD;
             response.data_len = 0;
@@ -136,15 +154,15 @@ ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t 
 }
 
 
-/*!
+/**
  * @brief Handler for GET Device ID command as in IPMI v2.0 section 20.1 for
  * more information.
  *
- * @param req pointer to request message
+ * @param req Pointer to request IPMI message
  *
- * @param rsp pointer to response message
+ * @param rsp Pointer to response IPMI message
  *
- * @return
+ * @return None
  */
 IPMI_HANDLER(ipmi_get_device_id,  NETFN_APP, IPMI_GET_DEVICE_ID_CMD, ipmi_msg *req, ipmi_msg* rsp)
 {

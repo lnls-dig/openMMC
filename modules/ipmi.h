@@ -19,6 +19,18 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file ipmi.h
+ * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
+ *
+ * @brief IPMI module definitions
+ * @ingroup IPMI
+ */
+
+/**
+ * @defgroup IPMI IPMI - Intelligent Platform Management Interface
+ */
+
 #ifndef IPMI_H_
 #define IPMI_H_
 
@@ -64,6 +76,7 @@
 
 /**
  * @defgroup IPMI_CMD IPMI Commands
+ * @ingroup IPMI
  * @{
  */
 
