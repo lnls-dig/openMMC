@@ -32,8 +32,36 @@
 
 #include "wwdt_17xx_40xx.h"
 
+/**
+ * @brief       Initialize the Watchdog timer
+ * @return      None
+ */
 #define wdt_init()                  Chip_WWDT_Init(LPC_WWDT)
+
+/**
+ * @brief       Start the Watchdog timer
+ * @return      None
+ */
 #define wdt_start()                 Chip_WWDT_Start(LPC_WWDT)
+
+/**
+ * @brief       Config the Watchdog timer to reset upon count end
+ * @return      None
+ */
 #define wdt_config()                Chip_WWDT_SetOption(LPC_WWDT, WWDT_WDMOD_WDRESET)
+
+/**
+ * @brief       Set Watchdog Timer max count
+ *
+ * Select the max count for the timer, when this count reaches 0, the chip is reseted
+ *
+ * @param [in]  timeout Max count for Watchdog timer
+ * @return      None
+ */
 #define wdt_set_timeout( timeout )  Chip_WWDT_SetTimeOut(LPC_WWDT, timeout)
+
+/**
+ * @brief       Reload the watchdog counter
+ * @return      None
+ */
 #define wdt_feed()                  Chip_WWDT_Feed(LPC_WWDT)

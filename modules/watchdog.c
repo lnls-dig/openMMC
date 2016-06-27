@@ -19,10 +19,9 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/*!
+/**
  * @file watchdog.c
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date December 2015
  *
  * @brief Reset the uC if it fails to reload the watchdog timer
  */

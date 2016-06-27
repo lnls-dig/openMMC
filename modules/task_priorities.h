@@ -23,7 +23,7 @@
 #define TASK_PRIORITIES_H_
 
 #ifndef tskIDLE_PRIORITY
-#define tskIDLE_PRIORITY 0
+#define tskIDLE_PRIORITY                (0)
 #endif
 
 #define tskLED_PRIORITY                 (tskIDLE_PRIORITY+1)

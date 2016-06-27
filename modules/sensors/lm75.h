@@ -19,17 +19,31 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/*!
+/**
+ * @defgroup LM75 LM75 - Temperature Sensor
+ * @ingroup SENSORS
+ *
+ * The LM75 is a temperature sensor, Delta-Sigma analog-to-digital converter, and digital over-temperature detector with I2C interface.
+ * The host can query the LM75 at any time to read temperature. <br>
+ * The open-drain Overtemperature Shutdown (O.S.) output becomes active when the temperature exceeds a programmable limit.
+ * This pin can operate in either “Comparator” or “Interrupt” mode.
+ */
+
+/**
  * @file lm75.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
  *
  * @brief Definitions for LM75 I2C Temperature Sensor
+ *
+ * @ingroup LM75
  */
 
 #ifndef LM75_H_
 #define LM75_H_
 
+/**
+ * @brief Rate at which the LM75 sensors are read (in ms)
+ */
 #define LM75_UPDATE_RATE        500
 
 TaskHandle_t vTaskLM75_Handle;
@@ -39,7 +53,20 @@ extern const SDR_type_01h_t SDR_LM75_CLOCK_SWITCH;
 extern const SDR_type_01h_t SDR_LM75_DCDC;
 extern const SDR_type_01h_t SDR_LM75_RAM;
 
+/**
+ * @brief Initializes LM75 monitoring task
+ *
+ * @return None
+ */
 void LM75_init( void );
+
+/**
+ * @brief Monitoring task for LM75 sensor
+ *
+ * This task unblocks after every #LM75_UPDATE_RATE ms and updates the read from all the LM75 sensors listed in this module's SDR table
+ *
+ * @param Parameters Pointer to parameter list passed to task upon initialization (not used here)
+ */
 void vTaskLM75( void* Parameters );
 
 #endif

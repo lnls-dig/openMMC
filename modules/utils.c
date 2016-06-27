@@ -19,23 +19,16 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/*! @file utils.c
-  @brief General utilities functions
-  @author Henrique Silva
+/**
+ * @file utils.c
+ * @brief General utilities functions
+ * @author Henrique Silva
 */
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
 #include "utils.h"
 
-/*! @brief Calculate the difference between 2 tick values
- * Since he tick counter can overflow, we need to check if the current value is higher than the start time before performing any calculations.
- * The Tick counter is expected to overflow at the portMAX_DELAY value
- * @param current_time Current tick count
- * @param start_time Start tick count
- *
- * @return Tick difference between arguments
- */
 TickType_t getTickDifference(TickType_t current_time, TickType_t start_time)
 {
     TickType_t result = 0;
@@ -48,17 +41,6 @@ TickType_t getTickDifference(TickType_t current_time, TickType_t start_time)
     return result;
 }
 
-/* Include chksum calculation function */
-
-
-/*! @brief Calculate a n-byte message 2's complement checksum.
- * The checksum byte is calculated by perfoming a simple 8bit 2's complement of the sum of all previous bytes.
- * Since we're using a unsigned int to hold the checksum value, we only need to subtract all bytes from it.
- * @param buffer Pointer to the message bytes.
- * @param range How many bytes will be used in the calculation.
- *
- * @return Checksum of the specified bytes of the buffer.
- */
 uint8_t calculate_chksum ( uint8_t * buffer, uint8_t range )
 {
     configASSERT( buffer != NULL );
@@ -70,8 +52,6 @@ uint8_t calculate_chksum ( uint8_t * buffer, uint8_t range )
     return chksum;
 }
 
-/* Compare two buffers' size and data
- * Returns 0 if equal, 0xFF if different */
 uint8_t cmpBuffs( uint8_t *bufa, size_t len_a, uint8_t *bufb, size_t len_b )
 {
     uint16_t i;

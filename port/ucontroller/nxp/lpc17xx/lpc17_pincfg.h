@@ -17,18 +17,25 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*!
+/**
  * @file lpc17_pincfg.h
- * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date June 2016
+ * @brief Pin Config functions redirection for LPC17xx
  *
- * @brief
+ * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
  */
+
 #ifndef LPC17_PINCFG_H_
 #define LPC17_PINCFG_H_
 
 #include "port.h"
 
+/**
+ * @brief       Sets I/O Control pin mux
+ * @param       port    : GPIO port to mux
+ * @param       pin     : GPIO pin to mux
+ * @param       cfg     : Configuration bits to select pin mode/function
+ * @see IOCON_17XX_40XX_MODE_FUNC
+ */
 #define pin_config(port, pin, cfg) Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin, cfg)
 
 #endif

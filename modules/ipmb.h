@@ -19,10 +19,9 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/*!
+/**
  * @file ipmb.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date August 2015
  *
  * @brief Definitions used in IPMB Layer
  */
@@ -36,32 +35,52 @@
 #include "queue.h"
 #include "semphr.h"
 
-/*! @brief Default I2C interface to use in IPMB protocol */
+/**
+ * @brief Default I2C interface to use in IPMB protocol
+ */
 #define IPMB_I2C                I2C0
 
-/*! @brief Maximum count of messages to be sent */
+/**
+ * @brief I2C Clock Frequency for IPMB - 100kHz
+ */
+#define IPMB_I2C_FREQ 100000
+
+/**
+ * @brief Maximum count of messages to be sent
+ */
 #define IPMB_TXQUEUE_LEN        2
-/*! @brief Maximum count if received messages to be delivered to client task  */
+/**
+ * @brief Maximum count if received messages to be delivered to client task
+ */
 #define IPMB_CLIENT_QUEUE_LEN   2
 
-/*! @brief Maximum retries made by IPMB TX Task when sending a message */
+/**
+ * @brief Maximum retries made by IPMB TX Task when sending a message
+ */
 #define IPMB_MAX_RETRIES        3
 
-/*! @brief Timeout limit between the end of a request and start of a response (defined in IPMB timing specifications)
+/**
+ * @brief Timeout limit between the end of a request and start of a response (defined in IPMB timing specifications)
  */
 #define IPMB_MSG_TIMEOUT        250/portTICK_PERIOD_MS
 
-/*! @brief Timeout limit waiting a free space in client queue to put a received message
+/**
+ * @brief Timeout limit waiting a free space in client queue to put a received message
  */
 #define CLIENT_NOTIFY_TIMEOUT   5
 
-/*! @brief Position of Header cheksum byte in a IPMI message
+/**
+ * @brief Position of Header cheksum byte in a IPMI message
  */
 #define IPMI_HEADER_CHECKSUM_POSITION      2
-/*! @brief Maximum length in bytes of a IPMI message (including connection header)
+
+/**
+ * @brief Maximum length in bytes of a IPMI message (including connection header)
  */
 #define IPMI_MSG_MAX_LENGTH         32
-/*! @brief Length of connection header in a request
+
+/**
+ * @brief Length of connection header in a request
  *
  * The connection header in a request is made by:
  * - rsSA -> Destination Address
@@ -73,9 +92,9 @@
  * - Messagechecksum -> 2's complement of the sum of preceding bytes
  */
 #define IPMB_REQ_HEADER_LENGTH      6
-/* Response header is 1 byte longer because it must include the completion code */
 
-/*! @brief Length of connection header in a response
+/**
+ * @brief Length of connection header in a response
  *
  * The connection header in a response is made by:
  * - rqSA -> Destination Address
@@ -86,80 +105,110 @@
  * - CMD -> Command
  * - CC -> Completion Code
  * - Messagechecksum -> 2's complement of the sum of preceding bytes
+ * @note Response header is 1 byte longer than request's because it must include the completion code
  */
 #define IPMB_RESP_HEADER_LENGTH     7
 
 #define IPMB_NETFN_MASK         0xFC
-#define IPMB_DEST_LUN_MASK      0x3
+#define IPMB_DEST_LUN_MASK      0x03
 #define IPMB_SEQ_MASK           0xFC
-#define IPMB_SRC_LUN_MASK       0x3
+#define IPMB_SRC_LUN_MASK       0x03
 
-/*! @brief MicroTCA's MCH slave address */
+/**
+ * @brief MicroTCA's MCH slave address
+ */
 #define MCH_ADDRESS             0x20
 
-/* @brief Macro to check is the message is a response (odd netfn) */
+/**
+ * @brief Macro to check is the message is a response (odd netfn)
+ */
 #define IS_RESPONSE(msg) (msg.netfn & 0x01)
 
-/*! @brief Size of #IPMBL_TABLE
+/**
+ * @brief Size of #IPMBL_TABLE
  */
 #define IPMBL_TABLE_SIZE                27
 
-/*! @brief GA pins definition */
+/**
+ * @brief Minimum clock cycles to the GPIO pin change take effect on some boards
+ */
+#define GPIO_GA_DELAY 10
+
+/**
+ * @brief GA pins definition
+ */
 typedef enum {
     GROUNDED = 0,
     POWERED,
     UNCONNECTED
-}GA_Pin_state;
+} GA_Pin_state;
 
-/*! @brief IPMI message struct */
+/**
+ * @brief IPMI message struct
+ */
 typedef struct ipmi_msg {
-    uint8_t dest_addr;                  /*!< Destination slave address */
-    uint8_t netfn;                      /*!< Net Function
+    uint8_t dest_addr;                  /**< Destination slave address */
+    uint8_t netfn;                      /**< Net Function
                                          * @see ipmi.h
                                          */
-    uint8_t dest_LUN;                   /*!< Destination LUN (Logical Unit Number) */
-    uint8_t hdr_chksum;                 /*!< Connection Header Checksum */
-    uint8_t src_addr;                   /*!< Source slave address */
-    uint8_t seq;                        /*!< Sequence Number */
-    uint8_t src_LUN;                    /*!< Source LUN (Logical Unit Number) */
-    uint8_t cmd;                        /*!< Command
+    uint8_t dest_LUN;                   /**< Destination LUN (Logical Unit Number) */
+    uint8_t hdr_chksum;                 /**< Connection Header Checksum */
+    uint8_t src_addr;                   /**< Source slave address */
+    uint8_t seq;                        /**< Sequence Number */
+    uint8_t src_LUN;                    /**< Source LUN (Logical Unit Number) */
+    uint8_t cmd;                        /**< Command
                                          * @see ipmi.h
                                          */
-    uint8_t completion_code;            /*!< Completion Code
+    uint8_t completion_code;            /**< Completion Code
                                          * @see ipmi.h
                                          */
-    uint8_t data_len;                   /*!< Amount of valid bytes in #data buffer */
-    uint8_t data[IPMI_MSG_MAX_LENGTH];  /*!< Data buffer <br>
+    uint8_t data_len;                   /**< Amount of valid bytes in #data buffer */
+    uint8_t data[IPMI_MSG_MAX_LENGTH];  /**< Data buffer <br>
                                          * Data field has 24 bytes:
                                          * 32 (Max IPMI msg len) - 7 header bytes - 1 final chksum byte
                                          */
-    uint8_t msg_chksum;                 /*!< Message checksum */
+    uint8_t msg_chksum;                 /**< Message checksum */
 } ipmi_msg;
 
+/**
+ * @brief IPMI message configuration struct
+ *
+ * This struct is used in the IPMB layer in order to keep the informations about the request/response being handled
+ */
 typedef struct ipmi_msg_cfg {
-    ipmi_msg buffer;
-    TaskHandle_t caller_task;
-    uint8_t retries;
-    uint32_t timestamp;
+    ipmi_msg buffer;                    /**< IPMI Message */
+    TaskHandle_t caller_task;           /**< Task to be notified when the send/receive process is done */
+    uint8_t retries;                    /**< Current retry counter */
+    uint32_t timestamp;                 /**< Tick count at the beginning of the process */
 } ipmi_msg_cfg;
 
-/*! @brief IPMB errors enumeration */
+/**
+ * @brief IPMB errors enumeration
+ */
 typedef enum ipmb_error {
-    ipmb_error_unknown = 0,
-    ipmb_error_success,                 /*!< Generic no-error flag  */
-    ipmb_error_failure,                 /*!< Generic failure on IPMB */
-    ipmb_error_timeout,                 /*!< Error raised when a message takes too long to be responded */
-    ipmb_error_invalid_req,             /*!< A invalid request was received */
-    ipmb_error_hdr_chksum,              /*!< Invalid header checksum from incoming message */
-    ipmb_error_msg_chksum,              /*!< Invalid message checksum from incoming message */
-    ipmb_error_queue_creation           /*!< Client queue couldn't be created. Invalid pointer to handler was given */
+    ipmb_error_unknown = 0,             /**< Unknown error */
+    ipmb_error_success,                 /**< Generic no-error flag  */
+    ipmb_error_failure,                 /**< Generic failure on IPMB */
+    ipmb_error_timeout,                 /**< Error raised when a message takes too long to be responded */
+    ipmb_error_invalid_req,             /**< A invalid request was received */
+    ipmb_error_hdr_chksum,              /**< Invalid header checksum from incoming message */
+    ipmb_error_msg_chksum,              /**< Invalid message checksum from incoming message */
+    ipmb_error_queue_creation           /**< Client queue couldn't be created. Invalid pointer to handler was given */
 } ipmb_error;
 
+/**
+ * @brief AMC IPMB Address
+ *
+ * This variable saves this module's IPMB address read through the Geographical Address pins
+ *
+ * @see get_ipmb_addr
+ */
 extern uint8_t ipmb_addr;
 
 /* Function Prototypes */
 
-/*! @brief IPMB Transmitter Task
+/**
+ * @brief IPMB Transmitter Task
  *
  * When #ipmb_send_request or #ipmb_send_response put a message in #ipmb_txqueue, this task unblocks.
  * First step to send a message is differentiating requests from responses. It does this analyzing the parity of NetFN (even for requests, odd for responses).
@@ -177,7 +226,8 @@ extern uint8_t ipmb_addr;
  */
 void IPMB_TXTask ( void *pvParameters );
 
-/*! @brief IPMB Receiver Task
+/**
+ * @brief IPMB Receiver Task
  *
  * Similarly to #IPMB_TXTask, this task remains blocked until a new message is received by the I2C driver. The message passes through checksum checking to assure its integrity. <br>
  * If the message is a request, we have to check if it's a new one or just a retransmission of the last. In order to do this, the sequential number is tested, since every request has a different one.<br>
@@ -193,18 +243,25 @@ void IPMB_TXTask ( void *pvParameters );
  */
 void IPMB_RXTask ( void *pvParameters );
 
-/*! @brief Initializes the IPMB Layer.
+/**
+ * @brief Initializes the IPMB Layer.
  *
  * Configures the I2C Driver, creates the TX queue for the IPMB Task and both IPMB RX and IPMB TX tasks
  */
 void ipmb_init ( void );
 
-/*! @brief Format and send a request via IPMB channel
+/**
+ * @brief Format and send a request via IPMB channel
  */
 ipmb_error ipmb_send_request ( ipmi_msg * req );
+
+/**
+ * @brief Format and send a response via IPMB channel
+ */
 ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp );
 
-/*! @brief Creates and returns a queue in which the client can block to receive the incoming requests.
+/**
+ * @brief Creates and returns a queue in which the client can block to receive the incoming requests.
  *
  * The queue is created and its handler is written at the given pointer (queue).
  * Also keeps a copy of the handler to know where to write the incoming messages.
@@ -216,20 +273,64 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp );
  */
 ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue );
 
+/**
+ * @brief Asserts the input message checksums by comparing them with our calculated ones.
+ *
+ * @param buffer Pointer to the message bytes.
+ * @param buffer_len Size of the message.
+ *
+ * @retval ipmb_error_success The message's checksum bytes are correct, therefore the message is valid.
+ * @retval ipmb_error_hdr_chksum The header checksum byte is invalid.
+ * @retval ipmb_error_hdr_chksum The final checksum byte is invalid.
+ */
 ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len );
 
-/*! @brief Reads own I2C slave address using GA pins
+/**
+ * @brief Reads own I2C slave address using GA pins
  *
  * Based on coreipm/coreipm/mmc.c
  * @author Gokhan Sozmen
- * Reads the GA pins, performing an unconnection checking, to define the device I2C slave address, as specified by MicroTCA documentation.
+ *
+ *  The state of each GA signal is represented by G (grounded), U (unconnected),
+ *  or P (pulled up to Management Power).
+ *
+ *  The MMC drives P1 low and reads the GA lines. The MMC then drives P1 high and
+ *  reads the GA lines. Any line that changes state between the two reads indicate
+ *  an unconnected (U) pin.
+ *
+ *  The IPMB-L address of a Module can be calculated as (70h + Site Number x 2). <br>
+ *  G = 0, P = 1, U = 2 <br>
+ *  | Pin | Ternary | Decimal | Address |
+ *  |:---:|:-------:|:-------:|:-------:|
+ *  | GGG | 000 | 0  | 0x70 |
+ *  | GGP | 001 | 1  | 0x8A |
+ *  | GGU | 002 | 2  | 0x72 |
+ *  | GPG | 010 | 3  | 0x8E |
+ *  | GPP | 011 | 4  | 0x92 |
+ *  | GPU | 012 | 5  | 0x90 |
+ *  | GUG | 020 | 6  | 0x74 |
+ *  | GUP | 021 | 7  | 0x8C |
+ *  | GUU | 022 | 8  | 0x76 |
+ *  | PGG | 100 | 9  | 0x98 |
+ *  | PGP | 101 | 10 | 0x9C |
+ *  | PGU | 102 | 11 | 0x9A |
+ *  | PPG | 110 | 12 | 0xA0 |
+ *  | PPP | 111 | 13 | 0xA4 |
+ *  | PPU | 112 | 14 | 0x88 |
+ *  | PUG | 120 | 15 | 0x9E |
+ *  | PUP | 121 | 16 | 0x86 |
+ *  | PUU | 122 | 17 | 0x84 |
+ *  | UGG | 200 | 18 | 0x78 |
+ *  | UGP | 201 | 19 | 0x94 |
+ *  | UGU | 202 | 20 | 0x7A |
+ *  | UPG | 210 | 21 | 0x96 |
+ *  | UPP | 211 | 22 | 0x82 |
+ *  | UPU | 212 | 23 | 0x80 |
+ *  | UUG | 220 | 24 | 0x7C |
+ *  | UUP | 221 | 25 | 0x7E |
+ *  | UUU | 222 | 26 | 0xA2 |
  *
  * @return 7-bit Slave Address
- *
- * @todo Develop a function to discover the Geographic Address once (checking the GA pins)
- * and store it into a global variable, since everytime a IPMI message is built
- * (request or response) the MMC has to check its own  address to fill the rs/rqSA field,
- * and it takes some time to go through all this function.
  */
 uint8_t get_ipmb_addr( void );
 

@@ -81,7 +81,9 @@ typedef struct __attribute__ ((__packed__)) {
 #endif
 } t_fmc_diag;
 
-/* AFC diagnostic struct sent to FPGA via SPI */
+/**
+ * @brief AFC diagnostic struct sent to FPGA via SPI
+ */
 typedef struct __attribute__ ((__packed__)) {
     uint32_t cardID[4];
     uint32_t slot_id:16,
@@ -96,7 +98,20 @@ typedef union {
     uint32_t buffer[sizeof(board_diagnostic)/sizeof(uint32_t)];
 } t_board_diagnostic;
 
+/**
+ * @brief FPGA Diagnostics Task
+ *
+ * This task formats all sensors information and sends to the FPGA via SPI.
+ * All the information is accessed by the FPGA using the Wishbone stream.
+ *
+ * @param Parameters Pointer to parameters passed to the task upon initialization.
+ */
 void vTaskFPGA_COMM( void * Parameters );
+
+/**
+ * @brief Initializes the FPGA Diagnostics Task
+ *
+ */
 void fpga_spi_init( void );
 
 #endif
