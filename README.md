@@ -1,4 +1,5 @@
-# openMMC [![Build Status](https://travis-ci.org/lnls-dig/openMMC.svg?branch=master)](https://travis-ci.org/lnls-dig/openMMC)
+# openMMC {#mainpage}
+@image html "https://travis-ci.org/lnls-dig/openMMC.svg?branch=master"
 Open Source modular IPM Controller firmware
 
 ## Installation:

@@ -1,9 +1,7 @@
 /*
- * board_defs.h
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   AFCIPMI  --
- *
- *   Copyright (C) 2015  Henrique Silva <henrique.silva@lnls.br>
+ *   Copyright (C) 2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,10 +15,30 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef BOARD_DEFS_H_
-#define BOARD_DEFS_H_
+/**
+ * @defgroup AFC_TIMING AFC-Timing Board Port
+ * @ingroup BOARD_PORTS
+ */
+
+/**
+ * @file afc-timing/pin_mapping.h
+ * @brief Hardware pin definitions for AFC-Timing
+ *
+ * @ingroup AFC_TIMING_PIN_MAPPING
+ */
+
+/**
+ * @defgroup AFC_TIMING_PIN_MAPPING AFC-Timing Pin Mapping
+ * @ingroup AFC_TIMING
+ * @{
+ */
+
+#ifndef PIN_MAPPING_H_
+#define PIN_MAPPING_H_
 
 /* SPI Interfaces */
 #define FPGA_SPI        0
@@ -151,5 +169,9 @@
 #define UART_DEBUG_PORT         4
 #define UART_DEBUG_TXD_PIN      28
 #define UART_DEBUG_RXD_PIN      29
+
+/**
+ * @}
+ */
 
 #endif

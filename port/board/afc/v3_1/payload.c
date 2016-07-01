@@ -86,6 +86,13 @@ void EINT2_IRQHandler( void )
     LPC_SYSCTL->EXTINT |= (1 << 2);
 }
 
+/**
+ * @brief Set AFC's DCDC Converters state
+ *
+ * @param on DCDCs state
+ *
+ * @warning The FMC1_P12V DCDC is not affected by this function since it has to be always on in order to measure the Payload power status on the AFC board.
+ */
 void setDC_DC_ConvertersON( bool on )
 {
     gpio_set_pin_state( GPIO_EN_FMC1_PVADJ_PORT, GPIO_EN_FMC1_PVADJ_PIN, on );
@@ -96,7 +103,6 @@ void setDC_DC_ConvertersON( bool on )
     gpio_set_pin_state( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, on );
     gpio_set_pin_state( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, on );
 
-
     gpio_set_pin_state( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, on );
     gpio_set_pin_state( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, on ); // <- this one causes problems if not switched off before power loss
     gpio_set_pin_state( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, on );
@@ -104,6 +110,9 @@ void setDC_DC_ConvertersON( bool on )
     gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, on );
 }
 
+/**
+ * @brief Initialize AFC's DCDC converters hardware
+ */
 void initializeDCDC( void )
 {
     setDC_DC_ConvertersON(false);
@@ -183,8 +192,8 @@ void payload_init( void )
 
 void vTaskPayload( void *pvParameters )
 {
-    payload_state state = PAYLOAD_NO_POWER;
-    payload_state new_state = PAYLOAD_STATE_NO_CHANGE;
+    uint8_t state = PAYLOAD_NO_POWER;
+    uint8_t new_state = PAYLOAD_STATE_NO_CHANGE;
 
     uint8_t P12V_good = 0;
     uint8_t P1V0_good = 0;

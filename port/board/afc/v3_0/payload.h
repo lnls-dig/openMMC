@@ -25,7 +25,7 @@
 
 #include "event_groups.h"
 
-typedef enum {
+enum {
     PAYLOAD_NO_POWER = 0,
     PAYLOAD_SWITCHING_ON,
     PAYLOAD_POWER_GOOD_WAIT,

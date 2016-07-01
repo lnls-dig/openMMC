@@ -169,8 +169,8 @@ void payload_init( void )
 
 void vTaskPayload( void *pvParameters )
 {
-    payload_state state = PAYLOAD_NO_POWER;
-    payload_state new_state = PAYLOAD_STATE_NO_CHANGE;
+    uint8_t state = PAYLOAD_NO_POWER;
+    uint8_t new_state = PAYLOAD_STATE_NO_CHANGE;
 
     uint8_t P12V_good = 0;
     uint8_t P1V0_good = 0;

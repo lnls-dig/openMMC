@@ -19,6 +19,20 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file   adn4604.h
+ * @author Henrique Silva <henrique.silva@lnls.br>
+ *
+ * @brief  ADN4604 module interface declarations
+ *
+ * @ingroup ADN4604
+ */
+
+/**
+ * @defgroup ADN4604 ADN4604 16x16 Digital Crosspoint Switch
+ * @ingroup PERIPH_IC
+ */
+
 #ifndef ADN4604_H_
 #define ADN4604_H_
 
@@ -85,25 +99,75 @@ typedef struct adn_connect_cfg{
 #define ADN_TX_CON_OUT0                 0x20
 
 enum adn4604_term_ctl {
-    RXW_TERM = 0,  /* Input[7:0] (West) termination control */
-    RXE_TERM,      /* Input[15:8] (East) termination control */
-    TXS_TERM,      /* Output[7:0] (South) termination control */
-    TXN_TERM       /* Output[15:8] (North) termination control */
+    RXW_TERM = 0,  /*< Input[7:0]   (West)  termination control */
+    RXE_TERM,      /*< Input[15:8]  (East)  termination control */
+    TXS_TERM,      /*< Output[7:0]  (South) termination control */
+    TXN_TERM       /*< Output[15:8] (North) termination control */
 };
 
 enum adn4604_tx_ctl {
-	TX_DISABLED,
-	TX_STANDBY,
-	TX_SQUELCHED,
-	TX_ENABLED
+    TX_DISABLED,
+    TX_STANDBY,
+    TX_SQUELCHED,
+    TX_ENABLED
 };
 
+/**
+ * @brief Initializes the ADN4604 Clock switch hardware
+ *
+ * This IC starts with a pre-defined configuration provided by the board port in the adn4604_usercfg.h file.
+ * The current port status may be changed with OEM IPMI commands.
+ */
 void adn4604_init( void );
+
+/**
+ * @brief Sets the output status
+ *
+ * @param output Output number (0 to 15)
+ * @param tx_mode Selected mode: (TX_DISABLED, TX_STANDBY, TX_SQUELCHED or TX_ENABLED)
+ */
 void adn4604_tx_control( uint8_t output, uint8_t tx_mode );
+
+/**
+ * @brief Activates the current stored configuration
+ *
+ * @note The Update pin has precedence over the software register, so if the Update pin is asserted, but the low-to-high step doesn't occur, you won't be able to update the IC configuration
+ *
+ */
 void adn4604_update( void );
+
+/**
+ * @brief ADN4604 Software Reset
+ */
 void adn4604_reset( void );
+
+/**
+ * @brief Configures the cross-connection map
+ *
+ * @param map Selected map to configure (0 or 1)
+ * @param xpt_con Outputs assignment
+ */
 void adn4604_xpt_config( uint8_t map, adn_connect_map_t xpt_con );
+
+/**
+ * @brief Sets the active map on the IC
+ *
+ * @param map Selected map (0 or 1)
+ */
 void adn4604_active_map( uint8_t map );
+
+/**
+ * @brief Reads the outputs current connections
+ *
+ * @return Outputs current connection
+ */
 adn_connect_map_t adn4604_out_status( void );
+
+/**
+ * @brief Controls the inputs/outputs line termination
+ *
+ * @param cfg Selected in/outputs (separated in quadrants defined in #adn4604_term_ctl)
+ */
 void adn4604_termination_ctl( uint8_t cfg );
+
 #endif

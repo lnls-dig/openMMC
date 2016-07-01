@@ -20,7 +20,8 @@
  */
 
 /**
- * @defgroup SENSORS Sensors implementations
+ * @defgroup SENSORS Sensors
+ * @ingroup PERIPH_IC
  */
 
 /**

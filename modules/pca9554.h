@@ -33,6 +33,7 @@
 
 /**
  * @defgroup PCA9554 PCA9554 8-bit I2C/SMBus I/O Expander Module
+ * @ingroup PERIPH_IC
  */
 
 /**
