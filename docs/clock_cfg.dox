@@ -1,0 +1,81 @@
+/**
+ * @page CLK_CFG Clock Routing Configuration
+ *
+ * @tableofcontents
+ *
+ * @section CLK_CFG_SCHROFF Clock configuration on Schroff crate with NAT MCH
+ * Guide to configure the clock switching inside the uTCA crate (NAT MCH + Schroff Crate + AFC board)
+ *
+ * @subsection CLK_CFG_SCHROFF_AFC AFC Configuration
+ * The AFC board has a crossbar clock switch that is configured upon payload activation (Hotswap handle pressed - Blue LED off).
+ *
+ * The outputs configuration is defined inside the file openMMC/port/board/\<board-name\>/adn4604_usercfg.h .
+ *
+ * In this file you can change the clock outputs (ADN4604\_CFG\_OUT\_n). For example:
+ * @code
+       #define ADN4604_CFG_OUT_0       0      // TCLKD_OUT
+       #define ADN4604_CFG_OUT_1       0      // TCLKC_OUT
+       #define ADN4604_CFG_OUT_2       0      // TCLKA_OUT
+       #define ADN4604_CFG_OUT_3       0      // TCLKB_OUT
+       #define ADN4604_CFG_OUT_4       13     // FPGA_CCLK
+       #define ADN4604_CFG_OUT_5       8      // FP2_CLK2
+       #define ADN4604_CFG_OUT_6       8      // LINK01_CLK
+       #define ADN4604_CFG_OUT_7       8      // FP2_CLK1
+       #define ADN4604_CFG_OUT_8       8      // PCIE_CLK1
+       #define ADN4604_CFG_OUT_9       8      // LINK23_CLK
+       #define ADN4604_CFG_OUT_10      14     // FIN1_CLK3
+       #define ADN4604_CFG_OUT_11      14     // FIN1_CLK2
+       #define ADN4604_CFG_OUT_12      14     // RTM_SYNC_CLK
+       #define ADN4604_CFG_OUT_13      5      // OP15C (Aux U-Fl connector)
+       #define ADN4604_CFG_OUT_14      14     // FIN2_CLK2
+       #define ADN4604_CFG_OUT_15      14     // FIN2_CLK3
+ * @endcode
+ *
+ * You must also set (in the same header) which outputs will be enabled. To do that, just set the corresponding output enable flag (ADN4604\_EN\_OUT\_n) to 1, like the following:
+ *
+ * @code
+       #define ADN4604_EN_OUT_0        0       // TCLKD_OUT
+       #define ADN4604_EN_OUT_1        0       // TCLKC_OUT
+       #define ADN4604_EN_OUT_2        0       // TCLKA_OUT
+       #define ADN4604_EN_OUT_3        0       // TCLKB_OUT
+       #define ADN4604_EN_OUT_4        1       // FPGA_CCLK
+       #define ADN4604_EN_OUT_5        1       // FP2_CLK2
+       #define ADN4604_EN_OUT_6        1       // LINK01_CLK
+       #define ADN4604_EN_OUT_7        1       // FP2_CLK1
+       #define ADN4604_EN_OUT_8        1       // PCIE_CLK1
+       #define ADN4604_EN_OUT_9        1       // LINK23_CLK
+       #define ADN4604_EN_OUT_10       1       // FIN1_CLK3
+       #define ADN4604_EN_OUT_11       1       // FIN1_CLK2
+       #define ADN4604_EN_OUT_12       0       // RTM_SYNC_CLK
+       #define ADN4604_EN_OUT_13       1       // OP15C (Aux U-Fl connector)
+       #define ADN4604_EN_OUT_14       1       // FIN2_CLK2
+       #define ADN4604_EN_OUT_15       1       // FIN2_CLK3
+ * @endcode
+ *
+ * @subsection CLK_CFG_SCHROFF_MCH MCH Configuration
+ * In order to receive the clock in the AFC board, the signal must be available in one of the uTCA user clock lanes (TCLKA-D) and be correctly switched to the AFC board (the MCH uses a star topology to connect the clocks to the AFCs).
+ *
+ * @subsubsection CLK_CFG_SCHROFF_MCH_NAT NAT MCH
+ * @note This configuration is only needed if you'll use the MCH internal clock switching feature. If your clock has already been routed directly to the TCLK lanes of the AMCs, you're good to go
+ *
+ * The NAT Clock switch is configured using a text file that'll be parsed by the FPGA.
+ * In this file all the clock connection are defined (source, destination). A default configuration file can be obtained on the MCH webserver, under the `Script Management` menu.
+ *
+ * The user clocks are treated here by different names:
+ * @code
+       TCLKA/C -> CLK1
+       TCLKB/D -> CLK2
+       FCLKA   -> CLK3
+ * @endcode
+ *
+ * To configure the clock switching, download the current configuration file and search for the line `clk_phys_out = dst, src`
+ * Here you can edit the source for each destination, for example, if you want to route the TCLKB from AMC3 to TCLKA from AMC4 one will write:
+ * @code
+       clk_phys_out = 4, 19
+ * @endcode
+ *
+ * Keep in mind that one MCH only has access to one pair of TCLK signals, either TCLKA and TCLKB or TCLKC and TCLKD. The other pair is routed to the redundant MCH slot.
+ *
+ * After editing the needed options, save the file and upload it using the Webserver feature.
+ * Here you can choose to overwrite the startup default configuration with your new file, if you don't select this option your changes will be lost on the next reboot.
+ */
