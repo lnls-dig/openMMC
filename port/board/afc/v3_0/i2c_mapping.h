@@ -1,3 +1,6 @@
+#ifndef I2C_MAPPING_H_
+#define I2C_MAPPING_H_
+
 #include "i2c.h"
 
 #define I2CMODE_POOLING         1
@@ -65,3 +68,5 @@ enum {
 i2c_mux_state_t i2c_mux[I2C_MUX_CNT];
 i2c_bus_mapping_t i2c_bus_map[I2C_BUS_CNT];
 i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT];
+
+#endif
