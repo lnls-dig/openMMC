@@ -108,6 +108,6 @@
  * @brief       Set a GPIO pin direction
  * @param       port    : GPIO Port number where pin is located
  * @param       pin     : pin number
- * @param       state   : true (1) for OUTPUT, false (0) for INPUT
+ * @param       dir     : true (1) for OUTPUT, false (0) for INPUT
  */
 #define gpio_set_pin_dir( port, pin, dir )     Chip_GPIO_SetPinDIR( LPC_GPIO, port, pin, dir )

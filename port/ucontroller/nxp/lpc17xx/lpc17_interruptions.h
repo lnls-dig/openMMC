@@ -43,15 +43,13 @@
  * @brief Enable interruption
  *
  * @param [in] irq         Interrupt number
- * @param [in] priority    Priority level
  */
 #define irq_enable(irq)                 NVIC_EnableIRQ( irq )
 
 /**
- * @brief Enable interruption
+ * @brief Disable interruption
  *
  * @param [in] irq         Interrupt number
- * @param [in] priority    Priority level
  */
 #define irq_disable(irq)                NVIC_DisableIRQ( irq )
 

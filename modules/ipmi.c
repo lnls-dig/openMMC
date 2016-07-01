@@ -114,7 +114,7 @@ void ipmi_init ( void )
     xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", 100, ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle );
 }
 
-/*!
+/**
  * @brief Finds a handler associated with a given netfunction and command.
  *
  * @param[in] netfn 8-bit network function code
@@ -139,7 +139,7 @@ t_req_handler ipmi_retrieve_handler( uint8_t netfn, uint8_t cmd )
     return handler;
 }
 
-/*!
+/**
  * @brief Sends an event message via IPMB interface
  *
  * @param[in] sensor Pointer to sensor structure defined in sensor.h
@@ -177,9 +177,9 @@ ipmb_error ipmi_event_send( sensor_t * sensor, uint8_t assert_deassert, uint8_t 
  * @brief Handler for GET Device ID command as in IPMI v2.0 section 20.1 for
  * more information.
  *
- * @param req[in] Pointer to request IPMI message
+ * @param[in]  req Pointer to request IPMI message
  *
- * @param rsp[out] Pointer to response IPMI message
+ * @param[out] rsp Pointer to response IPMI message
  *
  * @return None
  */
@@ -203,14 +203,14 @@ IPMI_HANDLER(ipmi_get_device_id,  NETFN_APP, IPMI_GET_DEVICE_ID_CMD, ipmi_msg *r
     rsp->data_len = len;
 }
 
-/*!
+/**
  * @brief Handler for GET Device GUID command
  *
- * @param[in] req pointer to request message
+ * @param[in]  req pointer to request message
  *
  * @param[out] rsp pointer to response message
  *
- * @return
+ * @return None
  */
 IPMI_HANDLER(ipmi_get_device_guid,  NETFN_APP, IPMI_GET_DEVICE_GUID_CMD, ipmi_msg *req, ipmi_msg* rsp)
 {
@@ -224,7 +224,7 @@ IPMI_HANDLER(ipmi_get_device_guid,  NETFN_APP, IPMI_GET_DEVICE_GUID_CMD, ipmi_ms
     rsp->data_len = 16;
 }
 
-/*!
+/**
  * @brief Handler for GET Properties request. To be called by IPMI
  *  request handler, it must obey the predefined function signature
  *  and protocol. Check IPMI 2.0 table 3-11 for more information.
@@ -247,14 +247,13 @@ IPMI_HANDLER(ipmi_picmg_get_properties, NETFN_GRPEXT,IPMI_PICMG_CMD_GET_PROPERTI
     rsp->data_len = len;
 }
 
-/*!
+/**
  * @brief Handler for Set AMC Port state request.
  * Check IPMI 2.0 table 3-11 for more information.
  *
- * @param[in] request Request to be handled and answered. Unused in
+ * @param[in] req Request to be handled and answered. Unused in
  *  this particular function.
- *
- * @return ipmi_msg Message with data, data length and completion code.
+ * @param[out] rsp Message with data, data length and completion code.
  */
 IPMI_HANDLER(ipmi_picmg_cmd_set_amc_port_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_AMC_PORT_STATE, ipmi_msg *req, ipmi_msg *rsp)
 {

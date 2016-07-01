@@ -246,21 +246,21 @@ IPMI_HANDLER(ipmi_se_get_sdr_info, NETFN_SE, IPMI_GET_DEVICE_SDR_INFO_CMD, ipmi_
     rsp->completion_code = IPMI_CC_OK;
 }
 
-/*!
+/**
  * @brief Handler for "Set Event Receiver" command, as on IPMIv2 1.1
  * section 29.1.
  *
  * Set (or reset) the address to which IPMI events
  * will be sent. Also, disable sending events if command 0xFF is received.
  *
- * @param[in] req Incoming request to be handled and answered.
+ * @param[in]  req Incoming request to be handled and answered.
+ * @param[out] rsp Message with data, data length and completion code.
  *
- * @return void
  */
 uint8_t event_receiver_addr = 0xFF;
 uint8_t event_receiver_lun = 0x00;
 
-IPMI_HANDLER(ipmi_se_set_event_reciever, NETFN_SE, IPMI_SET_EVENT_RECEIVER_CMD, ipmi_msg *req, ipmi_msg *rsp)
+IPMI_HANDLER(ipmi_se_set_event_receiver, NETFN_SE, IPMI_SET_EVENT_RECEIVER_CMD, ipmi_msg *req, ipmi_msg *rsp)
 {
     /* Update the event receiver address (even if its 0xFF,
        the checking will be done in check_sensor_event function) */
@@ -271,13 +271,14 @@ IPMI_HANDLER(ipmi_se_set_event_reciever, NETFN_SE, IPMI_SET_EVENT_RECEIVER_CMD, 
     rsp->data_len = 0;
 }
 
-/*!
+/**
  * @brief Handler for "Get Event Receiver" command, as on IPMIv2 1.1
  * section 29.1.
  *
  * Returns the previously set event receiver address and LUN
  *
- * @param[in] req Incoming request to be handled and answered.
+ * @param[in]  req Incoming request to be handled and answered.
+ * @param[out] rsp Message with data, data length and completion code.
  *
  * @return void
  */

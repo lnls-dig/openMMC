@@ -74,9 +74,9 @@ uint8_t calculate_chksum( uint8_t * buffer, uint8_t range );
  * @brief Compare 2 buffers
  *
  * @param bufa First buffer to compare
- * @param len_a Length of #bufa
+ * @param len_a Length of bufa
  * @param bufb Second buffer to compare
- * @param len_b Length of #bufb
+ * @param len_b Length of bufb
  *
  * @retval 0x00 Buffers are equal
  * @retval 0xFF Buffers are different
