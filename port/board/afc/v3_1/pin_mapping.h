@@ -164,7 +164,7 @@
 #define SCANSTA_ADDR4_PIN       4
 #define SCANSTA_ADDR5_PIN       5
 #define SCANSTA_ADDR6_PIN       6
-#define SCANSTA_RST_PIN         7
+#define SCANSTA_TRIST_B_PIN     7
 
 /* UART Debug */
 #define UART_DEBUG_PORT         4
