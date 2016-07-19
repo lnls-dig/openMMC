@@ -161,7 +161,7 @@ void LED_init( void )
     memcpy( &led_config[1], &rtm_leds_config, sizeof(rtm_leds_config) );
 #endif
 
-    xTaskCreate( LED_Task, (const char *) "LED Task", 120, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
+    xTaskCreate( LED_Task, (const char *) "LED Task", 150, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
 }
 
 void LED_Task( void *Parameters )
