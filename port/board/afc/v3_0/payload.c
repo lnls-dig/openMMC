@@ -197,20 +197,33 @@ void vTaskPayload( void *pvParameters )
 
         if ( current_evt & PAYLOAD_MESSAGE_P12GOOD ) {
             P12V_good = 1;
-        } else if ( current_evt & PAYLOAD_MESSAGE_P12GOODn ) {
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_P12GOOD );
+        }
+        if ( current_evt & PAYLOAD_MESSAGE_P12GOODn ) {
             P12V_good = 0;
-        } else if ( current_evt & PAYLOAD_MESSAGE_PGOOD ) {
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_P12GOODn );
+        }
+        if ( current_evt & PAYLOAD_MESSAGE_PGOOD ) {
             P1V0_good = 1;
-        } else if ( current_evt & PAYLOAD_MESSAGE_PGOODn ) {
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PGOOD );
+        }
+        if ( current_evt & PAYLOAD_MESSAGE_PGOODn ) {
             P1V0_good = 0;
-        } else if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PGOODn );
+        }
+        if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
             QUIESCED_req = 1;
-        } else if ( current_evt & PAYLOAD_MESSAGE_COLD_RST ) {
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCED );
+        }
+        if ( current_evt & PAYLOAD_MESSAGE_COLD_RST ) {
             state = PAYLOAD_SWITCHING_OFF;
-        } else if ( current_evt & PAYLOAD_MESSAGE_REBOOT ) {
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_COLD_RST );
+        }
+        if ( current_evt & PAYLOAD_MESSAGE_REBOOT ) {
             gpio_set_pin_low( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
             asm("NOP");
             gpio_set_pin_high( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_REBOOT );
         }
 
         FPGA_boot_DONE = gpio_read_pin( GPIO_DONE_B_PORT, GPIO_DONE_B_PIN );
