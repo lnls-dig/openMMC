@@ -19,6 +19,15 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file   adn4604.c
+ * @author Henrique Silva <henrique.silva@lnls.br>
+ *
+ * @brief  ADN4604 module interface implementations
+ *
+ * @ingroup ADN4604
+ */
+
 /* FreeRTOS Includes */
 #include "FreeRTOS.h"
 
@@ -34,7 +43,6 @@ adn_connect_map_t con;
 
 void adn4604_init( void )
 {
-
     uint16_t out_enable_flag = {
         ADN4604_EN_OUT_0 << 0 |
         ADN4604_EN_OUT_1 << 1 |

@@ -50,7 +50,6 @@
 #define SENSOR_STATE_HIGH_CRIT          0x10    // temperature is higher upper critical
 #define SENSOR_STATE_HIGH_NON_REC       0x20    // temperature is higher high non recoverable
 
-
 /* IPMI Sensor Events */
 #define IPMI_THRESHOLD_LNC_GL           0x00    // lower non critical going low
 #define IPMI_THRESHOLD_LNC_GH           0x01    // lower non critical going high
@@ -213,8 +212,6 @@ const SDR_type_12h_t SDR_RTM_DEV_LOCATOR;
 #define GET_SENSOR_TYPE(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
 
 #define GET_EVENT_TYPE_CODE(n)      ((SDR_type_01h_t *)sensor->sdr)->event_reading_type
-
-void initializeDCDC( void );
 
 void sdr_init( void );
 void user_sdr_init( void );

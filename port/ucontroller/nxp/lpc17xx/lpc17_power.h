@@ -17,10 +17,9 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*!
+/**
  * @file lpc17_power.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date March 2016
  *
  * @brief Definitions of power mode selection for LPC17xx
  */
@@ -32,7 +31,30 @@
 
 #include "pmu_17xx_40xx.h"
 
+/**
+ * @brief	Enter MCU Sleep mode
+ * @return	None
+ * @note The sleep mode effects differ between controllers, check the corresponding documentation
+ */
 #define pm_sleep()		Chip_PMU_Sleep(LPC_PMU, PMU_MCU_SLEEP)
+
+/**
+ * @brief	Enter MCU Deep Sleep mode
+ * @return	None
+ * @note The deep sleep mode effects differ between controllers, check the corresponding documentation
+ */
 #define pm_deep_sleep()		Chip_PMU_Sleep(LPC_PMU, PMU_MCU_DEEP_SLEEP)
+
+/**
+ * @brief	Enter MCU Power Down mode
+ * @return	None
+ * @note The power down mode effects differ between controllers, check the corresponding documentation
+ */
 #define pm_power_down()		Chip_PMU_Sleep(LPC_PMU, PMU_MCU_POWER_DOWN)
+
+/**
+ * @brief	Enter MCU Deep Power Down mode
+ * @return	None
+ * @note The deep power down mode effects differ between controllers, check the corresponding documentation
+ */
 #define pm_deep_power_down()	Chip_PMU_Sleep(LPC_PMU, PMU_MCU_DEEP_PWRDOWN)

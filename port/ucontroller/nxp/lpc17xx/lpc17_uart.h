@@ -17,12 +17,11 @@
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*!
- * @file gpio.h
+/**
+ * @file lpc17_uart.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
  *
- * @brief Definitions of GPIO driver implementation for LPC17xx
+ * @brief LPC17xx UART interface definitions
  */
 
 #ifndef LPC17_UART_H_

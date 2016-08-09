@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V8.2.3 - Copyright (C) 2015 Real Time Engineers Ltd.
+    FreeRTOS V9.0.0 - Copyright (C) 2016 Real Time Engineers Ltd.
     All rights reserved
 
     VISIT http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
@@ -83,6 +83,21 @@
 #define portMAX_INTERRUPTS				( ( uint32_t ) sizeof( uint32_t ) * 8UL ) /* The number of bits in an uint32_t. */
 #define portNO_CRITICAL_NESTING 		( ( uint32_t ) 0 )
 
+/* The priorities at which the various components of the simulation execute.
+Priorities are higher when a soak test is performed to lessen the effect of
+Windows interfering with the timing. */
+#define portSOAK_TEST
+#ifndef portSOAK_TEST
+	#define portDELETE_SELF_THREAD_PRIORITY			 THREAD_PRIORITY_HIGHEST /* Must be highest. */
+	#define portSIMULATED_INTERRUPTS_THREAD_PRIORITY THREAD_PRIORITY_NORMAL
+	#define portSIMULATED_TIMER_THREAD_PRIORITY		 THREAD_PRIORITY_BELOW_NORMAL
+	#define portTASK_THREAD_PRIORITY				 THREAD_PRIORITY_IDLE
+#else
+	#define portDELETE_SELF_THREAD_PRIORITY			 THREAD_PRIORITY_TIME_CRITICAL /* Must be highest. */
+	#define portSIMULATED_INTERRUPTS_THREAD_PRIORITY THREAD_PRIORITY_HIGHEST
+	#define portSIMULATED_TIMER_THREAD_PRIORITY		 THREAD_PRIORITY_ABOVE_NORMAL
+	#define portTASK_THREAD_PRIORITY				 THREAD_PRIORITY_NORMAL
+#endif
 /*
  * Created as a high priority thread, this function uses a timer to simulate
  * a tick interrupt being generated on an embedded target.  In this Windows
@@ -247,6 +262,17 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 {
 xThreadState *pxThreadState = NULL;
 int8_t *pcTopOfStack = ( int8_t * ) pxTopOfStack;
+const SIZE_T xStackSize = 1024; /* Set the size to a small number which will get rounded up to the minimum possible. */
+
+	#ifdef portSOAK_TEST
+	{
+		/* Ensure highest priority class is inherited. */
+		if( !SetPriorityClass( GetCurrentProcess(), REALTIME_PRIORITY_CLASS ) )
+		{
+			printf( "SetPriorityClass() failed\r\n" );
+		}
+	}
+	#endif
 
 	/* In this simulated case a stack is not initialised, but instead a thread
 	is created that will execute the task being created.  The thread handles
@@ -257,11 +283,11 @@ int8_t *pcTopOfStack = ( int8_t * ) pxTopOfStack;
 	pxThreadState = ( xThreadState * ) ( pcTopOfStack - sizeof( xThreadState ) );
 
 	/* Create the thread itself. */
-	pxThreadState->pvThread = CreateThread( NULL, 0, ( LPTHREAD_START_ROUTINE ) pxCode, pvParameters, CREATE_SUSPENDED, NULL );
-	configASSERT( pxThreadState->pvThread );
+	pxThreadState->pvThread = CreateThread( NULL, xStackSize, ( LPTHREAD_START_ROUTINE ) pxCode, pvParameters, CREATE_SUSPENDED | STACK_SIZE_PARAM_IS_A_RESERVATION, NULL );
+	configASSERT( pxThreadState->pvThread ); /* See comment where TerminateThread() is called. */
 	SetThreadAffinityMask( pxThreadState->pvThread, 0x01 );
 	SetThreadPriorityBoost( pxThreadState->pvThread, TRUE );
-	SetThreadPriority( pxThreadState->pvThread, THREAD_PRIORITY_IDLE );
+	SetThreadPriority( pxThreadState->pvThread, portTASK_THREAD_PRIORITY );
 
 	return ( StackType_t * ) pxThreadState;
 }
@@ -298,7 +324,7 @@ xThreadState *pxThreadState;
 
 	if( lSuccess == pdPASS )
 	{
-		if( SetThreadPriority( pvHandle, THREAD_PRIORITY_NORMAL ) == 0 )
+		if( SetThreadPriority( pvHandle, portSIMULATED_INTERRUPTS_THREAD_PRIORITY ) == 0 )
 		{
 			lSuccess = pdFAIL;
 		}
@@ -315,7 +341,7 @@ xThreadState *pxThreadState;
 		pvHandle = CreateThread( NULL, 0, prvSimulatedPeripheralTimer, NULL, CREATE_SUSPENDED, NULL );
 		if( pvHandle != NULL )
 		{
-			SetThreadPriority( pvHandle, THREAD_PRIORITY_BELOW_NORMAL );
+			SetThreadPriority( pvHandle, portSIMULATED_TIMER_THREAD_PRIORITY );
 			SetThreadPriorityBoost( pvHandle, TRUE );
 			SetThreadAffinityMask( pvHandle, 0x01 );
 			ResumeThread( pvHandle );
@@ -427,8 +453,8 @@ CONTEXT xContext;
 				pxThreadState = ( xThreadState *) *( ( size_t * ) pvOldCurrentTCB );
 				SuspendThread( pxThreadState->pvThread );
 
-				/* Ensure the thread is actually suspended by performing a 
-				synchronous operation that can only complete when the thread is 
+				/* Ensure the thread is actually suspended by performing a
+				synchronous operation that can only complete when the thread is
 				actually suspended.  The below code asks for dummy register
 				data. */
 				xContext.ContextFlags = CONTEXT_INTEGER;
@@ -465,6 +491,10 @@ uint32_t ulErrorCode;
 	{
 		WaitForSingleObject( pvInterruptEventMutex, INFINITE );
 
+		/* !!! This is not a nice way to terminate a thread, and will eventually
+		result in resources being depleted if tasks frequently delete other
+		tasks (rather than deleting themselves) as the task stacks will not be
+		freed. */
 		ulErrorCode = TerminateThread( pxThreadState->pvThread, 0 );
 		configASSERT( ulErrorCode );
 
@@ -493,7 +523,7 @@ uint32_t ulErrorCode;
 	does not run and swap it out before it is closed.  If that were to happen
 	the thread would never run again and effectively be a thread handle and
 	memory leak. */
-	SetThreadPriority( pvThread, THREAD_PRIORITY_ABOVE_NORMAL );
+	SetThreadPriority( pvThread, portDELETE_SELF_THREAD_PRIORITY );
 
 	/* This function will not return, therefore a yield is set as pending to
 	ensure a context switch occurs away from this thread on the next tick. */
@@ -506,6 +536,10 @@ uint32_t ulErrorCode;
 	/* Close the thread. */
 	ulErrorCode = CloseHandle( pvThread );
 	configASSERT( ulErrorCode );
+
+	/* This is called from a critical section, which must be exited before the
+	thread stops. */
+	taskEXIT_CRITICAL();
 
 	ExitThread( 0 );
 }
@@ -524,13 +558,15 @@ void vPortGenerateSimulatedInterrupt( uint32_t ulInterruptNumber )
 
 	if( ( ulInterruptNumber < portMAX_INTERRUPTS ) && ( pvInterruptEventMutex != NULL ) )
 	{
-		/* Yield interrupts are processed even when critical nesting is non-zero. */
+		/* Yield interrupts are processed even when critical nesting is
+		non-zero. */
 		WaitForSingleObject( pvInterruptEventMutex, INFINITE );
 		ulPendingInterrupts |= ( 1 << ulInterruptNumber );
 
-		/* The simulated interrupt is now held pending, but don't actually process it
-		yet if this call is within a critical section.  It is possible for this to
-		be in a critical section as calls to wait for mutexes are accumulative. */
+		/* The simulated interrupt is now held pending, but don't actually
+		process it yet if this call is within a critical section.  It is
+		possible for this to be in a critical section as calls to wait for
+		mutexes are accumulative. */
 		if( ulCriticalNesting == 0 )
 		{
 			SetEvent( pvInterruptEvent );

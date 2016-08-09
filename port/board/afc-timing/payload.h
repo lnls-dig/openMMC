@@ -25,7 +25,7 @@
 
 #include "event_groups.h"
 
-typedef enum {
+enum {
     PAYLOAD_NO_POWER = 0,
     PAYLOAD_SWITCHING_ON,
     PAYLOAD_POWER_GOOD_WAIT,
@@ -48,11 +48,6 @@ typedef enum {
 #define PAYLOAD_MESSAGE_WARM_RST        (1 << 5)
 #define PAYLOAD_MESSAGE_REBOOT          (1 << 6)
 #define PAYLOAD_MESSAGE_QUIESCED        (1 << 7)
-
-#define FRU_CTLCODE_COLD_RST            (0)
-#define FRU_CTLCODE_WARM_RST            (1)
-#define FRU_CTLCODE_REBOOT              (2)
-#define FRU_CTLCODE_QUIESCE             (4)
 
 #define PAYLOAD_BASE_DELAY 100
 

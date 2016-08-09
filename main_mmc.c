@@ -38,8 +38,10 @@
 #include "jtag.h"
 #include "fpga_spi.h"
 #include "watchdog.h"
-#include "rtm.h"
 #include "uart_debug.h"
+#ifdef MODULE_RTM
+#include "rtm.h"
+#endif
 
 //#define HEAP_TEST
 //#define STOP_TEST

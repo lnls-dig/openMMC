@@ -25,8 +25,21 @@
 #include "i2c.h"
 #include "i2c_mapping.h"
 
-#define I2C_MUX_COUNT		(sizeof(i2c_mux)/sizeof(i2c_mux_state_t))
-#define I2C_CHIP_MAP_COUNT	(sizeof(i2c_chip_map)/sizeof(i2c_chip_mapping_t))
+/**
+ * @brief Number of I2C peripheral buses that are being controlled
+ * @note This value is contabilized at compile time and may change from board to board. Check the board's i2c_mapping.c file for more info
+ *
+ * @see i2c_mapping.c
+ */
+#define I2C_MUX_COUNT (sizeof(i2c_mux) / sizeof(i2c_mux_state_t))
+
+/**
+ * @brief Number of I2C Chips that are being controlled
+ * @note This value is contabilized at compile time and may change from board to board. Check the board's i2c_mapping.c file for more info
+ *
+ * @see i2c_mapping.c
+ */
+#define I2C_CHIP_MAP_COUNT (sizeof(i2c_chip_map)/sizeof(i2c_chip_mapping_t))
 
 void i2c_init( void )
 {

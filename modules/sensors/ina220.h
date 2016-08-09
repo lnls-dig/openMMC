@@ -19,12 +19,22 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/*!
+/**
+ * @defgroup INA220 INA220 - High- or Low-Side, Bidirectional Current and Power Monitor
+ * @ingroup SENSORS
+ *
+ * The INA220 is a current shunt and power monitor with an I2C- or SMBUS-compatible interface. <br>
+ * The INA220 monitors both shunt drop and supply voltage. A programmable calibration value, combined with an internal multiplier, enables direct readouts in amperes.
+ * An additional multiplying register calculates power in watts.
+ */
+
+/**
  * @file ina220.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- * @date September 2015
  *
  * @brief Definitions for INA220 Current/Voltage/Power Sensor
+ *
+ * @ingroup INA220
  */
 
 #ifndef INA220_H_
@@ -36,15 +46,71 @@
 #define MAX_INA220_COUNT        12
 #define INA220_UPDATE_RATE      100
 
-/* common register definitions */
+/**
+ * @defgroup INA220_REGS INA220 Registers
+ * @ingroup INA220
+ * @{
+ */
+
+/**
+ * @brief INA220 Configuration register (Read/write)
+ *
+ * All-register reset, settings for bus voltage range, PGA gain, ADC resolution/averaging
+ *
+ * @note Default value = 0x399F
+ */
 #define INA220_CONFIG                   0x00
-#define INA220_SHUNT_VOLTAGE            0x01 /* readonly */
-#define INA220_BUS_VOLTAGE              0x02 /* readonly */
-#define INA220_POWER                    0x03 /* readonly */
-#define INA220_CURRENT                  0x04 /* readonly */
+
+/**
+ * @brief INA220 Shunt Voltage register (Read only)
+ *
+ * Shunt voltage measurement data
+ *
+ */
+#define INA220_SHUNT_VOLTAGE            0x01
+
+/**
+ * @brief INA220 Bus Voltage register (Read only)
+ *
+ * Bus Voltage measurement data
+ *
+ */
+#define INA220_BUS_VOLTAGE              0x02
+
+/**
+ * @brief INA220 Power register (Read only)
+ *
+ * Power measurement data
+ *
+ * @note The Power register default to 0 because the Calibration register defaults to 0, yielding a zero current value until the Calibration register is programmed.
+ */
+#define INA220_POWER                    0x03
+
+/**
+ * @brief INA220 Current register (Read only)
+ *
+ * Contains the value of the current flowing through the shunt resistor.
+ *
+ * @note The Current register default to 0 because the Calibration register defaults to 0, yielding a zero current value until the Calibration register is programmed.
+ */
+#define INA220_CURRENT                  0x04
+
+/**
+ * @brief INA220 Calibration register (Read/write)
+ *
+ * Sets full-scale range and LSB of current and power measurements. Overall system calibration
+ *
+ * @note Default value = 0x0000
+ */
 #define INA220_CALIBRATION              0x05
 
-/* register count */
+/**
+ * @}
+ */
+
+/**
+ * @brief INA220 Register Count
+ */
 #define INA220_REGISTERS                6
 
 /* Scale range values */
@@ -52,10 +118,10 @@
 #define INA220_32V_SCALE_RANGE          0x01
 
 /* PGA gain */
-#define INA220_PGA_GAIN_40MV           0x00
-#define INA220_PGA_GAIN_80MV           0x01
-#define INA220_PGA_GAIN_160MV          0x02
-#define INA220_PGA_GAIN_320MV          0x03
+#define INA220_PGA_GAIN_40MV		0x00
+#define INA220_PGA_GAIN_80MV		0x01
+#define INA220_PGA_GAIN_160MV		0x02
+#define INA220_PGA_GAIN_320MV		0x03
 
 /* ADC Resolution/Averaging */
 #define INA220_RES_SAMPLES_9BIT         0x0
@@ -83,7 +149,7 @@
 
 /* worst case is 68.10 ms (~14.6Hz, ina219) */
 #define INA220_CONVERSION_RATE          15
-#define INA220_MAX_DELAY                69 /* worst case delay in ms */
+#define INA220_MAX_DELAY                69	/* worst case delay in ms */
 
 #define INA220_RSHUNT_DEFAULT           10000
 
@@ -130,20 +196,6 @@ typedef struct {
 } ina220_data_t;
 
 TaskHandle_t vTaskINA220_Handle;
-
-/* INA220 SDR List */
-extern const SDR_type_01h_t SDR_FMC1_VADJ;
-extern const SDR_type_01h_t SDR_FMC1_12V;
-extern const SDR_type_01h_t SDR_FMC1_P3V3;
-extern const SDR_type_01h_t SDR_FMC1_VADJ_CURR;
-extern const SDR_type_01h_t SDR_FMC1_12V_CURR;
-extern const SDR_type_01h_t SDR_FMC1_P3V3_CURR;
-extern const SDR_type_01h_t SDR_FMC2_VADJ;
-extern const SDR_type_01h_t SDR_FMC2_12V;
-extern const SDR_type_01h_t SDR_FMC2_P3V3;
-extern const SDR_type_01h_t SDR_FMC2_VADJ_CURR;
-extern const SDR_type_01h_t SDR_FMC2_12V_CURR;
-extern const SDR_type_01h_t SDR_FMC2_P3V3_CURR;
 
 uint8_t ina220_config( ina220_data_t * data );
 bool ina220_calibrate( ina220_data_t * data );

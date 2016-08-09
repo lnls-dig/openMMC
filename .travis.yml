@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 
 notifications:
   email: false
@@ -18,10 +18,6 @@ before_script:
   - sudo apt-get install -y cmake -qq
 
 env:
-  global:
-    - GH_REPO_NAME: openmmc
-    - DOXYFILE: $TRAVIS_BUILD_DIR/docs/Doxyfile
-    - GH_REPO_REF: github.com/lnls-dig/openmmc.git
   matrix:
   - BOARD='afc'        -VERSION='3.0' -RTM=''
   - BOARD='afc'        -VERSION='3.1' -RTM='rtm-8sfp'
@@ -43,5 +39,4 @@ script:
   # Generate and deploy documentation
 after_success:
   - cd $TRAVIS_BUILD_DIR/docs
-  - chmod +x generateDocumentationAndDeploy.sh
-  - ./generateDocumentationAndDeploy.sh
+  - bash deploy_docs.sh

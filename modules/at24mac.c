@@ -19,10 +19,19 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file   at24mac.c
+ * @author Henrique Silva <henrique.silva@lnls.br>
+ *
+ * @brief  AT24MACX02 EEPROM module interface implementation
+ *
+ * @ingroup AT24MAC
+ */
+
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
-
 #include "string.h"
+
 /* Project Includes */
 #include "at24mac.h"
 #include "port.h"

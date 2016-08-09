@@ -22,7 +22,6 @@
 /* Project includes */
 #include "port.h"
 #include "rtm.h"
-#include "rtm_user.h"
 #include "pca9554.h"
 #include "pin_mapping.h"
 #include "hotswap.h"
@@ -35,7 +34,7 @@
 
 void rtm_enable_payload_power( void )
 {
-    gpio_set_pin_state(GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 1 );
+    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 1 );
     /* Debug LEDs */
     pca9554_write_pin( RTM_GPIO_LED_RED, 1 );
     pca9554_write_pin( RTM_GPIO_LED_BLUE, 1 );
@@ -44,7 +43,7 @@ void rtm_enable_payload_power( void )
 
 void rtm_disable_payload_power( void )
 {
-    gpio_set_pin_state(GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 0 );
+    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 0 );
     /* Debug LEDs */
     pca9554_write_pin( RTM_GPIO_LED_RED, 0 );
     pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );

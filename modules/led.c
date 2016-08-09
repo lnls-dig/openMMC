@@ -161,7 +161,7 @@ void LED_init( void )
     memcpy( &led_config[1], &rtm_leds_config, sizeof(rtm_leds_config) );
 #endif
 
-    xTaskCreate( LED_Task, (const char *) "LED Task", 120, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
+    xTaskCreate( LED_Task, (const char *) "LED Task", 150, (void * ) NULL, tskLED_PRIORITY, ( TaskHandle_t * ) NULL);
 }
 
 void LED_Task( void *Parameters )
@@ -197,6 +197,8 @@ void LED_Task( void *Parameters )
                     led_config[fru][num].mode_cfg[cfg.mode].init_status = cfg.new_state.init_status;
                     led_config[fru][num].mode_cfg[cfg.mode].t_init = cfg.new_state.t_init;
                     led_config[fru][num].mode_cfg[cfg.mode].t_toggle = cfg.new_state.t_toggle;
+                    /* Reset the LED internal counter */
+                    led_config[fru][num].counter = 0;
                 }
             }
         }
@@ -274,11 +276,11 @@ void amc_led_act( uint8_t id, uint8_t action )
 {
     switch( action ) {
     case LEDACT_TURN_ON:
-        gpio_clr_pin( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        gpio_set_pin_low( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
         break;
 
     case LEDACT_TURN_OFF:
-        gpio_set_pin( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        gpio_set_pin_high( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
         break;
 
     case LEDACT_TOGGLE:

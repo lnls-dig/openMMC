@@ -1,9 +1,7 @@
 /*
- * board_defs.h
+ *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   AFCIPMI  --
- *
- *   Copyright (C) 2015  Henrique Silva <henrique.silva@lnls.br>
+ *   Copyright (C) 2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,10 +15,31 @@
  *
  *   You should have received a copy of the GNU General Public License
  *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef BOARD_DEFS_H_
-#define BOARD_DEFS_H_
+/**
+ * @defgroup AFC_V3_1 AFCv3.1 Board Port
+ * @ingroup BOARD_PORTS
+ */
+
+/**
+ * @file afc/v3_1/pin_mapping.h
+ * @brief Hardware pin definitions for AFCv3.1
+ *
+ * @ingroup AFC_V3_1_PIN_MAPPING
+ */
+
+/**
+ * @defgroup AFC_V3_1_PIN_MAPPING AFCv3.1 Pin Mapping
+ * @ingroup AFC_V3_1
+ * @{
+ */
+
+#ifndef PIN_MAPPING_H_
+#define PIN_MAPPING_H_
+
 
 /* SPI Interfaces */
 #define FPGA_SPI        0
@@ -136,9 +155,24 @@
 #define GPIO_ADN_RESETN_PORT    1
 #define GPIO_ADN_RESETN_PIN     22
 
+/* SCANSTA JTAG Switch */
+#define SCANSTA_PORT            2
+#define SCANSTA_ADDR0_PIN       0
+#define SCANSTA_ADDR1_PIN       1
+#define SCANSTA_ADDR2_PIN       2
+#define SCANSTA_ADDR3_PIN       3
+#define SCANSTA_ADDR4_PIN       4
+#define SCANSTA_ADDR5_PIN       5
+#define SCANSTA_ADDR6_PIN       6
+#define SCANSTA_TRIST_B_PIN     7
+
 /* UART Debug */
 #define UART_DEBUG_PORT         4
 #define UART_DEBUG_TXD_PIN      28
 #define UART_DEBUG_RXD_PIN      29
+
+/**
+ * @}
+ */
 
 #endif

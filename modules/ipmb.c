@@ -36,16 +36,61 @@
 #include "port.h"
 #include "task_priorities.h"
 
-ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg );
-
+/**
+ * @brief Encode IPMI msg struct to a byte formatted buffer
+ *
+ * This function formats the ipmi_msg struct fields into a byte array, following the specification:
+ * <table>
+ * <caption>IPMB Messages</caption>
+ * <tr><th>                 <th>REQUEST   <th>RESPONSE   <th>Bit Len   <th>Byte #
+ * <tr><td>Connection       <td>rsSA      <td>rqSA       <td>8         <td>1
+ * <tr><td>Header           <td>NetFN     <td>NetFN      <td>6         <td>2
+ * <tr><td>                 <td>rsLUN     <td>rqLUN      <td>2         <td>2
+ * <tr><td>Header Chksum    <td>Chksum    <td>Chksum     <td>8         <td>3
+ * <tr><td>                 <td>rqSA      <td>rsSA       <td>8         <td>4
+ * <tr><td>Callback Info    <td>rqSeq     <td>rqSeq      <td>6         <td>5
+ * <tr><td>                 <td>rqLUN     <td>rsLUN      <td>2         <td>5
+ * <tr><td>Command          <td>CMD       <td>CMD        <td>8         <td>6
+ * <tr><td>Data             <td>          <td>CC         <td>8         <td>7
+ * <tr><td>                 <td>Data      <td>Data       <td>8*N       <td>7+N
+ * <tr><td>Message Chksum   <td>Chksum    <td>Checksum   <td>8         <td>7+N+1
+ * </table>
+ *
+ * @param[out] buffer Byte buffer which will hold the formatted message
+ * @param[in] msg The message struct to be formatted
+ *
+ * @retval ipmb_error_success The message was successfully formatted
+ */
 ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg );
+
+/**
+ * @brief Decodes a buffer and copies to its specific fields in a ipmi_msg struct
+ *
+ * @param[out] msg Pointer to a ipmi_msg struct which will hold the decoded message
+ * @param[in] buffer Pointer to a byte array that will be decoded
+ * @param[in] len Length of \p buffer
+ *
+ * @retval ipmb_error_success The message was successfully decoded
+ */
 ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len );
 
-#define I2C_SPEED 100000
+/**
+ * @brief Notifies the client that a new request has arrived and copies the message to its queue.
+ * This function receives a message wrapped in a ipmi_msg_cfg struct and copies only the ipmi_msg
+ * field to the client queue.
+ * Also, if a task has registered its handle in the caller_task field, notify it.
+ *
+ * @param[in] msg_cfg The message that arrived, wrapped in the configuration struct ipmi_msg_cfg.
+ *
+ * @retval ipmb_error_success The message was successfully copied.
+ * @retval ipmb_error_timeout The client_queue was full.
+ */
+ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg );
 
 /* Local variables */
 QueueHandle_t ipmb_txqueue = NULL;
 QueueHandle_t client_queue = NULL;
+
 static uint8_t current_seq;
 static ipmi_msg_cfg last_sent_req;
 
@@ -56,7 +101,6 @@ void IPMB_TXTask ( void * pvParameters )
 
     for ( ;; ) {
         xQueueReceive( ipmb_txqueue, &current_msg_tx, portMAX_DELAY);
-
 
         if ( IS_RESPONSE(current_msg_tx.buffer) ) {
             /* We're sending a response */
@@ -88,7 +132,7 @@ void IPMB_TXTask ( void * pvParameters )
                 xTaskNotify( current_msg_tx.caller_task , ipmb_error_success, eSetValueWithOverwrite);
             }
 
-        }else{
+        } else {
 
             /***************************************/
             /* Sending new outgoing request        */
@@ -136,10 +180,11 @@ void IPMB_RXTask ( void *pvParameters )
             rx_len++;
 
             /* Perform a checksum test on the message, if it doesn't pass, just ignore it.
-               Following the IPMB specs, we have no way to know if we're the one who should
-               receive it. In MicroTCA crates with star topology for IPMB, we are assured we
-               are the recipients, however, malformed messages may be safely ignored as the
-               MCMC should take care of retrying. */
+             * Following the IPMB specs, we have no way to know if we're the one who should
+             * receive it. In MicroTCA crates with star topology for IPMB, we are assured we
+             * are the recipients, however, malformed messages may be safely ignored as the
+             * MCMC should take care of retrying.
+             */
 
             if ( ipmb_assert_chksum( ipmb_buffer_rx, rx_len ) != ipmb_error_success ) {
                 continue;
@@ -172,7 +217,7 @@ void IPMB_RXTask ( void *pvParameters )
 
 void ipmb_init ( void )
 {
-    vI2CConfig( IPMB_I2C, I2C_SPEED );
+    vI2CConfig( IPMB_I2C, IPMB_I2C_FREQ );
     ipmb_addr = get_ipmb_addr( );
     vI2CSlaveSetup( IPMB_I2C, ipmb_addr );
 
@@ -238,16 +283,6 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
     return ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
 }
 
-/*! @brief Notifies the client that a new request has arrived and copies the message to its queue.
- * This function receives a message wrapped in a ipmi_msg_cfg struct and copies only the ipmi_msg
- * field to the client queue.
- * Also, if a task has registered its handle in the caller_task field, notify it.
- *
- * @param[in] msg_cfg The message that arrived, wrapped in the configuration struct ipmi_msg_cfg.
- *
- * @retval ipmb_error_success The message was successfully copied.
- * @retval ipmb_error_timeout The client_queue was full.
- */
 ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
 {
     configASSERT( client_queue );
@@ -279,15 +314,6 @@ ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
     }
 }
 
-/*! @brief Asserts the input message checksums by comparing them with our calculated ones.
- *
- * @param buffer Pointer to the message bytes.
- * @param buffer_len Size of the message.
- *
- * @retval ipmb_error_success The message's checksum bytes are correct, therefore the message is valid.
- * @retval ipmb_error_hdr_chksum The header checksum byte is invalid.
- * @retval ipmb_error_hdr_chksum The final checksum byte is invalid.
- */
 ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
 {
     configASSERT( buffer );
@@ -305,37 +331,6 @@ ipmb_error ipmb_assert_chksum ( uint8_t * buffer, uint8_t buffer_len )
     return ipmb_error_msg_chksum;
 }
 
-/*! @brief Encode IPMI msg struct to a byte formatted buffer
- *
- * This function formats the ipmi_msg struct fields into a byte array, following the specification:
- *
- *| IPMB Messages  |         |          |         |        |
- *|----------------+---------+----------+---------+--------|
- *|                | REQUEST | RESPONSE | Bit Len | Byte # |
- *|----------------+---------+----------+---------+--------|
- *| Connection     | rsSA    | rqSA     |       8 |      1 |
- *| Header         | NetFN   | NetFN    |       6 |      2 |
- *|                | rsLUN   | rqLUN    |       2 |      2 |
- *|----------------+---------+----------+---------+--------|
- *| Header Chksum  | Chksum  | Chksum   |       8 |      3 |
- *|----------------+---------+----------+---------+--------|
- *|                | rqSA    | rsSA     |       8 |      4 |
- *| Callback Info  | rqSeq   | rqSeq    |       6 |      5 |
- *|                | rqLUN   | rsLUN    |       2 |      5 |
- *|----------------+---------+----------+---------+--------|
- *| Command        | CMD     | CMD      |       8 |      6 |
- *|----------------+---------+----------+---------+--------|
- *| Data           |         | CC       |       8 |      7 |
- *|                | Data    | Data     |     8*N |    7+N |
- *|----------------+---------+----------+---------+--------|
- *| Message Chksum | Chksum  | Checksum |       8 |  7+N+1 |
- *|----------------+---------+----------+---------+--------|
- *
- * @param[out] buffer Byte buffer which will hold the formatted message
- * @param[in] msg The message struct to be formatted
- *
- * @retval ipmb_error_success The message was successfully formatted
- */
 ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
 {
     configASSERT( msg );
@@ -359,14 +354,6 @@ ipmb_error ipmb_encode ( uint8_t * buffer, ipmi_msg * msg )
     return ipmb_error_success;
 }
 
-/*! @brief Decodes a buffer and copies to its specific fields in a ipmi_msg struct
- *
- * @param[out] msg Pointer to a ipmi_msg struct which will hold the decoded message
- * @param[in] buffer Pointer to a byte array that will be decoded
- * @param[in] len Length of \p buffer
- *
- * @retval ipmb_error_success The message was successfully decoded
- */
 ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
 {
     configASSERT( msg );
@@ -399,54 +386,14 @@ ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
  *==============================================================
  */
 
-/*! @brief Table holding all possible address values in IPMB specification
+/**
+ * @brief Table holding all possible address values in IPMB specification
  * @see get_ipmb_addr()
  */
 unsigned char IPMBL_TABLE[IPMBL_TABLE_SIZE] = {
     0x70, 0x8A, 0x72, 0x8E, 0x92, 0x90, 0x74, 0x8C, 0x76,
     0x98, 0x9C, 0x9A, 0xA0, 0xA4, 0x88, 0x9E, 0x86, 0x84,
     0x78, 0x94, 0x7A, 0x96, 0x82, 0x80, 0x7C, 0x7E, 0xA2 };
-
-/*! The state of each GA signal is represented by G (grounded), U (unconnected),
- *  or P (pulled up to Management Power).
- *
- *  The MMC drives P1 low and reads the GA lines. The MMC then drives P1 high and
- *  reads the GA lines. Any line that changes state between the two reads indicate
- *  an unconnected (U) pin.
- *
- *  The IPMB-L address of a Module can be calculated as (70h + Site Number x 2). <br>
- *  G = 0, P = 1, U = 2 <br>
- *  | Pin | Ternary | Decimal | Address |
- *  |:---:|:-------:|:-------:|:-------:|
- *  | GGG | 000 | 0  | 0x70 |
- *  | GGP | 001 | 1  | 0x8A |
- *  | GGU | 002 | 2  | 0x72 |
- *  | GPG | 010 | 3  | 0x8E |
- *  | GPP | 011 | 4  | 0x92 |
- *  | GPU | 012 | 5  | 0x90 |
- *  | GUG | 020 | 6  | 0x74 |
- *  | GUP | 021 | 7  | 0x8C |
- *  | GUU | 022 | 8  | 0x76 |
- *  | PGG | 100 | 9  | 0x98 |
- *  | PGP | 101 | 10 | 0x9C |
- *  | PGU | 102 | 11 | 0x9A |
- *  | PPG | 110 | 12 | 0xA0 |
- *  | PPP | 111 | 13 | 0xA4 |
- *  | PPU | 112 | 14 | 0x88 |
- *  | PUG | 120 | 15 | 0x9E |
- *  | PUP | 121 | 16 | 0x86 |
- *  | PUU | 122 | 17 | 0x84 |
- *  | UGG | 200 | 18 | 0x78 |
- *  | UGP | 201 | 19 | 0x94 |
- *  | UGU | 202 | 20 | 0x7A |
- *  | UPG | 210 | 21 | 0x96 |
- *  | UPP | 211 | 22 | 0x82 |
- *  | UPU | 212 | 23 | 0x80 |
- *  | UUG | 220 | 24 | 0x7C |
- *  | UUP | 221 | 25 | 0x7E |
- *  | UUU | 222 | 26 | 0xA2 |
- */
-#define GPIO_GA_DELAY 10
 
 uint8_t get_ipmb_addr( void )
 {
@@ -461,8 +408,8 @@ uint8_t get_ipmb_addr( void )
      *  to have correct GA value after GA_TEST_PIN changes */
     {
         uint8_t i;
-        for (i = 0; i < GPIO_GA_DELAY; i++){
-            __asm volatile ("nop");
+        for (i = 0; i < GPIO_GA_DELAY; i++) {
+            asm("NOP");
         }
     }
 
@@ -478,10 +425,10 @@ uint8_t get_ipmb_addr( void )
      *  to have correct GA value after GA_TEST_PIN changes */
     {
         uint8_t i;
-        for (i = 0; i < GPIO_GA_DELAY; i++)
-            __asm volatile ("nop");
+        for (i = 0; i < GPIO_GA_DELAY; i++) {
+            asm("NOP");
+        }
     }
-
 
     if ( ga0 != gpio_read_pin(GA0_PORT, GA0_PIN) ){
         ga0 = UNCONNECTED;
@@ -504,4 +451,3 @@ uint8_t get_ipmb_addr( void )
 
     return IPMBL_TABLE[index];
 }
-#undef GPIO_GA_DELAY

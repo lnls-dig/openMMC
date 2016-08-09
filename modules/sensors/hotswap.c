@@ -19,6 +19,15 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file hotswap.c
+ * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
+ *
+ * @brief Hotswap sensors implementation
+ *
+ * @ingroup HOTSWAP
+ */
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
@@ -30,7 +39,6 @@
 #include "led.h"
 #include "fru.h"
 #include "utils.h"
-#include "rtm.h"
 
 static uint8_t hotswap_get_handle_status( void )
 {

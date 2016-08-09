@@ -23,9 +23,17 @@
 #ifndef __IPMI_OEM_H_
 #define __IPMI_OEM_H_
 
-/*!
- * @file ipmi_oem.h
+/**
+ * @file afc/v3_0/ipmi_oem.h
  * @brief Custom IPMI commands for AFC
+ *
+ * @ingroup AFC_V3_0_IPMI_OEM
+ */
+
+/**
+ * @defgroup AFC_V3_0_IPMI_OEM AFCv3.0 IPMI OEM Commands
+ * @ingroup AFC_V3_0
+ * @{
  */
 
 /*
@@ -35,10 +43,11 @@
 
 #include "ipmi.h"
 
-/* Custom NetFn */
+/**
+ * @brief Custom NetFN (User defined, value greater than 0x2C)
+ */
 #define NETFN_CUSTOM_OEM                    0x30
 
-/* AFC Custom Commands */
 #define IPMI_OEM_CMD_I2C_TRANSFER           0x00
 #define IPMI_OEM_CMD_GPIO                   0x01
 #define IPMI_OEM_CMD_CLOCK_CROSSBAR_GET     0x02
@@ -46,5 +55,8 @@
 #define IPMI_OEM_CMD_SSP_TRANSFER           0x04
 #define IPMI_OEM_CMD_SSP_TRANSFER_RAW       0x05
 #define IPMI_OEM_CMD_CLOCK_CROSSBAR_RESET   0x06
+/**
+ * @}
+ */
 
 #endif

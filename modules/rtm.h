@@ -19,13 +19,27 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file   rtm.h
+ * @author Henrique Silva <henrique.silva@lnls.br>
+ *
+ * @brief  Generic RTM Module management functions
+ *
+ * @ingroup RTM_Manage
+ */
+
 #ifndef RTM_H_
 #define RTM_H_
 
+#include "rtm_user.h"
+
+/**
+ * @brief Initialize RTM Manage task
+ *
+ * This task creates the RTM_Manage task and initialize some GPIO pins used to detect the RTM Board presence
+ *
+ * @return None
+ */
 void rtm_manage_init( void );
-void rtm_enable_payload_power( void );
-uint8_t rtm_get_hotswap_handle_status( void );
-bool rtm_compatibility_check( void );
-bool rtm_quiesce( void );
 
 #endif
