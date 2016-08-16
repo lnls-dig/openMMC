@@ -4,7 +4,7 @@ if(NOT BOARD)
   message(FATAL_ERROR "${BoldRed}Target board was not selected! You must pass the flag -DBOARD=<board_name>${ColourReset}")
 endif()
 
-if(${BOARD} MATCHES "^(AFC|afc)$")
+if(${BOARD} MATCHES "^(afc-bpm)$")
 
   if(NOT VERSION)
     message(FATAL_ERROR "${BoldRed}AFC board version was not selected! You must pass the flag -DVERSION=<major>.<minor>${ColourReset}")
@@ -12,9 +12,9 @@ if(${BOARD} MATCHES "^(AFC|afc)$")
 
   message(STATUS "Selected Board version: ${VERSION}")
   if(${VERSION} MATCHES "(3.0)")
-    add_subdirectory(afc/v3_0)
+    add_subdirectory(afc-bpm/v3_0)
   elseif(${VERSION} MATCHES "(3.1)")
-    add_subdirectory(afc/v3_1)
+    add_subdirectory(afc-bpm/v3_1)
   endif()
 
 elseif(${BOARD} MATCHES "^(afc-timing)$" )
