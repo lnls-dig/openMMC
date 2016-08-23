@@ -27,7 +27,6 @@
 #ifndef LPC17_UART_H_
 #define LPC17_UART_H_
 
-#include "semphr.h"
 #include "string.h"
 #include "stdio.h"
 
