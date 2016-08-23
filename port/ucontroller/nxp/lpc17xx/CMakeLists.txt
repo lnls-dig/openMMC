@@ -3,6 +3,7 @@ set(LPCOPEN_SRCPATH ${LPC17XX_PATH}/lpcopen/src)
 set(LPCOPEN_INCPATH ${LPC17XX_PATH}/lpcopen/inc)
 
 include_directories(${LPC17XX_PATH})
+include_directories(${PROJ_HDRS})
 
 #Silence GCC Warnings
 add_compile_options( -Wno-switch -Wno-unused-but-set-variable )

@@ -58,6 +58,8 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" CACHE STRING "")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "")
 
 set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/main_mmc.c)
+set(PROJ_HDRS ${CMAKE_SOURCE_DIR} )
+
 add_subdirectory(port/board)
 add_subdirectory(FreeRTOS)
 add_subdirectory(port/ucontroller)

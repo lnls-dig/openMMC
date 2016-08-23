@@ -29,10 +29,10 @@
 #include "chip_lpc175x_6x.h"
 #include "lpc17_hpm.h"
 #include "iap.h"
-#include "ipmi.h"
-#include "boot.h"
+#include "modules/ipmi.h"
+#include "boot/boot.h"
 #ifdef MODULE_WATCHDOG
-#include "watchdog.h"
+#include "modules/watchdog.h"
 #endif
 
 uint32_t ipmc_page_addr = 0;
