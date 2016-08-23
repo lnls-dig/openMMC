@@ -71,3 +71,4 @@ set(UCONTROLLER_HDRS ${UCONTROLLER_HDRS} PARENT_SCOPE)
 
 add_library(lpcopen STATIC ${LIBLPCOPEN_SRCS})
 
+add_dependencies(lpcopen FreeRTOS)
