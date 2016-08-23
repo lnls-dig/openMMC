@@ -44,8 +44,8 @@ set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat
 
 # Build specific flags
 set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_ERROR_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS} -O0 -g3 -DDEBUG")
-set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS} -O3")
+set(CMAKE_C_FLAGS_DEBUG     "-O0 -g3 -DDEBUG")
+set(CMAKE_C_FLAGS_RELEASE   "-Os")
 
 # When we break up long strings in CMake we get semicolon
 # separated lists, undo this here...
