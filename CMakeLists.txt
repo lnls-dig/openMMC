@@ -85,7 +85,7 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 add_executable(${CMAKE_PROJECT_NAME} ${UCONTROLLER_SRCS} ${PROJ_SRCS})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${MODULES_FLAGS})
 
-add_executable(bootloader ${BOOT_SRCS} ${UCONTROLLER_SRCS})
+add_executable(bootloader ${BOOT_SRCS})
 
 # Linker flags
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
