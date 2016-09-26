@@ -92,17 +92,17 @@ QueueHandle_t ipmb_txqueue = NULL;
 QueueHandle_t client_queue = NULL;
 
 static uint8_t current_seq;
-static ipmi_msg_cfg last_sent_req;
+static ipmi_msg_cfg *last_sent_req;
 
 void IPMB_TXTask ( void * pvParameters )
 {
-    ipmi_msg_cfg current_msg_tx;
+    ipmi_msg_cfg *current_msg_tx;
     uint8_t ipmb_buffer_tx[IPMI_MSG_MAX_LENGTH];
 
     for ( ;; ) {
         xQueueReceive( ipmb_txqueue, &current_msg_tx, portMAX_DELAY);
 
-        if ( IS_RESPONSE(current_msg_tx.buffer) ) {
+        if ( IS_RESPONSE(current_msg_tx->buffer) ) {
             /* We're sending a response */
 
             /**********************************/
@@ -110,8 +110,11 @@ void IPMB_TXTask ( void * pvParameters )
             /**********************************/
 
             /* See if we've already tried sending this message 3 times */
-            if ( current_msg_tx.retries > IPMB_MAX_RETRIES ) {
-                xTaskNotify( current_msg_tx.caller_task ,ipmb_error_failure , eSetValueWithOverwrite);
+            if ( current_msg_tx->retries > IPMB_MAX_RETRIES ) {
+                xTaskNotify( current_msg_tx->caller_task ,ipmb_error_failure , eSetValueWithOverwrite);
+		/* Free the message buffer */
+		vPortFree( current_msg_tx );
+		current_msg_tx = NULL;
                 continue;
             }
 
@@ -120,16 +123,19 @@ void IPMB_TXTask ( void * pvParameters )
             /**********************************/
 
             /* Encode the message buffer to the IPMB format */
-            ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx.buffer );
-            uint8_t resp_tx_size = current_msg_tx.buffer.data_len + IPMB_RESP_HEADER_LENGTH;
-            if ( xI2CMasterWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], resp_tx_size ) < resp_tx_size ) {
+            ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx->buffer );
+            uint8_t resp_tx_size = current_msg_tx->buffer.data_len + IPMB_RESP_HEADER_LENGTH;
+            if ( xI2CMasterWrite( IPMB_I2C, current_msg_tx->buffer.dest_addr >> 1, &ipmb_buffer_tx[1], resp_tx_size ) < resp_tx_size ) {
                 /* Message couldn't be transmitted right now, increase retry counter and try again later */
-                current_msg_tx.retries++;
+                current_msg_tx->retries++;
                 xQueueSendToFront( ipmb_txqueue, &current_msg_tx, 0 );
 
             } else {
                 /* Success case*/
-                xTaskNotify( current_msg_tx.caller_task , ipmb_error_success, eSetValueWithOverwrite);
+                xTaskNotify( current_msg_tx->caller_task , ipmb_error_success, eSetValueWithOverwrite);
+		/* Free the message buffer */
+		vPortFree( current_msg_tx );
+		current_msg_tx = NULL;
             }
 
         } else {
@@ -139,26 +145,30 @@ void IPMB_TXTask ( void * pvParameters )
             /***************************************/
 
             /* Get the time when the message is first sent */
-            if ( current_msg_tx.retries == 0 ) {
-                current_msg_tx.timestamp = xTaskGetTickCount();
+            if ( current_msg_tx->retries == 0 ) {
+                current_msg_tx->timestamp = xTaskGetTickCount();
             }
 
-            ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx.buffer );
-            uint8_t req_tx_size = current_msg_tx.buffer.data_len + IPMB_REQ_HEADER_LENGTH;
-            if ( xI2CMasterWrite( IPMB_I2C, current_msg_tx.buffer.dest_addr >> 1, &ipmb_buffer_tx[1], req_tx_size ) < req_tx_size) {
+            ipmb_encode( &ipmb_buffer_tx[0], &current_msg_tx->buffer );
+            uint8_t req_tx_size = current_msg_tx->buffer.data_len + IPMB_REQ_HEADER_LENGTH;
+            if ( xI2CMasterWrite( IPMB_I2C, current_msg_tx->buffer.dest_addr >> 1, &ipmb_buffer_tx[1], req_tx_size ) < req_tx_size) {
 
-                current_msg_tx.retries++;
+                current_msg_tx->retries++;
 
-                if ( current_msg_tx.retries > IPMB_MAX_RETRIES ){
-                    xTaskNotify ( current_msg_tx.caller_task, ipmb_error_failure, eSetValueWithOverwrite);
+                if ( current_msg_tx->retries > IPMB_MAX_RETRIES ){
+                    xTaskNotify ( current_msg_tx->caller_task, ipmb_error_failure, eSetValueWithOverwrite);
+		    /* Free the message buffer */
+		    vPortFree( current_msg_tx );
+		    current_msg_tx = NULL;
                 } else {
                     xQueueSendToFront( ipmb_txqueue, &current_msg_tx, 0 );
                 }
 
             } else {
-                /* Request was successfully sent, keep a copy here for future comparison */
+                /* Request was successfully sent, keep a copy here for future comparison and clean the last used buffer */
+		vPortFree( last_sent_req );
                 last_sent_req = current_msg_tx;
-                xTaskNotify ( current_msg_tx.caller_task, ipmb_error_success, eSetValueWithOverwrite);
+                xTaskNotify ( current_msg_tx->caller_task, ipmb_error_success, eSetValueWithOverwrite);
             }
         }
     }
@@ -166,7 +176,7 @@ void IPMB_TXTask ( void * pvParameters )
 
 void IPMB_RXTask ( void *pvParameters )
 {
-    ipmi_msg_cfg current_msg_rx;
+    ipmi_msg_cfg *current_msg_rx;
     uint8_t ipmb_buffer_rx[IPMI_MSG_MAX_LENGTH];
     uint8_t rx_len;
 
@@ -190,17 +200,19 @@ void IPMB_RXTask ( void *pvParameters )
                 continue;
             }
 
+	    current_msg_rx = pvPortMalloc(sizeof(ipmi_msg_cfg));
+
             /* Clear our local buffer before writing new data into it */
-            memset(&current_msg_rx, 0, sizeof(ipmi_msg_cfg));
+            memset(current_msg_rx, 0, sizeof(ipmi_msg_cfg));
 
-            ipmb_decode( &current_msg_rx.buffer, ipmb_buffer_rx, rx_len );
+            ipmb_decode( &(current_msg_rx->buffer), ipmb_buffer_rx, rx_len );
 
-            if ( IS_RESPONSE(current_msg_rx.buffer ) ) {
+            if ( IS_RESPONSE(current_msg_rx->buffer ) ) {
                 /* The message is a response, check if it's been received in time */
-                if ( (xTaskGetTickCount() - last_sent_req.timestamp) < IPMB_MSG_TIMEOUT ) {
+                if ( (xTaskGetTickCount() - last_sent_req->timestamp) < IPMB_MSG_TIMEOUT ) {
                     /* Seq number checking is enough to match the messages */
-                    if ( current_msg_rx.buffer.seq == last_sent_req.buffer.seq ) {
-                        ipmb_notify_client ( &current_msg_rx );
+                    if ( current_msg_rx->buffer.seq == last_sent_req->buffer.seq ) {
+                        ipmb_notify_client ( current_msg_rx );
                     }
                     /* If we received a response that doesn't match a previously sent request, just discard it */
                 }
@@ -209,7 +221,7 @@ void IPMB_RXTask ( void *pvParameters )
                 /* The received message is a request */
 
                 /* Notify the client about the new request */
-                ipmb_notify_client ( &current_msg_rx );
+                ipmb_notify_client ( current_msg_rx );
             }
         }
     }
@@ -221,7 +233,7 @@ void ipmb_init ( void )
     ipmb_addr = get_ipmb_addr( );
     vI2CSlaveSetup( IPMB_I2C, ipmb_addr );
 
-    ipmb_txqueue = xQueueCreate( IPMB_TXQUEUE_LEN, sizeof(ipmi_msg_cfg) );
+    ipmb_txqueue = xQueueCreate( IPMB_TXQUEUE_LEN, sizeof(ipmi_msg_cfg *) );
     vQueueAddToRegistry( ipmb_txqueue, "IPMB_TX_QUEUE");
 
     xTaskCreate( IPMB_TXTask, (const char*)"IPMB_TX", 100, ( void * ) NULL, tskIPMB_TX_PRIORITY, ( TaskHandle_t * ) NULL );
@@ -230,23 +242,24 @@ void ipmb_init ( void )
 
 ipmb_error ipmb_send_request ( ipmi_msg * req )
 {
-    ipmi_msg_cfg req_cfg;
+    ipmi_msg_cfg *req_cfg = pvPortMalloc( sizeof( ipmi_msg_cfg ) );
 
     /* Builds the message according to the IPMB specification */
 
     /* Copies data from the msg struct passed by caller */
-    memcpy( &(req_cfg.buffer), req, sizeof(ipmi_msg));
+    memcpy( &(req_cfg->buffer), req, sizeof(ipmi_msg));
     /* Write necessary fields (should be garbage data by now) */
-    req_cfg.buffer.dest_addr = MCH_ADDRESS;
-    req_cfg.buffer.dest_LUN = 0;
-    req_cfg.buffer.src_addr = ipmb_addr;
-    req_cfg.buffer.seq = current_seq++;
-    req_cfg.buffer.src_LUN = 0;
-    req_cfg.caller_task = xTaskGetCurrentTaskHandle();
-    req_cfg.retries = 0;
+    req_cfg->buffer.dest_addr = MCH_ADDRESS;
+    req_cfg->buffer.dest_LUN = 0;
+    req_cfg->buffer.src_addr = ipmb_addr;
+    req_cfg->buffer.seq = current_seq++;
+    req_cfg->buffer.src_LUN = 0;
+    req_cfg->caller_task = xTaskGetCurrentTaskHandle();
+    req_cfg->retries = 0;
 
     /* Blocks here until is able put message in tx queue */
     if (xQueueSend( ipmb_txqueue, &req_cfg, 1) != pdTRUE ){
+	vPortFree( req_cfg );
         return ipmb_error_failure;
     }
 
@@ -256,26 +269,27 @@ ipmb_error ipmb_send_request ( ipmi_msg * req )
 
 ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
 {
-    ipmi_msg_cfg resp_cfg;
+    ipmi_msg_cfg *resp_cfg = pvPortMalloc( sizeof(ipmi_msg_cfg) );
 
     /* Builds the message according to the IPMB specification */
 
     /* Copies data from the response msg struct passed by caller */
-    memcpy( &(resp_cfg.buffer), resp, sizeof(ipmi_msg));
+    memcpy( &(resp_cfg->buffer), resp, sizeof(ipmi_msg));
 
     /* Write necessary fields (should be garbage data by now) */
-    resp_cfg.buffer.dest_addr = req->src_addr;
-    resp_cfg.buffer.netfn = req->netfn + 1;
-    resp_cfg.buffer.dest_LUN = req->src_LUN;
-    resp_cfg.buffer.src_addr = req->dest_addr;
-    resp_cfg.buffer.seq = req->seq;
-    resp_cfg.buffer.src_LUN = req->dest_LUN;
-    resp_cfg.buffer.cmd = req->cmd;
-    resp_cfg.caller_task = xTaskGetCurrentTaskHandle();
-    resp_cfg.retries = 0;
+    resp_cfg->buffer.dest_addr = req->src_addr;
+    resp_cfg->buffer.netfn = req->netfn + 1;
+    resp_cfg->buffer.dest_LUN = req->src_LUN;
+    resp_cfg->buffer.src_addr = req->dest_addr;
+    resp_cfg->buffer.seq = req->seq;
+    resp_cfg->buffer.src_LUN = req->dest_LUN;
+    resp_cfg->buffer.cmd = req->cmd;
+    resp_cfg->caller_task = xTaskGetCurrentTaskHandle();
+    resp_cfg->retries = 0;
 
     /* Blocks here until is able put message in tx queue */
-    if (xQueueSend( ipmb_txqueue, &resp_cfg, portMAX_DELAY) != pdTRUE ){
+    if ( xQueueSend( ipmb_txqueue, &resp_cfg, portMAX_DELAY) != pdTRUE ){
+	vPortFree( resp_cfg );
         return ipmb_error_failure;
     }
 
@@ -286,16 +300,22 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
 ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
 {
     configASSERT( client_queue );
-    configASSERT( msg_cfg != NULL );
+    configASSERT( msg_cfg );
     /* Sends only the ipmi msg, not the control struct */
     if (!IS_RESPONSE(msg_cfg->buffer)) {
         if ( xQueueSend( client_queue, &(msg_cfg->buffer), CLIENT_NOTIFY_TIMEOUT ) == pdFALSE ) {
-            return ipmb_error_timeout;
+	    /* This shouldn't happen, but if it does, clear the message buffer, since the IPMB_TX task gives us its ownership */
+	    vPortFree( msg_cfg );
+	    return ipmb_error_timeout;
         }
     }
     if ( msg_cfg->caller_task ) {
         xTaskNotifyGive( msg_cfg->caller_task );
     }
+
+    /* The message has already been copied to the responsible task, free it so we don't run out of resources */
+    vPortFree( msg_cfg );
+
     return ipmb_error_success;
 }
 
@@ -303,7 +323,7 @@ ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
 {
     configASSERT( queue != NULL );
 
-    *queue = xQueueCreate( IPMB_CLIENT_QUEUE_LEN, sizeof(ipmi_msg) );
+    *queue = xQueueCreate( IPMB_CLIENT_QUEUE_LEN, sizeof(ipmi_msg *) );
     vQueueAddToRegistry(*queue, "ipmi_rx_queue");
     /* Copies the queue handler so we know where to write */
     client_queue = *queue;
