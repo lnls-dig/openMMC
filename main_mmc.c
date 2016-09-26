@@ -51,8 +51,6 @@ void heap_test ( void* param);
 TaskHandle_t heap_handle;
 /*-----------------------------------------------------------*/
 
-uint8_t ipmb_addr = 0xFF;
-
 int main( void )
 {
 
@@ -83,7 +81,6 @@ int main( void )
     fru_init(FRU_AMC);
 #endif
 
-    ipmb_addr = get_ipmb_addr();
 #ifdef MODULE_SDR
     sdr_init();
 #endif
