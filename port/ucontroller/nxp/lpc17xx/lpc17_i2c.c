@@ -63,16 +63,12 @@ void Board_I2C_Init(I2C_ID_T id)
 {
     switch (id) {
     case I2C0:
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 27, IOCON_MODE_INACT, IOCON_FUNC1);
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 28, IOCON_MODE_INACT, IOCON_FUNC1);
+        Chip_IOCON_PinMux(LPC_IOCON, I2C0_PORT, I2C0_SDA_PIN, IOCON_MODE_INACT, IOCON_FUNC1);
+        Chip_IOCON_PinMux(LPC_IOCON, I2C0_PORT, I2C0_SCL_PIN, IOCON_MODE_INACT, IOCON_FUNC1);
         Chip_IOCON_SetI2CPad(LPC_IOCON, I2CPADCFG_STD_MODE);
         break;
 
     case I2C1:
-        Chip_IOCON_PinMux(LPC_IOCON, 0,  0, IOCON_MODE_INACT, IOCON_FUNC3);
-        Chip_IOCON_PinMux(LPC_IOCON, 0,  1, IOCON_MODE_INACT, IOCON_FUNC3);
-        Chip_IOCON_EnableOD(LPC_IOCON, 0,  0);
-        Chip_IOCON_EnableOD(LPC_IOCON, 0,  1);
 
 #ifndef BOARD_AFC_V3_1
 	    Chip_IOCON_PinMux(LPC_IOCON, 0, 19, IOCON_MODE_INACT, IOCON_FUNC2);
@@ -80,13 +76,17 @@ void Board_I2C_Init(I2C_ID_T id)
 	    Chip_IOCON_EnableOD(LPC_IOCON, 0, 19);
 	    Chip_IOCON_EnableOD(LPC_IOCON, 0, 20);
 #endif
+        Chip_IOCON_PinMux(LPC_IOCON, I2C1_PORT, I2C1_SDA_PIN, IOCON_MODE_INACT, IOCON_FUNC3);
+        Chip_IOCON_PinMux(LPC_IOCON, I2C1_PORT, I2C1_SCL_PIN, IOCON_MODE_INACT, IOCON_FUNC3);
+        Chip_IOCON_EnableOD(LPC_IOCON, I2C1_PORT, I2C1_SDA_PIN);
+        Chip_IOCON_EnableOD(LPC_IOCON, I2C1_PORT, I2C1_SCL_PIN);
         break;
 
     case I2C2:
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 10, IOCON_MODE_INACT, IOCON_FUNC2);
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 11, IOCON_MODE_INACT, IOCON_FUNC2);
-        Chip_IOCON_EnableOD(LPC_IOCON, 0, 10);
-        Chip_IOCON_EnableOD(LPC_IOCON, 0, 11);
+        Chip_IOCON_PinMux(LPC_IOCON, I2C2_PORT, I2C2_SDA_PIN, IOCON_MODE_INACT, IOCON_FUNC2);
+        Chip_IOCON_PinMux(LPC_IOCON, I2C2_PORT, I2C2_SCL_PIN, IOCON_MODE_INACT, IOCON_FUNC2);
+        Chip_IOCON_EnableOD(LPC_IOCON, I2C2_PORT, I2C2_SDA_PIN);
+        Chip_IOCON_EnableOD(LPC_IOCON, I2C2_PORT, I2C2_SCL_PIN);
         break;
     default:
         break;
