@@ -139,8 +139,8 @@
 #define GPIO_FPGA_RESET_PIN     9
 #define GPIO_FLASH_CS_MUX_PORT  0
 #define GPIO_FLASH_CS_MUX_PIN   19
-#define GPIO_INITB_PORT         0
-#define GPIO_INITB_PIN          20
+#define GPIO_FPGA_INITB_PORT    0
+#define GPIO_FPGA_INITB_PIN     20
 
 /* VADJ DAC */
 #define GPIO_DAC_VADJ_RST_PORT  0

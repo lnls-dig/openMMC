@@ -176,14 +176,14 @@ void payload_init( void )
     /* 0 = FPGA reads bitstream from Program memory
      * 1 = FPGA reads bitstream from User memory
      */
-    gpio_set_pin_dir(0, 19, OUTPUT);
-    gpio_set_pin_state(0, 19, LOW);
+    gpio_set_pin_dir( GPIO_FLASH_CS_MUX_PORT, GPIO_FLASH_CS_MUX_PIN, OUTPUT );
+    gpio_set_pin_state( GPIO_FLASH_CS_MUX_PORT, GPIO_FLASH_CS_MUX_PIN, LOW );
 
     /* Init_B */
     /* TODO: Check Init_b pin for error on initialization, then use it as output control */
 
-    gpio_set_pin_dir(0, 20, OUTPUT);
-    gpio_set_pin_state(0, 20, HIGH);
+    gpio_set_pin_dir( GPIO_FPGA_INITB_PORT, GPIO_FPGA_INITB_PIN, OUTPUT );
+    gpio_set_pin_state( GPIO_FPGA_INITB_PORT, GPIO_FPGA_INITB_PIN, HIGH );
 }
 
 void vTaskPayload( void *pvParameters )
