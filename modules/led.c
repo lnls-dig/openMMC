@@ -59,7 +59,7 @@ LEDConfig_t amc_leds_config[LED_CNT] = {
         .mode = LEDMODE_LOCAL,
         .mode_cfg = {
             [LEDMODE_LOCAL] = {
-                .t_init = 0xFF,
+                .t_init = 0,
                 .t_toggle = 0,
                 .init_status = LEDINIT_ON,
             }
@@ -348,7 +348,7 @@ IPMI_HANDLER(ipmi_picmg_set_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_
         break;
     case 0xFF:
         /* ON override */
-        LEDUpdate( fru_id, led_num, LEDMODE_OVERRIDE, LEDINIT_ON, 0xFF, 0 );
+        LEDUpdate( fru_id, led_num, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
         break;
     case 0xFB:
         /* Lamp Test */
