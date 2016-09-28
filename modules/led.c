@@ -224,23 +224,25 @@ void LEDManage( LEDConfig_t *led_cfg )
         counter_tog = led_cfg->mode_cfg[mode].t_init;
     }
 
-    if ( ( led_cfg->counter == counter_cmp ) && ( counter_tog != 0 ) ) {
-        /* Special case for lamp_test (we must return to the highest priority state */
-        if ( led_cfg->mode == LEDMODE_LAMPTEST ) {
-            led_cfg->mode_cfg[LEDMODE_LAMPTEST].active = false;
+    /* Special case for lamp_test (we must return to the highest priority state */
+    if ( (led_cfg->mode == LEDMODE_LAMPTEST) && (led_cfg->counter >= counter_cmp) ) {
+        led_cfg->mode_cfg[LEDMODE_LAMPTEST].active = false;
+        /* Reset counter */
+        led_cfg->counter = 0;
 
-            if ( led_cfg->mode_cfg[LEDMODE_OVERRIDE].active ) {
-                led_cfg->mode = LEDMODE_OVERRIDE;
-            } else {
-                led_cfg->mode = LEDMODE_LOCAL;
-            }
-
+        /* Revert to the previous state */
+        if ( led_cfg->mode_cfg[LEDMODE_OVERRIDE].active ) {
+            led_cfg->mode = LEDMODE_OVERRIDE;
         } else {
-            /* General case for blinking operation */
-            led_cfg->state = !(led_cfg->state);
-            led_cfg->act_func( led_cfg->id, LEDACT_TOGGLE );
-            led_cfg->counter = 0;
+            led_cfg->mode = LEDMODE_LOCAL;
         }
+    }
+
+    if ( ( led_cfg->counter >= counter_cmp ) && ( counter_tog != 0 ) ) {
+        /* General case for blinking operation - toggle LED */
+        led_cfg->state = !(led_cfg->state);
+        led_cfg->act_func( led_cfg->id, LEDACT_TOGGLE );
+        led_cfg->counter = 0;
     } else {
         /* Stay in the current state and increment counter */
         led_cfg->act_func( led_cfg->id, status );

@@ -52,8 +52,8 @@ enum LEDInit_status {
 };
 
 enum LEDState {
-    LEDSTATE_INIT,
-    LEDSTATE_TOGGLED
+    LEDSTATE_INIT = 0x00,
+    LEDSTATE_TOGGLED = 0xFF
 };
 
 enum LEDAct {
