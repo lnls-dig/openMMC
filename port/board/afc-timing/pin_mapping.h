@@ -170,6 +170,10 @@
 #define UART_DEBUG_TXD_PIN      28
 #define UART_DEBUG_RXD_PIN      29
 
+/* MMC ENABLE# */
+#define MMC_ENABLE_PORT         2
+#define MMC_ENABLE_PIN          8
+
 /**
  * @}
  */
