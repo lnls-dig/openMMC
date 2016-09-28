@@ -51,7 +51,7 @@
 #define ADN4604_EN_OUT_5        0       /* FP2_CLK2 */
 #define ADN4604_EN_OUT_6        1       /* LINK01_CLK */
 #define ADN4604_EN_OUT_7        0       /* FP2_CLK1 */
-#define ADN4604_EN_OUT_8        0       /* PCIE_CLK1 */
+#define ADN4604_EN_OUT_8        1       /* PCIE_CLK1 */
 #define ADN4604_EN_OUT_9        1       /* LINK23_CLK */
 #define ADN4604_EN_OUT_10       0       /* FIN1_CLK3 */
 #define ADN4604_EN_OUT_11       0       /* FIN1_CLK2 */
