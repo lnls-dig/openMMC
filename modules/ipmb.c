@@ -209,7 +209,7 @@ void IPMB_RXTask ( void *pvParameters )
 
             ipmb_decode( &(current_msg_rx->buffer), ipmb_buffer_rx, rx_len );
 
-            if ( IS_RESPONSE(current_msg_rx->buffer ) ) {
+            if ( IS_RESPONSE( current_msg_rx->buffer ) ) {
                 /* The message is a response, check if it's been received in time */
                 if ( (xTaskGetTickCount() - last_sent_req->timestamp) < IPMB_MSG_TIMEOUT ) {
                     /* Seq number checking is enough to match the messages */
@@ -325,7 +325,7 @@ ipmb_error ipmb_register_rxqueue ( QueueHandle_t * queue )
 {
     configASSERT( queue != NULL );
 
-    *queue = xQueueCreate( IPMB_CLIENT_QUEUE_LEN, sizeof(ipmi_msg *) );
+    *queue = xQueueCreate( IPMB_CLIENT_QUEUE_LEN, sizeof( ipmi_msg ) );
     vQueueAddToRegistry(*queue, "ipmi_rx_queue");
     /* Copies the queue handler so we know where to write */
     client_queue = *queue;
