@@ -262,21 +262,21 @@ void vTaskPayload( void *pvParameters )
 
         case PAYLOAD_NO_POWER:
 
-	    if (PP_good) {
+            if (PP_good) {
                 new_state = PAYLOAD_SWITCHING_ON;
             }
             QUIESCED_req = 0;
             break;
 
-        case PAYLOAD_SWITCHING_ON:
-            setDC_DC_ConvertersON( true );
-            new_state = PAYLOAD_POWER_GOOD_WAIT;
-            break;
-
         case PAYLOAD_POWER_GOOD_WAIT:
+            /* Turn DDC converters on */
+            setDC_DC_ConvertersON( true );
+
+            /* Clear hotswap sensor backend power failure bits */
             hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
             hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_FAILURE_MASK );
-            if (QUIESCED_req) {
+
+            if ( QUIESCED_req || ( PP_good == 0 ) ) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if ( DCDC_good == 1 ) {
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
@@ -291,15 +291,7 @@ void vTaskPayload( void *pvParameters )
             break;
 
         case PAYLOAD_FPGA_BOOTING:
-            if (QUIESCED_req == 1 || P12V_good == 0) {
-                new_state = PAYLOAD_SWITCHING_OFF;
-            } else if (FPGA_boot_DONE) {
-                new_state = PAYLOAD_FPGA_WORKING;
-            }
-            break;
-
-        case PAYLOAD_FPGA_WORKING:
-            if (QUIESCED_req == 1 || P12V_good == 0) {
+            if ( QUIESCED_req == 1 || PP_good == 0 || DCDC_good == 0 ) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             }
             break;
@@ -308,15 +300,20 @@ void vTaskPayload( void *pvParameters )
             setDC_DC_ConvertersON( false );
             hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
             hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_BP_SDOWN );
-            hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
-            if ( hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_QUIESCED ) == ipmb_error_success ) {
-                QUIESCED_req = 0;
-                /* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
-                P12V_good = 0;
-                P1V0_good = 0;
+
+            if ( QUIESCED_req ) {
+                hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
+                if ( hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_QUIESCED ) == ipmb_error_success ) {
+                    QUIESCED_req = 0;
+                    hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
+                    new_state = PAYLOAD_NO_POWER;
+                }
+            } else {
                 new_state = PAYLOAD_NO_POWER;
-                hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
             }
+            /* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
+            PP_good = 0;
+            DCDC_good = 0;
             break;
 
         default:

@@ -86,6 +86,13 @@ void EINT2_IRQHandler( void )
     LPC_SYSCTL->EXTINT |= (1 << 2);
 }
 
+/**
+ * @brief Set AFC's DCDC Converters state
+ *
+ * @param on DCDCs state
+ *
+ * @warning The FMC1_P12V DCDC is not affected by this function since it has to be always on in order to measure the Payload power status on the AFC board.
+ */
 void setDC_DC_ConvertersON( bool on )
 {
     gpio_set_pin_state( GPIO_EN_FMC1_PVADJ_PORT, GPIO_EN_FMC1_PVADJ_PIN, on );
@@ -96,7 +103,6 @@ void setDC_DC_ConvertersON( bool on )
     gpio_set_pin_state( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, on );
     gpio_set_pin_state( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, on );
 
-
     gpio_set_pin_state( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, on );
     gpio_set_pin_state( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, on ); // <- this one causes problems if not switched off before power loss
     gpio_set_pin_state( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, on );
@@ -104,6 +110,9 @@ void setDC_DC_ConvertersON( bool on )
     gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, on );
 }
 
+/**
+ * @brief Initialize AFC's DCDC converters hardware
+ */
 void initializeDCDC( void )
 {
     setDC_DC_ConvertersON(false);
@@ -191,11 +200,13 @@ void vTaskPayload( void *pvParameters )
     uint8_t state = PAYLOAD_NO_POWER;
     uint8_t new_state = PAYLOAD_STATE_NO_CHANGE;
 
-    uint8_t P12V_good = 0;
-    uint8_t P1V0_good = 0;
-    uint8_t FPGA_boot_DONE = 0;
-    uint8_t QUIESCED_req = 0;
+    /* Payload power good flag */
+    uint8_t PP_good = 0;
 
+    /* Payload DCDCs good flag */
+    uint8_t DCDC_good = 0;
+
+    uint8_t QUIESCED_req = 0;
     EventBits_t current_evt;
 
     extern sensor_t * hotswap_amc_sensor;
@@ -214,21 +225,21 @@ void vTaskPayload( void *pvParameters )
 
         current_evt = xEventGroupGetBits( amc_payload_evt );
 
-        if ( current_evt & PAYLOAD_MESSAGE_P12GOOD ) {
-            P12V_good = 1;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_P12GOOD );
+        if ( current_evt & PAYLOAD_MESSAGE_PPGOOD ) {
+            PP_good = 1;
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PPGOOD );
         }
-        if ( current_evt & PAYLOAD_MESSAGE_P12GOODn ) {
-            P12V_good = 0;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_P12GOODn );
+        if ( current_evt & PAYLOAD_MESSAGE_PPGOODn ) {
+            PP_good = 0;
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PPGOODn );
         }
-        if ( current_evt & PAYLOAD_MESSAGE_PGOOD ) {
-            P1V0_good = 1;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PGOOD );
+        if ( current_evt & PAYLOAD_MESSAGE_DCDC_PGOOD ) {
+            DCDC_good = 1;
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_DCDC_PGOOD );
         }
-        if ( current_evt & PAYLOAD_MESSAGE_PGOODn ) {
-            P1V0_good = 0;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PGOODn );
+        if ( current_evt & PAYLOAD_MESSAGE_DCDC_PGOODn ) {
+            DCDC_good = 0;
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_DCDC_PGOODn );
         }
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
             QUIESCED_req = 1;
@@ -245,28 +256,29 @@ void vTaskPayload( void *pvParameters )
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_REBOOT );
         }
 
-        FPGA_boot_DONE = gpio_read_pin( GPIO_DONE_B_PORT, GPIO_DONE_B_PIN );
-        P1V0_good = gpio_read_pin( GPIO_PGOOD_P1V0_PORT,GPIO_PGOOD_P1V0_PIN );
+        DCDC_good = gpio_read_pin( GPIO_DCDC_PGOOD_PORT,GPIO_DCDC_PGOOD_PIN );
 
         switch(state) {
+
         case PAYLOAD_NO_POWER:
-            if (P12V_good == 1) {
+
+            if (PP_good) {
                 new_state = PAYLOAD_SWITCHING_ON;
             }
             QUIESCED_req = 0;
             break;
 
-        case PAYLOAD_SWITCHING_ON:
-            setDC_DC_ConvertersON( true );
-            new_state = PAYLOAD_POWER_GOOD_WAIT;
-            break;
-
         case PAYLOAD_POWER_GOOD_WAIT:
+            /* Turn DDC converters on */
+            setDC_DC_ConvertersON( true );
+
+            /* Clear hotswap sensor backend power failure bits */
             hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
             hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_FAILURE_MASK );
-            if (QUIESCED_req) {
+
+            if ( QUIESCED_req || ( PP_good == 0 ) ) {
                 new_state = PAYLOAD_SWITCHING_OFF;
-            } else if (P1V0_good == 1) {
+            } else if ( DCDC_good == 1 ) {
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
             }
             break;
@@ -279,15 +291,7 @@ void vTaskPayload( void *pvParameters )
             break;
 
         case PAYLOAD_FPGA_BOOTING:
-            if (QUIESCED_req == 1 || P12V_good == 0) {
-                new_state = PAYLOAD_SWITCHING_OFF;
-            } else if (FPGA_boot_DONE) {
-                new_state = PAYLOAD_FPGA_WORKING;
-            }
-            break;
-
-        case PAYLOAD_FPGA_WORKING:
-            if (QUIESCED_req == 1 || P12V_good == 0) {
+            if ( QUIESCED_req == 1 || PP_good == 0 || DCDC_good == 0 ) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             }
             break;
@@ -296,15 +300,20 @@ void vTaskPayload( void *pvParameters )
             setDC_DC_ConvertersON( false );
             hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
             hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_BP_SDOWN );
-            hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
-            if ( hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_QUIESCED ) == ipmb_error_success ) {
-                QUIESCED_req = 0;
-                /* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
-                P12V_good = 0;
-                P1V0_good = 0;
+
+            if ( QUIESCED_req ) {
+                hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
+                if ( hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_QUIESCED ) == ipmb_error_success ) {
+                    QUIESCED_req = 0;
+                    hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
+                    new_state = PAYLOAD_NO_POWER;
+                }
+            } else {
                 new_state = PAYLOAD_NO_POWER;
-                hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
             }
+            /* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
+            PP_good = 0;
+            DCDC_good = 0;
             break;
 
         default:
