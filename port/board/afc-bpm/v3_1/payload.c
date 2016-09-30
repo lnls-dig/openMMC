@@ -200,11 +200,13 @@ void vTaskPayload( void *pvParameters )
     uint8_t state = PAYLOAD_NO_POWER;
     uint8_t new_state = PAYLOAD_STATE_NO_CHANGE;
 
-    uint8_t P12V_good = 0;
-    uint8_t P1V0_good = 0;
-    uint8_t FPGA_boot_DONE = 0;
-    uint8_t QUIESCED_req = 0;
+    /* Payload power good flag */
+    uint8_t PP_good = 0;
 
+    /* Payload DCDCs good flag */
+    uint8_t DCDC_good = 0;
+
+    uint8_t QUIESCED_req = 0;
     EventBits_t current_evt;
 
     extern sensor_t * hotswap_amc_sensor;
@@ -223,21 +225,21 @@ void vTaskPayload( void *pvParameters )
 
         current_evt = xEventGroupGetBits( amc_payload_evt );
 
-        if ( current_evt & PAYLOAD_MESSAGE_P12GOOD ) {
-            P12V_good = 1;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_P12GOOD );
+        if ( current_evt & PAYLOAD_MESSAGE_PPGOOD ) {
+            PP_good = 1;
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PPGOOD );
         }
-        if ( current_evt & PAYLOAD_MESSAGE_P12GOODn ) {
-            P12V_good = 0;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_P12GOODn );
+        if ( current_evt & PAYLOAD_MESSAGE_PPGOODn ) {
+            PP_good = 0;
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PPGOODn );
         }
-        if ( current_evt & PAYLOAD_MESSAGE_PGOOD ) {
-            P1V0_good = 1;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PGOOD );
+        if ( current_evt & PAYLOAD_MESSAGE_DCDC_PGOOD ) {
+            DCDC_good = 1;
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_DCDC_PGOOD );
         }
-        if ( current_evt & PAYLOAD_MESSAGE_PGOODn ) {
-            P1V0_good = 0;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PGOODn );
+        if ( current_evt & PAYLOAD_MESSAGE_DCDC_PGOODn ) {
+            DCDC_good = 0;
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_DCDC_PGOODn );
         }
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
             QUIESCED_req = 1;
@@ -254,12 +256,13 @@ void vTaskPayload( void *pvParameters )
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_REBOOT );
         }
 
-        FPGA_boot_DONE = gpio_read_pin( GPIO_DONE_B_PORT, GPIO_DONE_B_PIN );
-        P1V0_good = gpio_read_pin( GPIO_PGOOD_P1V0_PORT,GPIO_PGOOD_P1V0_PIN );
+        DCDC_good = gpio_read_pin( GPIO_DCDC_PGOOD_PORT,GPIO_DCDC_PGOOD_PIN );
 
         switch(state) {
+
         case PAYLOAD_NO_POWER:
-            if (P12V_good == 1) {
+
+	    if (PP_good) {
                 new_state = PAYLOAD_SWITCHING_ON;
             }
             QUIESCED_req = 0;
@@ -275,7 +278,7 @@ void vTaskPayload( void *pvParameters )
             hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_FAILURE_MASK );
             if (QUIESCED_req) {
                 new_state = PAYLOAD_SWITCHING_OFF;
-            } else if (P1V0_good == 1) {
+            } else if ( DCDC_good == 1 ) {
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
             }
             break;

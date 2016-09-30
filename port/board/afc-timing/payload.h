@@ -20,11 +20,27 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+/**
+ * @file afc/v3_1/payload.h
+ * @brief Payload control module definitions for AFCv3.1
+ *
+ * @ingroup AFC_V3_1_PAYLOAD
+ */
+
+/**
+ * @defgroup AFC_V3_1_PAYLOAD AFCv3.1 Payload Control
+ * @ingroup AFC_V3_1
+ * @{
+ */
+
 #ifndef PAYLOAD_H_
 #define PAYLOAD_H_
 
 #include "event_groups.h"
 
+/**
+ * @brief Payload state machine state numbers
+ */
 enum {
     PAYLOAD_NO_POWER = 0,
     PAYLOAD_SWITCHING_ON,
@@ -40,19 +56,48 @@ enum {
     PAYLOAD_POWER_FAIL = 255
 } payload_state;
 
-#define PAYLOAD_MESSAGE_P12GOOD         (1 << 0)
-#define PAYLOAD_MESSAGE_P12GOODn        (1 << 1)
-#define PAYLOAD_MESSAGE_PGOOD           (1 << 2)
-#define PAYLOAD_MESSAGE_PGOODn          (1 << 3)
+/**
+ * @defgroup AFC_V3_1_PAYLOAD_MSG Payload Messages Codes
+ * @ingroup AFC_V3_1_PAYLOAD
+ * @{
+ */
+#define PAYLOAD_MESSAGE_PPGOOD          (1 << 0)
+#define PAYLOAD_MESSAGE_PPGOODn         (1 << 1)
+#define PAYLOAD_MESSAGE_DCDC_PGOOD      (1 << 2)
+#define PAYLOAD_MESSAGE_DCDC_PGOODn     (1 << 3)
 #define PAYLOAD_MESSAGE_COLD_RST        (1 << 4)
 #define PAYLOAD_MESSAGE_WARM_RST        (1 << 5)
 #define PAYLOAD_MESSAGE_REBOOT          (1 << 6)
 #define PAYLOAD_MESSAGE_QUIESCED        (1 << 7)
+/**
+ * @}
+ */
 
+/**
+ * @brief Payload task unblock delay
+ */
 #define PAYLOAD_BASE_DELAY 100
 
+/**
+ * @brief Sends a message to the payload task
+ *
+ * This function basically sets a flag that the Payload task reads and advances (or not) on the state machine
+ *
+ * @param fru_id Target FRU ID (0:AMC 1:RTM)
+ * @param msg Message to send, using @ref AFC_V3_1_PAYLOAD_MSG definitions
+ */
 void payload_send_message( uint8_t fru_id, EventBits_t msg );
+
+/**
+ * @brief Payload Control task
+ *
+ * @param pvParameters Pointer to buffer holding parameters passed to task upon initialization
+ */
 void vTaskPayload( void *pvParameters );
+
+/**
+ * @brief Creates Payload Control task and initializes the board's needed hardware
+ */
 void payload_init( void );
 
 #ifdef MODULE_HPM
@@ -63,4 +108,8 @@ uint8_t payload_hpm_get_upgrade_status( void );
 uint8_t payload_hpm_activate_firmware( void );
 #endif
 
-#endif /* PAYLOAD_H_ */
+#endif /* IPMI_PAYLOAD_H_ */
+
+/**
+ * @}
+ */

@@ -123,8 +123,8 @@
 #define GPIO_EN_1V5_VTT_PIN     29
 #define GPIO_EN_P1V0_PORT       3
 #define GPIO_EN_P1V0_PIN        25
-#define GPIO_PGOOD_P1V0_PORT    3
-#define GPIO_PGOOD_P1V0_PIN     26
+#define GPIO_DCDC_PGOOD_PORT    3
+#define GPIO_DCDC_PGOOD_PIN     26
 
 /* RTM */
 #define GPIO_EN_RTM_PWR_PORT    1

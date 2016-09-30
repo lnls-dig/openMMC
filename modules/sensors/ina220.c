@@ -109,9 +109,9 @@ void vTaskINA220( void *Parameters )
                 SDR_type_01h_t * ina220_sdr = ( SDR_type_01h_t * ) ina220_sensor->sdr;
                 if ( ( ina220_sensor->readout_value >= (ina220_sdr->lower_critical_thr ) ) &&
                      ( ina220_sensor->readout_value <= (ina220_sdr->upper_critical_thr ) ) ) {
-                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_P12GOOD );
+                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_PPGOOD );
                 } else {
-                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_P12GOODn );
+                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_PPGOODn );
                 }
             }
 #endif
