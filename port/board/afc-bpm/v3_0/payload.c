@@ -241,7 +241,7 @@ void vTaskPayload( void *pvParameters )
         case PAYLOAD_NO_POWER:
 
             if (PP_good) {
-                new_state = PAYLOAD_SWITCHING_ON;
+                new_state = PAYLOAD_POWER_GOOD_WAIT;
             }
             QUIESCED_req = 0;
             break;
