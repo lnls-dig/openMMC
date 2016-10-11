@@ -145,7 +145,7 @@ uint8_t ina220_config( ina220_data_t * data )
     return -1;
 }
 
-uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg )
+Bool ina220_readvalue( ina220_data_t * data, uint8_t reg, uint16_t *read )
 {
     uint8_t i2c_interf, i2c_addr;
     uint8_t val[2] = {0};
@@ -155,20 +155,23 @@ uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg )
         xI2CMasterWriteRead( i2c_interf, i2c_addr, reg, &val[0], sizeof(val)/sizeof(val[0]) );
 
         i2c_give( i2c_interf );
+
+	*read = (val[0] << 8) | (val[1]);
+	return true;
     }
 
-    return ( (val[0] << 8) | (val[1]) );
+    return false;
 }
 
 void ina220_readall( ina220_data_t * data )
 {
     /* Read all INA220 Registers */
     for ( uint8_t i = 0; i < INA220_REGISTERS; i++ ) {
-        data->regs[i] = ina220_readvalue( data, i );
+        ina220_readvalue( data, i, &(data->regs[i]) );
     }
 }
 
-bool ina220_calibrate( ina220_data_t * data )
+Bool ina220_calibrate( ina220_data_t * data )
 {
     uint8_t i2c_interf, i2c_addr;
     uint16_t cal = data->config->calibration_reg;

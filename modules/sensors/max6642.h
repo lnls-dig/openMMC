@@ -91,7 +91,7 @@ void vTaskMAX6642( void *Parameters );
  *
  * @return Temperature value
  */
-uint8_t max6642_read_local( sensor_t *sensor );
+Bool max6642_read_local( sensor_t *sensor, uint8_t *temp );
 
 /**
  * @brief Reads MAX6642's remote temperature value
@@ -100,7 +100,7 @@ uint8_t max6642_read_local( sensor_t *sensor );
  *
  * @return Temperature value
  */
-uint8_t max6642_read_remote( sensor_t *sensor );
+Bool max6642_read_remote( sensor_t *sensor, uint8_t *temp );
 
 /**
  * @brief Reads MAX6642's local extended temperature value
@@ -111,7 +111,7 @@ uint8_t max6642_read_remote( sensor_t *sensor );
  *
  * @return Extended temperature value (2 MSB)
  */
-uint8_t max6642_read_local_extd( sensor_t *sensor );
+Bool max6642_read_local_extd( sensor_t *sensor, uint8_t *temp );
 
 /**
  * @brief Reads MAX6642's remote extended temperature value
@@ -122,7 +122,7 @@ uint8_t max6642_read_local_extd( sensor_t *sensor );
  *
  * @return Extended temperature value (2 MSB)
  */
-uint8_t max6642_read_remote_extd( sensor_t *sensor );
+Bool max6642_read_remote_extd( sensor_t *sensor, uint8_t *temp );
 
 /**
  * @brief Reads MAX6642 status byte

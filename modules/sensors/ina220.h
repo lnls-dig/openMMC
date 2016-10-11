@@ -198,13 +198,10 @@ typedef struct {
 TaskHandle_t vTaskINA220_Handle;
 
 uint8_t ina220_config( ina220_data_t * data );
-bool ina220_calibrate( ina220_data_t * data );
-uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg );
-uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg );
+Bool ina220_calibrate( ina220_data_t * data );
+Bool ina220_readvalue( ina220_data_t * data, uint8_t reg, uint16_t *read );
 void ina220_readall( ina220_data_t * data );
-void ina220_sdr_init ( TaskHandle_t handle );
 void ina220_init( void );
-
 void vTaskINA220( void* Parameters );
 
 #endif
