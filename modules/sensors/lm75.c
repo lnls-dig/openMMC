@@ -68,7 +68,7 @@ void vTaskLM75( void* Parameters )
 	    }
 
 	    /* Try to gain the I2C bus */
-	    if ( i2c_take_by_chipid( temp_sensor->chipid, &i2c_addr, &i2c_interf, 50 ) == pdTRUE ) {
+	    if ( i2c_take_by_chipid( temp_sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY ) == pdTRUE ) {
 
                 /* Update the temperature reading */
                 if (xI2CMasterRead( i2c_interf, i2c_addr, &temp[0], 2) == 2) {
