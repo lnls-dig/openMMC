@@ -154,8 +154,10 @@ void payload_init( void )
 {
     gpio_set_pin_dir( MMC_ENABLE_PORT, MMC_ENABLE_PIN, INPUT );
 
+#ifndef BENCH_TEST
     /* Wait until ENABLE# signal is asserted ( ENABLE == 0) */
     while ( gpio_read_pin( MMC_ENABLE_PORT, MMC_ENABLE_PIN ) == 1 ) {};
+#endif
 
     xTaskCreate( vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
 
