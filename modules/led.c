@@ -190,6 +190,7 @@ void LED_Task( void *Parameters )
 
                 fru = cfg.fru_id;
                 num = cfg.led_num;
+
                 led_config[fru][num].mode = cfg.mode;
                 led_config[fru][num].mode_cfg[cfg.mode].active = true;
                 /* Only update the settings if its an override */
@@ -197,6 +198,7 @@ void LED_Task( void *Parameters )
                     led_config[fru][num].mode_cfg[cfg.mode].init_status = cfg.new_state.init_status;
                     led_config[fru][num].mode_cfg[cfg.mode].t_init = cfg.new_state.t_init;
                     led_config[fru][num].mode_cfg[cfg.mode].t_toggle = cfg.new_state.t_toggle;
+                    led_config[fru][num].state = LEDSTATE_INIT;
                     /* Reset the LED internal counter */
                     led_config[fru][num].counter = 0;
                 }
