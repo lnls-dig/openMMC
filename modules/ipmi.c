@@ -70,7 +70,12 @@ void IPMITask( void * pvParameters )
             continue;
         }
 
-	DEBUG_MSG(" IPMI Message Received! \n ");
+        DEBUG_MSG(" IPMI Message Received: \n ");
+        DEBUG_MSG(" \tNETFn: 0x%X\tCMD: 0x%X\t Data: ", req_received.netfn, req_received.cmd);
+        for (int i=0; i < req_received.data_len; i++) {
+            DEBUG_MSG("0x%X ", req_received.data[i]);
+        }
+        DEBUG_MSG("\n");
 
         req_handler = (t_req_handler) 0;
         req_handler = ipmi_retrieve_handler(req_received.netfn, req_received.cmd);
