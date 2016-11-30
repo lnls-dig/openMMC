@@ -155,16 +155,16 @@
 #define GPIO_ADN_RESETN_PORT    1
 #define GPIO_ADN_RESETN_PIN     22
 
-/* SCANSTA JTAG Switch */
-#define SCANSTA_PORT            2
-#define SCANSTA_ADDR0_PIN       0
-#define SCANSTA_ADDR1_PIN       1
-#define SCANSTA_ADDR2_PIN       2
-#define SCANSTA_ADDR3_PIN       3
-#define SCANSTA_ADDR4_PIN       4
-#define SCANSTA_ADDR5_PIN       5
-#define SCANSTA_ADDR6_PIN       6
-#define SCANSTA_TRIST_B_PIN     7
+/* SCANSTA1101 JTAG Switch */
+#define SCANSTA1101_PORT            2
+#define SCANSTA1101_ADDR0_PIN       0
+#define SCANSTA1101_ADDR1_PIN       1
+#define SCANSTA1101_ADDR2_PIN       2
+#define SCANSTA1101_ADDR3_PIN       3
+#define SCANSTA1101_ADDR4_PIN       4
+#define SCANSTA1101_ADDR5_PIN       5
+#define SCANSTA1101_ADDR6_PIN       6
+#define SCANSTA1101_TRIST_B_PIN     7
 
 /* UART Debug */
 #define UART_DEBUG_PORT         4

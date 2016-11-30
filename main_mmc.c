@@ -35,7 +35,7 @@
 #include "payload.h"
 #include "i2c.h"
 #include "fru.h"
-#include "jtag.h"
+#include "scansta1101.h"
 #include "fpga_spi.h"
 #include "watchdog.h"
 #include "uart_debug.h"
@@ -90,8 +90,8 @@ int main( void )
 #ifdef MODULE_PAYLOAD
     payload_init();
 #endif
-#ifdef MODULE_JTAG_SWITCH
-    scansta_init();
+#ifdef MODULE_SCANSTA1101
+    scansta1101_init();
 #endif
 #ifdef MODULE_FPGA_SPI
     fpga_spi_init();

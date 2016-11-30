@@ -19,14 +19,14 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef JTAG_H_
-#define JTAG_H_
+#ifndef SCANSTA1101_H_
+#define SCANSTA1101_H_
 
 #include "pin_mapping.h"
 
 /**
- * @brief Initialize and configure SCANSTA addr pins
+ * @brief Initialize and configure SCANSTA1101 addr pins
  */
-void scansta_init( void );
+void scansta1101_init( void );
 
 #endif
