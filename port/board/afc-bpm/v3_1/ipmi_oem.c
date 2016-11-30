@@ -99,6 +99,65 @@ IPMI_HANDLER(ipmi_oem_cmd_i2c_transfer, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_I2C_TRANS
     i2c_give( i2c_interf );
 }
 
+/* GPIO Access IPMI commands */
+/** @brief Handler for IPMI_OEM_CMD_GPIO IPMI command
+ *
+ * Access and configure the controller's GPIO
+ *
+ * Req data:
+ * [0] - Mode - (0) = Read port status (direction and value)
+ *              (1) = Set pin as input
+ *              (2) = Set pin as output (pin value is on byte 3)
+ * [1] - GPIO Port number
+ * [2] - GPIO Pin number
+ * [3] - Output pin value (optional)
+ *
+ * @param req[in]
+ * @param rsp[out]
+ *
+ * @return
+ */
+IPMI_HANDLER(ipmi_oem_cmd_gpio_pin, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_GPIO_PIN, ipmi_msg *req, ipmi_msg* rsp)
+{
+    uint8_t mode = req->data[0];
+    uint8_t port = req->data[1];
+    uint8_t pin = req->data[2];
+    uint8_t pin_state;
+
+    uint8_t len = 0;
+
+    rsp->completion_code = IPMI_CC_OK;
+
+    switch (mode) {
+    case 0:
+	/* Port read, returns port direction and read value*/
+	rsp->data[len++] = gpio_get_port_dir( port );
+	rsp->data[len++] = gpio_read_port( port );
+	break;
+
+    case 1:
+	/* Set pin as input */
+	gpio_set_pin_dir( port, pin, INPUT );
+	break;
+
+    case 2:
+	/* Set pin as output */
+	gpio_set_pin_dir( port, pin, OUTPUT );
+
+	/* If given, set the pin output value */
+	if (req->data_len > 3) {
+	    pin_state = req->data[3];
+	    gpio_set_pin_state( port, pin, pin_state );
+	}
+	break;
+
+    default:
+	rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+	break;
+    }
+
+    rsp->data_len = len;
+}
 
 /* ADN4604 IPMI Control commands */
 #ifdef MODULE_ADN4604
