@@ -37,7 +37,6 @@
 #include "adn4604_usercfg.h"
 #include "i2c.h"
 #include "i2c_mapping.h"
-#include "ipmi_oem.h"
 
 adn_connect_map_t con;
 
@@ -215,53 +214,3 @@ void adn4604_termination_ctl( uint8_t cfg )
         i2c_give( i2c_interf );
     }
 }
-
-#ifdef IPMI_OEM_CMD_CLOCK_CROSSBAR_SET
-/* This command may take a while to execute and hold the IPMI transaction */
-IPMI_HANDLER(ipmi_oem_clock_crossbar_set, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_CLOCK_CROSSBAR_SET, ipmi_msg *req, ipmi_msg* rsp)
-{
-    int len = rsp->data_len = 0;
-
-    uint8_t map;
-    uint8_t output = req->data[1];
-    uint8_t input = req->data[2];
-    uint8_t enable = req->data[3];
-
-    if (output % 2) {
-        *((uint8_t *)&con+(output/2)) &= 0x0F;
-        *((uint8_t *)&con+(output/2)) |= (input << 4) & 0xF0;
-    } else {
-        *((uint8_t *)&con+(output/2)) &= 0xF0;
-        *((uint8_t *)&con+(output/2)) |= input & 0x0F;
-    }
-
-    if ( req->data[0] == 0 ) {
-        map = ADN_XPT_MAP0_CON_REG;
-    } else {
-        map = ADN_XPT_MAP1_CON_REG;
-    }
-
-    adn4604_xpt_config( map , con );
-
-    if ( enable ) {
-        adn4604_tx_control( output, TX_ENABLED );
-    } else {
-        adn4604_tx_control( output, TX_DISABLED );
-    }
-
-    adn4604_update();
-
-    rsp->data_len = len;
-    rsp->completion_code = IPMI_CC_OK;
-}
-#endif
-
-#ifdef IPMI_OEM_CMD_CLOCK_CROSSBAR_RESET
-IPMI_HANDLER(ipmi_oem_clock_crossbar_reset, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_CLOCK_CROSSBAR_RESET, ipmi_msg *req, ipmi_msg* rsp)
-{
-    adn4604_reset();
-
-    rsp->data_len = 0;
-    rsp->completion_code = IPMI_CC_OK;
-}
-#endif
