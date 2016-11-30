@@ -24,7 +24,7 @@
 #define IPMI_OEM_H_
 
 /**
- * @file afc/v3_1/ipmi_oem.h
+ * @file afc-bpm/v3_1/ipmi_oem.h
  * @brief Custom IPMI commands for AFC
  *
  * @ingroup AFC_V3_1_IPMI_OEM
