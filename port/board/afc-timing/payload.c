@@ -284,7 +284,7 @@ void vTaskPayload( void *pvParameters )
             break;
 
         case PAYLOAD_STATE_FPGA_SETUP:
-#ifdef MODULE_CLOCK_SWITCH
+#ifdef MODULE_ADN4604
             adn4604_init();
 #endif
             new_state = PAYLOAD_FPGA_BOOTING;

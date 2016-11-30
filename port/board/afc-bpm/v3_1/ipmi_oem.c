@@ -23,12 +23,12 @@
 #include "ipmi_oem.h"
 
 /* ADN4604 IPMI Control commands */
-#ifdef MODULE_CLOCK_SWITCH
+#ifdef MODULE_ADN4604
 
 #include "adn4604.h"
 
 /* This command may take a while to execute and hold the IPMI transaction */
-IPMI_HANDLER(ipmi_oem_clock_crossbar_set, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_CLOCK_CROSSBAR_SET, ipmi_msg *req, ipmi_msg* rsp)
+IPMI_HANDLER(ipmi_oem_adn4604_cfg_output, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_ADN4604_SET_OUTPUT_CFG, ipmi_msg *req, ipmi_msg* rsp)
 {
     int len = rsp->data_len = 0;
 
@@ -63,7 +63,7 @@ IPMI_HANDLER(ipmi_oem_clock_crossbar_set, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_CLOCK_C
     rsp->completion_code = IPMI_CC_OK;
 }
 
-IPMI_HANDLER(ipmi_oem_clock_crossbar_reset, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_ADN4604_RESET, ipmi_msg *req, ipmi_msg* rsp)
+IPMI_HANDLER(ipmi_oem_adn4604_reset, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_ADN4604_RESET, ipmi_msg *req, ipmi_msg* rsp)
 {
     adn4604_reset();
 

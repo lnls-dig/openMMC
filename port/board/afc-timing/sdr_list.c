@@ -876,7 +876,7 @@ const SDR_type_01h_t SDR_LM75_uC = {
     .IDstring = "TEMP UC" /*  sensor string */
 };
 
-const SDR_type_01h_t SDR_LM75_CLOCK_SWITCH = {
+const SDR_type_01h_t SDR_LM75_ADN4604 = {
 
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
@@ -1143,7 +1143,7 @@ void user_sdr_init( void )
 #ifdef MODULE_LM75
     /* Board Temperature */
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_uC, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_0 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_CLOCK_SWITCH, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_1 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_ADN4604, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_1 );
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_DCDC, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_2 );
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RAM, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_3 );
 #ifdef MODULE_RTM
