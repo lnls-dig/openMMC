@@ -22,6 +22,84 @@
 
 #include "ipmi_oem.h"
 
+#include "port.h"
+#include "i2c.h"
+
+/** @brief Handler for IPMI_OEM_CMD_I2C_TRANSFER IPMI command
+ *
+ * Performs a raw I2C master read on the selected bus and return the data
+ * Req data:
+ * [0] - Bus ID @see i2c_mapping.h
+ * [1] - #Chip/Address identification - (0) = ChipID identification on byte 2
+ *                                      (1) = I2C Address identification on byte 2
+ * [2] - ChipID/I2C_Address - 8 bit address
+ * [3] - Data Write len (n)
+ * [4] - Data to Write
+ * [4+n] - Data Read len (m)
+ *
+ * @param req[in]
+ * @param rsp[out]
+ *
+ * @return
+ */
+IPMI_HANDLER(ipmi_oem_cmd_i2c_transfer, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_I2C_TRANSFER, ipmi_msg *req, ipmi_msg* rsp)
+{
+    uint8_t bus_id = req->data[0];
+    uint8_t chipid_sel = req->data[1];
+    uint8_t chipid_i2caddr = req->data[2];
+    uint8_t write_len = req->data[3];
+    uint8_t read_len = req->data[4+write_len];
+    uint8_t *read_data;
+
+    uint8_t semph_err;
+
+    uint8_t i2c_interf;
+    uint8_t i2c_addr;
+
+    if ( chipid_sel == 0 ) {
+        /* Use chip id to take the bus */
+        semph_err = i2c_take_by_chipid( chipid_i2caddr, &i2c_addr, &i2c_interf, (TickType_t)10);
+    } else {
+        semph_err = i2c_take_by_busid( bus_id, &i2c_interf, (TickType_t)10 );
+        i2c_addr = chipid_i2caddr;
+    }
+
+    if ( semph_err == 0 ) {
+        rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+        return;
+    }
+
+    if ( write_len > 0 ) {
+        if (xI2CMasterWrite( i2c_interf, i2c_addr, &req->data[4], write_len ) == write_len) {
+            rsp->completion_code = IPMI_CC_OK;
+        } else {
+            rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+            return;
+        }
+    }
+
+    if ( read_len > 0 ) {
+        read_data = pvPortMalloc( read_len );
+        memset( read_data, read_len, 0 );
+
+        if ( xI2CMasterRead( i2c_interf, i2c_addr, read_data, read_len ) == read_len ) {
+            rsp->data[0] = read_len;
+            memcpy( &rsp->data[1], read_data, read_len );
+
+        rsp->data_len = read_len+1;
+        rsp->completion_code = IPMI_CC_OK;
+        } else {
+        rsp->data_len = 0;
+            rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+        }
+
+	vPortFree( read_data );
+    }
+
+    i2c_give( i2c_interf );
+}
+
+
 /* ADN4604 IPMI Control commands */
 #ifdef MODULE_ADN4604
 
