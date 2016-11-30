@@ -379,7 +379,7 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
     sensor_t * cur_sensor = find_sensor_by_id( sensor_number );
 
     if (sensor_number > sdr_count) {
-        rsp->completion_code = IPMI_CC_REQ_DATA_NOT_PRESENT;
+        rsp->completion_code = IPMI_CC_PARAM_OUT_OF_RANGE;
         rsp->data_len = 0;
         return;
     }
