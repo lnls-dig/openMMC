@@ -131,8 +131,14 @@ IPMI_HANDLER(ipmi_oem_cmd_gpio_pin, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_GPIO_PIN, ipm
     switch (mode) {
     case 0:
 	/* Port read, returns port direction and read value*/
-	rsp->data[len++] = gpio_get_port_dir( port );
-	rsp->data[len++] = gpio_read_port( port );
+	rsp->data[len++] = ( gpio_get_port_dir( port ) >> 24 ) & 0xFF;
+	rsp->data[len++] = ( gpio_get_port_dir( port ) >> 16 ) & 0xFF;
+	rsp->data[len++] = ( gpio_get_port_dir( port ) >>  8 ) & 0xFF;
+	rsp->data[len++] = ( gpio_get_port_dir( port ) >>  0 ) & 0xFF;
+	rsp->data[len++] = ( gpio_read_port( port ) >> 24 ) & 0xFF;
+	rsp->data[len++] = ( gpio_read_port( port ) >> 16 ) & 0xFF;
+	rsp->data[len++] = ( gpio_read_port( port ) >>  8 ) & 0xFF;
+	rsp->data[len++] = ( gpio_read_port( port ) >>  0 ) & 0xFF;
 	break;
 
     case 1:
