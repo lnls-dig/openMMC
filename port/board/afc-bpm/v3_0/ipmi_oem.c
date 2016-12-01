@@ -85,15 +85,14 @@ IPMI_HANDLER(ipmi_oem_cmd_i2c_transfer, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_I2C_TRANS
         if ( xI2CMasterRead( i2c_interf, i2c_addr, read_data, read_len ) == read_len ) {
             rsp->data[0] = read_len;
             memcpy( &rsp->data[1], read_data, read_len );
-
-        rsp->data_len = read_len+1;
-        rsp->completion_code = IPMI_CC_OK;
+            rsp->data_len = read_len+1;
+            rsp->completion_code = IPMI_CC_OK;
         } else {
-        rsp->data_len = 0;
+            rsp->data_len = 0;
             rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
         }
 
-	vPortFree( read_data );
+        vPortFree( read_data );
     }
 
     i2c_give( i2c_interf );
@@ -130,36 +129,36 @@ IPMI_HANDLER(ipmi_oem_cmd_gpio_pin, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_GPIO_PIN, ipm
 
     switch (mode) {
     case 0:
-	/* Port read, returns port direction and read value*/
-	rsp->data[len++] = ( gpio_get_port_dir( port ) >> 24 ) & 0xFF;
-	rsp->data[len++] = ( gpio_get_port_dir( port ) >> 16 ) & 0xFF;
-	rsp->data[len++] = ( gpio_get_port_dir( port ) >>  8 ) & 0xFF;
-	rsp->data[len++] = ( gpio_get_port_dir( port ) >>  0 ) & 0xFF;
-	rsp->data[len++] = ( gpio_read_port( port ) >> 24 ) & 0xFF;
-	rsp->data[len++] = ( gpio_read_port( port ) >> 16 ) & 0xFF;
-	rsp->data[len++] = ( gpio_read_port( port ) >>  8 ) & 0xFF;
-	rsp->data[len++] = ( gpio_read_port( port ) >>  0 ) & 0xFF;
-	break;
+        /* Port read, returns port direction and read value*/
+        rsp->data[len++] = ( gpio_get_port_dir( port ) >> 24 ) & 0xFF;
+        rsp->data[len++] = ( gpio_get_port_dir( port ) >> 16 ) & 0xFF;
+        rsp->data[len++] = ( gpio_get_port_dir( port ) >>  8 ) & 0xFF;
+        rsp->data[len++] = ( gpio_get_port_dir( port ) >>  0 ) & 0xFF;
+        rsp->data[len++] = ( gpio_read_port( port ) >> 24 ) & 0xFF;
+        rsp->data[len++] = ( gpio_read_port( port ) >> 16 ) & 0xFF;
+        rsp->data[len++] = ( gpio_read_port( port ) >>  8 ) & 0xFF;
+        rsp->data[len++] = ( gpio_read_port( port ) >>  0 ) & 0xFF;
+        break;
 
     case 1:
-	/* Set pin as input */
-	gpio_set_pin_dir( port, pin, INPUT );
-	break;
+        /* Set pin as input */
+        gpio_set_pin_dir( port, pin, INPUT );
+        break;
 
     case 2:
-	/* Set pin as output */
-	gpio_set_pin_dir( port, pin, OUTPUT );
+        /* Set pin as output */
+        gpio_set_pin_dir( port, pin, OUTPUT );
 
-	/* If given, set the pin output value */
-	if (req->data_len > 3) {
-	    pin_state = req->data[3];
-	    gpio_set_pin_state( port, pin, pin_state );
-	}
-	break;
+        /* If given, set the pin output value */
+        if (req->data_len > 3) {
+            pin_state = req->data[3];
+            gpio_set_pin_state( port, pin, pin_state );
+        }
+        break;
 
     default:
-	rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
-	break;
+        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+        break;
     }
 
     rsp->data_len = len;
