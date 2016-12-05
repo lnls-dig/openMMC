@@ -423,11 +423,10 @@ uint8_t get_ipmb_addr( void )
     uint8_t index;
 
     /* Set the test pin and read all GA pins */
-    gpio_set_pin_dir(GA_TEST_PORT, GA_TEST_PIN, OUTPUT);
-    gpio_set_pin_state(GA_TEST_PORT, GA_TEST_PIN, HIGH);
+    gpio_set_pin_state(PIN_PORT(GPIO_GA_TEST), PIN_NUMBER(GPIO_GA_TEST), GPIO_LEVEL_HIGH);
 
     /* when using NAMC-EXT-RTM at least 11 instruction cycles required
-     *  to have correct GA value after GA_TEST_PIN changes */
+     *  to have correct GA value after GPIO_GA_TEST_PIN changes */
     {
         uint8_t i;
         for (i = 0; i < GPIO_GA_DELAY; i++) {
@@ -435,16 +434,16 @@ uint8_t get_ipmb_addr( void )
         }
     }
 
-    ga0 = gpio_read_pin(GA0_PORT, GA0_PIN);
-    ga1 = gpio_read_pin(GA1_PORT, GA1_PIN);
-    ga2 = gpio_read_pin(GA2_PORT, GA2_PIN);
+    ga0 = gpio_read_pin(PIN_PORT(GPIO_GA0), PIN_NUMBER(GPIO_GA0));
+    ga1 = gpio_read_pin(PIN_PORT(GPIO_GA1), PIN_NUMBER(GPIO_GA1));
+    ga2 = gpio_read_pin(PIN_PORT(GPIO_GA2), PIN_NUMBER(GPIO_GA2));
 
     /* Clear the test pin and see if any GA pin has changed is value,
      * meaning that it is unconnected */
-    gpio_set_pin_state(GA_TEST_PORT, GA_TEST_PIN, LOW);
+    gpio_set_pin_state(PIN_PORT(GPIO_GA_TEST), PIN_NUMBER(GPIO_GA_TEST), GPIO_LEVEL_LOW);
 
     /* when using NAMC-EXT-RTM at least 11 instruction cycles required
-     *  to have correct GA value after GA_TEST_PIN changes */
+     *  to have correct GA value after GPIO_GA_TEST_PIN changes */
     {
         uint8_t i;
         for (i = 0; i < GPIO_GA_DELAY; i++) {
@@ -452,15 +451,15 @@ uint8_t get_ipmb_addr( void )
         }
     }
 
-    if ( ga0 != gpio_read_pin(GA0_PORT, GA0_PIN) ){
+    if ( ga0 != gpio_read_pin(PIN_PORT(GPIO_GA0), PIN_NUMBER(GPIO_GA0)) ){
         ga0 = UNCONNECTED;
     }
 
-    if ( ga1 != gpio_read_pin(GA1_PORT, GA1_PIN) ){
+    if ( ga1 != gpio_read_pin(PIN_PORT(GPIO_GA1), PIN_NUMBER(GPIO_GA1)) ){
         ga1 = UNCONNECTED;
     }
 
-    if ( ga2 != gpio_read_pin(GA2_PORT, GA2_PIN) ){
+    if ( ga2 != gpio_read_pin(PIN_PORT(GPIO_GA2), PIN_NUMBER(GPIO_GA2)) ){
         ga2 = UNCONNECTED;
     }
 

@@ -31,24 +31,10 @@
 #include "string.h"
 #include "task_priorities.h"
 
-const LEDPincfg_t amc_led_pincfg[LED_CNT] = {
-    [LED_BLUE] = {
-        .pin = LEDBLUE_PIN,
-        .port = LEDBLUE_PORT,
-        .func = LED_PIN_FUNC
-    },
-
-    [LED1] = {
-        .pin = LEDRED_PIN,
-        .port = LEDRED_PORT,
-        .func = LED_PIN_FUNC
-    },
-
-    [LED2] = {
-        .pin = LEDGREEN_PIN,
-        .port = LEDGREEN_PORT,
-        .func = LED_PIN_FUNC
-    }
+const uint32_t amc_led_pincfg[LED_CNT] = {
+    [LED_BLUE] = GPIO_LEDBLUE,
+    [LED1] = GPIO_LEDRED,
+    [LED2] = GPIO_LEDGREEN
 };
 
 LEDConfig_t amc_leds_config[LED_CNT] = {
@@ -150,9 +136,6 @@ void LED_init( void )
 {
     /* AMC LED Pins initialization */
     gpio_init();
-    for ( uint8_t id = 0; id < LED_CNT; id++ ) {
-        gpio_set_pin_dir( amc_led_pincfg[id].port, amc_led_pincfg[id].pin, OUTPUT );
-    }
 
     led_update_queue = xQueueCreate( 3, sizeof(LEDUpdate_t) );
 
@@ -280,15 +263,15 @@ void amc_led_act( uint8_t id, uint8_t action )
 {
     switch( action ) {
     case LEDACT_TURN_ON:
-        gpio_set_pin_low( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        gpio_set_pin_low( PIN_PORT(amc_led_pincfg[id]), PIN_NUMBER(amc_led_pincfg[id]) );
         break;
 
     case LEDACT_TURN_OFF:
-        gpio_set_pin_high( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        gpio_set_pin_high( PIN_PORT(amc_led_pincfg[id]), PIN_NUMBER(amc_led_pincfg[id]) );
         break;
 
     case LEDACT_TOGGLE:
-        gpio_pin_toggle( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        gpio_pin_toggle( PIN_PORT(amc_led_pincfg[id]), PIN_NUMBER(amc_led_pincfg[id]) );
         break;
 
     default:

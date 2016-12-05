@@ -76,9 +76,9 @@ void EINT2_IRQHandler( void )
     /* Simple debouncing routine */
     /* If the last interruption happened in the last 200ms, this one is only a bounce, ignore it and wait for the next interruption */
     if ( getTickDifference( current_time, last_time ) > DEBOUNCE_TIME ) {
-        gpio_set_pin_low( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
+        gpio_set_pin_low( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
         asm("NOP");
-        gpio_set_pin_high( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
+        gpio_set_pin_high( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
 
         last_time = current_time;
     }
@@ -95,19 +95,19 @@ void EINT2_IRQHandler( void )
  */
 void setDC_DC_ConvertersON( bool on )
 {
-    gpio_set_pin_state( GPIO_EN_FMC1_PVADJ_PORT, GPIO_EN_FMC1_PVADJ_PIN, on );
-    //gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, on );
-    gpio_set_pin_state( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, on );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC1_PVADJ), PIN_NUMBER(GPIO_EN_FMC1_PVADJ), on );
+    //gpio_set_pin_state( GPIO_EN_FMC1_P12V), PIN_NUMBER(GPIO_EN_FMC1_P12V), on );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC1_P3V3), PIN_NUMBER(GPIO_EN_FMC1_P3V3), on );
 
-    gpio_set_pin_state( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, on );
-    gpio_set_pin_state( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, on );
-    gpio_set_pin_state( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, on );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC2_PVADJ), PIN_NUMBER(GPIO_EN_FMC2_PVADJ), on );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC2_P12V), PIN_NUMBER(GPIO_EN_FMC2_P12V), on );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC2_P3V3), PIN_NUMBER(GPIO_EN_FMC2_P3V3), on );
 
-    gpio_set_pin_state( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, on );
-    gpio_set_pin_state( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, on ); // <- this one causes problems if not switched off before power loss
-    gpio_set_pin_state( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, on );
-    gpio_set_pin_state( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, on );
-    gpio_set_pin_state( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, on );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_P1V0), PIN_NUMBER(GPIO_EN_P1V0), on );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_P1V8), PIN_NUMBER(GPIO_EN_P1V8), on ); // <- this one causes problems if not switched off before power loss
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_P1V2), PIN_NUMBER(GPIO_EN_P1V2), on );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_P1V5_VTT), PIN_NUMBER(GPIO_EN_P1V5_VTT), on );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_P3V3), PIN_NUMBER(GPIO_EN_P3V3), on );
 }
 
 /**
@@ -152,11 +152,10 @@ TaskHandle_t vTaskPayload_Handle;
 
 void payload_init( void )
 {
-    gpio_set_pin_dir( MMC_ENABLE_PORT, MMC_ENABLE_PIN, INPUT );
 
 #ifndef BENCH_TEST
     /* Wait until ENABLE# signal is asserted ( ENABLE == 0) */
-    while ( gpio_read_pin( MMC_ENABLE_PORT, MMC_ENABLE_PIN ) == 1 ) {};
+    while ( gpio_read_pin( PIN_PORT(GPIO_MMC_ENABLE), PIN_NUMBER(GPIO_MMC_ENABLE) ) == 1 ) {};
 #endif
 
     xTaskCreate( vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
@@ -166,8 +165,6 @@ void payload_init( void )
     rtm_payload_evt = xEventGroupCreate();
 #endif
 
-    initializeDCDC();
-
 #ifdef MODULE_DAC_AD84XX
     /* Configure the PVADJ DAC */
     dac_vadj_init();
@@ -176,25 +173,21 @@ void payload_init( void )
 #endif
 
     /* Configure FPGA reset button interruption on front panel */
-    pin_config( GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN, (IOCON_MODE_INACT | IOCON_FUNC1) );
     irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1 );
     irq_enable( EINT2_IRQn );
-    gpio_set_pin_dir( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, OUTPUT );
-    gpio_set_pin_state( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, HIGH );
 
+    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_HIGH );
 
     /* Flash CS Mux - Only valid to AFC v3.1 */
     /* 0 = FPGA reads bitstream from Program memory
      * 1 = FPGA reads bitstream from User memory
      */
-    gpio_set_pin_dir( GPIO_FLASH_CS_MUX_PORT, GPIO_FLASH_CS_MUX_PIN, OUTPUT );
-    gpio_set_pin_state( GPIO_FLASH_CS_MUX_PORT, GPIO_FLASH_CS_MUX_PIN, LOW );
+    gpio_set_pin_state( PIN_PORT(GPIO_FLASH_CS_MUX), PIN_NUMBER(GPIO_FLASH_CS_MUX), GPIO_LEVEL_LOW );
 
     /* Init_B */
     /* TODO: Check Init_b pin for error on initialization, then use it as output control */
 
-    gpio_set_pin_dir( GPIO_FPGA_INITB_PORT, GPIO_FPGA_INITB_PIN, OUTPUT );
-    gpio_set_pin_state( GPIO_FPGA_INITB_PORT, GPIO_FPGA_INITB_PIN, HIGH );
+    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_INITB), PIN_NUMBER(GPIO_FPGA_INITB), GPIO_LEVEL_HIGH );
 }
 
 void vTaskPayload( void *pvParameters )
@@ -216,12 +209,12 @@ void vTaskPayload( void *pvParameters )
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
 
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH );
+    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_HIGH );
 
     for ( ;; ) {
 
         /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
-        gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, HIGH );
+        gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC1_P12V), PIN_NUMBER(GPIO_EN_FMC1_P12V), GPIO_LEVEL_HIGH );
 
         new_state = state;
 
@@ -252,13 +245,13 @@ void vTaskPayload( void *pvParameters )
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_COLD_RST );
         }
         if ( current_evt & PAYLOAD_MESSAGE_REBOOT ) {
-            gpio_set_pin_low( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
+            gpio_set_pin_low( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
             asm("NOP");
-            gpio_set_pin_high( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
+            gpio_set_pin_high( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_REBOOT );
         }
 
-        DCDC_good = gpio_read_pin( GPIO_DCDC_PGOOD_PORT,GPIO_DCDC_PGOOD_PIN );
+	DCDC_good = gpio_read_pin( PIN_PORT(GPIO_DCDC_PGOOD), PIN_NUMBER(GPIO_DCDC_PGOOD) );
 
         switch(state) {
 
@@ -349,11 +342,10 @@ uint8_t payload_hpm_prepare_comp( void )
     ssp_init( FLASH_SPI, FLASH_SPI_BITRATE, FLASH_SPI_FRAME_SIZE, SSP_MASTER, SSP_INTERRUPT );
 
     /* Prevent the FPGA from accessing the Flash to configure itself now */
-    gpio_set_pin_dir( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, OUTPUT );
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH );
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW );
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH );
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW );
+    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_HIGH );
+    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_LOW );
+    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_HIGH );
+    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_LOW );
 
     /* Erase FLASH */
     flash_bulk_erase();
@@ -423,8 +415,8 @@ uint8_t payload_hpm_get_upgrade_status( void )
 uint8_t payload_hpm_activate_firmware( void )
 {
     /* Reset FPGA - Pulse PROGRAM_B pin */
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, LOW);
-    gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH);
+    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_LOW);
+    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_HIGH);
 
     return IPMI_CC_OK;
 }

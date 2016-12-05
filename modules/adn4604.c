@@ -61,14 +61,11 @@ void adn4604_init( void )
         ADN4604_EN_OUT_15 << 15
     };
 
-    /* Disable UPDATE' pin by pulling it HIGH */
-    gpio_set_pin_dir( GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, OUTPUT );
-    gpio_set_pin_state( GPIO_ADN_UPDATE_PORT, GPIO_ADN_UPDATE_PIN, HIGH );
+    /* Disable UPDATE' pin by pulling it GPIO_LEVEL_HIGH */
+    gpio_set_pin_state( PIN_PORT(GPIO_ADN_UPDATE), PIN_NUMBER(GPIO_ADN_UPDATE), GPIO_LEVEL_HIGH );
 
     /* There's a delay circuit in the Reset pin of the clock switch, we must wait until it clears out */
-    gpio_set_pin_dir( GPIO_ADN_RESETN_PORT, GPIO_ADN_RESETN_PIN, INPUT );
-
-    while( gpio_read_pin( GPIO_ADN_RESETN_PORT, GPIO_ADN_RESETN_PIN ) == 0 ) {
+    while( gpio_read_pin( PIN_PORT(GPIO_ADN_RESETN), PIN_NUMBER(GPIO_ADN_RESETN) ) == 0 ) {
         vTaskDelay( 50 );
     }
 

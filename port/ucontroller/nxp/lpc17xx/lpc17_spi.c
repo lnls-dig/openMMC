@@ -34,13 +34,13 @@ static uint8_t frame_size = 8;
 /* Assert SSEL pin */
 void spi_assertSSEL(void)
 {
-    Chip_GPIO_SetPinState(LPC_GPIO, 0, 16, LOW);
+    gpio_set_pin_state( PIN_PORT(SPI_SSEL), PIN_NUMBER(SPI_SSEL), GPIO_LEVEL_LOW);
 }
 
 /* De-Assert SSEL pin */
 void spi_deassertSSEL(void)
 {
-    Chip_GPIO_SetPinState(LPC_GPIO, 0, 16, HIGH);
+    gpio_set_pin_state( PIN_PORT(SPI_SSEL), PIN_NUMBER(SPI_SSEL), GPIO_LEVEL_HIGH);
 }
 
 void spi_config( uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll )
@@ -50,13 +50,6 @@ void spi_config( uint32_t bitrate, uint8_t frame_sz, bool master_mode, bool poll
 
     spi_polling = poll;
     frame_size = frame_sz;
-
-    /* Set up clock and muxing for SPI interface */
-    Chip_IOCON_PinMux(LPC_IOCON, 0, 15, IOCON_MODE_PULLDOWN, IOCON_FUNC3);
-    Chip_IOCON_PinMux(LPC_IOCON, 0, 16, IOCON_MODE_PULLUP, IOCON_FUNC0);
-    /* Pin 17 is used for PROGRAM_B, as we don't receive any data, the MISO pin is not used */
-    Chip_IOCON_PinMux(LPC_IOCON, 0, 18, IOCON_MODE_INACT, IOCON_FUNC3);
-    gpio_set_pin_dir(0, 16, OUTPUT);
 
     spi_deassertSSEL();
 
