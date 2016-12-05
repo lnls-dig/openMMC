@@ -64,6 +64,8 @@ int main( void )
     {}
 #endif
 
+    pin_init();
+
 #ifdef MODULE_UART_DEBUG
     uart_debug_init( 19200 );
 #endif

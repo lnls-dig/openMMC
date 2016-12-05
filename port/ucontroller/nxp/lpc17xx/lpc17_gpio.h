@@ -30,10 +30,11 @@
 
 #include "gpio_17xx_40xx.h"
 
-#define INPUT 0
-#define OUTPUT 1
-#define LOW 0
-#define HIGH 1
+#define GPIO_LEVEL_LOW  0
+#define GPIO_LEVEL_HIGH 1
+
+#define GPIO_DIR_INPUT  0
+#define GPIO_DIR_OUTPUT 1
 
 /**
  * @brief       Initialize GPIO block
