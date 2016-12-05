@@ -43,3 +43,12 @@ void dac_ad84xx_set_val( uint8_t addr, uint8_t val )
     spi_write( (uint8_t *) &data, sizeof(data) );
     spi_deassertSSEL();
 }
+
+void dac_ad84xx_set_res( uint8_t addr, uint16_t res )
+{
+    uint8_t data = 0;
+
+    data = ((res - 50)*256)/1000;
+
+    dac_ad84xx_set_val( addr, data );
+}

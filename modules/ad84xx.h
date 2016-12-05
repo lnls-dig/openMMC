@@ -37,4 +37,12 @@ void dac_ad84xx_init( void );
  */
 void dac_ad84xx_set_val( uint8_t addr, uint8_t val );
 
+/**
+ * @brief Converts a resistance value into a proportional divisor value for AD84xx
+ *
+ * @param addr Selects which potentiometer will be set
+ * @param val Output resistance value [in Ohms]
+ */
+void dac_ad84xx_set_res( uint8_t addr, uint16_t res );
+
 #endif
