@@ -110,26 +110,18 @@ void setDC_DC_ConvertersON( bool on )
     gpio_set_pin_state( PIN_PORT(GPIO_EN_P3V3), PIN_NUMBER(GPIO_EN_P3V3), on );
 }
 
-/**
- * @brief Initialize AFC's DCDC converters hardware
- */
-void initializeDCDC( void )
+void set_vadj_volt( uint8_t fmc_slot, float v )
 {
-    setDC_DC_ConvertersON(false);
-    gpio_set_pin_dir( GPIO_EN_P1V2_PORT, GPIO_EN_P1V2_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_EN_P1V8_PORT, GPIO_EN_P1V8_PIN, OUTPUT );
+    uint32_t res_total;
+    uint32_t res_dac;
 
-    gpio_set_pin_dir( GPIO_EN_FMC2_P3V3_PORT, GPIO_EN_FMC2_P3V3_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_EN_FMC2_PVADJ_PORT, GPIO_EN_FMC2_PVADJ_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_EN_FMC2_P12V_PORT, GPIO_EN_FMC2_P12V_PIN, OUTPUT );
+    res_total = (uint32_t) (1162.5/(v-0.775)) - 453;
+    res_dac = (1800*res_total)/(1800-res_total);
 
-    gpio_set_pin_dir( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_EN_FMC1_P3V3_PORT, GPIO_EN_FMC1_P3V3_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_EN_FMC1_PVADJ_PORT,  GPIO_EN_FMC1_PVADJ_PIN, OUTPUT );
+    /* Use only the lower 8-bits (the dac only has 256 steps) */
+    res_dac &= 0xFF;
 
-    gpio_set_pin_dir( GPIO_EN_P3V3_PORT, GPIO_EN_P3V3_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_EN_1V5_VTT_PORT, GPIO_EN_1V5_VTT_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_EN_P1V0_PORT, GPIO_EN_P1V0_PIN, OUTPUT );
+    dac_ad84xx_set_res( fmc_slot, res_dac );
 }
 
 EventGroupHandle_t amc_payload_evt = NULL;
@@ -167,9 +159,9 @@ void payload_init( void )
 
 #ifdef MODULE_DAC_AD84XX
     /* Configure the PVADJ DAC */
-    dac_vadj_init();
-    dac_vadj_config( 0, 25 );
-    dac_vadj_config( 1, 25 );
+    dac_ad84xx_init();
+    set_vadj_volt( 0, 2.5 );
+    set_vadj_volt( 1, 2.5 );
 #endif
 
     /* Configure FPGA reset button interruption on front panel */
