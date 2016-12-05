@@ -23,22 +23,20 @@
 #include "port.h"
 #include "ad84xx.h"
 
-#define DAC_VADJ_SPI_BITRATE    10000000
-#define DAC_VADJ_FRAME_SIZE     10
+#define DAC_AD84XX_SPI_BITRATE    10000000
+#define DAC_AD84XX_FRAME_SIZE     10
 
-void dac_vadj_init( void )
+void dac_ad84xx_init( void )
 {
-    gpio_set_pin_dir( GPIO_DAC_VADJ_RST_PORT, GPIO_DAC_VADJ_RST_PIN, OUTPUT);
-
     /* Reset the AD84xx while initializing the SSP interface */
-    gpio_set_pin_state( GPIO_DAC_VADJ_RST_PORT, GPIO_DAC_VADJ_RST_PIN, LOW);
+    gpio_set_pin_state( PIN_PORT(GPIO_DAC_VADJ_RST), PIN_NUMBER(GPIO_DAC_VADJ_RST), GPIO_LEVEL_LOW);
 
-    spi_config( DAC_VADJ_SPI_BITRATE, DAC_VADJ_FRAME_SIZE, SPI_MASTER, SPI_POLLING );
+    spi_config( DAC_AD84XX_SPI_BITRATE, DAC_AD84XX_FRAME_SIZE, SPI_MASTER, SPI_POLLING );
 
-    gpio_set_pin_state( GPIO_DAC_VADJ_RST_PORT, GPIO_DAC_VADJ_RST_PIN, HIGH);
+    gpio_set_pin_state( PIN_PORT(GPIO_DAC_VADJ_RST), PIN_NUMBER(GPIO_DAC_VADJ_RST), GPIO_LEVEL_HIGH);
 }
 
-void dac_vadj_config( uint8_t addr, uint8_t val )
+void dac_ad84xx_set_val( uint8_t addr, uint8_t val )
 {
     uint16_t data = (addr << 8) | (val);
     spi_assertSSEL();

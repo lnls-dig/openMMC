@@ -27,14 +27,14 @@
  *
  * @note This module uses legacy SPI and controls SSEL as a GPIO
  */
-void dac_vadj_init( void );
+void dac_ad84xx_init( void );
 
 /**
- * @brief Configure the output value of AD84XX
+ * @brief Write a value to the AD84xx DAC output register
  *
  * @param addr Selects which potentiometer will be set
  * @param val Value to be set
  */
-void dac_vadj_config( uint8_t addr, uint8_t val );
+void dac_ad84xx_set_val( uint8_t addr, uint8_t val );
 
 #endif
