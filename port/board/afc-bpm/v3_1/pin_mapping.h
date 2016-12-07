@@ -190,7 +190,7 @@
         GPIO_GA0,                               \
         GPIO_GA1,                               \
         GPIO_GA2,                               \
-	GPIO_GA_TEST,                           \
+        GPIO_GA_TEST,                           \
         GPIO_LEDBLUE,                           \
         GPIO_LEDGREEN,                          \
         GPIO_LEDRED,                            \

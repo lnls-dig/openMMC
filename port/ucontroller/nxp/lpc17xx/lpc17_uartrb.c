@@ -38,7 +38,7 @@ volatile lpc_uart_cfg_t usart_cfg[4] = {
 
 /* Transmit and receive ring buffer sizes - MUST be power of 2 */
 #define UART_SRB_SIZE 256       /* Send */
-#define UART_RRB_SIZE 32	/* Receive */
+#define UART_RRB_SIZE 32        /* Receive */
 
 /* Transmit and receive buffers */
 static uint8_t rxbuff[UART_RRB_SIZE], txbuff[UART_SRB_SIZE];

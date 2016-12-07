@@ -98,8 +98,8 @@ void IPMITask( void * pvParameters )
 
         } else {
             /** If there is no function handler, use data from received
-	     *  message to send "invalid command" response (IPMI table 5-2,
-	     *  page 44). */
+             *  message to send "invalid command" response (IPMI table 5-2,
+             *  page 44). */
 
             response.completion_code = IPMI_CC_INV_CMD;
             response.data_len = 0;

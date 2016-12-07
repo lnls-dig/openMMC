@@ -48,10 +48,10 @@ size_t eeprom_24xx64_read( uint8_t id, uint16_t address, uint8_t *rx_data, size_
     addr8[1] = (address) & 0xFF;
 
     if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout ) && ( rx_data != NULL ) ) {
-	/* Sets address register */
-	xI2CMasterWrite( i2c_interface, i2c_addr, addr8 , sizeof(addr8) );
+        /* Sets address register */
+        xI2CMasterWrite( i2c_interface, i2c_addr, addr8 , sizeof(addr8) );
 
-	/* Read data */
+        /* Read data */
         rx_len = xI2CMasterRead( i2c_interface, i2c_addr, rx_data, buf_len );
         i2c_give( i2c_interface );
     }
@@ -79,7 +79,7 @@ size_t eeprom_24xx64_write( uint8_t id, uint16_t address, uint8_t *tx_data, size
                 bytes_to_write = ( buf_len - tx_len );
             }
             page_buf[0] = (curr_addr >> 8) & 0xFF;
-	    page_buf[1] = (curr_addr) & 0xFF;
+            page_buf[1] = (curr_addr) & 0xFF;
 
             memcpy(&page_buf[2], tx_data+tx_len, bytes_to_write);
 

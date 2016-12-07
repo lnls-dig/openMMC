@@ -43,9 +43,9 @@
  */
 #define NETFN_CUSTOM_OEM                    0x30
 
-#define IPMI_OEM_CMD_I2C_TRANSFER		0x00
+#define IPMI_OEM_CMD_I2C_TRANSFER               0x00
 
-#define IPMI_OEM_CMD_ADN4604_SET_OUTPUT_CFG	0x01
+#define IPMI_OEM_CMD_ADN4604_SET_OUTPUT_CFG     0x01
 #define IPMI_OEM_CMD_ADN4604_GET_OUTPUT_CFG     0x02
 #define IPMI_OEM_CMD_ADN4604_RESET              0x03
 

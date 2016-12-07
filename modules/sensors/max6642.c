@@ -88,8 +88,8 @@ Bool max6642_read_local( sensor_t *sensor, uint8_t *temp )
         xI2CMasterWriteRead( i2c_interf, i2c_addr, MAX6642_CMD_READ_LOCAL, &read, 1 );
         i2c_give( i2c_interf );
 
-	*temp = read;
-	return true;
+        *temp = read;
+        return true;
     }
 
     return false;
@@ -105,8 +105,8 @@ Bool max6642_read_remote( sensor_t *sensor, uint8_t *temp )
         xI2CMasterWriteRead( i2c_interf, i2c_addr, MAX6642_CMD_READ_REMOTE, &read, 1 );
         i2c_give( i2c_interf );
 
-	*temp = read;
-	return true;
+        *temp = read;
+        return true;
     }
 
     return false;
@@ -122,8 +122,8 @@ Bool max6642_read_local_extd( sensor_t *sensor, uint8_t *temp )
         xI2CMasterWriteRead( i2c_interf, i2c_addr, MAX6642_CMD_READ_LOCAL_EXTD, &read, 1 );
         i2c_give( i2c_interf );
 
-	*temp = read;
-	return true;
+        *temp = read;
+        return true;
     }
 
     return false;
@@ -139,8 +139,8 @@ Bool max6642_read_remote_extd( sensor_t *sensor, uint8_t *temp )
         xI2CMasterWriteRead( i2c_interf, i2c_addr, MAX6642_CMD_READ_REMOTE_EXTD, &read, 1 );
         i2c_give( i2c_interf );
 
-	*temp = read;
-	return true;
+        *temp = read;
+        return true;
     }
 
     return false;

@@ -214,9 +214,9 @@ void sdr_pop( void )
     sensor_t * new_head;
 
     if ( sdr_head ) {
-	new_head = sdr_head->next;
-	vPortFree( sdr_head );
-	sdr_head = new_head;
+        new_head = sdr_head->next;
+        vPortFree( sdr_head );
+        sdr_head = new_head;
     }
 }
 

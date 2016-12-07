@@ -243,7 +243,7 @@ void vTaskPayload( void *pvParameters )
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_REBOOT );
         }
 
-	DCDC_good = gpio_read_pin( PIN_PORT(GPIO_DCDC_PGOOD), PIN_NUMBER(GPIO_DCDC_PGOOD) );
+        DCDC_good = gpio_read_pin( PIN_PORT(GPIO_DCDC_PGOOD), PIN_NUMBER(GPIO_DCDC_PGOOD) );
 
         switch(state) {
 
