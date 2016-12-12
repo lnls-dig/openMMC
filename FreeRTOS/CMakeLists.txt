@@ -4,6 +4,11 @@ set(FREERTOS_INCDIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(FREERTOS_INC ${FREERTOS_INCDIR})
 
+#Include FreeRTOS Trace module sources
+if(FREERTOS_TRACE)
+  add_subdirectory(trace)
+endif()
+
 #Port files
 if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
   set(FREERTOS_INC ${FREERTOS_INC} ${CMAKE_CURRENT_SOURCE_DIR}/portable/GCC/ARM_CM3)

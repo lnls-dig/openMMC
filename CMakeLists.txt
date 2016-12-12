@@ -19,10 +19,7 @@ if(NOT CMAKE_TOOLCHAIN_FILE)
   message(WARNING "${Yellow}No toolchain configuration file specified. Using default option!${ColourReset}")
 
   include(${CMAKE_SOURCE_DIR}/toolchain/toolchain-arm-none-eabi.cmake)
-
 endif()
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build_cfg")
 
 set(CMAKE_COLOR_MAKEFILE ON)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -34,7 +31,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING
-    "Choose the type of build, options are: none Debug Release Trace."
+    "Choose the type of build, options are: none Debug Release."
     FORCE)
 endif()
 message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
@@ -65,9 +62,6 @@ add_subdirectory(FreeRTOS)
 add_subdirectory(port/ucontroller)
 add_subdirectory(boot)
 add_subdirectory(modules)
-if(CMAKE_BUILD_TYPE STREQUAL "Trace")
-  add_subdirectory(trace)
-endif()
 
 include_directories( ${UCONTROLLER_HDRS} ${PROJ_HDRS} )
 
