@@ -96,12 +96,6 @@ typedef struct LEDUpdate {
     LEDState_t new_state;
 } LEDUpdate_t;
 
-typedef struct LEDPincfg {
-    uint8_t port;
-    uint8_t pin;
-    uint8_t func;
-} LEDPincfg_t;
-
 
 void LED_init( void );
 void LED_Task( void *Parameters );

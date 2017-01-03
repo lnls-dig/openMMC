@@ -42,7 +42,7 @@
 
 static uint8_t hotswap_get_handle_status( void )
 {
-    return gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN);
+    return gpio_read_pin(PIN_PORT(GPIO_HOT_SWAP_HANDLE), PIN_NUMBER(GPIO_HOT_SWAP_HANDLE));
 }
 
 SDR_type_02h_t * hotswap_amc_pSDR;
@@ -100,7 +100,7 @@ void vTaskHotSwap( void *Parameters )
     const TickType_t xFrequency = 50;
 
     /* Override Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
-    if ( gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN) == 0 ) {
+    if ( gpio_read_pin(PIN_PORT(GPIO_HOT_SWAP_HANDLE), PIN_NUMBER(GPIO_HOT_SWAP_HANDLE)) == 0 ) {
         LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
     } else {
         LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );

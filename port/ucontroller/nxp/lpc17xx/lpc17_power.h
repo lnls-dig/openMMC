@@ -32,29 +32,29 @@
 #include "pmu_17xx_40xx.h"
 
 /**
- * @brief	Enter MCU Sleep mode
- * @return	None
+ * @brief       Enter MCU Sleep mode
+ * @return      None
  * @note The sleep mode effects differ between controllers, check the corresponding documentation
  */
-#define pm_sleep()		Chip_PMU_Sleep(LPC_PMU, PMU_MCU_SLEEP)
+#define pm_sleep()              Chip_PMU_Sleep(LPC_PMU, PMU_MCU_SLEEP)
 
 /**
- * @brief	Enter MCU Deep Sleep mode
- * @return	None
+ * @brief       Enter MCU Deep Sleep mode
+ * @return      None
  * @note The deep sleep mode effects differ between controllers, check the corresponding documentation
  */
-#define pm_deep_sleep()		Chip_PMU_Sleep(LPC_PMU, PMU_MCU_DEEP_SLEEP)
+#define pm_deep_sleep()         Chip_PMU_Sleep(LPC_PMU, PMU_MCU_DEEP_SLEEP)
 
 /**
- * @brief	Enter MCU Power Down mode
- * @return	None
+ * @brief       Enter MCU Power Down mode
+ * @return      None
  * @note The power down mode effects differ between controllers, check the corresponding documentation
  */
-#define pm_power_down()		Chip_PMU_Sleep(LPC_PMU, PMU_MCU_POWER_DOWN)
+#define pm_power_down()         Chip_PMU_Sleep(LPC_PMU, PMU_MCU_POWER_DOWN)
 
 /**
- * @brief	Enter MCU Deep Power Down mode
- * @return	None
+ * @brief       Enter MCU Deep Power Down mode
+ * @return      None
  * @note The deep power down mode effects differ between controllers, check the corresponding documentation
  */
-#define pm_deep_power_down()	Chip_PMU_Sleep(LPC_PMU, PMU_MCU_DEEP_PWRDOWN)
+#define pm_deep_power_down()    Chip_PMU_Sleep(LPC_PMU, PMU_MCU_DEEP_PWRDOWN)

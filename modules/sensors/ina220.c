@@ -156,8 +156,8 @@ Bool ina220_readvalue( ina220_data_t * data, uint8_t reg, uint16_t *read )
 
         i2c_give( i2c_interf );
 
-	*read = (val[0] << 8) | (val[1]);
-	return true;
+        *read = (val[0] << 8) | (val[1]);
+        return true;
     }
 
     return false;

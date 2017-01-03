@@ -60,7 +60,7 @@ void WatchdogTask (void * Parameters)
             NVIC_SystemReset();
         }
         wdt_feed();
-	DEBUG_MSG(" Watchdog fed (again) \n ");
+        DEBUG_MSG(" Watchdog fed (again) \n ");
         vTaskDelay(WATCHDOG_FEED_DELAY);
     }
 }

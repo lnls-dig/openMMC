@@ -114,9 +114,9 @@ void IPMB_TXTask ( void * pvParameters )
             /* See if we've already tried sending this message 3 times */
             if ( current_msg_tx->retries > IPMB_MAX_RETRIES ) {
                 xTaskNotify( current_msg_tx->caller_task ,ipmb_error_failure , eSetValueWithOverwrite);
-		/* Free the message buffer */
-		vPortFree( current_msg_tx );
-		current_msg_tx = NULL;
+                /* Free the message buffer */
+                vPortFree( current_msg_tx );
+                current_msg_tx = NULL;
                 continue;
             }
 
@@ -135,9 +135,9 @@ void IPMB_TXTask ( void * pvParameters )
             } else {
                 /* Success case*/
                 xTaskNotify( current_msg_tx->caller_task , ipmb_error_success, eSetValueWithOverwrite);
-		/* Free the message buffer */
-		vPortFree( current_msg_tx );
-		current_msg_tx = NULL;
+                /* Free the message buffer */
+                vPortFree( current_msg_tx );
+                current_msg_tx = NULL;
             }
 
         } else {
@@ -159,16 +159,16 @@ void IPMB_TXTask ( void * pvParameters )
 
                 if ( current_msg_tx->retries > IPMB_MAX_RETRIES ){
                     xTaskNotify ( current_msg_tx->caller_task, ipmb_error_failure, eSetValueWithOverwrite);
-		    /* Free the message buffer */
-		    vPortFree( current_msg_tx );
-		    current_msg_tx = NULL;
+                    /* Free the message buffer */
+                    vPortFree( current_msg_tx );
+                    current_msg_tx = NULL;
                 } else {
                     xQueueSendToFront( ipmb_txqueue, &current_msg_tx, 0 );
                 }
 
             } else {
                 /* Request was successfully sent, keep a copy here for future comparison and clean the last used buffer */
-		vPortFree( last_sent_req );
+                vPortFree( last_sent_req );
                 last_sent_req = current_msg_tx;
                 xTaskNotify ( current_msg_tx->caller_task, ipmb_error_success, eSetValueWithOverwrite);
             }
@@ -202,7 +202,7 @@ void IPMB_RXTask ( void *pvParameters )
                 continue;
             }
 
-	    current_msg_rx = pvPortMalloc(sizeof(ipmi_msg_cfg));
+            current_msg_rx = pvPortMalloc(sizeof(ipmi_msg_cfg));
 
             /* Clear our local buffer before writing new data into it */
             memset(current_msg_rx, 0, sizeof(ipmi_msg_cfg));
@@ -261,7 +261,7 @@ ipmb_error ipmb_send_request ( ipmi_msg * req )
 
     /* Blocks here until is able put message in tx queue */
     if (xQueueSend( ipmb_txqueue, &req_cfg, 1) != pdTRUE ){
-	vPortFree( req_cfg );
+        vPortFree( req_cfg );
         return ipmb_error_failure;
     }
 
@@ -291,7 +291,7 @@ ipmb_error ipmb_send_response ( ipmi_msg * req, ipmi_msg * resp )
 
     /* Blocks here until is able put message in tx queue */
     if ( xQueueSend( ipmb_txqueue, &resp_cfg, portMAX_DELAY) != pdTRUE ){
-	vPortFree( resp_cfg );
+        vPortFree( resp_cfg );
         return ipmb_error_failure;
     }
 
@@ -306,9 +306,9 @@ ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg )
     /* Sends only the ipmi msg, not the control struct */
     if (!IS_RESPONSE(msg_cfg->buffer)) {
         if ( xQueueSend( client_queue, &(msg_cfg->buffer), CLIENT_NOTIFY_TIMEOUT ) == pdFALSE ) {
-	    /* This shouldn't happen, but if it does, clear the message buffer, since the IPMB_TX task gives us its ownership */
-	    vPortFree( msg_cfg );
-	    return ipmb_error_timeout;
+            /* This shouldn't happen, but if it does, clear the message buffer, since the IPMB_TX task gives us its ownership */
+            vPortFree( msg_cfg );
+            return ipmb_error_timeout;
         }
     }
     if ( msg_cfg->caller_task ) {
@@ -423,11 +423,10 @@ uint8_t get_ipmb_addr( void )
     uint8_t index;
 
     /* Set the test pin and read all GA pins */
-    gpio_set_pin_dir(GA_TEST_PORT, GA_TEST_PIN, OUTPUT);
-    gpio_set_pin_state(GA_TEST_PORT, GA_TEST_PIN, HIGH);
+    gpio_set_pin_state(PIN_PORT(GPIO_GA_TEST), PIN_NUMBER(GPIO_GA_TEST), GPIO_LEVEL_HIGH);
 
     /* when using NAMC-EXT-RTM at least 11 instruction cycles required
-     *  to have correct GA value after GA_TEST_PIN changes */
+     *  to have correct GA value after GPIO_GA_TEST_PIN changes */
     {
         uint8_t i;
         for (i = 0; i < GPIO_GA_DELAY; i++) {
@@ -435,16 +434,16 @@ uint8_t get_ipmb_addr( void )
         }
     }
 
-    ga0 = gpio_read_pin(GA0_PORT, GA0_PIN);
-    ga1 = gpio_read_pin(GA1_PORT, GA1_PIN);
-    ga2 = gpio_read_pin(GA2_PORT, GA2_PIN);
+    ga0 = gpio_read_pin(PIN_PORT(GPIO_GA0), PIN_NUMBER(GPIO_GA0));
+    ga1 = gpio_read_pin(PIN_PORT(GPIO_GA1), PIN_NUMBER(GPIO_GA1));
+    ga2 = gpio_read_pin(PIN_PORT(GPIO_GA2), PIN_NUMBER(GPIO_GA2));
 
     /* Clear the test pin and see if any GA pin has changed is value,
      * meaning that it is unconnected */
-    gpio_set_pin_state(GA_TEST_PORT, GA_TEST_PIN, LOW);
+    gpio_set_pin_state(PIN_PORT(GPIO_GA_TEST), PIN_NUMBER(GPIO_GA_TEST), GPIO_LEVEL_LOW);
 
     /* when using NAMC-EXT-RTM at least 11 instruction cycles required
-     *  to have correct GA value after GA_TEST_PIN changes */
+     *  to have correct GA value after GPIO_GA_TEST_PIN changes */
     {
         uint8_t i;
         for (i = 0; i < GPIO_GA_DELAY; i++) {
@@ -452,15 +451,15 @@ uint8_t get_ipmb_addr( void )
         }
     }
 
-    if ( ga0 != gpio_read_pin(GA0_PORT, GA0_PIN) ){
+    if ( ga0 != gpio_read_pin(PIN_PORT(GPIO_GA0), PIN_NUMBER(GPIO_GA0)) ){
         ga0 = UNCONNECTED;
     }
 
-    if ( ga1 != gpio_read_pin(GA1_PORT, GA1_PIN) ){
+    if ( ga1 != gpio_read_pin(PIN_PORT(GPIO_GA1), PIN_NUMBER(GPIO_GA1)) ){
         ga1 = UNCONNECTED;
     }
 
-    if ( ga2 != gpio_read_pin(GA2_PORT, GA2_PIN) ){
+    if ( ga2 != gpio_read_pin(PIN_PORT(GPIO_GA2), PIN_NUMBER(GPIO_GA2)) ){
         ga2 = UNCONNECTED;
     }
 

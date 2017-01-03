@@ -133,13 +133,11 @@ void vTaskFPGA_COMM( void * Parameters )
     init_diag_struct( diag );
 
     /* Check if the FPGA has finished programming itself from the FLASH */
-    while (!gpio_read_pin( GPIO_DONE_B_PORT, GPIO_DONE_B_PIN)) {
+    while (!gpio_read_pin( PIN_PORT(GPIO_FPGA_DONE_B), PIN_NUMBER(GPIO_FPGA_DONE_B))) {
         vTaskDelay(FPGA_UPDATE_RATE);
     }
 
-    //if (board_info.board_version == BOARD_VERSION_AFC_V3_1) {
-    gpio_set_pin_state(0, 19, HIGH);
-    //}
+    gpio_set_pin_state(0, 19, GPIO_LEVEL_HIGH);
 
     ssp_init( FPGA_SPI, FPGA_SPI_BITRATE, FPGA_SPI_FRAME_SIZE, SSP_MASTER, SSP_POLLING );
 

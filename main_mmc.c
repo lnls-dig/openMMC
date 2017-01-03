@@ -22,16 +22,11 @@
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
-#include "task.h"
-#include "queue.h"
-#include "semphr.h"
 
 /* Project includes */
 #include "port.h"
-#include "pin_mapping.h"
 #include "led.h"
 #include "ipmi.h"
-#include "sdr.h"
 #include "payload.h"
 #include "i2c.h"
 #include "fru.h"
@@ -43,26 +38,10 @@
 #include "rtm.h"
 #endif
 
-//#define HEAP_TEST
-//#define STOP_TEST
-
-/* LED pins initialization */
-void heap_test ( void* param);
-TaskHandle_t heap_handle;
 /*-----------------------------------------------------------*/
-
 int main( void )
 {
-
-#if (configGENERATE_RUN_TIME_STATS == 1)
-    vConfigureTimerForRunTimeStats();
-#endif
-
-#ifdef STOP_TEST
-    int test = 0;
-    while (test == 0)
-    {}
-#endif
+    pin_init();
 
 #ifdef MODULE_UART_DEBUG
     uart_debug_init( 19200 );
@@ -102,10 +81,8 @@ int main( void )
     /*  Init IPMI interface */
     /* NOTE: ipmb_init() is called inside this function */
     ipmi_init();
-#ifdef HEAP_TEST
-    xTaskCreate( heap_test, "Heap Test", 50, (void *) NULL, tskIDLE_PRIORITY+5, &heap_handle );
-#endif
-/* Start the tasks running. */
+
+    /* Start the tasks running. */
     vTaskStartScheduler();
 
     /* If all is well we will never reach here as the scheduler will now be
@@ -114,50 +91,9 @@ int main( void )
     for( ;; );
 
 }
+
 /*-----------------------------------------------------------*/
 /* Put the MCU in sleep state when no task is running */
 void vApplicationIdleHook (void) {
     pm_sleep();
 }
-
-/*-----------------------------------------------------------*/
-/* System Debug funtions */
-#ifdef HEAP_TEST
-static char stats[500];
-void heap_test ( void* param)
-{
-    uint8_t water_mark = 0;
-    size_t used_heap = 0;
-
-    for (;;) {
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-        water_mark = uxTaskGetStackHighWaterMark(NULL);
-        used_heap = configTOTAL_HEAP_SIZE - xPortGetFreeHeapSize();
-        vTaskGetRunTimeStats(stats);
-    }
-}
-#endif
-
-/*-----------------------------------------------------------*/
-/* FreeRTOS Debug Functions */
-
-#if (configGENERATE_RUN_TIME_STATS == 1)
-void vConfigureTimerForRunTimeStats( void )
-{
-    const unsigned long CTCR_CTM_TIMER = 0x00, TCR_COUNT_ENABLE = 0x01;
-
-    /* Power up and feed the timer with a clock. */
-    Chip_TIMER_Init(LPC_TIMER0);
-    /* Reset Timer 0 */
-    Chip_TIMER_Reset(LPC_TIMER0);
-    /* Just count up. */
-    LPC_TIMER0->CTCR = CTCR_CTM_TIMER;
-
-    /* Prescale to a frequency that is good enough to get a decent resolution,
-       but not too fast so as to overflow all the time. */
-    LPC_TIMER0->PR =  ( configCPU_CLOCK_HZ / 10000UL ) - 1UL;
-
-    /* Start the counter. */
-    LPC_TIMER0->TCR = TCR_COUNT_ENABLE;
-}
-#endif

@@ -35,7 +35,7 @@
 /**
  * @brief SSP Interfaces count in LPC17xx
  */
-#define MAX_SSP_INTERFACES      3
+#define MAX_SSP_INTERFACES      2
 
 /**
  * @brief Macro to retrieve the pointer to LPC_SSP registers based on id number
@@ -56,35 +56,14 @@ enum ssel_state {
 };
 
 /**
- * @brief SSP Pins configuration
- */
-typedef struct ssp_pin {
-    uint8_t port;             /**< Port number where the SSP interface is located */
-    uint8_t sck_pin;          /**< Serial Clock (SCK) pin number */
-    uint8_t sck_mode;         /**< Serial Clock (SCK) pin mode */
-    uint8_t sck_func;         /**< Serial Clock (SCK) pin function */
-    uint8_t mosi_pin;         /**< Master Out Slave In (MOSI) pin number */
-    uint8_t mosi_mode;        /**< Master Out Slave In (MOSI) pin mode */
-    uint8_t mosi_func;        /**< Master Out Slave In (MOSI) pin function */
-    uint8_t miso_pin;         /**< Master In Slave Out (MISO) pin number */
-    uint8_t miso_mode;        /**< Master In Slave Out (MISO) pin mode */
-    uint8_t miso_func;        /**< Master In Slave Out (MISO) pin function */
-    uint8_t ssel_pin;         /**< Slave Select (SSEL) pin number */
-    uint8_t ssel_mode;        /**< Slave Select (SSEL) pin mode */
-    uint8_t ssel_func;        /**< Slave Select (SSEL) pin function */
-} ssp_pin_t;
-
-/**
  * @brief SSP Interface config struct
  */
 typedef struct ssp_config {
     LPC_SSP_T * lpc_id;
     IRQn_Type irq;
-    uint32_t bitrate;
-    uint8_t master_mode;
+    uint32_t ssel_pin;
     uint8_t polling;
     uint8_t frame_size;
-    const ssp_pin_t * pin_cfg;
     Chip_SSP_DATA_SETUP_T xf_setup;
     TaskHandle_t caller_task;
 } ssp_config_t;
