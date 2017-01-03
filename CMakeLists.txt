@@ -54,7 +54,6 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" CACHE STRING "")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "")
 
-set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/main_mmc.c)
 set(PROJ_HDRS ${CMAKE_SOURCE_DIR} )
 
 add_subdirectory(port/board)
@@ -112,7 +111,6 @@ add_custom_command(TARGET bootloader POST_BUILD
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
   COMMENT "Converting the AXF output to a binary file"
   )
-
 
 ##Program command
 set(LPCXPRESSO_INSTALL_PATH /usr/local/)
