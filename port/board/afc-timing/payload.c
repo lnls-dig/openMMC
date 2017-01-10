@@ -67,23 +67,37 @@
  * 255 - power fail
  */
 
-static TickType_t last_time;
+static TickType_t edge_time;
+static uint8_t reset_lock;
+uint8_t last_state = 1;
 
-void EINT2_IRQHandler( void )
+static void check_fpga_reset( void )
 {
-    TickType_t current_time = xTaskGetTickCountFromISR();
+    TickType_t diff;
+    TickType_t cur_time = xTaskGetTickCount();
 
-    /* Simple debouncing routine */
-    /* If the last interruption happened in the last 200ms, this one is only a bounce, ignore it and wait for the next interruption */
-    if ( getTickDifference( current_time, last_time ) > DEBOUNCE_TIME ) {
+    uint8_t cur_state = gpio_read_pin( GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN);
+
+    if ( (cur_state == 0) && (last_state == 1) ) {
+        /* Detects the falling edge of the front panel button */
+        edge_time = cur_time;
+        reset_lock = 0;
+    }
+
+    diff = getTickDifference( cur_time, edge_time );
+
+    if ( (diff > pdMS_TO_TICKS(2000)) && (reset_lock == 0) && (cur_state == 0) ) {
         gpio_set_pin_low( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
-        asm("NOP");
         gpio_set_pin_high( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
 
-        last_time = current_time;
+        /* If the user continues to press the button after the 2s, prevent this action to be repeated */
+        reset_lock = 1;
+
+        /* Blink RED LED to indicate to the user that the Reset was performed */
+        LEDUpdate( FRU_AMC, LED1, LEDMODE_LAMPTEST, LEDINIT_ON, 5, 0 );
     }
-    /* Clear interruption flag */
-    LPC_SYSCTL->EXTINT |= (1 << 2);
+
+    last_state = cur_state;
 }
 
 /**
@@ -173,10 +187,10 @@ void payload_init( void )
     dac_vadj_config( 1, 25 );
 #endif
 
-    /* Configure FPGA reset button interruption on front panel */
-    pin_config( GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN, (IOCON_MODE_INACT | IOCON_FUNC1) );
-    irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1 );
-    irq_enable( EINT2_IRQn );
+    /* Configure reset button on front panel */
+    gpio_set_pin_dir( GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN, INPUT );
+
+    /* Configure FPGA reset line */
     gpio_set_pin_dir( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, OUTPUT );
     gpio_set_pin_state( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, HIGH );
 
