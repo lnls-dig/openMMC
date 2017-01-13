@@ -36,6 +36,7 @@
 #include "hotswap.h"
 #include "utils.h"
 #include "fru.h"
+#include "led.h"
 
 /** @todo Rewrite this comment section about payload states since they've been changed */
 /* payload states

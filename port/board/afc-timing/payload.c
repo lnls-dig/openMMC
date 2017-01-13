@@ -36,6 +36,7 @@
 #include "hotswap.h"
 #include "utils.h"
 #include "fru.h"
+#include "led.h"
 
 /* payload states
  *   0 - no power
@@ -193,7 +194,6 @@ void payload_init( void )
     /* Configure FPGA reset line */
     gpio_set_pin_dir( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, OUTPUT );
     gpio_set_pin_state( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN, HIGH );
-
 
     /* Flash CS Mux - Only valid to AFC v3.1 */
     /* 0 = FPGA reads bitstream from Program memory
