@@ -62,3 +62,6 @@ out/*
 
 #Doxygen output
 *html*
+
+TAGS
+.dir-locals.el
