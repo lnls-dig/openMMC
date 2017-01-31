@@ -39,10 +39,22 @@
 #include "led.h"
 #include "fru.h"
 #include "utils.h"
+#include "uart_debug.h"
 
-static uint8_t hotswap_get_handle_status( void )
+static bool hotswap_get_handle_status( uint8_t *state )
 {
-    return gpio_read_pin(PIN_PORT(GPIO_HOT_SWAP_HANDLE), PIN_NUMBER(GPIO_HOT_SWAP_HANDLE));
+    static uint8_t falling, rising;
+
+    bool pin_read = gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN);
+
+    falling = (falling << 1) | !pin_read | 0x80;
+    rising = (rising << 1) | pin_read | 0x80;
+
+    if ( (falling == 0xFF) || (rising == 0xFF) ) {
+        *state = pin_read;
+        return true;
+    }
+    return false;
 }
 
 SDR_type_02h_t * hotswap_amc_pSDR;
@@ -89,8 +101,12 @@ void hotswap_init( void )
 void vTaskHotSwap( void *Parameters )
 {
     /* Init old_state with a different value, so that the uC always send its state on startup */
-    static uint8_t old_state_amc = 0xFF;
-    static uint8_t new_state_amc;
+    static uint8_t new_state_amc, old_state_amc = 0xFF;
+
+    while( !hotswap_get_handle_status( &new_state_amc )) {
+        vTaskDelay(10);
+    }
+
 #ifdef MODULE_RTM
     static uint8_t old_state_rtm = 0xFF;
     static uint8_t new_state_rtm;
@@ -100,7 +116,7 @@ void vTaskHotSwap( void *Parameters )
     const TickType_t xFrequency = 50;
 
     /* Override Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
-    if ( gpio_read_pin(PIN_PORT(GPIO_HOT_SWAP_HANDLE), PIN_NUMBER(GPIO_HOT_SWAP_HANDLE)) == 0 ) {
+    if ( new_state_amc == 0 ) {
         LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
     } else {
         LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
@@ -112,9 +128,14 @@ void vTaskHotSwap( void *Parameters )
     for ( ;; ) {
         vTaskDelayUntil( &xLastWakeTime, xFrequency );
 
-        new_state_amc = hotswap_get_handle_status();
+        hotswap_get_handle_status( &new_state_amc );
 
         if ( new_state_amc ^ old_state_amc ) {
+            if ( new_state_amc == 0 ) {
+                DEBUG_MSG("Hotswap handle pressed!\n");
+            } else {
+                DEBUG_MSG("Hotswap handle released!\n");
+            }
             if ( hotswap_send_event( hotswap_amc_sensor, new_state_amc ) == ipmb_error_success ) {
                 hotswap_set_mask_bit( HOTSWAP_AMC, 1 << new_state_amc );
                 hotswap_clear_mask_bit( HOTSWAP_AMC, 1 << (!new_state_amc) );
