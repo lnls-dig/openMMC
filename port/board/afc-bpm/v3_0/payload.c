@@ -36,8 +36,8 @@
 #include "hotswap.h"
 #include "utils.h"
 #include "fru.h"
+#include "led.h"
 
-/** @todo Rewrite this comment section about payload states since they've been changed */
 /* payload states
  *   0 - no power
  *   1 - power switching on
@@ -68,23 +68,39 @@
  * 255 - power fail
  */
 
-static TickType_t last_time;
-
-void EINT2_IRQHandler( void )
+static void check_fpga_reset( void )
 {
-    TickType_t current_time = xTaskGetTickCountFromISR();
+    static TickType_t edge_time;
+    static uint8_t reset_lock;
+    static uint8_t last_state = 1;
 
-    /* Simple debouncing routine */
-    /* If the last interruption happened in the last 200ms, this one is only a bounce, ignore it and wait for the next interruption */
-    if ( getTickDifference( current_time, last_time ) > DEBOUNCE_TIME ) {
-        gpio_set_pin_low( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
-        asm("NOP");
-        gpio_set_pin_high( GPIO_FPGA_RESET_PORT, GPIO_FPGA_RESET_PIN );
+    TickType_t diff;
+    TickType_t cur_time = xTaskGetTickCount();
 
-        last_time = current_time;
+    uint8_t cur_state = gpio_read_pin( PIN_PORT(GPIO_FRONT_BUTTON), PIN_NUMBER(GPIO_FRONT_BUTTON));
+
+    if ( (cur_state == 0) && (last_state == 1) ) {
+        /* Detects the falling edge of the front panel button */
+        edge_time = cur_time;
+        reset_lock = 0;
     }
-    /* Clear interruption flag */
-    LPC_SYSCTL->EXTINT |= (1 << 2);
+
+    diff = getTickDifference( cur_time, edge_time );
+
+    if ( (diff > pdMS_TO_TICKS(2000)) && (reset_lock == 0) && (cur_state == 0) ) {
+        gpio_set_pin_low( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
+        asm("NOP");
+        gpio_set_pin_high( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
+
+        /* If the user continues to press the button after the 2s, prevent this action to be repeated */
+        reset_lock = 1;
+
+        /* Blink RED LED to indicate to the user that the Reset was performed */
+        LEDUpdate( FRU_AMC, LED1, LEDMODE_LAMPTEST, LEDINIT_ON, 5, 0 );
+    }
+
+    last_state = cur_state;
+}
 }
 
 /**
@@ -195,6 +211,8 @@ void vTaskPayload( void *pvParameters )
     gpio_set_pin_state( GPIO_PROGRAM_B_PORT, GPIO_PROGRAM_B_PIN, HIGH );
 
     for ( ;; ) {
+
+        check_fpga_reset();
 
         /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
         gpio_set_pin_state( GPIO_EN_FMC1_P12V_PORT, GPIO_EN_FMC1_P12V_PIN, HIGH );

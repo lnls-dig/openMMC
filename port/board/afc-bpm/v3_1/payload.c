@@ -36,6 +36,7 @@
 #include "hotswap.h"
 #include "utils.h"
 #include "fru.h"
+#include "led.h"
 
 /* payload states
  *   0 - no power
@@ -67,23 +68,38 @@
  * 255 - power fail
  */
 
-static TickType_t last_time;
+static TickType_t edge_time;
+static uint8_t reset_lock;
+uint8_t last_state = 1;
 
-void EINT2_IRQHandler( void )
+static void check_fpga_reset( void )
 {
-    TickType_t current_time = xTaskGetTickCountFromISR();
+    TickType_t diff;
+    TickType_t cur_time = xTaskGetTickCount();
 
-    /* Simple debouncing routine */
-    /* If the last interruption happened in the last 200ms, this one is only a bounce, ignore it and wait for the next interruption */
-    if ( getTickDifference( current_time, last_time ) > DEBOUNCE_TIME ) {
+    uint8_t cur_state = gpio_read_pin( GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN);
+
+    if ( (cur_state == 0) && (last_state == 1) ) {
+        /* Detects the falling edge of the front panel button */
+        edge_time = cur_time;
+        reset_lock = 0;
+    }
+
+    diff = getTickDifference( cur_time, edge_time );
+
+    if ( (diff > pdMS_TO_TICKS(2000)) && (reset_lock == 0) && (cur_state == 0) ) {
         gpio_set_pin_low( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
         asm("NOP");
         gpio_set_pin_high( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
 
-        last_time = current_time;
+        /* If the user continues to press the button after the 2s, prevent this action to be repeated */
+        reset_lock = 1;
+
+        /* Blink RED LED to indicate to the user that the Reset was performed */
+        LEDUpdate( FRU_AMC, LED1, LEDMODE_LAMPTEST, LEDINIT_ON, 5, 0 );
     }
-    /* Clear interruption flag */
-    LPC_SYSCTL->EXTINT |= (1 << 2);
+
+    last_state = cur_state;
 }
 
 /**
@@ -144,6 +160,7 @@ TaskHandle_t vTaskPayload_Handle;
 
 void payload_init( void )
 {
+    gpio_set_pin_dir( MMC_ENABLE_PORT, MMC_ENABLE_PIN, INPUT );
 
 #ifndef BENCH_TEST
     /* Wait until ENABLE# signal is asserted ( ENABLE == 0) */
@@ -163,10 +180,6 @@ void payload_init( void )
     set_vadj_volt( 0, 2.5 );
     set_vadj_volt( 1, 2.5 );
 #endif
-
-    /* Configure FPGA reset button interruption on front panel */
-    irq_set_priority( EINT2_IRQn, configMAX_SYSCALL_INTERRUPT_PRIORITY - 1 );
-    irq_enable( EINT2_IRQn );
 
     gpio_set_pin_state( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_HIGH );
 
@@ -204,6 +217,8 @@ void vTaskPayload( void *pvParameters )
     gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_HIGH );
 
     for ( ;; ) {
+
+        check_fpga_reset();
 
         /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
         gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC1_P12V), PIN_NUMBER(GPIO_EN_FMC1_P12V), GPIO_LEVEL_HIGH );
