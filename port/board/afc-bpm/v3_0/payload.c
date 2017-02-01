@@ -101,6 +101,19 @@ static void check_fpga_reset( void )
 
     last_state = cur_state;
 }
+
+void set_vadj_volt( uint8_t fmc_slot, float v )
+{
+    uint32_t res_total;
+    uint32_t res_dac;
+
+    res_total = (uint32_t) (1162.5/(v-0.775)) - 453;
+    res_dac = (1800*res_total)/(1800-res_total);
+
+    /* Use only the lower 8-bits (the dac only has 256 steps) */
+    res_dac &= 0xFF;
+
+    dac_ad84xx_set_res( fmc_slot, res_dac );
 }
 
 /**
@@ -152,9 +165,9 @@ void payload_init( void )
 
 #ifdef MODULE_DAC_AD84XX
     /* Configure the PVADJ DAC */
-    dac_vadj_init();
-    dac_vadj_config( 0, 25 );
-    dac_vadj_config( 1, 25 );
+    dac_ad84xx_init();
+    set_vadj_volt( 0, 2.5 );
+    set_vadj_volt( 1, 2.5 );
 #endif
 
     /* Configure FPGA reset line */
