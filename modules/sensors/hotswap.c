@@ -45,7 +45,7 @@ static bool hotswap_get_handle_status( uint8_t *state )
 {
     static uint8_t falling, rising;
 
-    bool pin_read = gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN);
+    bool pin_read = gpio_read_pin(PIN_PORT(GPIO_HOT_SWAP_HANDLE), PIN_NUMBER(GPIO_HOT_SWAP_HANDLE));
 
     falling = (falling << 1) | !pin_read | 0x80;
     rising = (rising << 1) | pin_read | 0x80;

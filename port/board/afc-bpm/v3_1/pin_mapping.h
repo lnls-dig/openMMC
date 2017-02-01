@@ -25,7 +25,7 @@
  */
 
 /**
- * @file afc/v3_1/pin_mapping.h
+ * @file afc-bpm/v3_1/pin_mapping.h
  * @brief Hardware pin definitions for AFCv3.1
  *
  * @ingroup AFC_V3_1_PIN_MAPPING
@@ -56,15 +56,12 @@
 #define I2C0_SCL                        PIN_DEF( PORT0, 28, (IOCON_FUNC1 | IOCON_MODE_INACT), NON_GPIO )
 #define I2C1_SDA                        PIN_DEF( PORT0,  0, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
 #define I2C1_SCL                        PIN_DEF( PORT0,  1, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
-#define I2C2_SDA                        PIN_DEF( PORT0, 10, (IOCON_FUNC1 | IOCON_MODE_INACT), NON_GPIO )
-#define I2C2_SCL                        PIN_DEF( PORT0, 11, (IOCON_FUNC1 | IOCON_MODE_INACT), NON_GPIO )
+#define I2C2_SDA                        PIN_DEF( PORT0, 10, (IOCON_FUNC2 | IOCON_MODE_INACT), NON_GPIO )
+#define I2C2_SCL                        PIN_DEF( PORT0, 11, (IOCON_FUNC2 | IOCON_MODE_INACT), NON_GPIO )
 
 /* UART Debug port */
 #define UART_DEBUG_TXD                  PIN_DEF( PORT4, 28, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
 #define UART_DEBUG_RXD                  PIN_DEF( PORT4, 29, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
-
-/* Front Panel BUTTON */
-#define FRONT_BUTTON_EXTINT             PIN_DEF( PORT2, 12, (IOCON_FUNC1 | IOCON_MODE_INACT), NON_GPIO )
 
 /* SSP Ports */
 /* FPGA SPI Port (SSEL is GPIO for word transfers larger than 8bits) */
@@ -96,6 +93,9 @@
 #define GPIO_LEDBLUE                    PIN_DEF( PORT1,  9, (IOCON_FUNC0 | IOCON_MODE_PULLUP), GPIO_DIR_OUTPUT )
 #define GPIO_LEDGREEN                   PIN_DEF( PORT1, 10, (IOCON_FUNC0 | IOCON_MODE_PULLDOWN), GPIO_DIR_OUTPUT )
 #define GPIO_LEDRED                     PIN_DEF( PORT1, 25, (IOCON_FUNC0 | IOCON_MODE_PULLDOWN), GPIO_DIR_OUTPUT )
+
+/* Front Panel BUTTON */
+#define GPIO_FRONT_BUTTON               PIN_DEF( PORT2, 12, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_INPUT )
 
 /* Hot swap handle */
 #define GPIO_HOT_SWAP_HANDLE            PIN_DEF( PORT2, 13, (IOCON_FUNC0 | IOCON_MODE_PULLUP), GPIO_DIR_INPUT )
@@ -175,7 +175,6 @@
         I2C2_SCL,                               \
         UART_DEBUG_TXD,                         \
         UART_DEBUG_RXD,                         \
-        FRONT_BUTTON_EXTINT,                    \
         SSP0_SCK,                               \
         SSP0_SSEL,                              \
         SSP0_MISO,                              \
@@ -194,6 +193,7 @@
         GPIO_LEDBLUE,                           \
         GPIO_LEDGREEN,                          \
         GPIO_LEDRED,                            \
+        GPIO_FRONT_BUTTON,                      \
         GPIO_HOT_SWAP_HANDLE,                   \
         GPIO_EN_P1V0,                           \
         GPIO_EN_P1V2,                           \

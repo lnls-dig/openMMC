@@ -77,7 +77,7 @@ static void check_fpga_reset( void )
     TickType_t diff;
     TickType_t cur_time = xTaskGetTickCount();
 
-    uint8_t cur_state = gpio_read_pin( GPIO_FRONT_BUTTON_PORT, GPIO_FRONT_BUTTON_PIN);
+    uint8_t cur_state = gpio_read_pin( PIN_PORT(GPIO_FRONT_BUTTON), PIN_NUMBER(GPIO_FRONT_BUTTON));
 
     if ( (cur_state == 0) && (last_state == 1) ) {
         /* Detects the falling edge of the front panel button */
@@ -112,7 +112,7 @@ static void check_fpga_reset( void )
 void setDC_DC_ConvertersON( bool on )
 {
     gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC1_PVADJ), PIN_NUMBER(GPIO_EN_FMC1_PVADJ), on );
-    //gpio_set_pin_state( GPIO_EN_FMC1_P12V), PIN_NUMBER(GPIO_EN_FMC1_P12V), on );
+    //gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC1_P12V), PIN_NUMBER(GPIO_EN_FMC1_P12V), on );
     gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC1_P3V3), PIN_NUMBER(GPIO_EN_FMC1_P3V3), on );
 
     gpio_set_pin_state( PIN_PORT(GPIO_EN_FMC2_PVADJ), PIN_NUMBER(GPIO_EN_FMC2_PVADJ), on );
@@ -160,7 +160,6 @@ TaskHandle_t vTaskPayload_Handle;
 
 void payload_init( void )
 {
-    gpio_set_pin_dir( MMC_ENABLE_PORT, MMC_ENABLE_PIN, INPUT );
 
 #ifndef BENCH_TEST
     /* Wait until ENABLE# signal is asserted ( ENABLE == 0) */

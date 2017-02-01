@@ -34,7 +34,7 @@
 
 void rtm_enable_payload_power( void )
 {
-    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 1 );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 1 );
     /* Debug LEDs */
     pca9554_write_pin( RTM_GPIO_LED_RED, 1 );
     pca9554_write_pin( RTM_GPIO_LED_BLUE, 1 );
@@ -43,7 +43,7 @@ void rtm_enable_payload_power( void )
 
 void rtm_disable_payload_power( void )
 {
-    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 0 );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 0 );
     /* Debug LEDs */
     pca9554_write_pin( RTM_GPIO_LED_RED, 0 );
     pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
@@ -92,15 +92,15 @@ void rtm_hardware_init( void )
 void rtm_enable_i2c( void )
 {
     /* Enable I2C communication with RTM */
-    gpio_set_pin_dir( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, OUTPUT );
-    gpio_set_pin_state( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, HIGH );
+    gpio_set_pin_dir( PIN_PORT(GPIO_RTM_PS), PIN_NUMBER(GPIO_RTM_PS), GPIO_DIR_OUTPUT );
+    gpio_set_pin_dir( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_DIR_OUTPUT );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_LEVEL_HIGH );
 }
 
 void rtm_disable_i2c( void )
 {
-    gpio_set_pin_dir( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN, INPUT );
-    gpio_set_pin_dir( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, INPUT );
+    gpio_set_pin_dir( PIN_PORT(GPIO_RTM_PS), PIN_NUMBER(GPIO_RTM_PS), GPIO_DIR_INPUT );
+    gpio_set_pin_dir( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_DIR_INPUT );
 }
 
 bool rtm_compatibility_check( void )
