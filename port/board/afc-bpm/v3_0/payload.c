@@ -102,6 +102,7 @@ static void check_fpga_reset( void )
     last_state = cur_state;
 }
 
+#ifdef MODULE_DAC_AD84XX
 void set_vadj_volt( uint8_t fmc_slot, float v )
 {
     uint32_t res_total;
@@ -115,6 +116,7 @@ void set_vadj_volt( uint8_t fmc_slot, float v )
 
     dac_ad84xx_set_res( fmc_slot, res_dac );
 }
+#endif
 
 /**
  * @brief Set AFC's DCDC Converters state

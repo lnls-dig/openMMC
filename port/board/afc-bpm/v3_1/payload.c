@@ -126,6 +126,7 @@ void setDC_DC_ConvertersON( bool on )
     gpio_set_pin_state( PIN_PORT(GPIO_EN_P3V3), PIN_NUMBER(GPIO_EN_P3V3), on );
 }
 
+#ifdef MODULE_DAC_AD84XX
 void set_vadj_volt( uint8_t fmc_slot, float v )
 {
     uint32_t res_total;
@@ -139,6 +140,7 @@ void set_vadj_volt( uint8_t fmc_slot, float v )
 
     dac_ad84xx_set_res( fmc_slot, res_dac );
 }
+#endif
 
 EventGroupHandle_t amc_payload_evt = NULL;
 #ifdef MODULE_RTM
