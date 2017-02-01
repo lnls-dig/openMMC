@@ -68,12 +68,12 @@
  * 255 - power fail
  */
 
-static TickType_t edge_time;
-static uint8_t reset_lock;
-uint8_t last_state = 1;
-
 static void check_fpga_reset( void )
 {
+    static TickType_t edge_time;
+    static uint8_t reset_lock;
+    static uint8_t last_state = 1;
+
     TickType_t diff;
     TickType_t cur_time = xTaskGetTickCount();
 
