@@ -39,9 +39,6 @@ void uart_debug_init( uint32_t baud )
 
     uart_init( UART_DEBUG );
 
-    pin_config( UART_DEBUG_PORT, UART_DEBUG_TXD_PIN, ( IOCON_MODE_INACT | IOCON_FUNC3 ) );
-    pin_config( UART_DEBUG_PORT, UART_DEBUG_RXD_PIN, ( IOCON_MODE_INACT | IOCON_FUNC3 ) );
-
     uart_set_baud( UART_DEBUG, baud );
 
     /* Defaults to 8N1, no parity */
