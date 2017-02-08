@@ -93,6 +93,7 @@ size_t eeprom_24xx64_write( uint8_t id, uint16_t address, uint8_t *tx_data, size
 
             /* Write the data */
             tx_len += xI2CMasterWrite( i2c_interface, i2c_addr, &page_buf[0] , bytes_to_write+2 );
+            tx_len -= 2; /* Remove the 2 page bytes from the count */
             curr_addr += bytes_to_write;
         }
         i2c_give( i2c_interface );
