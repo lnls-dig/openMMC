@@ -29,7 +29,7 @@
 #include "fru.h"
 #include "utils.h"
 #include "led.h"
-
+#include "uart_debug.h"
 /* RTM Management functions */
 
 void rtm_enable_payload_power( void )
@@ -50,13 +50,25 @@ void rtm_disable_payload_power( void )
     pca9554_write_pin( RTM_GPIO_LED_GREEN, 1 );
 }
 
-uint8_t rtm_get_hotswap_handle_status( void )
+uint8_t rtm_get_hotswap_handle_status( uint8_t *state )
 {
+    static uint8_t falling, rising;
+    uint8_t pin_read;
+
     rtm_enable_i2c();
-    return pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE );
+
     if (pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE, &pin_read ) == 0 ) {
         return false;
     }
+
+    falling = (falling << 1) | !pin_read | 0x80;
+    rising = (rising << 1) | pin_read | 0x80;
+
+    if ( (falling == 0xFF) || (rising == 0xFF) ) {
+        *state = pin_read;
+        return true;
+    }
+    return false;
 }
 
 void rtm_check_presence( uint8_t *status )

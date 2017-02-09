@@ -101,15 +101,10 @@ void hotswap_init( void )
 void vTaskHotSwap( void *Parameters )
 {
     /* Init old_state with a different value, so that the uC always send its state on startup */
-    static uint8_t new_state_amc, old_state_amc = 0xFF;
-
-    while( !hotswap_get_handle_status( &new_state_amc )) {
-        vTaskDelay(10);
-    }
-
+    static uint8_t new_state_amc = 0x01, old_state_amc = 0xFF;
 #ifdef MODULE_RTM
-    static uint8_t old_state_rtm = 0xFF;
-    static uint8_t new_state_rtm;
+    static uint8_t new_state_rtm = 0x01, old_state_rtm = 0xFF;
+    extern bool rtm_present;
 #endif
 
     TickType_t xLastWakeTime;
@@ -122,19 +117,29 @@ void vTaskHotSwap( void *Parameters )
         LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
     }
 
+#ifdef MODULE_RTM
+    /* Override RTM Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
+    if ( new_state_rtm == 0 ) {
+        LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
+    } else {
+        LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
+    }
+#endif
     /* Initialise the xLastWakeTime variable with the current time. */
     xLastWakeTime = xTaskGetTickCount();
 
     for ( ;; ) {
         vTaskDelayUntil( &xLastWakeTime, xFrequency );
 
-        hotswap_get_handle_status( &new_state_amc );
+        if (!hotswap_get_handle_status( &new_state_amc )) {
+            continue;
+        }
 
         if ( new_state_amc ^ old_state_amc ) {
             if ( new_state_amc == 0 ) {
-                DEBUG_MSG("Hotswap handle pressed!\n");
+                DEBUG_MSG("AMC Hotswap handle pressed!\n");
             } else {
-                DEBUG_MSG("Hotswap handle released!\n");
+                DEBUG_MSG("AMC Hotswap handle released!\n");
             }
             if ( hotswap_send_event( hotswap_amc_sensor, new_state_amc ) == ipmb_error_success ) {
                 hotswap_set_mask_bit( HOTSWAP_AMC, 1 << new_state_amc );
@@ -145,8 +150,16 @@ void vTaskHotSwap( void *Parameters )
 
 #ifdef MODULE_RTM
         new_state_rtm = rtm_get_hotswap_handle_status();
+        if (!rtm_get_hotswap_handle_status( &new_state_rtm )) {
+            continue;
+        }
 
         if ( new_state_rtm ^ old_state_rtm ) {
+            if ( new_state_rtm == 0 ) {
+                DEBUG_MSG("RTM Hotswap handle pressed!\n");
+            } else {
+                DEBUG_MSG("RTM Hotswap handle released!\n");
+            }
             if ( hotswap_send_event( hotswap_rtm_sensor, new_state_rtm ) == ipmb_error_success ) {
                 hotswap_set_mask_bit( HOTSWAP_RTM, 1 << new_state_rtm );
                 hotswap_clear_mask_bit( HOTSWAP_RTM, 1 << (!new_state_rtm) );
