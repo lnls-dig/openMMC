@@ -149,7 +149,12 @@ void vTaskHotSwap( void *Parameters )
         }
 
 #ifdef MODULE_RTM
-        new_state_rtm = rtm_get_hotswap_handle_status();
+        if ( !rtm_present ) {
+            /* Keep this flag in a different state so that when the RTM board connects, we send its hotswap status right after */
+            old_state_rtm = 0xFF;
+            continue;
+        }
+
         if (!rtm_get_hotswap_handle_status( &new_state_rtm )) {
             continue;
         }

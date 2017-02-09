@@ -35,6 +35,7 @@
 #include "hotswap.h"
 #include "payload.h"
 
+volatile bool rtm_present = false;
 volatile uint8_t rtm_power_level = 0;
 extern EventGroupHandle_t rtm_payload_evt;
 
@@ -66,6 +67,8 @@ void RTM_Manage( void * Parameters )
         if ( ps_new_state ^ ps_old_state ) {
             if ( ps_new_state == HOTSWAP_STATE_URTM_PRSENT ) {
 
+                rtm_present = true;
+
                 /* Create/Read the RTM FRU info before sending the hotswap event */
                 fru_init(FRU_RTM);
 
@@ -93,6 +96,8 @@ void RTM_Manage( void * Parameters )
 
             } else if ( ps_new_state == HOTSWAP_STATE_URTM_ABSENT ) {
                 //sdr_disable_sensors(); /* Not implemented yet */
+
+                rtm_present = false;
 
                 hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_ABSENT_MASK );
                 hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_PRESENT_MASK );
