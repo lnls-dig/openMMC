@@ -54,6 +54,9 @@ uint8_t rtm_get_hotswap_handle_status( void )
 {
     rtm_enable_i2c();
     return pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE );
+    if (pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE, &pin_read ) == 0 ) {
+        return false;
+    }
 }
 
 void rtm_check_presence( uint8_t *status )
@@ -182,7 +185,7 @@ void rtm_ctrl_led( uint8_t id, uint8_t state )
 
 uint8_t rtm_read_led( uint8_t id )
 {
-    uint8_t pca_pin;
+    uint8_t pca_pin, stat;
 
     switch( id ) {
     case LED_BLUE:
@@ -201,5 +204,7 @@ uint8_t rtm_read_led( uint8_t id )
         return 1;
     }
 
-    return pca9554_read_pin( pca_pin );
+    pca9554_read_pin( pca_pin, &stat );
+
+    return stat;
 }

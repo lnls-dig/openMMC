@@ -77,7 +77,7 @@
  *
  * @return 8-bit value with the pins status
  */
-uint8_t pca9554_read_port( void );
+uint8_t pca9554_read_port( uint8_t *readout );
 
 /**
  * @brief Read a pin status
@@ -86,7 +86,7 @@ uint8_t pca9554_read_port( void );
  *
  * @return Pin logical status
  */
-uint8_t pca9554_read_pin( uint8_t pin );
+uint8_t pca9554_read_pin( uint8_t pin, uint8_t *status );
 
 /**
  * @brief Write all output pins
@@ -95,7 +95,7 @@ uint8_t pca9554_read_pin( uint8_t pin );
  *
  * @return None
  */
-void pca9554_write_port( uint8_t data );
+uint8_t pca9554_write_port( uint8_t data );
 
 /**
  * @brief Write a output pin
@@ -105,7 +105,7 @@ void pca9554_write_port( uint8_t data );
  *
  * @return None
  */
-void pca9554_write_pin( uint8_t pin, bool data );
+uint8_t pca9554_write_pin( uint8_t pin, bool data );
 
 /* Polarity Control */
 /**
@@ -113,7 +113,7 @@ void pca9554_write_pin( uint8_t pin, bool data );
  *
  * @param pol Polarity (active-high/low)
  */
-void pca9554_set_port_pol( uint8_t pol );
+uint8_t pca9554_set_port_pol( uint8_t pol );
 
 /**
  * @brief Set pin polarity
@@ -121,14 +121,14 @@ void pca9554_set_port_pol( uint8_t pol );
  * @param pin Selected pin
  * @param pol Pin Polarity (active-high/low)
  */
-void pca9554_set_pin_pol( uint8_t pin, bool pol );
+uint8_t pca9554_set_pin_pol( uint8_t pin, bool pol );
 
 /**
  * @brief Read all pins polarity
  *
  * @return Pins polarity (active-high/low)
  */
-uint8_t pca9554_get_port_pol( void );
+uint8_t pca9554_get_port_pol( uint8_t *pol );
 
 /**
  * @brief Read pin polarity
@@ -137,7 +137,7 @@ uint8_t pca9554_get_port_pol( void );
  *
  * @return Pin polarity value
  */
-bool pca9554_get_pin_pol( uint8_t pin );
+uint8_t pca9554_get_pin_pol( uint8_t pin, uint8_t *pol );
 
 /* Pins direction (output/input) */
 /**
@@ -147,7 +147,7 @@ bool pca9554_get_pin_pol( uint8_t pin );
  *
  * @return None
  */
-void pca9554_set_port_dir( uint8_t dir );
+uint8_t pca9554_set_port_dir( uint8_t dir );
 
 /**
  * @brief Set pin direction
@@ -157,14 +157,14 @@ void pca9554_set_port_dir( uint8_t dir );
  *
  * @return None
  */
-void pca9554_set_pin_dir( uint8_t pin, bool dir );
+uint8_t pca9554_set_pin_dir( uint8_t pin, bool dir );
 
 /**
  * @brief Read all pins direction
  *
  * @return 8-bit value with the pins direction setup
  */
-uint8_t pca9554_get_port_dir( void );
+uint8_t pca9554_get_port_dir( uint8_t *dir );
 
 /**
  * @brief Read pin direction
@@ -173,6 +173,6 @@ uint8_t pca9554_get_port_dir( void );
  *
  * @return Pin direction
  */
-bool pca9554_get_pin_dir( uint8_t pin );
+uint8_t pca9554_get_pin_dir( uint8_t pin, uint8_t *dir );
 
 #endif
