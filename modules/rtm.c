@@ -119,6 +119,7 @@ void RTM_Manage( void * Parameters )
                 /* Quiesced event */
                 hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_QUIESCED );
+                xEventGroupClearBits( rtm_payload_evt, PAYLOAD_MESSAGE_QUIESCED );
             }
         }
     }
