@@ -24,11 +24,10 @@
 #include <stdarg.h>
 #include "stdio.h"
 
-#undef printf
-#undef sprintf
-#undef putchar
+#include "uart_debug.h"
 
-#define putchar(c) (void)0
+
+//#define putchar(c) (void)0
 
 static void printchar(char **str, int c)
 {

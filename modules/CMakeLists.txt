@@ -8,11 +8,12 @@ set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/pin_cfg.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/i2c.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/led.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/ipmb.c ${MODULE_PATH}/ipmi.c)
+set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/printf-stdarg.c)
 
 message(STATUS "Selected modules to compile: ${TARGET_MODULES}")
 
 if (";${TARGET_MODULES};" MATCHES ";UART_DEBUG;")
-  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/uart_debug.c)
+
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_UART_DEBUG")
 endif()
 
