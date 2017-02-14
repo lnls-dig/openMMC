@@ -137,9 +137,9 @@ void vTaskHotSwap( void *Parameters )
 
         if ( new_state_amc ^ old_state_amc ) {
             if ( new_state_amc == 0 ) {
-                DEBUG_MSG("AMC Hotswap handle pressed!\n");
+                printf("AMC Hotswap handle pressed!\n");
             } else {
-                DEBUG_MSG("AMC Hotswap handle released!\n");
+                printf("AMC Hotswap handle released!\n");
             }
             if ( hotswap_send_event( hotswap_amc_sensor, new_state_amc ) == ipmb_error_success ) {
                 hotswap_set_mask_bit( HOTSWAP_AMC, 1 << new_state_amc );
@@ -161,9 +161,9 @@ void vTaskHotSwap( void *Parameters )
 
         if ( new_state_rtm ^ old_state_rtm ) {
             if ( new_state_rtm == 0 ) {
-                DEBUG_MSG("RTM Hotswap handle pressed!\n");
+                printf("RTM Hotswap handle pressed!\n");
             } else {
-                DEBUG_MSG("RTM Hotswap handle released!\n");
+                printf("RTM Hotswap handle released!\n");
             }
             if ( hotswap_send_event( hotswap_rtm_sensor, new_state_rtm ) == ipmb_error_success ) {
                 hotswap_set_mask_bit( HOTSWAP_RTM, 1 << new_state_rtm );

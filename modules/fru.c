@@ -24,6 +24,7 @@
 
 #include "FreeRTOS.h"
 
+#include "port.h"
 #include "fru.h"
 #include "fru_editor.h"
 #include "at24mac.h"
@@ -54,10 +55,10 @@ void fru_init( uint8_t id )
     }
 
 #ifdef FRU_WRITE_EEPROM
-    DEBUG_MSG(">FRU_WRITE_EEPROM flag enabled! Building FRU info...");
+    printf(">FRU_WRITE_EEPROM flag enabled! Building FRU info...");
     fru[id].fru_size = fru[id].build_func( &fru[id].buffer );
 
-    DEBUG_MSG(" Writing FRU info to EEPROM... \n");
+    printf(" Writing FRU info to EEPROM... \n");
     at24mac_write( fru[id].eeprom_id, 0x00, fru[id].buffer, fru[id].fru_size, 0 );
 #endif
 
@@ -68,14 +69,14 @@ void fru_init( uint8_t id )
     if ( at24mac_read( fru[id].eeprom_id, 0x00, &common_header[0], 8, 0 ) == 8 ) {
         if ( (calculate_chksum( &common_header[0], 7 ) == common_header[7]) && common_header[0] == 1 ) {
             /* We have a valid FRU image in the SEEPROM */
-            DEBUG_MSG("FRU information found in EEPROM!\n");
+            printf("FRU information found in EEPROM!\n");
             fru[id].runtime = false;
             return;
         }
     }
 #endif
     /* Could not access the SEEPROM, create a runtime fru info */
-    DEBUG_MSG("Could not find FRU information in EEPROM, building a runtime info...\n");
+    printf("Could not find FRU information in EEPROM, building a runtime info...\n");
     fru[id].fru_size = fru[id].build_func( &fru[id].buffer );
     fru[id].runtime = true;
 }
