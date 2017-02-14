@@ -44,7 +44,7 @@ int main( void )
     pin_init();
 
 #ifdef MODULE_UART_DEBUG
-    uart_debug_init( 19200 );
+    uart_init( UART_DEBUG );
 #endif
 
     DEBUG_MSG("openMMC Starting!\n");
