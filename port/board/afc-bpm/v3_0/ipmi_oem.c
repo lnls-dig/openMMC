@@ -142,12 +142,12 @@ IPMI_HANDLER(ipmi_oem_cmd_gpio_pin, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_GPIO_PIN, ipm
 
     case 1:
         /* Set pin as input */
-        gpio_set_pin_dir( port, pin, INPUT );
+        gpio_set_pin_dir( port, pin, GPIO_DIR_INPUT );
         break;
 
     case 2:
         /* Set pin as output */
-        gpio_set_pin_dir( port, pin, OUTPUT );
+        gpio_set_pin_dir( port, pin, GPIO_DIR_OUTPUT );
 
         /* If given, set the pin output value */
         if (req->data_len > 3) {
