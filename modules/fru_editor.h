@@ -97,6 +97,20 @@
 
 #define current_in_ma(curr)    (uint8_t)(curr/100)
 
+/* FMC Module Size */
+#define FMC_SINGLE_WIDTH        (0x00)
+#define FMC_DOUBLE_WIDTH        (0x01)
+
+/* FMC Connector Size */
+#define FMC_CONN_LPC            (0x00)
+#define FMC_CONN_HPC            (0x01)
+#define FMC_CONN_NOT_FITTED     (0x03)
+
+/* FMC Clock Direction */
+#define MEZZANINE_TO_CARRIER    (0x00)
+#define CARRIER_TO_MEZZANINE    (0x01)
+
+
 typedef struct fru_common_header {
 #ifdef BF_MS_FIRST
 uint8_t   :4,                     /* Common Header Format Version
@@ -365,6 +379,54 @@ typedef struct zone3_compatibility_rec {
     uint8_t compat_designator[4];
 } zone3_compatibility_rec_t;
 
+typedef struct fmc_subtype_rec {
+    fru_multirecord_area_header_t hdr;
+    uint8_t manuf_id[3];    /* Manufacturer ID. LS Byte first. Write as the
+                               three byte ID assigned to Vita 57.1. For this
+                               specification, the value (0012A2h) shall
+                               be used. */
+    uint8_t version:4,
+        subtype:4;
+    uint8_t reserved:1,
+        clk_dir:1,
+        p2_conn_size:2,
+        p1_conn_size:2,
+        module_size:2;
+    uint8_t p1_a_signals;
+    uint8_t p1_b_signals;
+    uint8_t p2_a_signals;
+    uint8_t p2_b_signals;
+    uint8_t p2_gbt:4,
+        p1_gbt:4;
+    uint8_t max_tck_clk;
+} fmc_subtype_rec_t;
+
+typedef struct dc_load_rec {
+    fru_multirecord_area_header_t hdr;
+    uint8_t output_number:4,
+        reserved:4;
+    uint8_t nominal_voltage[2];
+    uint8_t min_spec_volt[2];
+    uint8_t max_spec_volt[2];
+    uint8_t ripple_noise_pkpk[2];
+    uint8_t min_current_load[2];
+    uint8_t max_current_load[2];
+} dc_load_rec_t;
+
+typedef struct dc_output_rec {
+    fru_multirecord_area_header_t hdr;
+    uint8_t output_number:4,
+        reserved:3,
+        standby:1;
+    uint8_t nominal_voltage[2];
+    uint8_t max_neg_dev[2];
+    uint8_t max_pos_dev[2];
+    uint8_t ripple_noise_pkpk[2];
+    uint8_t min_current_draw[2];
+    uint8_t max_current_draw[2];
+} dc_output_rec_t;
+
+
 uint8_t fru_header_build( uint8_t **buffer, size_t int_use_off, size_t chassis_off, size_t board_off, size_t product_off, size_t multirecord_off );
 uint8_t board_info_area_build( uint8_t **buffer, uint8_t lang, uint32_t mfg_time, const char *manuf, const char *name, const char *sn, const char *pn, const char *file_id );
 uint8_t chassis_info_area_build( uint8_t **buffer, uint8_t type, const char *pn, const char *sn, uint8_t *custom_data, size_t custom_data_sz );
@@ -373,6 +435,9 @@ uint8_t amc_point_to_point_record_build( uint8_t **buffer, amc_p2p_descriptor_t 
 uint8_t amc_point_to_point_clock_build( uint8_t **buffer, clock_config_descriptor_t * clk_desc, uint8_t desc_count );
 uint8_t module_current_record_build( uint8_t **buffer, uint8_t current );
 uint8_t zone3_compatibility_record_build( uint8_t **buffer, uint32_t compat_code );
+uint8_t fmc_subtype_record_build( uint8_t **buffer, uint8_t clock_dir, uint8_t module_size, uint8_t p1_conn_size, uint8_t p2_conn_size, uint8_t p1_a_count, uint8_t p1_b_count, uint8_t p2_a_count, uint8_t p2_b_count, uint8_t p1_gbt, uint8_t p2_gbt, uint8_t eol );
+uint8_t dc_load_record_build( uint8_t **buffer, uint16_t nominal_volt, uint16_t min_volt, uint16_t max_volt, uint16_t ripple_noise, uint16_t min_load, uint16_t max_load, uint8_t eol );
+uint8_t dc_output_record_build( uint8_t **buffer, uint16_t nominal_volt, uint16_t neg_dev, uint16_t pos_dev, uint16_t ripple_noise, uint16_t min_draw, uint16_t max_draw, uint8_t eol );
 
 size_t amc_fru_info_build( uint8_t **buffer );
 #ifdef MODULE_RTM

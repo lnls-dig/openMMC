@@ -405,3 +405,151 @@ uint8_t zone3_compatibility_record_build( uint8_t **buffer, uint32_t compat_code
 
     return len;
 }
+
+/* FMC MultiRecords */
+
+uint8_t fmc_subtype_record_build( uint8_t **buffer, uint8_t clock_dir, uint8_t module_size, uint8_t p1_conn_size, uint8_t p2_conn_size, uint8_t p1_a_count, uint8_t p1_b_count, uint8_t p2_a_count, uint8_t p2_b_count, uint8_t p1_gbt, uint8_t p2_gbt, uint8_t eol )
+{
+    uint8_t len = sizeof(fmc_subtype_rec_t);
+    uint8_t *fmc_ptr;
+
+    /* Allocate the needed memory region */
+    fmc_ptr = pvPortMalloc(len);
+
+    /* Clear the buffer */
+    memset(fmc_ptr, 0x00, len);
+
+    fmc_subtype_rec_t *fmc_subtype = (fmc_subtype_rec_t *) fmc_ptr;
+
+    /* Record Type ID */
+    fmc_subtype->hdr.record_type_id = 0xFA;    //OEM FMC Record
+    fmc_subtype->hdr.eol = eol;    //End of Records
+    fmc_subtype->hdr.version = 0x02;    //Record format version
+    fmc_subtype->hdr.record_len = len-sizeof(fru_multirecord_area_header_t);        //Record length
+    fmc_subtype->manuf_id[0] = 0xA2;
+    fmc_subtype->manuf_id[1] = 0x12;
+    fmc_subtype->manuf_id[2] = 0x00;   //Manufacturer ID (PICMG)
+
+    fmc_subtype->version = 0;
+    fmc_subtype->subtype = 0;
+
+    fmc_subtype->reserved = 0;
+    fmc_subtype->clk_dir = clock_dir; /* Carrier to Mezzanine */
+    fmc_subtype->p2_conn_size = p2_conn_size; /* Not fitted for single width mezzanines */
+    fmc_subtype->p1_conn_size = p1_conn_size; /* HPC Connector */
+    fmc_subtype->module_size = module_size; /* Single width */
+
+    /* P1 Connector signals count */
+    fmc_subtype->p1_a_signals = p1_a_count; /* 102 */
+    fmc_subtype->p1_b_signals = p1_b_count; /* 38 */
+
+    /* P2 Connector signals count */
+    fmc_subtype->p2_a_signals = p2_a_count; /* 0 */
+    fmc_subtype->p2_b_signals = p2_b_count; /* 0 */
+
+    /* GBT Transceivers count */
+    fmc_subtype->p1_gbt = p1_gbt; /* 4 */
+    fmc_subtype->p2_gbt = p2_gbt; /* 0 */
+
+    /* Checksums */
+
+    /* Record Checksum */
+    fmc_subtype->hdr.record_chksum = calculate_chksum( ((uint8_t *)fmc_subtype)+sizeof(fru_multirecord_area_header_t), fmc_subtype->hdr.record_len);
+    /* Header Checksum */
+    fmc_subtype->hdr.header_chksum = calculate_chksum( (uint8_t *)&(fmc_subtype->hdr), sizeof(fru_multirecord_area_header_t));
+
+    *buffer = &fmc_ptr[0];
+
+    return len;
+}
+
+uint8_t dc_load_record_build( uint8_t **buffer, uint16_t nominal_volt, uint16_t min_volt, uint16_t max_volt, uint16_t ripple_noise, uint16_t min_load, uint16_t max_load, uint8_t eol )
+{
+    uint8_t len = sizeof(dc_load_rec_t);
+    uint8_t *dc_load_ptr;
+
+    /* Allocate the needed memory region */
+    dc_load_ptr = pvPortMalloc(len);
+
+    /* Clear the buffer */
+    memset(dc_load_ptr, 0x00, len);
+
+    dc_load_rec_t *dc_load = (dc_load_rec_t *) dc_load_ptr;
+
+    dc_load->hdr.record_type_id = 0x02;
+    dc_load->hdr.eol = eol;
+    dc_load->hdr.version = 0x02;
+    dc_load->hdr.record_len = len-sizeof(fru_multirecord_area_header_t);
+
+    dc_load->reserved = 0;
+    dc_load->output_number = 0;
+    dc_load->nominal_voltage[0] = nominal_volt & 0xFF;
+    dc_load->nominal_voltage[1] = (nominal_volt >> 8) & 0xFF;
+
+    dc_load->min_spec_volt[0] = min_volt & 0xFF;
+    dc_load->min_spec_volt[1] = (min_volt >> 8) & 0xFF;
+    dc_load->max_spec_volt[0] = max_volt & 0xFF;
+    dc_load->max_spec_volt[1] = (max_volt >> 8) & 0xFF;
+
+    dc_load->ripple_noise_pkpk[0] = ripple_noise & 0xFF;
+    dc_load->ripple_noise_pkpk[1] = (ripple_noise >> 8) & 0xFF;
+
+    dc_load->min_current_load[0] = min_load & 0xFF;
+    dc_load->min_current_load[1] = (min_load >> 8) & 0xFF;
+
+    dc_load->max_current_load[0] = max_load & 0xFF;
+    dc_load->max_current_load[1] = (max_load >> 8) & 0xFF;
+
+    dc_load->hdr.record_chksum = calculate_chksum( ((uint8_t *)dc_load)+sizeof(fru_multirecord_area_header_t), dc_load->hdr.record_len );
+    dc_load->hdr.header_chksum = calculate_chksum( (uint8_t *)&(dc_load->hdr), sizeof(fru_multirecord_area_header_t) );
+
+    *buffer = &dc_load_ptr[0];
+
+    return len;
+}
+
+uint8_t dc_output_record_build( uint8_t **buffer, uint16_t nominal_volt, uint16_t neg_dev, uint16_t pos_dev, uint16_t ripple_noise, uint16_t min_draw, uint16_t max_draw, uint8_t eol )
+{
+    uint8_t len = sizeof(dc_output_rec_t);
+    uint8_t *dc_output_ptr;
+
+    /* Allocate the needed memory region */
+    dc_output_ptr = pvPortMalloc(len);
+
+    /* Clear the buffer */
+    memset(dc_output_ptr, 0x00, len);
+
+    dc_output_rec_t *dc_output = (dc_output_rec_t *) dc_output_ptr;
+
+    dc_output->hdr.record_type_id = 0x02;
+    dc_output->hdr.eol = eol;
+    dc_output->hdr.version = 0x02;
+    dc_output->hdr.record_len = len-sizeof(fru_multirecord_area_header_t);
+
+    dc_output->reserved = 0;
+    dc_output->output_number = 0;
+
+    dc_output->nominal_voltage[0] = nominal_volt & 0xFF;
+    dc_output->nominal_voltage[1] = (nominal_volt >> 8) & 0xFF;
+
+    dc_output->max_neg_dev[0] = neg_dev & 0xFF;
+    dc_output->max_neg_dev[1] = (neg_dev >> 8) & 0xFF;
+    dc_output->max_pos_dev[0] = pos_dev & 0xFF;
+    dc_output->max_pos_dev[1] = (pos_dev >> 8) & 0xFF;
+
+    dc_output->ripple_noise_pkpk[0] = ripple_noise & 0xFF;
+    dc_output->ripple_noise_pkpk[1] = (ripple_noise >> 8) & 0xFF;
+
+    dc_output->min_current_draw[0] = min_draw & 0xFF;
+    dc_output->min_current_draw[1] = (min_draw >> 8) & 0xFF;
+
+    dc_output->max_current_draw[0] = max_draw & 0xFF;
+    dc_output->max_current_draw[1] = (max_draw >> 8) & 0xFF;
+
+    dc_output->hdr.record_chksum = calculate_chksum( ((uint8_t *)dc_output)+sizeof(fru_multirecord_area_header_t), dc_output->hdr.record_len );
+    dc_output->hdr.header_chksum = calculate_chksum( (uint8_t *)&(dc_output->hdr), sizeof(fru_multirecord_area_header_t) );
+
+    *buffer = &dc_output_ptr[0];
+
+    return len;
+}
