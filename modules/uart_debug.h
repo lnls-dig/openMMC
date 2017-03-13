@@ -42,10 +42,6 @@
  *
  */
 
-#undef printf
-#undef sprintf
-#undef putchar
-
 #define putchar(c) uart_send(UART_DEBUG, &c, 1)
 
 #else
