@@ -33,6 +33,7 @@
 typedef struct lpc_uart_cfg {
     LPC_USART_T * ptr;
     IRQn_Type irq;
+    CHIP_SYSCTL_PCLK_T sysclk;
 } lpc_uart_cfg_t;
 
 const lpc_uart_cfg_t usart_cfg[4];
@@ -48,6 +49,6 @@ const lpc_uart_cfg_t usart_cfg[4];
 #define uart_send( id, msg, len ) Chip_UART_SendBlocking( usart_cfg[id].ptr, msg, len )
 #define uart_read( id, buf, len ) Chip_UART_ReadBlocking( usart_cfg[id].ptr, buf, len )
 
-#define uart_init( id ) Chip_UART_Init( usart_cfg[id].ptr )
+void uart_init ( uint8_t id );
 
 #endif

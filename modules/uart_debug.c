@@ -33,19 +33,6 @@
 
 char debug_buf[100];
 
-void uart_debug_init( uint32_t baud )
-{
-    Chip_Clock_SetPCLKDiv( SYSCTL_PCLK_UART3, SYSCTL_CLKDIV_2 );
-
-    uart_init( UART_DEBUG );
-
-    uart_set_baud( UART_DEBUG, baud );
-
-    /* Defaults to 8N1, no parity */
-    uart_config_data( UART_DEBUG, ( UART_LCR_WLEN8 | UART_LCR_SBS_1BIT | UART_LCR_PARITY_DIS ) );
-
-    uart_tx_enable ( UART_DEBUG );
-}
 
 void uart_printf( uint8_t id, const char *format, ... )
 {
