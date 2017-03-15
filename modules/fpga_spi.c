@@ -24,9 +24,6 @@
 #include "port.h"
 #include "fpga_spi.h"
 #include "task_priorities.h"
-#include "string.h"
-#include "led.h"
-#include "i2c.h"
 #include "sdr.h"
 
 #define FPGA_SPI_BITRATE                10000000
@@ -135,12 +132,12 @@ void vTaskFPGA_COMM( void * Parameters )
             }
         }
 
-        diag->fmc_slot.fmc2_pg_c2m = gpio_read_pin( 1, 19 );
-        diag->fmc_slot.fmc1_pg_c2m = gpio_read_pin( 1, 18 );
-        diag->fmc_slot.fmc2_pg_m2c = gpio_read_pin( 1, 17 );
-        diag->fmc_slot.fmc1_pg_m2c = gpio_read_pin( 1, 16 );
-        diag->fmc_slot.fmc2_prsnt_m2c_n = gpio_read_pin( 1, 15 );
-        diag->fmc_slot.fmc2_prsnt_m2c_n = gpio_read_pin( 1, 14 );
+        diag->fmc_slot.fmc2_pg_c2m = gpio_read_pin( PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M) );
+        diag->fmc_slot.fmc1_pg_c2m = gpio_read_pin( PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M) );
+        diag->fmc_slot.fmc2_pg_m2c = gpio_read_pin( PIN_PORT(GPIO_FMC2_PG_M2C), PIN_NUMBER(GPIO_FMC2_PG_M2C) );
+        diag->fmc_slot.fmc1_pg_m2c = gpio_read_pin( PIN_PORT(GPIO_FMC1_PG_M2C), PIN_NUMBER(GPIO_FMC1_PG_M2C) );
+        diag->fmc_slot.fmc2_prsnt_m2c_n = gpio_read_pin( PIN_PORT(GPIO_FMC2_PRSNT_M2C), PIN_NUMBER(GPIO_FMC2_PRSNT_M2C) );
+        diag->fmc_slot.fmc1_prsnt_m2c_n = gpio_read_pin( PIN_PORT(GPIO_FMC1_PRSNT_M2C), PIN_NUMBER(GPIO_FMC1_PRSNT_M2C) );
 
         write_fpga_buffer( diag_struct );
 
