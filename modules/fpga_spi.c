@@ -58,28 +58,6 @@ static void write_fpga_buffer( t_board_diagnostic diag )
     write_fpga_byte( diag.buffer[i] , 0xFF );
 }
 
-/* Read one byte from the specified address on the FPGA RAM */
-static uint32_t read_fpga_byte( uint16_t address )
-{
-    uint8_t tx_buff[3];
-    uint8_t rx_buff[7];
-
-    tx_buff[0] = RD_COMMAND;
-    tx_buff[1] = (address >> 8) & 0xFF;
-    tx_buff[2] = address & 0xFF;
-
-    ssp_write_read( FPGA_SPI, &tx_buff[0], sizeof(tx_buff), &rx_buff[0], sizeof(rx_buff), portMAX_DELAY );
-
-    return ( (rx_buff[3] << 24) | (rx_buff[4] << 16) | (rx_buff[5] << 8) | rx_buff[6]);
-}
-
-static void read_fpga_buffer( uint32_t * buffer, uint32_t buffer_len )
-{
-    for (uint8_t i = 0; i < buffer_len; i++) {
-        buffer[i] = read_fpga_byte(i);
-    }
-}
-
 static void init_diag_struct( board_diagnostic * diag )
 {
     uint8_t i;
@@ -166,26 +144,6 @@ void vTaskFPGA_COMM( void * Parameters )
 
         write_fpga_buffer( diag_struct );
 
-        /* BUG: The SSP interface keeps returning 0 when trying to read the
-         * data from the FPGA, despite the fact that the waveform shows it's
-         * being returned correctly */
-
-#if SSP_TESTS
-        uint32_t rx_trace[FPGA_MEM_ADDR_MAX] = {0};
-        read_fpga_buffer( &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) );
-
-        uint32_t data;
-
-        if( cmpBuffs( &(diag_struct.buffer[0]), sizeof(diag_struct.buffer)/sizeof(diag_struct.buffer[0]), &rx_trace[0], sizeof(rx_trace)/sizeof(rx_trace[0]) != 0 ) ) {
-            data = 0xAAAAAAAA;
-            LED_update(LED_RED, &LED_2Hz_Blink_Activity);
-        } else {
-            data = 0x55555555;
-            LED_update(LED_RED, &LED_Off_Activity);
-        }
-
-        write_fpga_byte( 0x05, data );
-#endif
         write_fpga_byte( 0x05, 0x55555555 );
         vTaskDelay(FPGA_UPDATE_RATE);
     }
