@@ -1112,25 +1112,25 @@ void user_sdr_init( void )
 #ifdef MODULE_INA220_VOLTAGE
     /* FMC1 Voltage */
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V, &vTaskINA220_Handle, FMC1_12V_DEVID, CHIP_ID_INA_5 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ, &vTaskINA220_Handle, FMC1_VADJ_DEVID, CHIP_ID_INA_1 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3, &vTaskINA220_Handle, FMC1_P3V3_DEVID, CHIP_ID_INA_3 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ, &vTaskINA220_Handle, FMC1_VADJ_DEVID, CHIP_ID_INA_2 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3, &vTaskINA220_Handle, FMC1_P3V3_DEVID, CHIP_ID_INA_4 );
 
     /* FMC2 Voltage */
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V, &vTaskINA220_Handle, FMC2_12V_DEVID, CHIP_ID_INA_0 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ, &vTaskINA220_Handle, FMC2_VADJ_DEVID, CHIP_ID_INA_2 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3, &vTaskINA220_Handle, FMC2_P3V3_DEVID, CHIP_ID_INA_4 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ, &vTaskINA220_Handle, FMC2_VADJ_DEVID, CHIP_ID_INA_1 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3, &vTaskINA220_Handle, FMC2_P3V3_DEVID, CHIP_ID_INA_3 );
 #endif
 
 #ifdef MODULE_INA220_CURRENT
     /* FMC1 Current */
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V_CURR, &vTaskINA220_Handle, FMC1_12V_CURR_DEVID, CHIP_ID_INA_5 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ_CURR, &vTaskINA220_Handle, FMC1_VADJ_CURR_DEVID, CHIP_ID_INA_1 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3_CURR, &vTaskINA220_Handle, FMC1_P3V3_CURR_DEVID, CHIP_ID_INA_3 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_VADJ_CURR, &vTaskINA220_Handle, FMC1_VADJ_CURR_DEVID, CHIP_ID_INA_2 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_P3V3_CURR, &vTaskINA220_Handle, FMC1_P3V3_CURR_DEVID, CHIP_ID_INA_4 );
 
     /* FMC2 Current */
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_12V_CURR, &vTaskINA220_Handle, FMC2_12V_CURR_DEVID, CHIP_ID_INA_0 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ_CURR, &vTaskINA220_Handle, FMC2_VADJ_CURR_DEVID, CHIP_ID_INA_2 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3_CURR, &vTaskINA220_Handle, FMC2_P3V3_CURR_DEVID, CHIP_ID_INA_4 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_VADJ_CURR, &vTaskINA220_Handle, FMC2_VADJ_CURR_DEVID, CHIP_ID_INA_1 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_FMC2_P3V3_CURR, &vTaskINA220_Handle, FMC2_P3V3_CURR_DEVID, CHIP_ID_INA_3 );
 #endif
 
 #ifdef MODULE_MAX6642
