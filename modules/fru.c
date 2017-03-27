@@ -71,6 +71,8 @@ void fru_init( uint8_t id )
             /* We have a valid FRU image in the SEEPROM */
             printf("FRU information found in EEPROM!\n");
             fru[id].runtime = false;
+            /* Set FRU size to the maximum possible size for AT24MACx02 EEPROM to avoid reading the whole fru right now */
+            fru[id].fru_size = 256;
             return;
         }
     }
