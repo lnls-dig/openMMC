@@ -146,6 +146,9 @@ void vTaskHotSwap( void *Parameters )
                 hotswap_clear_mask_bit( HOTSWAP_AMC, 1 << (!new_state_amc) );
                 old_state_amc = new_state_amc;
             }
+#ifdef BENCH_TEST
+            old_state_amc = new_state_amc;
+#endif
         }
 
 #ifdef MODULE_RTM
@@ -170,6 +173,9 @@ void vTaskHotSwap( void *Parameters )
                 hotswap_clear_mask_bit( HOTSWAP_RTM, 1 << (!new_state_rtm) );
                 old_state_rtm = new_state_rtm;
             }
+#ifdef BENCH_TEST
+            old_state_rtm = new_state_rtm;
+#endif
         }
 #endif
     }
