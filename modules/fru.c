@@ -79,7 +79,9 @@ void fru_init( uint8_t id )
 #endif
     /* Could not access the SEEPROM, create a runtime fru info */
     printf("Could not find FRU information in EEPROM, building a runtime info...\n");
-    fru[id].fru_size = fru[id].build_func( &fru[id].buffer );
+    if ( fru[id].fru_size == 0 ) {
+        fru[id].fru_size = fru[id].build_func( &fru[id].buffer );
+    }
     fru[id].runtime = true;
 }
 
