@@ -155,3 +155,18 @@ add_custom_target(program_all
   COMMAND make -C ${CMAKE_BINARY_DIR} program_boot
   COMMAND make -C ${CMAKE_BINARY_DIR} program_app
   )
+
+add_custom_target(full_binary
+  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
+  DEPENDS ${CMAKE_PROJECT_NAME} bootloader
+  #Create a pad file with the total size of the bootloader (0x2000)
+  COMMAND dd if=/dev/zero bs=1 count=8192 | tr \"\\000\" \"\\377\" > bootloader_pad.bin
+  #Add padding bytes to the bootloader binary
+  COMMAND dd if=bootloader.bin of=bootloader_pad.bin conv=notrunc
+  #Concatenate bootloader and app binaries
+  COMMAND cat bootloader_pad.bin ${CMAKE_PROJECT_NAME}.bin > openMMC_full.bin
+
+  #Program full_binary (for tests only)
+  #COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  #COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load-exec=openMMC_full.bin -load-base=0x0
+  )
