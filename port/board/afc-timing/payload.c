@@ -190,10 +190,6 @@ void payload_init( void )
      */
     gpio_set_pin_state( PIN_PORT(GPIO_FLASH_CS_MUX), PIN_NUMBER(GPIO_FLASH_CS_MUX), GPIO_LEVEL_LOW );
 
-    /* Init_B */
-    /* TODO: Check Init_b pin for error on initialization, then use it as output control */
-
-    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_INITB), PIN_NUMBER(GPIO_FPGA_INITB), GPIO_LEVEL_HIGH );
 }
 
 void vTaskPayload( void *pvParameters )
