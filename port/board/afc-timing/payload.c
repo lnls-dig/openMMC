@@ -183,13 +183,6 @@ void payload_init( void )
 #endif
 
     gpio_set_pin_state( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_HIGH );
-
-    /* Flash CS Mux - Only valid to AFC v3.1 */
-    /* 0 = FPGA reads bitstream from Program memory
-     * 1 = FPGA reads bitstream from User memory
-     */
-    gpio_set_pin_state( PIN_PORT(GPIO_FLASH_CS_MUX), PIN_NUMBER(GPIO_FLASH_CS_MUX), GPIO_LEVEL_LOW );
-
 }
 
 void vTaskPayload( void *pvParameters )
