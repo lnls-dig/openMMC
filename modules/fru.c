@@ -28,6 +28,7 @@
 #include "fru.h"
 #include "fru_editor.h"
 #include "at24mac.h"
+#include "eeprom_24xx64.h"
 #include "utils.h"
 #include "ipmi.h"
 #include "i2c_mapping.h"
@@ -35,14 +36,22 @@
 
 fru_data_t fru[FRU_COUNT] = {
     [FRU_AMC] = {
-        .eeprom_id = CHIP_ID_EEPROM,
-        .build_func = amc_fru_info_build,
+        .cfg = {
+            .eeprom_id = CHIP_ID_EEPROM,
+            .build_f = amc_fru_info_build,
+            .read_f = at24mac_read,
+            .write_f = at24mac_write,
+        },
         .runtime = true
     },
 #ifdef MODULE_RTM
     [FRU_RTM] = {
-        .eeprom_id = CHIP_ID_RTM_EEPROM,
-        .build_func = rtm_fru_info_build,
+        .cfg = {
+            .eeprom_id = CHIP_ID_RTM_EEPROM,
+            .build_f = rtm_fru_info_build,
+            .read_f = eeprom_24xx64_read,
+            .write_f = eeprom_24xx64_write,
+        },
         .runtime = true
     }
 #endif
@@ -56,17 +65,16 @@ void fru_init( uint8_t id )
 
 #ifdef FRU_WRITE_EEPROM
     printf(">FRU_WRITE_EEPROM flag enabled! Building FRU info...");
-    fru[id].fru_size = fru[id].build_func( &fru[id].buffer );
+    fru[id].fru_size = fru[id].cfg.build_f( &fru[id].buffer );
 
     printf(" Writing FRU info to EEPROM... \n");
-    at24mac_write( fru[id].eeprom_id, 0x00, fru[id].buffer, fru[id].fru_size, 0 );
+    fru[id].cfg.write_f( fru[id].cfg.eeprom_id, 0x00, fru[id].buffer, fru[id].fru_size, 0 );
 #endif
 
-#ifdef MODULE_EEPROM_AT24MAC
     /* Read FRU info Common Header */
     uint8_t common_header[8];
 
-    if ( at24mac_read( fru[id].eeprom_id, 0x00, &common_header[0], 8, 0 ) == 8 ) {
+    if ( fru[id].cfg.read_f( fru[id].cfg.eeprom_id, 0x00, &common_header[0], 8, 0 ) == 8 ) {
         if ( (calculate_chksum( &common_header[0], 7 ) == common_header[7]) && common_header[0] == 1 ) {
             /* We have a valid FRU image in the SEEPROM */
             printf("FRU information found in EEPROM!\n");
@@ -76,11 +84,11 @@ void fru_init( uint8_t id )
             return;
         }
     }
-#endif
+
     /* Could not access the SEEPROM, create a runtime fru info */
     printf("Could not find FRU information in EEPROM, building a runtime info...\n");
     if ( fru[id].fru_size == 0 ) {
-        fru[id].fru_size = fru[id].build_func( &fru[id].buffer );
+        fru[id].fru_size = fru[id].cfg.build_f( &fru[id].buffer );
     }
     fru[id].runtime = true;
 }
@@ -106,9 +114,7 @@ size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len )
         }
         ret_val = i;
     } else {
-#ifdef MODULE_EEPROM_AT24MAC
-        ret_val = at24mac_read( fru[id].eeprom_id, offset, rx_buff, len, 0 );
-#endif
+        ret_val = fru[id].cfg.read_f( fru[id].cfg.eeprom_id, offset, rx_buff, len, 0 );
     }
     return ret_val;
 }
@@ -125,9 +131,7 @@ size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len )
         memcpy( &fru[id].buffer[offset], tx_buff, len );
         ret_val = len;
     } else {
-#ifdef MODULE_EEPROM_AT24MAC
-        ret_val = at24mac_write( fru[id].eeprom_id, offset, tx_buff, len, 0 );
-#endif
+        ret_val = fru[id].cfg.write_f( fru[id].cfg.eeprom_id, offset, tx_buff, len, 0 );
     }
     return ret_val;
 }
