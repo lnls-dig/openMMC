@@ -40,10 +40,10 @@ if (";${TARGET_MODULES};" MATCHES ";PAYLOAD;")
 endif()
 
 #Extra definitions
-if (WRITE_ID_EEPROM)
-  message(STATUS "EEPROM ID writing enabled!")
-  add_definitions(-DWRITE_ID_EEPROM)
-  set(WRITE_ID_EEPROM false CACHE BOOL "Set this flag to enable writing the board ID on the EEPROM" FORCE)
+if (FRU_WRITE_EEPROM)
+  message(STATUS "FRU EEPROM will be written if no valid data is found!")
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DFRU_WRITE_EEPROM")
+  set(FRU_WRITE_EEPROM false CACHE BOOL "Set this flag to enable writing the board ID on the EEPROM" FORCE)
 endif()
 
 #Set the variables in the main scope
