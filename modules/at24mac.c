@@ -37,7 +37,7 @@
 #include "port.h"
 #include "i2c.h"
 
-size_t at24mac_read( uint8_t id, uint8_t address, uint8_t *rx_data, size_t buf_len, uint8_t timeout )
+size_t at24mac_read( uint8_t id, uint16_t address, uint8_t *rx_data, size_t buf_len, uint32_t timeout )
 {
     uint8_t i2c_addr;
     uint8_t i2c_interface;
@@ -51,7 +51,7 @@ size_t at24mac_read( uint8_t id, uint8_t address, uint8_t *rx_data, size_t buf_l
     return rx_len;
 }
 
-size_t at24mac_read_serial_num( uint8_t id, uint8_t *rx_data, size_t buf_len, uint8_t timeout )
+size_t at24mac_read_serial_num( uint8_t id, uint8_t *rx_data, size_t buf_len, uint32_t timeout )
 {
     uint8_t i2c_addr;
     uint8_t i2c_interface;
@@ -66,7 +66,7 @@ size_t at24mac_read_serial_num( uint8_t id, uint8_t *rx_data, size_t buf_len, ui
     return rx_len;
 }
 
-size_t at24mac_read_eui( uint8_t id, uint8_t *rx_data, size_t buf_len, uint8_t timeout )
+size_t at24mac_read_eui( uint8_t id, uint8_t *rx_data, size_t buf_len, uint32_t timeout )
 {
     uint8_t i2c_addr;
     uint8_t i2c_interface;
@@ -82,7 +82,7 @@ size_t at24mac_read_eui( uint8_t id, uint8_t *rx_data, size_t buf_len, uint8_t t
     return rx_len;
 }
 
-size_t at24mac_write( uint8_t id, uint8_t address, uint8_t *tx_data, size_t buf_len, uint8_t timeout )
+size_t at24mac_write( uint8_t id, uint16_t address, uint8_t *tx_data, size_t buf_len, uint32_t timeout )
 {
     uint8_t i2c_addr;
     uint8_t i2c_interface;

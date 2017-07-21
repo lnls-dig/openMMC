@@ -58,7 +58,7 @@
  *
  * @return Number of bytes actually received
  */
-size_t at24mac_read( uint8_t id, uint8_t address, uint8_t *rx_data, size_t buf_len, uint8_t timeout );
+size_t at24mac_read( uint8_t id, uint16_t address, uint8_t *rx_data, size_t buf_len, uint32_t timeout );
 
 /**
  * @brief Read EEPROM serial number
@@ -70,7 +70,7 @@ size_t at24mac_read( uint8_t id, uint8_t address, uint8_t *rx_data, size_t buf_l
  *
  * @return Number of bytes read
  */
-size_t at24mac_read_serial_num( uint8_t id, uint8_t *rx_data, size_t buf_len, uint8_t timeout );
+size_t at24mac_read_serial_num( uint8_t id, uint8_t *rx_data, size_t buf_len, uint32_t timeout );
 
 /**
  * @brief Read EEPROM EUI number
@@ -82,7 +82,7 @@ size_t at24mac_read_serial_num( uint8_t id, uint8_t *rx_data, size_t buf_len, ui
  *
  * @return Number of bytes read
  */
-size_t at24mac_read_eui( uint8_t id, uint8_t *rx_data, size_t buf_len, uint8_t timeout );
+size_t at24mac_read_eui( uint8_t id, uint8_t *rx_data, size_t buf_len, uint32_t timeout );
 
 /**
  * @brief Write serial data to EEPROM
@@ -95,6 +95,6 @@ size_t at24mac_read_eui( uint8_t id, uint8_t *rx_data, size_t buf_len, uint8_t t
  *
  * @return Number of bytes actually written
  */
-size_t at24mac_write( uint8_t id, uint8_t address, uint8_t *tx_data, size_t buf_len, uint8_t timeout );
+size_t at24mac_write( uint8_t id, uint16_t address, uint8_t *tx_data, size_t buf_len, uint32_t timeout );
 
 #endif
