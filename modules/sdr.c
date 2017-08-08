@@ -36,7 +36,7 @@
 #include "ipmi.h"
 #include "fpga_spi.h"
 
-volatile uint8_t sdr_count = 0;
+volatile uint8_t sdr_count = 1;
 
 static uint16_t reservationID;
 static uint32_t sdr_change_count;
@@ -90,53 +90,17 @@ void sdr_init( void )
     sdr_head = NULL;
     sdr_tail = NULL;
 
-    sdr_head = pvPortMalloc( sizeof(sensor_t) );
-
-    configASSERT(sdr_head);
-
     /* Populate AMC SDR Device Locator Record */
-    sdr_head->num = 0;
-    sdr_head->sdr_type = TYPE_12;
-    sdr_head->sdr = (void *) &SDR0;
-    sdr_head->sdr_length = sizeof(SDR0);
-    sdr_head->task_handle = NULL;
-    sdr_head->diag_devID = NO_DIAG;
-    sdr_head->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
-
-    sdr_head->next = NULL;
-    sdr_tail = sdr_head;
-
-    sdr_count++;
-
-#ifdef MODULE_RTM
-    /* Populate RTM SDR Device Locator Record */
-    sensor_t * entry = pvPortMalloc( sizeof(sensor_t) );
-    entry->num = 1;
-    entry->sdr_type = TYPE_12;
-    entry->sdr = (void *) &SDR_RTM_DEV_LOCATOR;
-    entry->sdr_length = sizeof(SDR_RTM_DEV_LOCATOR);
-    entry->task_handle = NULL;
-    entry->diag_devID = NO_DIAG;
-    entry->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
-
-    /* Link the sdr list */
-    sdr_tail->next = entry;
-    sdr_tail = entry;
-    entry->next = NULL;
-
-    sdr_count++;
-    sdr_change_count++;
-#endif
+    sdr_head = sdr_insert_entry( TYPE_12, (void *) &SDR0, NULL, 0, 0 );
 }
 
 sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t chipid )
 {
-    uint8_t index = sdr_count;
     uint8_t sdr_len = sdr_get_size_by_type(type);
 
     sensor_t * entry = pvPortMalloc( sizeof(sensor_t) );
 
-    entry->num = index;
+   	entry->num = (type == TYPE_12) ? 0 : sdr_count;
     entry->sdr_type = type;
     entry->sdr = sdr;
     entry->sdr_length = sdr_len;
@@ -149,12 +113,16 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
     entry->state = SENSOR_STATE_LOW_NON_REC;
 
     /* Link the sdr list */
-    sdr_tail->next = entry;
+    if (sdr_tail) {
+    	sdr_tail->next = entry;
+    }
     sdr_tail = entry;
     entry->next = NULL;
 
-    sdr_count++;
-    sdr_change_count++;
+    if (type != TYPE_12) {
+    	sdr_count++;
+    	sdr_change_count++;
+    }
 
     return entry;
 }
