@@ -1062,7 +1062,7 @@ const SDR_type_01h_t SDR_MAX6642_FPGA = {
 };
 #endif
 
-void user_sdr_init( void )
+void amc_sdr_init( void )
 {
     /* Hotswap Sensor */
     sdr_insert_entry( TYPE_02, (void *) &SDR_HOTSWAP_AMC, &vTaskHotSwap_Handle, 0, 0 );
@@ -1101,12 +1101,7 @@ void user_sdr_init( void )
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_ADN4604, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_1 );
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_DCDC, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_2 );
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RAM, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_3 );
-#ifdef MODULE_RTM
-    extern const SDR_type_01h_t SDR_LM75_RTM_1;
-    extern const SDR_type_01h_t SDR_LM75_RTM_2;
+#endif
 
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_1, &vTaskLM75_Handle, 0, CHIP_ID_RTM_LM75_0 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_2, &vTaskLM75_Handle, 0, CHIP_ID_RTM_LM75_1 );
-#endif
-#endif
+
 }

@@ -66,7 +66,10 @@ size_t sdr_get_size_by_entry(sensor_t * entry)
 void sensor_init( void )
 {
     /* This function must be provided by the board port */
-    user_sdr_init();
+    amc_sdr_init();
+#ifdef MODULE_RTM
+    rtm_sdr_init();
+#endif
 
 #ifdef MODULE_HOTSWAP
     hotswap_init();
