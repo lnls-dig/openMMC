@@ -36,7 +36,7 @@
 #include "ipmi.h"
 #include "fpga_spi.h"
 
-volatile uint8_t sdr_count = 1;
+volatile uint8_t sdr_count = 0;
 
 static uint16_t reservationID;
 static uint32_t sdr_change_count;
@@ -92,6 +92,9 @@ void sdr_init( void )
 
     /* Populate AMC SDR Device Locator Record */
     sdr_head = sdr_insert_entry( TYPE_12, (void *) &SDR0, NULL, 0, 0 );
+#ifdef MODULE_RTM
+    sdr_insert_entry( TYPE_12, (void *) &SDR_RTM_DEV_LOCATOR, NULL, 0, 0 );
+#endif
 }
 
 sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t chipid )
@@ -100,7 +103,7 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
 
     sensor_t * entry = pvPortMalloc( sizeof(sensor_t) );
 
-   	entry->num = (type == TYPE_12) ? 0 : sdr_count;
+    entry->num = sdr_count;
     entry->sdr_type = type;
     entry->sdr = sdr;
     entry->sdr_length = sdr_len;
@@ -119,10 +122,8 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
     sdr_tail = entry;
     entry->next = NULL;
 
-    if (type != TYPE_12) {
-    	sdr_count++;
-    	sdr_change_count++;
-    }
+    sdr_count++;
+    sdr_change_count++;
 
     return entry;
 }
@@ -199,11 +200,15 @@ IPMI_HANDLER(ipmi_se_get_sdr_info, NETFN_SE, IPMI_GET_DEVICE_SDR_INFO_CMD, ipmi_
     int len = rsp->data_len;
 
     if (req->data_len == 0 || req->data[0] == 0) {
-        /* Return number of sensors only */
-        rsp->data[len++] = sdr_count-1;
+        /* Return number of sensors only (minus the dev locator fields) */
+#ifdef MODULE_RTM
+        rsp->data[len++] = sdr_count-3;
+#else
+        rsp->data[len++] = sdr_count-2;
+#endif
     } else {
         /* Return number of SDR entries */
-        rsp->data[len++] = sdr_count;
+        rsp->data[len++] = sdr_count-1;
     }
     /* Static Sensor population and LUN 0 has sensors */
     rsp->data[len++] = (1 << 7) | (1 << 1) | (1 << 0) ; // if dynamic, additional 4 bytes required (see Table 20-2 Get Device SDR INFO Command)

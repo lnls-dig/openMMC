@@ -184,7 +184,6 @@ const SDR_type_01h_t SDR_LM75_RTM_2 = {
 
 void rtm_sdr_init( void )
 {
-    sdr_insert_entry( TYPE_12, (void *) &SDR_RTM_DEV_LOCATOR, NULL, 0, 0 );
 #ifdef MODULE_HOTSWAP
     sdr_insert_entry( TYPE_02, (void *) &SDR_HOTSWAP_RTM, &vTaskHotSwap_Handle, 0, 0 );
 #endif
