@@ -214,7 +214,10 @@ const SDR_type_12h_t SDR_RTM_DEV_LOCATOR;
 #define GET_EVENT_TYPE_CODE(n)      ((SDR_type_01h_t *)sensor->sdr)->event_reading_type
 
 void sdr_init( void );
-void user_sdr_init( void );
+void amc_sdr_init( void );
+#ifdef MODULE_RTM
+void rtm_sdr_init( void );
+#endif
 void sensor_init( void );
 void check_sensor_event( sensor_t * sensor );
 
