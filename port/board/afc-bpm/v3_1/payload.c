@@ -135,9 +135,6 @@ void set_vadj_volt( uint8_t fmc_slot, float v )
     res_total = (uint32_t) (1162.5/(v-0.775)) - 453;
     res_dac = (1800*res_total)/(1800-res_total);
 
-    /* Use only the lower 8-bits (the dac only has 256 steps) */
-    res_dac &= 0xFF;
-
     dac_ad84xx_set_res( fmc_slot, res_dac );
 }
 #endif
