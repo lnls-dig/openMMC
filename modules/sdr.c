@@ -258,7 +258,7 @@ IPMI_HANDLER(ipmi_se_set_event_receiver, NETFN_SE, IPMI_SET_EVENT_RECEIVER_CMD, 
  *
  * @return void
  */
-IPMI_HANDLER(ipmi_se_get_event_reciever, NETFN_SE, IPMI_GET_EVENT_RECEIVER_CMD, ipmi_msg *req, ipmi_msg *rsp)
+IPMI_HANDLER(ipmi_se_get_event_receiver, NETFN_SE, IPMI_GET_EVENT_RECEIVER_CMD, ipmi_msg *req, ipmi_msg *rsp)
 {
     uint8_t len = 0;
     rsp->data[len++] = event_receiver_addr;
