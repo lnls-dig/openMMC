@@ -290,8 +290,6 @@ void vTaskPayload( void *pvParameters )
 
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON( false );
-            hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
-            hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_BP_SDOWN );
 
             if ( QUIESCED_req ) {
                 hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
