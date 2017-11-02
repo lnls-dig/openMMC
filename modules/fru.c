@@ -63,14 +63,6 @@ void fru_init( uint8_t id )
         return;
     }
 
-#ifdef FRU_WRITE_EEPROM
-    printf(">FRU_WRITE_EEPROM flag enabled! Building FRU info...");
-    fru[id].fru_size = fru[id].cfg.build_f( &fru[id].buffer );
-
-    printf(" Writing FRU info to EEPROM... \n");
-    fru[id].cfg.write_f( fru[id].cfg.eeprom_id, 0x00, fru[id].buffer, fru[id].fru_size, 0 );
-#endif
-
     /* Read FRU info Common Header */
     uint8_t common_header[8];
 
@@ -81,8 +73,17 @@ void fru_init( uint8_t id )
             fru[id].runtime = false;
             /* Set FRU size to the maximum possible size for AT24MACx02 EEPROM to avoid reading the whole fru right now */
             fru[id].fru_size = 256;
-            return;
+        } else {
+#ifdef FRU_WRITE_EEPROM
+            printf(">FRU_WRITE_EEPROM flag enabled! Building FRU info...");
+            fru[id].fru_size = fru[id].cfg.build_f( &fru[id].buffer );
+            fru[id].runtime = false;
+
+            printf(" Writing FRU info to EEPROM... \n");
+            fru[id].cfg.write_f( fru[id].cfg.eeprom_id, 0x00, fru[id].buffer, fru[id].fru_size, 0 );
+#endif
         }
+        return;
     }
 
     /* Could not access the SEEPROM, create a runtime fru info */
