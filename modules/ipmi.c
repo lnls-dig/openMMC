@@ -201,6 +201,7 @@ IPMI_HANDLER(ipmi_get_device_id,  NETFN_APP, IPMI_GET_DEVICE_ID_CMD, ipmi_msg *r
     rsp->data[len++] = IPMI_APP_IPMI_VERSION; /* IPMI Version 2.0 */
     rsp->data[len++] = IPMI_APP_DEV_SUP; /* Dev Support */
     rsp->data[len++] = IPMI_APP_MANUF_LSB; /* Manufacturer ID LSB */
+    rsp->data[len++] = IPMI_APP_MANUF_MIDB; /* Manufacturer ID MIDB */
     rsp->data[len++] = IPMI_APP_MANUF_MSB; /* Manufacturer ID MSB */
     rsp->data[len++] = IPMI_APP_PROD_ID_LSB; /* Product ID LSB */
     rsp->data[len++] = IPMI_APP_PROD_ID_MSB; /* Product ID MSB */
