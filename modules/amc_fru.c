@@ -1,3 +1,4 @@
+#include "port.h"
 #include "user_amc_fru.h"
 #include "utils.h"
 #include "uart_debug.h"
@@ -9,7 +10,7 @@ size_t amc_fru_info_build( uint8_t **buffer )
     size_t int_use_sz = 0, chassis_sz = 0, board_sz = 0, product_sz = 0, current_sz = 0, p2p_sz = 0, clk_sz = 0, z3_compat_sz = 0;
     size_t offset = 0;
 
-    DEBUG_MSG(">AMC FRU Information:\n");
+    printf(">AMC FRU Information:\n");
 
     /* Skip the common header */
     offset += 8;
@@ -17,48 +18,48 @@ size_t amc_fru_info_build( uint8_t **buffer )
     /* Board Information Area */
     board_off = offset;
     board_sz = board_info_area_build( &board_ptr, AMC_LANG_CODE, AMC_BOARD_MANUFACTURING_TIME, AMC_BOARD_MANUFACTURER, AMC_BOARD_NAME, AMC_BOARD_SN, AMC_BOARD_PN, AMC_FRU_FILE_ID );
-    DEBUG_MSG("\t-Board info area:\n");
-    DEBUG_MSG("\t\t-Language Code: %d\n", AMC_LANG_CODE);
-    DEBUG_MSG("\t\t-Manuf time: %d\n", AMC_BOARD_MANUFACTURING_TIME);
-    DEBUG_MSG("\t\t-Manufacturer: %s\n", AMC_BOARD_MANUFACTURER);
-    DEBUG_MSG("\t\t-Name: %s\n", AMC_BOARD_NAME);
-    DEBUG_MSG("\t\t-Serial Number: %s\n", AMC_BOARD_SN);
-    DEBUG_MSG("\t\t-Part Number: %s\n", AMC_BOARD_PN);
-    DEBUG_MSG("\t\t-File ID: %s\n", AMC_FRU_FILE_ID);
+    printf("\t-Board info area:\n");
+    printf("\t\t-Language Code: %d\n", AMC_LANG_CODE);
+    printf("\t\t-Manuf time: %d\n", AMC_BOARD_MANUFACTURING_TIME);
+    printf("\t\t-Manufacturer: %s\n", AMC_BOARD_MANUFACTURER);
+    printf("\t\t-Name: %s\n", AMC_BOARD_NAME);
+    printf("\t\t-Serial Number: %s\n", AMC_BOARD_SN);
+    printf("\t\t-Part Number: %s\n", AMC_BOARD_PN);
+    printf("\t\t-File ID: %s\n", AMC_FRU_FILE_ID);
     offset += board_sz;
 
     /* Chassis Information Area */
     /* Not needed in AMC boards */
-    DEBUG_MSG("No Chassis info area\n");
+    printf("No Chassis info area\n");
     offset += chassis_sz;
 
     /* Internal Use Area */
     /* To be implemented by user */
-    DEBUG_MSG("No internal use area\n");
+    printf("No internal use area\n");
     offset += int_use_sz;
 
     /* Product Information Area */
     product_off = offset;
     product_sz = product_info_area_build( &product_ptr, AMC_LANG_CODE, AMC_PRODUCT_MANUFACTURER, AMC_PRODUCT_NAME, AMC_PRODUCT_PN, AMC_PRODUCT_VERSION, AMC_PRODUCT_SN, AMC_PRODUCT_ASSET_TAG, AMC_FRU_FILE_ID );
-    DEBUG_MSG("\t-Product info area:\n");
-    DEBUG_MSG("\t\t-Language Code: %d\n", AMC_LANG_CODE);
-    DEBUG_MSG("\t\t-Manufacturer: %s\n", AMC_PRODUCT_MANUFACTURER);
-    DEBUG_MSG("\t\t-Name: %s\n", AMC_PRODUCT_NAME);
-    DEBUG_MSG("\t\t-Part Number: %s\n", AMC_PRODUCT_PN);
-    DEBUG_MSG("\t\t-Version: %s\n", AMC_PRODUCT_VERSION);
-    DEBUG_MSG("\t\t-Asset Tag: %s\n", AMC_PRODUCT_ASSET_TAG);
-    DEBUG_MSG("\t\t-Serial Number: %s\n", AMC_PRODUCT_SN);
-    DEBUG_MSG("\t\t-File ID: %s\n", AMC_FRU_FILE_ID);
+    printf("\t-Product info area:\n");
+    printf("\t\t-Language Code: %d\n", AMC_LANG_CODE);
+    printf("\t\t-Manufacturer: %s\n", AMC_PRODUCT_MANUFACTURER);
+    printf("\t\t-Name: %s\n", AMC_PRODUCT_NAME);
+    printf("\t\t-Part Number: %s\n", AMC_PRODUCT_PN);
+    printf("\t\t-Version: %s\n", AMC_PRODUCT_VERSION);
+    printf("\t\t-Asset Tag: %s\n", AMC_PRODUCT_ASSET_TAG);
+    printf("\t\t-Serial Number: %s\n", AMC_PRODUCT_SN);
+    printf("\t\t-File ID: %s\n", AMC_FRU_FILE_ID);
     offset += product_sz;
 
     /* Multirecord Area */
     multirec_off = offset;
-    DEBUG_MSG("\t-Multirecord Area: \n");
+    printf("\t-Multirecord Area: \n");
 
     /* Board Current requirement */
     current_off = offset;
     current_sz += module_current_record_build( &current_ptr, AMC_MODULE_CURRENT_RECORD );
-    DEBUG_MSG("\t\t-Module Current: %d A\n", AMC_MODULE_CURRENT_RECORD/10);
+    printf("\t\t-Module Current: %d A\n", AMC_MODULE_CURRENT_RECORD/10);
     offset += current_sz;
 
     /* Clock Point-to-Point Conectivity */
@@ -75,7 +76,7 @@ size_t amc_fru_info_build( uint8_t **buffer )
 
     /* Zone3 Connector Compatibility */
     z3_compat_off = offset;
-    DEBUG_MSG("\t\t-Zone3 Compatibility code: 0x%X\n", AMC_COMPATIBILITY_CODE);
+    printf("\t\t-Zone3 Compatibility code: 0x%X\n", AMC_COMPATIBILITY_CODE);
     z3_compat_sz += zone3_compatibility_record_build( &z3_ptr, AMC_COMPATIBILITY_CODE );
     offset += z3_compat_sz;
 
@@ -83,7 +84,7 @@ size_t amc_fru_info_build( uint8_t **buffer )
     fru_header_build( &hdr_ptr, int_use_off, chassis_off, board_off, product_off, multirec_off );
 
     *buffer = pvPortMalloc(offset);
-    DEBUG_MSG(">AMC FRU total size: %d bytes\n", offset);
+    printf(">AMC FRU total size: %d bytes\n", offset);
 
     memcpy( (*buffer)+0, hdr_ptr, 8);
     memcpy( (*buffer)+board_off, board_ptr, board_sz);

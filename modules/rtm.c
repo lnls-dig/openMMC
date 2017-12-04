@@ -34,7 +34,9 @@
 #include "fru.h"
 #include "hotswap.h"
 #include "payload.h"
+#include "uart_debug.h"
 
+volatile bool rtm_present = false;
 volatile uint8_t rtm_power_level = 0;
 extern EventGroupHandle_t rtm_payload_evt;
 
@@ -66,6 +68,10 @@ void RTM_Manage( void * Parameters )
         if ( ps_new_state ^ ps_old_state ) {
             if ( ps_new_state == HOTSWAP_STATE_URTM_PRSENT ) {
 
+                printf("RTM Board detected!\n");
+
+                rtm_present = true;
+
                 /* Create/Read the RTM FRU info before sending the hotswap event */
                 fru_init(FRU_RTM);
 
@@ -77,12 +83,14 @@ void RTM_Manage( void * Parameters )
                 /* Check the Zone3 compatibility records */
                 rtm_compatible = rtm_compatibility_check();
                 if ( rtm_compatible ) {
+                    printf("RTM Board is compatible! Initializing...\n");
                     /* Send RTM Compatible message */
                     hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_COMPATIBLE );
                     hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
 
                     rtm_hardware_init();
                 } else {
+                    printf("RTM Board is not compatible.\n");
                     /* Send RTM Incompatible message */
                     hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_INCOMPATIBLE );
                     hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
@@ -93,6 +101,10 @@ void RTM_Manage( void * Parameters )
 
             } else if ( ps_new_state == HOTSWAP_STATE_URTM_ABSENT ) {
                 //sdr_disable_sensors(); /* Not implemented yet */
+
+                printf("RTM Board disconnected!\n");
+
+                rtm_present = false;
 
                 hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_ABSENT_MASK );
                 hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_PRESENT_MASK );
@@ -106,8 +118,11 @@ void RTM_Manage( void * Parameters )
 
             if ( rtm_power_level == 0x01 ) {
                 hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
+
+                printf("Enabling RTM Payload power...\n");
                 rtm_enable_payload_power();
             } else {
+                printf("Disabling RTM Payload power...\n");
                 rtm_disable_payload_power();
             }
         }
@@ -117,8 +132,10 @@ void RTM_Manage( void * Parameters )
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
             if ( rtm_quiesce() ) {
                 /* Quiesced event */
+                printf("RTM Quiesced successfuly!\n");
                 hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_QUIESCED );
+                xEventGroupClearBits( rtm_payload_evt, PAYLOAD_MESSAGE_QUIESCED );
             }
         }
     }
@@ -126,10 +143,6 @@ void RTM_Manage( void * Parameters )
 
 void rtm_manage_init( void )
 {
-    gpio_set_pin_dir( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN, INPUT );
-    gpio_set_pin_dir( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, INPUT );
-
     rtm_power_level = 0;
 
     xTaskCreate( RTM_Manage, "RTM Manage", 100, (void *) NULL, tskRTM_MANAGE_PRIORITY, (TaskHandle_t *) NULL );

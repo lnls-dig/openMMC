@@ -20,32 +20,18 @@
  */
 
 /**
- * @file uart_debug.c
+ * @file uart_debug.h
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
  *
  * @brief UART interface implementation
  */
 
-#include "port.h"
-
-/**
- * @brief Initialize UART port to work as a Debug output
- *
- * @param baud Baud-rate to use in the UART port
- *
- * @return None
- */
-void uart_debug_init( uint32_t baud );
-
-/**
- * @brief Print formatted string to UART port
- *
- * @param id UART interface id
- * @param format Formatted string
- */
-void uart_printf( uint8_t id, const char *format, ... );
+#ifndef UART_DEBUG_H_
+#define UART_DEBUG_H_
 
 #ifdef MODULE_UART_DEBUG
+
+#include "port.h"
 
 /**
  * @brief Macro to call uart debug printf function
@@ -55,24 +41,16 @@ void uart_printf( uint8_t id, const char *format, ... );
  * @param msg Formatted string to print
  *
  */
-#define DEBUG_MSG(msg, ...) uart_printf(UART_DEBUG, msg, ##__VA_ARGS__)
 
-/**
- * @brief Macro to call uart send char function
- *
- * @warning When MODULE_UART_DEBUG is not defined, this macro simply throws out its args and do nothing
- *
- * @param msg Char to print
- *
- */
-#define DEBUG_CH(ch) uart_send_char(UART_DEBUG, ch)
+#undef putchar
+
+#define putchar(c) uart_send(UART_DEBUG, &c, 1)
 
 #else
 
-#undef DEBUG_MSG
-#undef DEBUG_CH
+#undef putchar
 
-#define DEBUG_MSG(...) (void)0
-#define DEBUG_CH(...) (void)0
+#define putchar(c) (void)0
 
+#endif
 #endif

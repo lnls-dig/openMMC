@@ -1,8 +1,7 @@
 /*
  *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   Copyright (C) 2016  Henrique Silva <henrique.silva@lnls.br>
- *   Copyright (C) 2015  Piotr Miedzik  <P.Miedzik@gsi.de>
+ *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -20,38 +19,14 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef IPMI_OEM_H_
-#define IPMI_OEM_H_
+#ifndef SCANSTA1101_H_
+#define SCANSTA1101_H_
+
+#include "pin_mapping.h"
 
 /**
- * @file afc-timing/ipmi_oem.h
- * @brief Custom IPMI commands for AFC Timing
- *
- * @ingroup AFC_TIMING_IPMI_OEM
+ * @brief Initialize and configure SCANSTA1101 addr pins
  */
-
-/**
- * @defgroup AFC_TIMING_IPMI_OEM AFC-Timing IPMI OEM Commands
- * @ingroup AFC_TIMING
- * @{
- */
-
-#include "ipmi.h"
-
-/**
- * @brief Custom NetFN (User defined, value greater than 0x2C)
- */
-#define NETFN_CUSTOM_OEM                    0x30
-
-#define IPMI_OEM_CMD_I2C_TRANSFER               0x00
-
-#define IPMI_OEM_CMD_ADN4604_SET_OUTPUT_CFG     0x01
-#define IPMI_OEM_CMD_ADN4604_GET_OUTPUT_CFG     0x02
-#define IPMI_OEM_CMD_ADN4604_RESET              0x03
-
-#define IPMI_OEM_CMD_GPIO_PIN                   0x04
-/**
- * @}
- */
+void scansta1101_init( void );
 
 #endif

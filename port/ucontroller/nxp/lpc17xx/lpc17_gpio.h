@@ -30,10 +30,11 @@
 
 #include "gpio_17xx_40xx.h"
 
-#define INPUT 0
-#define OUTPUT 1
-#define LOW 0
-#define HIGH 1
+#define GPIO_LEVEL_LOW  0
+#define GPIO_LEVEL_HIGH 1
+
+#define GPIO_DIR_INPUT  0
+#define GPIO_DIR_OUTPUT 1
 
 /**
  * @brief       Initialize GPIO block
@@ -111,3 +112,25 @@
  * @param       dir     : true (1) for OUTPUT, false (0) for INPUT
  */
 #define gpio_set_pin_dir( port, pin, dir )     Chip_GPIO_SetPinDIR( LPC_GPIO, port, pin, dir )
+
+/**
+ * @brief       Get a GPIO pin direction
+ * @param       port    : GPIO Port number where pin is located
+ * @param       pin     : pin number
+ * @return      Current pin direction ( 0 for INPUT, 1 for OUTPUT )
+ */
+#define gpio_get_pin_dir( port, pin )     Chip_GPIO_GetPinDIR( LPC_GPIO, port, pin )
+
+/**
+ * @brief       Set a GPIO port direction
+ * @param       port    : GPIO Port number
+ * @param       dir     : Bitfield indicating all pins direction (true (1) for OUTPUT, false (0) for INPUT )
+ */
+#define gpio_set_port_dir( port, dir )     Chip_GPIO_SetPortDIR( LPC_GPIO, port, dir )
+
+/**
+ * @brief       Get a GPIO port direction
+ * @param       port    : GPIO Port number
+ * @return      Bitfield indicating all pins current direction (true (1) for OUTPUT, false (0) for INPUT )
+ */
+#define gpio_get_port_dir( port )     Chip_GPIO_GetPortDIR( LPC_GPIO, port )

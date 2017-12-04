@@ -31,24 +31,10 @@
 #include "string.h"
 #include "task_priorities.h"
 
-const LEDPincfg_t amc_led_pincfg[LED_CNT] = {
-    [LED_BLUE] = {
-        .pin = LEDBLUE_PIN,
-        .port = LEDBLUE_PORT,
-        .func = LED_PIN_FUNC
-    },
-
-    [LED1] = {
-        .pin = LEDRED_PIN,
-        .port = LEDRED_PORT,
-        .func = LED_PIN_FUNC
-    },
-
-    [LED2] = {
-        .pin = LEDGREEN_PIN,
-        .port = LEDGREEN_PORT,
-        .func = LED_PIN_FUNC
-    }
+const uint32_t amc_led_pincfg[LED_CNT] = {
+    [LED_BLUE] = GPIO_LEDBLUE,
+    [LED1] = GPIO_LEDRED,
+    [LED2] = GPIO_LEDGREEN
 };
 
 LEDConfig_t amc_leds_config[LED_CNT] = {
@@ -59,7 +45,7 @@ LEDConfig_t amc_leds_config[LED_CNT] = {
         .mode = LEDMODE_LOCAL,
         .mode_cfg = {
             [LEDMODE_LOCAL] = {
-                .t_init = 0xFF,
+                .t_init = 0,
                 .t_toggle = 0,
                 .init_status = LEDINIT_ON,
             }
@@ -150,9 +136,6 @@ void LED_init( void )
 {
     /* AMC LED Pins initialization */
     gpio_init();
-    for ( uint8_t id = 0; id < LED_CNT; id++ ) {
-        gpio_set_pin_dir( amc_led_pincfg[id].port, amc_led_pincfg[id].pin, OUTPUT );
-    }
 
     led_update_queue = xQueueCreate( 3, sizeof(LEDUpdate_t) );
 
@@ -190,6 +173,7 @@ void LED_Task( void *Parameters )
 
                 fru = cfg.fru_id;
                 num = cfg.led_num;
+
                 led_config[fru][num].mode = cfg.mode;
                 led_config[fru][num].mode_cfg[cfg.mode].active = true;
                 /* Only update the settings if its an override */
@@ -197,6 +181,7 @@ void LED_Task( void *Parameters )
                     led_config[fru][num].mode_cfg[cfg.mode].init_status = cfg.new_state.init_status;
                     led_config[fru][num].mode_cfg[cfg.mode].t_init = cfg.new_state.t_init;
                     led_config[fru][num].mode_cfg[cfg.mode].t_toggle = cfg.new_state.t_toggle;
+                    led_config[fru][num].state = LEDSTATE_INIT;
                     /* Reset the LED internal counter */
                     led_config[fru][num].counter = 0;
                 }
@@ -224,23 +209,25 @@ void LEDManage( LEDConfig_t *led_cfg )
         counter_tog = led_cfg->mode_cfg[mode].t_init;
     }
 
-    if ( ( led_cfg->counter == counter_cmp ) && ( counter_tog != 0 ) ) {
-        /* Special case for lamp_test (we must return to the highest priority state */
-        if ( led_cfg->mode == LEDMODE_LAMPTEST ) {
-            led_cfg->mode_cfg[LEDMODE_LAMPTEST].active = false;
+    /* Special case for lamp_test (we must return to the highest priority state */
+    if ( (led_cfg->mode == LEDMODE_LAMPTEST) && (led_cfg->counter >= counter_cmp) ) {
+        led_cfg->mode_cfg[LEDMODE_LAMPTEST].active = false;
+        /* Reset counter */
+        led_cfg->counter = 0;
 
-            if ( led_cfg->mode_cfg[LEDMODE_OVERRIDE].active ) {
-                led_cfg->mode = LEDMODE_OVERRIDE;
-            } else {
-                led_cfg->mode = LEDMODE_LOCAL;
-            }
-
+        /* Revert to the previous state */
+        if ( led_cfg->mode_cfg[LEDMODE_OVERRIDE].active ) {
+            led_cfg->mode = LEDMODE_OVERRIDE;
         } else {
-            /* General case for blinking operation */
-            led_cfg->state = !(led_cfg->state);
-            led_cfg->act_func( led_cfg->id, LEDACT_TOGGLE );
-            led_cfg->counter = 0;
+            led_cfg->mode = LEDMODE_LOCAL;
         }
+    }
+
+    if ( ( led_cfg->counter >= counter_cmp ) && ( counter_tog != 0 ) ) {
+        /* General case for blinking operation - toggle LED */
+        led_cfg->state = !(led_cfg->state);
+        led_cfg->act_func( led_cfg->id, LEDACT_TOGGLE );
+        led_cfg->counter = 0;
     } else {
         /* Stay in the current state and increment counter */
         led_cfg->act_func( led_cfg->id, status );
@@ -276,15 +263,15 @@ void amc_led_act( uint8_t id, uint8_t action )
 {
     switch( action ) {
     case LEDACT_TURN_ON:
-        gpio_set_pin_low( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        gpio_set_pin_low( PIN_PORT(amc_led_pincfg[id]), PIN_NUMBER(amc_led_pincfg[id]) );
         break;
 
     case LEDACT_TURN_OFF:
-        gpio_set_pin_high( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        gpio_set_pin_high( PIN_PORT(amc_led_pincfg[id]), PIN_NUMBER(amc_led_pincfg[id]) );
         break;
 
     case LEDACT_TOGGLE:
-        gpio_pin_toggle( amc_led_pincfg[id].port, amc_led_pincfg[id].pin );
+        gpio_pin_toggle( PIN_PORT(amc_led_pincfg[id]), PIN_NUMBER(amc_led_pincfg[id]) );
         break;
 
     default:
@@ -348,7 +335,7 @@ IPMI_HANDLER(ipmi_picmg_set_fru_led_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_
         break;
     case 0xFF:
         /* ON override */
-        LEDUpdate( fru_id, led_num, LEDMODE_OVERRIDE, LEDINIT_ON, 0xFF, 0 );
+        LEDUpdate( fru_id, led_num, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
         break;
     case 0xFB:
         /* Lamp Test */

@@ -4,7 +4,7 @@
 
 int main (void)
 {
-	SystemCoreClockUpdate();
+    SystemCoreClockUpdate();
 
     bool upgrade = FALSE;
     uint32_t upgr_fw_id, user_fw_id;
@@ -74,7 +74,7 @@ void update_firmware( void )
     uint32_t page[64];
 
     for(uint8_t j=0; j<(sizeof(page)/sizeof(uint32_t)); j++) {
-	page[j] = 0xFFFFFFFF;
+        page[j] = 0xFFFFFFFF;
     }
 
     uint32_t fw_size = USER_FLASH_END_ADDR - USER_FLASH_START_ADDR;
@@ -84,17 +84,17 @@ void update_firmware( void )
     erase_sector( USER_FLASH_START_SECTOR , USER_FLASH_END_SECTOR );
 
     for ( offset = 0; offset < fw_size; dst += sizeof(page)) {
-	/* Populate a page from source address */
-	for (uint8_t i = 0; i<sizeof(page)/4; i++, src++, offset+=4 ) {
-	    page[i] = *src;
-	}
-	/* Program it into dst */
-	program_page( dst, page, sizeof(page) );
+        /* Populate a page from source address */
+        for (uint8_t i = 0; i<sizeof(page)/4; i++, src++, offset+=4 ) {
+            page[i] = *src;
+        }
+        /* Program it into dst */
+        program_page( dst, page, sizeof(page) );
 
-	/* Reset the data in local storage */
-	for(uint8_t j=0; j<(sizeof(page)/sizeof(uint32_t)); j++) {
-	    page[j] = 0xFFFFFFFF;
-	}
+        /* Reset the data in local storage */
+        for(uint8_t j=0; j<(sizeof(page)/sizeof(uint32_t)); j++) {
+            page[j] = 0xFFFFFFFF;
+        }
     }
 
     //erase_sector( UPGRADE_FLASH_START_SECTOR , UPGRADE_FLASH_END_SECTOR );

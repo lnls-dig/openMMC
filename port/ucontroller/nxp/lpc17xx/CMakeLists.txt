@@ -3,6 +3,7 @@ set(LPCOPEN_SRCPATH ${LPC17XX_PATH}/lpcopen/src)
 set(LPCOPEN_INCPATH ${LPC17XX_PATH}/lpcopen/inc)
 
 include_directories(${LPC17XX_PATH})
+include_directories(${PROJ_HDRS})
 
 #Silence GCC Warnings
 add_compile_options( -Wno-switch -Wno-unused-but-set-variable )
@@ -10,10 +11,6 @@ add_compile_options( -Wno-switch -Wno-unused-but-set-variable )
 set(UCONTROLLER_SRCS
   ${LPC17XX_PATH}/cr_startup_lpc175x_6x.c
   ${LPC17XX_PATH}/sysinit.c
-  ${LPC17XX_PATH}/lpc17_i2c.c
-  ${LPC17XX_PATH}/lpc17_spi.c
-  ${LPC17XX_PATH}/lpc17_ssp.c
-  ${LPC17XX_PATH}/lpc17_hpm.c
   )
 
 set(UCONTROLLER_HDRS
@@ -36,14 +33,18 @@ set(LIBLPCOPEN_SRCS
   ${LPCOPEN_SRCPATH}/timer_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/uart_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/wwdt_17xx_40xx.c
+
+  ${LPC17XX_PATH}/lpc17_i2c.c
+  ${LPC17XX_PATH}/lpc17_spi.c
+  ${LPC17XX_PATH}/lpc17_ssp.c
+  ${LPC17XX_PATH}/lpc17_hpm.c
   )
 
 if( UART_RINGBUFFER )
-  set(UCONTROLLER_SRCS ${UCONTROLLER_SRCS} ${LPC17XX_PATH}/lpc17_uartrb.c)
-  set(LIBLPCOPEN_SRCS ${LIBLPCOPEN_SRCS} ${LPCOPEN_SRCPATH}/ring_buffer.c)
+  set(LIBLPCOPEN_SRCS ${LIBLPCOPEN_SRCS} ${LPCOPEN_SRCPATH}/ring_buffer.c ${LPC17XX_PATH}/lpc17_uartrb.c)
   set(MODULES_FLAGS ${MODULES_FLAGS} -DUART_RINGBUFFER PARENT_SCOPE)
 else()
-  set(UCONTROLLER_SRCS ${UCONTROLLER_SRCS} ${LPC17XX_PATH}/lpc17_uart.c)
+  set(LIBLPCOPEN_SRCS ${LIBLPCOPEN_SRCS} ${LPC17XX_PATH}/lpc17_uart.c)
 endif()
 
 include_directories(${LPCOPEN_INCPATH})
@@ -71,3 +72,4 @@ set(UCONTROLLER_HDRS ${UCONTROLLER_HDRS} PARENT_SCOPE)
 
 add_library(lpcopen STATIC ${LIBLPCOPEN_SRCS})
 
+add_dependencies(lpcopen FreeRTOS)

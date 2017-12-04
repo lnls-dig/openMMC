@@ -52,8 +52,8 @@ enum LEDInit_status {
 };
 
 enum LEDState {
-    LEDSTATE_INIT,
-    LEDSTATE_TOGGLED
+    LEDSTATE_INIT = 0x00,
+    LEDSTATE_TOGGLED = 0xFF
 };
 
 enum LEDAct {
@@ -95,12 +95,6 @@ typedef struct LEDUpdate {
     uint8_t mode;
     LEDState_t new_state;
 } LEDUpdate_t;
-
-typedef struct LEDPincfg {
-    uint8_t port;
-    uint8_t pin;
-    uint8_t func;
-} LEDPincfg_t;
 
 
 void LED_init( void );

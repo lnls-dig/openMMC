@@ -49,7 +49,7 @@
 TaskHandle_t vTaskLM75_Handle;
 
 extern const SDR_type_01h_t SDR_LM75_uC;
-extern const SDR_type_01h_t SDR_LM75_CLOCK_SWITCH;
+extern const SDR_type_01h_t SDR_LM75_ADN4604;
 extern const SDR_type_01h_t SDR_LM75_DCDC;
 extern const SDR_type_01h_t SDR_LM75_RAM;
 

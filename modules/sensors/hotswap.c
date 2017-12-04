@@ -39,10 +39,22 @@
 #include "led.h"
 #include "fru.h"
 #include "utils.h"
+#include "uart_debug.h"
 
-static uint8_t hotswap_get_handle_status( void )
+static bool hotswap_get_handle_status( uint8_t *state )
 {
-    return gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN);
+    static uint8_t falling, rising;
+
+    bool pin_read = gpio_read_pin(PIN_PORT(GPIO_HOT_SWAP_HANDLE), PIN_NUMBER(GPIO_HOT_SWAP_HANDLE));
+
+    falling = (falling << 1) | !pin_read | 0x80;
+    rising = (rising << 1) | pin_read | 0x80;
+
+    if ( (falling == 0xFF) || (rising == 0xFF) ) {
+        *state = pin_read;
+        return true;
+    }
+    return false;
 }
 
 SDR_type_02h_t * hotswap_amc_pSDR;
@@ -89,48 +101,81 @@ void hotswap_init( void )
 void vTaskHotSwap( void *Parameters )
 {
     /* Init old_state with a different value, so that the uC always send its state on startup */
-    static uint8_t old_state_amc = 0xFF;
-    static uint8_t new_state_amc;
+    static uint8_t new_state_amc = 0x01, old_state_amc = 0xFF;
 #ifdef MODULE_RTM
-    static uint8_t old_state_rtm = 0xFF;
-    static uint8_t new_state_rtm;
+    static uint8_t new_state_rtm = 0x01, old_state_rtm = 0xFF;
+    extern bool rtm_present;
 #endif
 
     TickType_t xLastWakeTime;
     const TickType_t xFrequency = 50;
 
     /* Override Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
-    if ( gpio_read_pin(HOT_SWAP_HANDLE_PORT, HOT_SWAP_HANDLE_PIN) == 0 ) {
+    if ( new_state_amc == 0 ) {
         LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
     } else {
         LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
     }
 
+#ifdef MODULE_RTM
+    /* Override RTM Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
+    if ( new_state_rtm == 0 ) {
+        LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
+    } else {
+        LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
+    }
+#endif
     /* Initialise the xLastWakeTime variable with the current time. */
     xLastWakeTime = xTaskGetTickCount();
 
     for ( ;; ) {
         vTaskDelayUntil( &xLastWakeTime, xFrequency );
 
-        new_state_amc = hotswap_get_handle_status();
+        if (!hotswap_get_handle_status( &new_state_amc )) {
+            continue;
+        }
 
         if ( new_state_amc ^ old_state_amc ) {
+            if ( new_state_amc == 0 ) {
+                printf("AMC Hotswap handle pressed!\n");
+            } else {
+                printf("AMC Hotswap handle released!\n");
+            }
             if ( hotswap_send_event( hotswap_amc_sensor, new_state_amc ) == ipmb_error_success ) {
                 hotswap_set_mask_bit( HOTSWAP_AMC, 1 << new_state_amc );
                 hotswap_clear_mask_bit( HOTSWAP_AMC, 1 << (!new_state_amc) );
                 old_state_amc = new_state_amc;
             }
+#ifdef BENCH_TEST
+            old_state_amc = new_state_amc;
+#endif
         }
 
 #ifdef MODULE_RTM
-        new_state_rtm = rtm_get_hotswap_handle_status();
+        if ( !rtm_present ) {
+            /* Keep this flag in a different state so that when the RTM board connects, we send its hotswap status right after */
+            old_state_rtm = 0xFF;
+            continue;
+        }
+
+        if (!rtm_get_hotswap_handle_status( &new_state_rtm )) {
+            continue;
+        }
 
         if ( new_state_rtm ^ old_state_rtm ) {
+            if ( new_state_rtm == 0 ) {
+                printf("RTM Hotswap handle pressed!\n");
+            } else {
+                printf("RTM Hotswap handle released!\n");
+            }
             if ( hotswap_send_event( hotswap_rtm_sensor, new_state_rtm ) == ipmb_error_success ) {
                 hotswap_set_mask_bit( HOTSWAP_RTM, 1 << new_state_rtm );
                 hotswap_clear_mask_bit( HOTSWAP_RTM, 1 << (!new_state_rtm) );
                 old_state_rtm = new_state_rtm;
             }
+#ifdef BENCH_TEST
+            old_state_rtm = new_state_rtm;
+#endif
         }
 #endif
     }

@@ -58,7 +58,7 @@ size_t at24mac_read_serial_num( uint8_t id, uint8_t *rx_data, size_t buf_len, ui
     uint8_t rx_len = 0;
 
     if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout ) && ( rx_data != NULL ) ) {
-        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, AT24MAC_ID_ADDR, rx_data, buf_len);
+        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr+8, AT24MAC_ID_ADDR, rx_data, buf_len);
 
         i2c_give( i2c_interface );
     }
@@ -74,7 +74,7 @@ size_t at24mac_read_eui( uint8_t id, uint8_t *rx_data, size_t buf_len, uint8_t t
 
     if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout ) && ( rx_data != NULL ) ) {
 
-        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, AT24MAC_EUI_ADDR, rx_data, buf_len);
+        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr+8, AT24MAC_EUI_ADDR, rx_data, buf_len);
 
         i2c_give( i2c_interface );
     }

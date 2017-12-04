@@ -109,9 +109,9 @@ void vTaskINA220( void *Parameters )
                 SDR_type_01h_t * ina220_sdr = ( SDR_type_01h_t * ) ina220_sensor->sdr;
                 if ( ( ina220_sensor->readout_value >= (ina220_sdr->lower_critical_thr ) ) &&
                      ( ina220_sensor->readout_value <= (ina220_sdr->upper_critical_thr ) ) ) {
-                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_P12GOOD );
+                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_PPGOOD );
                 } else {
-                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_P12GOODn );
+                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_PPGOODn );
                 }
             }
 #endif
@@ -133,7 +133,7 @@ uint8_t ina220_config( ina220_data_t * data )
     }
     data->curr_reg_config = data->config->config_reg_default;
 
-    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, (TickType_t) 10) == pdTRUE ) {
+    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY) == pdTRUE ) {
 
         uint8_t cfg_buff[3] = { INA220_CONFIG, ( data->curr_reg_config.cfg_word >> 8) , ( data->curr_reg_config.cfg_word & 0xFFFF) };
 
@@ -145,36 +145,39 @@ uint8_t ina220_config( ina220_data_t * data )
     return -1;
 }
 
-uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg )
+Bool ina220_readvalue( ina220_data_t * data, uint8_t reg, uint16_t *read )
 {
     uint8_t i2c_interf, i2c_addr;
     uint8_t val[2] = {0};
 
-    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, (TickType_t) 10) == pdTRUE ) {
+    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY) == pdTRUE ) {
 
         xI2CMasterWriteRead( i2c_interf, i2c_addr, reg, &val[0], sizeof(val)/sizeof(val[0]) );
 
         i2c_give( i2c_interf );
+
+        *read = (val[0] << 8) | (val[1]);
+        return true;
     }
 
-    return ( (val[0] << 8) | (val[1]) );
+    return false;
 }
 
 void ina220_readall( ina220_data_t * data )
 {
     /* Read all INA220 Registers */
     for ( uint8_t i = 0; i < INA220_REGISTERS; i++ ) {
-        data->regs[i] = ina220_readvalue( data, i );
+        ina220_readvalue( data, i, &(data->regs[i]) );
     }
 }
 
-bool ina220_calibrate( ina220_data_t * data )
+Bool ina220_calibrate( ina220_data_t * data )
 {
     uint8_t i2c_interf, i2c_addr;
     uint16_t cal = data->config->calibration_reg;
     uint8_t cal_reg[3] = { INA220_CALIBRATION, (cal >> 8), (cal & 0xFFFF) };
 
-    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, (TickType_t) 10) == pdTRUE ) {
+    if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY) == pdTRUE ) {
 
         xI2CMasterWrite( i2c_interf, i2c_addr, &cal_reg[0], sizeof(cal_reg)/sizeof(cal_reg[0]) );
 

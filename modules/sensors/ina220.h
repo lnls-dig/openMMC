@@ -118,10 +118,10 @@
 #define INA220_32V_SCALE_RANGE          0x01
 
 /* PGA gain */
-#define INA220_PGA_GAIN_40MV		0x00
-#define INA220_PGA_GAIN_80MV		0x01
-#define INA220_PGA_GAIN_160MV		0x02
-#define INA220_PGA_GAIN_320MV		0x03
+#define INA220_PGA_GAIN_40MV            0x00
+#define INA220_PGA_GAIN_80MV            0x01
+#define INA220_PGA_GAIN_160MV           0x02
+#define INA220_PGA_GAIN_320MV           0x03
 
 /* ADC Resolution/Averaging */
 #define INA220_RES_SAMPLES_9BIT         0x0
@@ -149,7 +149,7 @@
 
 /* worst case is 68.10 ms (~14.6Hz, ina219) */
 #define INA220_CONVERSION_RATE          15
-#define INA220_MAX_DELAY                69	/* worst case delay in ms */
+#define INA220_MAX_DELAY                69      /* worst case delay in ms */
 
 #define INA220_RSHUNT_DEFAULT           10000
 
@@ -198,13 +198,10 @@ typedef struct {
 TaskHandle_t vTaskINA220_Handle;
 
 uint8_t ina220_config( ina220_data_t * data );
-bool ina220_calibrate( ina220_data_t * data );
-uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg );
-uint16_t ina220_readvalue( ina220_data_t * data, uint8_t reg );
+Bool ina220_calibrate( ina220_data_t * data );
+Bool ina220_readvalue( ina220_data_t * data, uint8_t reg, uint16_t *read );
 void ina220_readall( ina220_data_t * data );
-void ina220_sdr_init ( TaskHandle_t handle );
 void ina220_init( void );
-
 void vTaskINA220( void* Parameters );
 
 #endif

@@ -29,12 +29,12 @@
 #include "fru.h"
 #include "utils.h"
 #include "led.h"
-
+#include "uart_debug.h"
 /* RTM Management functions */
 
 void rtm_enable_payload_power( void )
 {
-    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 1 );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 1 );
     /* Debug LEDs */
     pca9554_write_pin( RTM_GPIO_LED_RED, 1 );
     pca9554_write_pin( RTM_GPIO_LED_BLUE, 1 );
@@ -43,17 +43,32 @@ void rtm_enable_payload_power( void )
 
 void rtm_disable_payload_power( void )
 {
-    gpio_set_pin_state( GPIO_EN_RTM_PWR_PORT, GPIO_EN_RTM_PWR_PIN, 0 );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 0 );
     /* Debug LEDs */
     pca9554_write_pin( RTM_GPIO_LED_RED, 0 );
     pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
     pca9554_write_pin( RTM_GPIO_LED_GREEN, 1 );
 }
 
-uint8_t rtm_get_hotswap_handle_status( void )
+uint8_t rtm_get_hotswap_handle_status( uint8_t *state )
 {
+    static uint8_t falling, rising;
+    uint8_t pin_read;
+
     rtm_enable_i2c();
-    return pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE );
+
+    if (pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE, &pin_read ) == 0 ) {
+        return false;
+    }
+
+    falling = (falling << 1) | !pin_read | 0x80;
+    rising = (rising << 1) | pin_read | 0x80;
+
+    if ( (falling == 0xFF) || (rising == 0xFF) ) {
+        *state = pin_read;
+        return true;
+    }
+    return false;
 }
 
 void rtm_check_presence( uint8_t *status )
@@ -92,15 +107,15 @@ void rtm_hardware_init( void )
 void rtm_enable_i2c( void )
 {
     /* Enable I2C communication with RTM */
-    gpio_set_pin_dir( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN, OUTPUT );
-    gpio_set_pin_dir( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, OUTPUT );
-    gpio_set_pin_state( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, HIGH );
+    gpio_set_pin_dir( PIN_PORT(GPIO_RTM_PS), PIN_NUMBER(GPIO_RTM_PS), GPIO_DIR_OUTPUT );
+    gpio_set_pin_dir( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_DIR_OUTPUT );
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_LEVEL_HIGH );
 }
 
 void rtm_disable_i2c( void )
 {
-    gpio_set_pin_dir( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN, INPUT );
-    gpio_set_pin_dir( GPIO_EN_RTM_I2C_PORT, GPIO_EN_RTM_I2C_PIN, INPUT );
+    gpio_set_pin_dir( PIN_PORT(GPIO_RTM_PS), PIN_NUMBER(GPIO_RTM_PS), GPIO_DIR_INPUT );
+    gpio_set_pin_dir( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_DIR_INPUT );
 }
 
 bool rtm_compatibility_check( void )
@@ -182,7 +197,7 @@ void rtm_ctrl_led( uint8_t id, uint8_t state )
 
 uint8_t rtm_read_led( uint8_t id )
 {
-    uint8_t pca_pin;
+    uint8_t pca_pin, stat;
 
     switch( id ) {
     case LED_BLUE:
@@ -201,5 +216,7 @@ uint8_t rtm_read_led( uint8_t id )
         return 1;
     }
 
-    return pca9554_read_pin( pca_pin );
+    pca9554_read_pin( pca_pin, &stat );
+
+    return stat;
 }

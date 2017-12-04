@@ -40,21 +40,26 @@
 /**
  * @brief  PCA9554 General register read
  *
- * @param  reg Selected register
+ * @param[in]  reg     Selected register
+ * @param[out] readout Register value read
  *
- * @return Register value
+ * @return Number of bytes read (1 if successful, 0 if failure)
  */
-static uint8_t pca9554_read_reg ( uint8_t reg )
+static uint8_t pca9554_read_reg ( uint8_t reg, uint8_t *readout )
 {
     uint8_t i2c_addr;
     uint8_t i2c_id;
-    uint8_t rx = 0;
+    uint8_t rx_len = 0;
+
+    if (readout == NULL) {
+        return 0;
+    }
 
     if( i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-        xI2CMasterWriteRead(i2c_id, i2c_addr, reg, &rx, 1);
+        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, readout, 1);
         i2c_give(i2c_id);
     }
-    return rx;
+    return rx_len;
 }
 
 /**
@@ -63,109 +68,122 @@ static uint8_t pca9554_read_reg ( uint8_t reg )
  * @param reg   Selected register
  * @param data  Value to write to register
  *
- * @return None
+ * @return Number of bytes written
  */
-static void pca9554_write_reg ( uint8_t reg, uint8_t data )
+static uint8_t pca9554_write_reg ( uint8_t reg, uint8_t data )
 {
     uint8_t i2c_addr;
     uint8_t i2c_id;
     uint8_t cmd_data[2] = {reg, data};
+    uint8_t tx_len = 0;
 
     if( i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-        xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
+        tx_len = xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
         i2c_give(i2c_id);
     }
+
+    return tx_len;
 }
 
 /* Pins Read/Write */
-uint8_t pca9554_read_port( void )
+uint8_t pca9554_read_port( uint8_t *readout )
 {
-    return pca9554_read_reg( PCA9554_INPUT_REG );
+    return pca9554_read_reg( PCA9554_INPUT_REG, readout );
 }
 
-uint8_t pca9554_read_pin( uint8_t pin )
+uint8_t pca9554_read_pin( uint8_t pin, uint8_t *status )
 {
-    uint8_t pin_read;
+    uint8_t rx_len, pin_read = 0;
 
-    pin_read = pca9554_read_port();
+    rx_len = pca9554_read_port( &pin_read );
 
-    return ((pin_read >> pin) & 0x1);
+    if (status) {
+        *status = ((pin_read >> pin) & 0x1);
+    }
+
+    return rx_len;
 }
 
-void pca9554_write_port( uint8_t data )
+uint8_t pca9554_write_port( uint8_t data )
 {
-    pca9554_write_reg( PCA9554_OUTPUT_REG, data );
+    return pca9554_write_reg( PCA9554_OUTPUT_REG, data );
 }
 
-void pca9554_write_pin( uint8_t pin, bool data )
+uint8_t pca9554_write_pin( uint8_t pin, bool data )
 {
-    uint8_t output;
+    uint8_t output = 0;
 
-    output = pca9554_read_port();
+    pca9554_read_port( &output );
     output &= ~( 1 << pin );
     output |= ( data << pin );
 
-    pca9554_write_port( output );
+    return pca9554_write_port( output );
 }
 
 /* Polarity Control */
-void pca9554_set_port_pol( uint8_t pol )
+uint8_t pca9554_set_port_pol( uint8_t pol )
 {
-    pca9554_write_reg( PCA9554_POLARITY_REG, pol );
+    return pca9554_write_reg( PCA9554_POLARITY_REG, pol );
 }
 
-void pca9554_set_pin_pol( uint8_t pin, bool pol )
+uint8_t pca9554_set_pin_pol( uint8_t pin, bool pol )
 {
-    uint8_t pol_reg;
+    uint8_t pol_reg = 0;
 
-    pol_reg = pca9554_read_port();
+    pca9554_read_port( &pol_reg );
     pol_reg &= ~( 1 << pin );
     pol_reg |= ( pol << pin );
 
-    pca9554_set_port_pol( pol_reg );
+    return pca9554_set_port_pol( pol_reg );
 }
 
-uint8_t pca9554_get_port_pol( void )
+uint8_t pca9554_get_port_pol( uint8_t *pol )
 {
-    return pca9554_read_reg( PCA9554_POLARITY_REG );
+    return pca9554_read_reg( PCA9554_POLARITY_REG, pol );
 }
 
-bool pca9554_get_pin_pol( uint8_t pin )
+uint8_t pca9554_get_pin_pol( uint8_t pin, uint8_t *pol )
 {
-    uint8_t port_pol;
+    uint8_t rx_len;
 
-    port_pol = pca9554_get_port_pol();
+    rx_len = pca9554_get_port_pol( pol );
 
-    return ((port_pol >> pin) & 0x1);
+    /* Mask all bits, except the one requested */
+    *pol = ((*pol >> pin) & 0x1);
+
+    return rx_len;
 }
 
 /* Pins direction (output/input) */
-void pca9554_set_port_dir( uint8_t dir )
+uint8_t pca9554_set_port_dir( uint8_t dir )
 {
-    pca9554_write_reg( PCA9554_CFG_REG, dir );
+    return pca9554_write_reg( PCA9554_CFG_REG, dir );
 }
 
-void pca9554_set_pin_dir( uint8_t pin, bool dir )
+uint8_t pca9554_set_pin_dir( uint8_t pin, bool dir )
 {
-    uint8_t dir_reg;
+    uint8_t dir_reg = 0;
 
-    dir_reg = pca9554_read_port();
+    pca9554_read_port( &dir_reg );
     dir_reg &= ~( 1 << pin );
     dir_reg |= ( dir << pin );
 
-    pca9554_set_port_dir( dir_reg );
+    return pca9554_set_port_dir( dir_reg );
 }
 
-uint8_t pca9554_get_port_dir( void )
+uint8_t pca9554_get_port_dir( uint8_t *dir )
 {
-    return pca9554_read_reg( PCA9554_CFG_REG );
+    return pca9554_read_reg( PCA9554_CFG_REG, dir );
 }
 
-bool pca9554_get_pin_dir( uint8_t pin )
+uint8_t pca9554_get_pin_dir( uint8_t pin, uint8_t *dir )
 {
-    uint8_t port_dir;
+    uint8_t rx_len;
 
-    port_dir = pca9554_get_port_dir();
+    rx_len = pca9554_get_port_dir( dir );
 
-    return ((port_dir >> pin) & 0x1);
+    /* Mask all bits, except the one requested */
+    *dir = ((*dir >> pin) & 0x1);
+
+    return rx_len;
 }

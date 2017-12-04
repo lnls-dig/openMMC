@@ -59,59 +59,32 @@ void I2C2_IRQHandler(void)
     i2c_state_handling(I2C2);
 }
 
-void Board_I2C_Init(I2C_ID_T id)
-{
-    switch (id) {
-    case I2C0:
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 27, IOCON_MODE_INACT, IOCON_FUNC1);
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 28, IOCON_MODE_INACT, IOCON_FUNC1);
-        Chip_IOCON_SetI2CPad(LPC_IOCON, I2CPADCFG_STD_MODE);
-        break;
-
-    case I2C1:
-        Chip_IOCON_PinMux(LPC_IOCON, 0,  0, IOCON_MODE_INACT, IOCON_FUNC3);
-        Chip_IOCON_PinMux(LPC_IOCON, 0,  1, IOCON_MODE_INACT, IOCON_FUNC3);
-        Chip_IOCON_EnableOD(LPC_IOCON, 0,  0);
-        Chip_IOCON_EnableOD(LPC_IOCON, 0,  1);
-
-#ifndef BOARD_AFC_V3_1
-	    Chip_IOCON_PinMux(LPC_IOCON, 0, 19, IOCON_MODE_INACT, IOCON_FUNC2);
-	    Chip_IOCON_PinMux(LPC_IOCON, 0, 20, IOCON_MODE_INACT, IOCON_FUNC2);
-	    Chip_IOCON_EnableOD(LPC_IOCON, 0, 19);
-	    Chip_IOCON_EnableOD(LPC_IOCON, 0, 20);
-#endif
-        break;
-
-    case I2C2:
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 10, IOCON_MODE_INACT, IOCON_FUNC2);
-        Chip_IOCON_PinMux(LPC_IOCON, 0, 11, IOCON_MODE_INACT, IOCON_FUNC2);
-        Chip_IOCON_EnableOD(LPC_IOCON, 0, 10);
-        Chip_IOCON_EnableOD(LPC_IOCON, 0, 11);
-        break;
-    default:
-        break;
-    }
-}
-
 void vI2CConfig( I2C_ID_T id, uint32_t speed )
 {
     IRQn_Type irq;
 
     switch (id) {
     case I2C0:
-	irq = I2C0_IRQn;
-	break;
+        irq = I2C0_IRQn;
+        /* Set special I2C pins configuration */
+        Chip_IOCON_SetI2CPad(LPC_IOCON, I2CPADCFG_STD_MODE);
+        break;
     case I2C1:
-	irq = I2C1_IRQn;
-	break;
+        irq = I2C1_IRQn;
+        /* Set special I2C pins configuration */
+        Chip_IOCON_EnableOD(LPC_IOCON, PIN_PORT(I2C1_SDA), PIN_NUMBER(I2C1_SDA));
+        Chip_IOCON_EnableOD(LPC_IOCON, PIN_PORT(I2C1_SCL), PIN_NUMBER(I2C1_SCL));
+        break;
     case I2C2:
-	irq = I2C2_IRQn;
-	break;
+        irq = I2C2_IRQn;
+        /* Set special I2C pins configuration */
+        Chip_IOCON_EnableOD(LPC_IOCON, PIN_PORT(I2C2_SDA), PIN_NUMBER(I2C2_SDA));
+        Chip_IOCON_EnableOD(LPC_IOCON, PIN_PORT(I2C2_SCL), PIN_NUMBER(I2C2_SCL));
+        break;
     default:
-	return;
+        return;
     }
 
-    Board_I2C_Init(id);
     Chip_I2C_Init(id);
     Chip_I2C_SetClockRate(id, speed);
     NVIC_SetPriority( irq, configMAX_SYSCALL_INTERRUPT_PRIORITY -1 );
@@ -133,11 +106,11 @@ uint8_t xI2CSlaveReceive( I2C_ID_T id, uint8_t * rx_buff, uint8_t buff_len, uint
 
     if ( ulTaskNotifyTake( pdTRUE, timeout ) == pdTRUE )
     {
-	if (recv_bytes > buff_len) {
-	    bytes_to_copy = buff_len;
-	} else {
-	    bytes_to_copy = recv_bytes;
-	}
+        if (recv_bytes > buff_len) {
+            bytes_to_copy = buff_len;
+        } else {
+            bytes_to_copy = recv_bytes;
+        }
         /* Copy the rx buffer to the pointer given */
         memcpy( rx_buff, &recv_msg[0], bytes_to_copy );
         return bytes_to_copy;

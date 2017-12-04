@@ -69,9 +69,14 @@ void IPMITask( void * pvParameters )
             configASSERT(pdFALSE);
             continue;
         }
-
-	DEBUG_MSG(" IPMI Message Received! \n ");
-
+#if 0
+        printf(" IPMI Message Received: \n ");
+        printf(" \tNETFn: 0x%X\tCMD: 0x%X\t Data: ", req_received.netfn, req_received.cmd);
+        for (int i=0; i < req_received.data_len; i++) {
+            printf("0x%X ", req_received.data[i]);
+        }
+        printf("\n");
+#endif
         req_handler = (t_req_handler) 0;
         req_handler = ipmi_retrieve_handler(req_received.netfn, req_received.cmd);
 
@@ -93,8 +98,8 @@ void IPMITask( void * pvParameters )
 
         } else {
             /** If there is no function handler, use data from received
-	     *  message to send "invalid command" response (IPMI table 5-2,
-	     *  page 44). */
+             *  message to send "invalid command" response (IPMI table 5-2,
+             *  page 44). */
 
             response.completion_code = IPMI_CC_INV_CMD;
             response.data_len = 0;
@@ -261,7 +266,6 @@ IPMI_HANDLER(ipmi_picmg_cmd_set_amc_port_state, NETFN_GRPEXT, IPMI_PICMG_CMD_SET
     rsp->data[rsp->data_len++] = IPMI_PICMG_GRP_EXT;
 }
 
-/* Compatibility with Vadatech */
 IPMI_HANDLER(ipmi_get_device_locator_record, NETFN_GRPEXT, IPMI_PICMG_CMD_GET_DEVICE_LOCATOR_RECORD, ipmi_msg * req, ipmi_msg * rsp )
 {
     uint8_t len = rsp->data_len = 0;
@@ -316,20 +320,6 @@ IPMI_HANDLER(ipmi_picmg_cmd_get_fru_control_capabilities, NETFN_GRPEXT, IPMI_PIC
      * [2] - Capable of issuing a graceful reboot
      * [1] - Capable of issuing a warm reset */
     rsp->data[len++] = 0x06; /* Graceful reboot and Warm reset */
-    rsp->data_len = len;
-    rsp->completion_code = IPMI_CC_OK;
-}
-
-IPMI_HANDLER(ipmi_picmg_cmd_set_fru_activation_policy, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_FRU_ACTIVATION_POLICY, ipmi_msg *req, ipmi_msg *rsp)
-{
-    uint8_t len = rsp->data_len = 0;
-
-    /* FRU Activation Policy Mask */
-    uint8_t fru_actv_mask = req->data[2];
-    uint8_t fru_actv_bits = req->data[3];
-
-    /* TODO: Implement FRU activation policy */
-    rsp->data[len++] = IPMI_PICMG_GRP_EXT;
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }

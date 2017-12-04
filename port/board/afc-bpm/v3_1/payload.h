@@ -61,10 +61,10 @@ enum {
  * @ingroup AFC_V3_1_PAYLOAD
  * @{
  */
-#define PAYLOAD_MESSAGE_P12GOOD         (1 << 0)
-#define PAYLOAD_MESSAGE_P12GOODn        (1 << 1)
-#define PAYLOAD_MESSAGE_PGOOD           (1 << 2)
-#define PAYLOAD_MESSAGE_PGOODn          (1 << 3)
+#define PAYLOAD_MESSAGE_PPGOOD          (1 << 0)
+#define PAYLOAD_MESSAGE_PPGOODn         (1 << 1)
+#define PAYLOAD_MESSAGE_DCDC_PGOOD      (1 << 2)
+#define PAYLOAD_MESSAGE_DCDC_PGOODn     (1 << 3)
 #define PAYLOAD_MESSAGE_COLD_RST        (1 << 4)
 #define PAYLOAD_MESSAGE_WARM_RST        (1 << 5)
 #define PAYLOAD_MESSAGE_REBOOT          (1 << 6)

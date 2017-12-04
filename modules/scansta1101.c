@@ -19,14 +19,16 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef JTAG_H_
-#define JTAG_H_
+#include "port.h"
+#include "scansta1101.h"
 
-#include "pin_mapping.h"
-
-/**
- * @brief Initialize and configure SCANSTA addr pins
- */
-void scansta_init( void );
-
-#endif
+void scansta1101_init( void )
+{
+    gpio_set_pin_state( PIN_PORT(GPIO_SCANSTA1101_ADDR0), PIN_NUMBER(GPIO_SCANSTA1101_ADDR0), GPIO_LEVEL_LOW );
+    gpio_set_pin_state( PIN_PORT(GPIO_SCANSTA1101_ADDR1), PIN_NUMBER(GPIO_SCANSTA1101_ADDR1), GPIO_LEVEL_LOW );
+    gpio_set_pin_state( PIN_PORT(GPIO_SCANSTA1101_ADDR2), PIN_NUMBER(GPIO_SCANSTA1101_ADDR2), GPIO_LEVEL_LOW );
+    gpio_set_pin_state( PIN_PORT(GPIO_SCANSTA1101_ADDR3), PIN_NUMBER(GPIO_SCANSTA1101_ADDR3), GPIO_LEVEL_LOW );
+    gpio_set_pin_state( PIN_PORT(GPIO_SCANSTA1101_ADDR4), PIN_NUMBER(GPIO_SCANSTA1101_ADDR4), GPIO_LEVEL_LOW );
+    gpio_set_pin_state( PIN_PORT(GPIO_SCANSTA1101_ADDR5), PIN_NUMBER(GPIO_SCANSTA1101_ADDR5), GPIO_LEVEL_LOW );
+    gpio_set_pin_state( PIN_PORT(GPIO_SCANSTA1101_ADDR6), PIN_NUMBER(GPIO_SCANSTA1101_ADDR6), GPIO_LEVEL_LOW );
+}

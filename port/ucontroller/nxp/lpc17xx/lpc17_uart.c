@@ -28,8 +28,23 @@
 #include "port.h"
 
 const lpc_uart_cfg_t usart_cfg[4] = {
-    {LPC_UART0, UART0_IRQn},
-    {LPC_UART1, UART1_IRQn},
-    {LPC_UART2, UART2_IRQn},
-    {LPC_UART3, UART3_IRQn}
+    { LPC_UART0, UART0_IRQn, SYSCTL_PCLK_UART0 },
+    { LPC_UART1, UART1_IRQn, SYSCTL_PCLK_UART1 },
+    { LPC_UART2, UART2_IRQn, SYSCTL_PCLK_UART2 },
+    { LPC_UART3, UART3_IRQn, SYSCTL_PCLK_UART3 }
 };
+
+void uart_init ( uint8_t id )
+{
+    Chip_Clock_SetPCLKDiv( usart_cfg[id].sysclk, SYSCTL_CLKDIV_2 );
+
+    Chip_UART_Init( usart_cfg[id].ptr );
+
+    /* Standard 19200 baud rate */
+    uart_set_baud( UART_DEBUG, 19200 );
+
+    /* Defaults to 8N1, no parity */
+    uart_config_data( UART_DEBUG, ( UART_LCR_WLEN8 | UART_LCR_SBS_1BIT | UART_LCR_PARITY_DIS ) );
+
+    uart_tx_enable ( UART_DEBUG );
+}

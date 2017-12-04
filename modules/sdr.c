@@ -214,9 +214,9 @@ void sdr_pop( void )
     sensor_t * new_head;
 
     if ( sdr_head ) {
-	new_head = sdr_head->next;
-	vPortFree( sdr_head );
-	sdr_head = new_head;
+        new_head = sdr_head->next;
+        vPortFree( sdr_head );
+        sdr_head = new_head;
     }
 }
 
@@ -379,7 +379,7 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
     sensor_t * cur_sensor = find_sensor_by_id( sensor_number );
 
     if (sensor_number > sdr_count) {
-        rsp->completion_code = IPMI_CC_REQ_DATA_NOT_PRESENT;
+        rsp->completion_code = IPMI_CC_PARAM_OUT_OF_RANGE;
         rsp->data_len = 0;
         return;
     }
@@ -396,6 +396,42 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
         /* TODO: Implement threshold reading */
         rsp->data[len++] = 0xC0;
     }
+
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}
+
+IPMI_HANDLER(ipmi_se_get_sensor_threshold, NETFN_SE, IPMI_GET_SENSOR_THRESHOLD_CMD,  ipmi_msg *req, ipmi_msg* rsp) {
+    int sensor_number = req->data[0];
+    int len = rsp->data_len;
+
+    /* Check if the requested sensor exists */
+    if (sensor_number > sdr_count) {
+        rsp->completion_code = IPMI_CC_PARAM_OUT_OF_RANGE;
+        rsp->data_len = 0;
+        return;
+    }
+
+    sensor_t *cur_sensor = find_sensor_by_id( sensor_number );
+
+    /* Check if the selected sensor has a Full Sensor Record */
+    if ( cur_sensor->sdr_type != TYPE_01) {
+        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+        rsp->data_len = 0;
+        return;
+    }
+
+    SDR_type_01h_t *sdr = ( SDR_type_01h_t *) cur_sensor->sdr;
+
+    /* Returns readable threshold mask */
+    rsp->data[len++] = sdr->readable_threshold_mask;
+    /* Returns thresh values */
+    rsp->data[len++] = sdr->lower_noncritical_thr;
+    rsp->data[len++] = sdr->lower_critical_thr;
+    rsp->data[len++] = sdr->lower_nonrecover_thr;
+    rsp->data[len++] = sdr->upper_noncritical_thr;
+    rsp->data[len++] = sdr->upper_critical_thr;
+    rsp->data[len++] = sdr->upper_nonrecover_thr;
 
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;

@@ -19,10 +19,7 @@ if(NOT CMAKE_TOOLCHAIN_FILE)
   message(WARNING "${Yellow}No toolchain configuration file specified. Using default option!${ColourReset}")
 
   include(${CMAKE_SOURCE_DIR}/toolchain/toolchain-arm-none-eabi.cmake)
-
 endif()
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/build_cfg")
 
 set(CMAKE_COLOR_MAKEFILE ON)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
@@ -34,7 +31,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING
-    "Choose the type of build, options are: none Debug Release Trace."
+    "Choose the type of build, options are: none Debug Release."
     FORCE)
 endif()
 message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
@@ -44,8 +41,8 @@ set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat
 
 # Build specific flags
 set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_ERROR_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG     "${CMAKE_C_FLAGS} -O0 -g3 -DDEBUG")
-set(CMAKE_C_FLAGS_RELEASE   "${CMAKE_C_FLAGS} -O3")
+set(CMAKE_C_FLAGS_DEBUG     "-O0 -g3 -DDEBUG")
+set(CMAKE_C_FLAGS_RELEASE   "-Os")
 
 # When we break up long strings in CMake we get semicolon
 # separated lists, undo this here...
@@ -57,15 +54,13 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" CACHE STRING "")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" CACHE STRING "")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "")
 
-set(PROJ_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/main_mmc.c)
+set(PROJ_HDRS ${CMAKE_SOURCE_DIR} )
+
 add_subdirectory(port/board)
-add_subdirectory(port/ucontroller)
 add_subdirectory(FreeRTOS)
+add_subdirectory(port/ucontroller)
 add_subdirectory(boot)
 add_subdirectory(modules)
-if(CMAKE_BUILD_TYPE STREQUAL "Trace")
-  add_subdirectory(trace)
-endif()
 
 include_directories( ${UCONTROLLER_HDRS} ${PROJ_HDRS} )
 
@@ -83,7 +78,7 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 add_executable(${CMAKE_PROJECT_NAME} ${UCONTROLLER_SRCS} ${PROJ_SRCS})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${MODULES_FLAGS})
 
-add_executable(bootloader ${BOOT_SRCS} ${UCONTROLLER_SRCS})
+add_executable(bootloader ${BOOT_SRCS})
 
 # Linker flags
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
@@ -101,7 +96,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
 target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
 # Link libraries
 target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS c gcc m lpcopen)
-target_link_libraries(bootloader gcc c m FreeRTOS lpcopen)
+target_link_libraries(bootloader gcc c m lpcopen)
 
 ##Generate .hex file
 
@@ -116,7 +111,6 @@ add_custom_command(TARGET bootloader POST_BUILD
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
   COMMENT "Converting the AXF output to a binary file"
   )
-
 
 ##Program command
 set(LPCXPRESSO_INSTALL_PATH /usr/local/)
@@ -160,4 +154,19 @@ add_custom_target(program_all
   COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -flash-mass-erase
   COMMAND make -C ${CMAKE_BINARY_DIR} program_boot
   COMMAND make -C ${CMAKE_BINARY_DIR} program_app
+  )
+
+add_custom_target(full_binary
+  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
+  DEPENDS ${CMAKE_PROJECT_NAME} bootloader
+  #Create a pad file with the total size of the bootloader (0x2000)
+  COMMAND dd if=/dev/zero bs=1 count=8192 | tr \"\\000\" \"\\377\" > bootloader_pad.bin
+  #Add padding bytes to the bootloader binary
+  COMMAND dd if=bootloader.bin of=bootloader_pad.bin conv=notrunc
+  #Concatenate bootloader and app binaries
+  COMMAND cat bootloader_pad.bin ${CMAKE_PROJECT_NAME}.bin > openMMC_full.bin
+
+  #Program full_binary (for tests only)
+  #COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  #COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load-exec=openMMC_full.bin -load-base=0x0
   )

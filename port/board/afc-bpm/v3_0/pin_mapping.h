@@ -20,20 +20,20 @@
  */
 
 /**
- * @defgroup AFC_TIMING AFC Timing Board Port
+ * @defgroup AFC_V3_0 AFCv3.0 Board Port
  * @ingroup BOARD_PORTS
  */
 
 /**
- * @file afc-timing/pin_mapping.h
- * @brief Hardware pin definitions for AFC Timing
+ * @file afc-bpm/v3_0/pin_mapping.h
+ * @brief Hardware pin definitions for AFCv3.0
  *
- * @ingroup AFC_TIMING_PIN_MAPPING
+ * @ingroup AFC_V3_0_PIN_MAPPING
  */
 
 /**
- * @defgroup AFC_TIMING_PIN_MAPPING AFC Timing Pin Mapping
- * @ingroup AFC_TIMING
+ * @defgroup AFC_V3_0_PIN_MAPPING AFCv3.0 Pin Mapping
+ * @ingroup AFC_V3_0
  * @{
  */
 
@@ -128,8 +128,6 @@
 #define GPIO_FPGA_PROGRAM_B             PIN_DEF( PORT0, 17, (IOCON_FUNC0 | IOCON_MODE_PULLDOWN), GPIO_DIR_OUTPUT )
 #define GPIO_FPGA_DONE_B                PIN_DEF( PORT0, 22, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_INPUT )
 #define GPIO_FPGA_RESET                 PIN_DEF( PORT2,  9, (IOCON_FUNC0 | IOCON_MODE_PULLDOWN), GPIO_DIR_OUTPUT )
-#define GPIO_FPGA_INITB                 PIN_DEF( PORT0, 20, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_OUTPUT )
-#define GPIO_FLASH_CS_MUX               PIN_DEF( PORT0, 19, (IOCON_FUNC0 | IOCON_MODE_PULLDOWN), GPIO_DIR_OUTPUT )
 
 /* VADJ DAC */
 #define GPIO_DAC_VADJ_RST               PIN_DEF( PORT0, 21, (IOCON_FUNC0 | IOCON_MODE_PULLUP), GPIO_DIR_OUTPUT )
@@ -213,8 +211,6 @@
         GPIO_FPGA_PROGRAM_B,                    \
         GPIO_FPGA_DONE_B,                       \
         GPIO_FPGA_RESET,                        \
-        GPIO_FPGA_INITB,                        \
-        GPIO_FLASH_CS_MUX,                      \
         GPIO_DAC_VADJ_RST,                      \
         GPIO_DAC_VADJ_CSN,                      \
         GPIO_ADN_UPDATE,                        \

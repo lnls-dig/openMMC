@@ -20,20 +20,20 @@
  */
 
 /**
- * @defgroup AFC_TIMING AFC Timing Board Port
+ * @defgroup AFC_V3_1 AFCv3.1 Board Port
  * @ingroup BOARD_PORTS
  */
 
 /**
- * @file afc-timing/pin_mapping.h
- * @brief Hardware pin definitions for AFC Timing
+ * @file afc-bpm/v3_1/pin_mapping.h
+ * @brief Hardware pin definitions for AFCv3.1
  *
- * @ingroup AFC_TIMING_PIN_MAPPING
+ * @ingroup AFC_V3_1_PIN_MAPPING
  */
 
 /**
- * @defgroup AFC_TIMING_PIN_MAPPING AFC Timing Pin Mapping
- * @ingroup AFC_TIMING
+ * @defgroup AFC_V3_1_PIN_MAPPING AFCv3.1 Pin Mapping
+ * @ingroup AFC_V3_1
  * @{
  */
 

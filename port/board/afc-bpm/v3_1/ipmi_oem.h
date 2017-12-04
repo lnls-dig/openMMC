@@ -20,11 +20,11 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef __IPMI_OEM_H_
-#define __IPMI_OEM_H_
+#ifndef IPMI_OEM_H_
+#define IPMI_OEM_H_
 
 /**
- * @file afc/v3_1/ipmi_oem.h
+ * @file afc-bpm/v3_1/ipmi_oem.h
  * @brief Custom IPMI commands for AFC
  *
  * @ingroup AFC_V3_1_IPMI_OEM
@@ -36,11 +36,6 @@
  * @{
  */
 
-/*
- * Following definitions by Piotr Miedzik in JAMMCI
- * https://github.com/qermit/JAMMCI/blob/master/src/ipmi/ipmi_oem.h
-*/
-
 #include "ipmi.h"
 
 /**
@@ -48,13 +43,13 @@
  */
 #define NETFN_CUSTOM_OEM                    0x30
 
-#define IPMI_OEM_CMD_I2C_TRANSFER           0x00
-#define IPMI_OEM_CMD_GPIO                   0x01
-#define IPMI_OEM_CMD_CLOCK_CROSSBAR_GET     0x02
-#define IPMI_OEM_CMD_CLOCK_CROSSBAR_SET     0x03
-#define IPMI_OEM_CMD_SSP_TRANSFER           0x04
-#define IPMI_OEM_CMD_SSP_TRANSFER_RAW       0x05
-#define IPMI_OEM_CMD_CLOCK_CROSSBAR_RESET   0x06
+#define IPMI_OEM_CMD_I2C_TRANSFER               0x00
+
+#define IPMI_OEM_CMD_ADN4604_SET_OUTPUT_CFG     0x01
+#define IPMI_OEM_CMD_ADN4604_GET_OUTPUT_CFG     0x02
+#define IPMI_OEM_CMD_ADN4604_RESET              0x03
+
+#define IPMI_OEM_CMD_GPIO_PIN                   0x04
 /**
  * @}
  */
