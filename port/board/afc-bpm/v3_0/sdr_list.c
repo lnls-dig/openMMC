@@ -1103,7 +1103,7 @@ const SDR_type_01h_t SDR_MAX6642_FPGA = {
 };
 #endif
 
-void user_sdr_init( void )
+void amc_sdr_init( void )
 {
     /* Hotswap Sensor */
     sdr_insert_entry( TYPE_02, (void *) &SDR_HOTSWAP_AMC, &vTaskHotSwap_Handle, 0, 0 );

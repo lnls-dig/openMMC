@@ -35,13 +35,21 @@ enum {
 };
 
 typedef size_t (* fru_build_t)(uint8_t **buffer);
+typedef size_t (* fru_st_read_t)(uint8_t id, uint16_t address, uint8_t *buffer, size_t len, uint32_t timeout);
+typedef size_t (* fru_st_write_t)(uint8_t id, uint16_t address, uint8_t *buffer, size_t len, uint32_t timeout);
+
+typedef struct fru_cfg {
+    uint8_t eeprom_id;
+    fru_build_t build_f;
+    fru_st_read_t read_f;
+    fru_st_write_t write_f;
+} fru_cfg_t;
 
 typedef struct fru_data {
-    uint8_t eeprom_id;
+    const fru_cfg_t cfg;
     uint8_t *buffer;
     size_t fru_size;
     bool runtime;
-    fru_build_t build_func;
 } fru_data_t;
 
 void fru_init( uint8_t id );

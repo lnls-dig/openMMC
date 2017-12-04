@@ -76,8 +76,8 @@ void vTaskLM75( void* Parameters )
                     temp_sensor->readout_value = converted_temp;
                 }
                 /* Check for threshold events */
-                check_sensor_event(temp_sensor);
                 i2c_give(i2c_interf);
+                check_sensor_event(temp_sensor);
             }
         }
         vTaskDelay(xFrequency);

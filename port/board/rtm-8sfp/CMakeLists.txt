@@ -1,6 +1,7 @@
 #List all modules used by this board
 set(RTM_8SFP_MODULES
   "PCA9554"
+  "EEPROM_24XX64"
   )
 
 set(RTM_8SFP_PATH ${CMAKE_CURRENT_SOURCE_DIR})

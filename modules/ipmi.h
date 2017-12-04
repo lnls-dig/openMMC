@@ -106,11 +106,18 @@
 #define IPMI_APP_MANUF_LSB              0x5A
 
 /**
+ * @brief Manufacturer ID MIDB
+ *
+ * @note PICMG ID = 0x315A
+ */
+#define IPMI_APP_MANUF_MIDB             0x31
+
+/**
  * @brief Manufacturer ID MSB
  *
  * @note PICMG ID = 0x315A
  */
-#define IPMI_APP_MANUF_MSB              0x31
+#define IPMI_APP_MANUF_MSB              0x00
 
 /**
  * @brief Product ID LSB (User-defined)

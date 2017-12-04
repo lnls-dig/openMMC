@@ -90,47 +90,6 @@ const SDR_type_02h_t SDR_HOTSWAP_AMC = {
     .IDstring = "HOTSWAP AMC" /* sensor string */
 };
 
-#ifdef MODULE_RTM
-const SDR_type_02h_t SDR_HOTSWAP_RTM = {
-
-    .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
-    .hdr.recID_MSB = 0x00,
-    .hdr.SDRversion = 0x51,
-    .hdr.rectype = TYPE_02,
-    .hdr.reclength = sizeof(SDR_type_02h_t) - sizeof(SDR_entry_hdr_t),
-
-    .ownerID = 0x00, /* i2c address, -> SDR_Init */
-    .ownerLUN = 0x00, /* sensor owner LUN */
-    .sensornum = 0x00, /* Filled by sdr_insert_entry() */
-
-/* record body bytes */
-    .entityID = 0xC0, /* entity id: RTM */
-    .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x03, /* init: event generation + scanning enabled */
-    .sensorcap = 0xc1, /* capabilities: auto re-arm,*/
-    .sensortype = SENSOR_TYPE_HOT_SWAP, /* sensor type: HOT SWAP*/
-    .event_reading_type = 0x6f, /* sensor reading*/
-    .assertion_event_mask = { 0x00, /* LSB assert event mask: 3 bit value */
-                              0x00 }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0x00, /* LSB deassert event mask: 3 bit value */
-                                0x00 }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x00, /* LSB: readable Threshold mask: no thresholds are readable:  */
-    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: no thresholds are setable: */
-    .sensor_units_1 = 0xc0, /* sensor units 1 : Does not return analog reading*/
-    .sensor_units_2 = 0x00, /* sensor units 2 :*/
-    .sensor_units_3 = 0x00, /* sensor units 3 :*/
-    .record_sharing[0] = 0x00,
-    .record_sharing[1] = 0x00,
-    .pos_thr_hysteresis = 0x00, /* positive going Threshold hysteresis value */
-    .neg_thr_hysteresis = 0x00, /* negative going Threshold hysteresis value */
-    .reserved1 = 0x00, /* reserved */
-    .reserved2 = 0x00, /* reserved */
-    .reserved3 = 0x00, /* reserved */
-    .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | STR_SIZE("HOTSWAP RTM"), /* 8 bit ASCII, number of bytes */
-    .IDstring = "HOTSWAP RTM" /* sensor string */
-};
-#endif
 #endif
 
 #ifdef MODULE_INA220_VOLTAGE
@@ -1103,14 +1062,8 @@ const SDR_type_01h_t SDR_MAX6642_FPGA = {
 };
 #endif
 
-void user_sdr_init( void )
+void amc_sdr_init( void )
 {
-    /* Hotswap Sensor */
-    sdr_insert_entry( TYPE_02, (void *) &SDR_HOTSWAP_AMC, &vTaskHotSwap_Handle, 0, 0 );
-#ifdef MODULE_RTM
-    sdr_insert_entry( TYPE_02, (void *) &SDR_HOTSWAP_RTM, &vTaskHotSwap_Handle, 0, 0 );
-#endif
-
     /* INA220 sensors */
 #ifdef MODULE_INA220_VOLTAGE
     /* FMC1 Voltage */
@@ -1146,12 +1099,9 @@ void user_sdr_init( void )
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_ADN4604, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_1 );
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_DCDC, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_2 );
     sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RAM, &vTaskLM75_Handle, 0, CHIP_ID_LM75AIM_3 );
-#ifdef MODULE_RTM
-    extern const SDR_type_01h_t SDR_LM75_RTM_1;
-    extern const SDR_type_01h_t SDR_LM75_RTM_2;
+#endif
+    /* Hotswap Sensor */
+    sdr_insert_entry( TYPE_02, (void *) &SDR_HOTSWAP_AMC, &vTaskHotSwap_Handle, 0, 0 );
 
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_1, &vTaskLM75_Handle, 0, CHIP_ID_RTM_LM75_0 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_LM75_RTM_2, &vTaskLM75_Handle, 0, CHIP_ID_RTM_LM75_1 );
-#endif
-#endif
+
 }

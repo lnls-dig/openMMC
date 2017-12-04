@@ -46,9 +46,14 @@ void dac_ad84xx_set_val( uint8_t addr, uint8_t val )
 
 void dac_ad84xx_set_res( uint8_t addr, uint16_t res )
 {
-    uint8_t data = 0;
+    uint16_t data = 0;
 
-    data = ((res - 50)*256)/1000;
+    if (res > 50) {
+        data = ((res - 50)*256)/1000;
+    }
+
+    /* DAC value is limited to 256 steps */
+    data &= 0xFF;
 
     dac_ad84xx_set_val( addr, data );
 }

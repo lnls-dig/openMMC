@@ -47,7 +47,7 @@
  *
  * @return Number of bytes actually received
  */
-size_t eeprom_24xx64_read( uint8_t id, uint16_t address, uint8_t *rx_data, size_t buf_len, TickType_t timeout );
+size_t eeprom_24xx64_read( uint8_t id, uint16_t address, uint8_t *rx_data, size_t buf_len, uint32_t timeout );
 
 /**
  * @brief Write serial data to EEPROM
@@ -60,6 +60,6 @@ size_t eeprom_24xx64_read( uint8_t id, uint16_t address, uint8_t *rx_data, size_
  *
  * @return Number of bytes actually written
  */
-size_t eeprom_24xx64_write( uint8_t id, uint16_t address, uint8_t *tx_data, size_t buf_len, TickType_t timeout );
+size_t eeprom_24xx64_write( uint8_t id, uint16_t address, uint8_t *tx_data, size_t buf_len, uint32_t timeout );
 
 #endif

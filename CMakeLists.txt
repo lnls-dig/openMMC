@@ -98,8 +98,7 @@ target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
 target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS c gcc m lpcopen)
 target_link_libraries(bootloader gcc c m lpcopen)
 
-##Generate .hex file
-
+##Generate binary file
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
   COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_PROJECT_NAME}.axf ${CMAKE_PROJECT_NAME}.bin
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
@@ -113,16 +112,33 @@ add_custom_command(TARGET bootloader POST_BUILD
   )
 
 ##Program command
-set(LPCXPRESSO_INSTALL_PATH /usr/local/)
+if(NOT DEBUG_PROBE)
+  set(DEBUG_PROBE "LPCLink")
+endif()
+
+if(${DEBUG_PROBE} MATCHES "^(LPCLink)$")
+  set(DFU_DEVICE "0x0471:0xDF55")
+  set(DFU_FIRMWARE "LPCXpressoWIN.enc")
+  set(NXP_PROG_NAME "crt_emu_cm3_nxp")
+  set(NXP_PROG_FLAGS "-wire=winusb")
+elseif(${DEBUG_PROBE} MATCHES "^(LPCLink2)$")
+  set(DFU_DEVICE "0x1FC9:0x000C")
+  set(NXP_PROG_NAME "crt_emu_cm_redlink")
+  set(DFU_FIRMWARE "LPC432x_CMSIS_DAP_V5_173.bin.hdr")
+  set(NXP_PROG_FLAGS "")
+endif()
+message(STATUS "Selected debug probe: ${DEBUG_PROBE}")
+
+set(LPCXPRESSO_INSTALL_PATH /usr/local/lpcxpresso/lpcxpresso/bin)
 
 find_program(DFU_UTIL dfu-util)
 if(NOT DFU_UTIL)
-  message(WARNING "${ColourBold}${Red}Dfu-util not found! Can't boot the LPCLink board!${ColourReset}")
+  message(WARNING "${ColourBold}${Red}Dfu-util not found! Can't boot the programmer board!${ColourReset}")
 endif()
 
-find_program(NXP_PROG crt_emu_cm3_nxp PATHS ${LPCXPRESSO_INSTALL_PATH})
+find_program(NXP_PROG ${NXP_PROG_NAME} PATHS ${LPCXPRESSO_INSTALL_PATH})
 if(NOT NXP_PROG)
-  message(WARNING "${ColourBold}${Red}crt_emu_cm3_nxp not found! Can't program the LPC chip!${ColourReset}")
+  message(WARNING "${ColourBold}${Red}${NXP_PROG_NAME} not found! Can't program the controller!${ColourReset}")
 else()
   get_filename_component( DFU_FIRMWARE_PATH ${NXP_PROG} DIRECTORY )
 endif()
@@ -132,27 +148,29 @@ add_custom_target(program_boot
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
   DEPENDS bootloader
   #Boot the programmer
-  COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  COMMAND ${DFU_UTIL} -d ${DFU_DEVICE} -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/${DFU_FIRMWARE} || true
   #Write bootloader firmware
-  COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load=bootloader.bin -load-base=0x0000
+  COMMAND ${NXP_PROG} -p${TARGET_CONTROLLER} -g ${NXP_PROG_FLAGS} -flash-load=bootloader.bin -load-base=0x0000
   )
 
 add_custom_target(program_app
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
   DEPENDS ${CMAKE_PROJECT_NAME}
   #Boot the programmer
-  COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  COMMAND ${DFU_UTIL} -d ${DFU_DEVICE} -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/${DFU_FIRMWARE} || true
   #Write application firmware
-  COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load-exec=${CMAKE_PROJECT_NAME}.bin -load-base=0x2000
+  COMMAND ${NXP_PROG} -p${TARGET_CONTROLLER} -g ${NXP_PROG_FLAGS} -flash-load-exec=${CMAKE_PROJECT_NAME}.bin -load-base=0x2000
   )
 
 add_custom_target(program_all
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/
   DEPENDS ${CMAKE_PROJECT_NAME} bootloader
-  COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
+  COMMAND ${DFU_UTIL} -d ${DFU_DEVICE} -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/${DFU_FIRMWARE} || true
   #Write application and bootloader firmwares
-  COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -flash-mass-erase
+  COMMAND ${NXP_PROG} -p${TARGET_CONTROLLER} -g  ${NXP_PROG_FLAGS} -flash-mass-erase
+  COMMAND sleep 0.5
   COMMAND make -C ${CMAKE_BINARY_DIR} program_boot
+  COMMAND sleep 0.5
   COMMAND make -C ${CMAKE_BINARY_DIR} program_app
   )
 
@@ -167,6 +185,6 @@ add_custom_target(full_binary
   COMMAND cat bootloader_pad.bin ${CMAKE_PROJECT_NAME}.bin > openMMC_full.bin
 
   #Program full_binary (for tests only)
-  #COMMAND ${DFU_UTIL} -d 0x471:0xdf55 -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/LPCXpressoWIN.enc || true
-  #COMMAND ${NXP_PROG} -wire=winusb -p${TARGET_CONTROLLER} -g -flash-load-exec=openMMC_full.bin -load-base=0x0
+  #COMMAND ${DFU_UTIL} -d ${DFU_DEVICE} -c 0 -t 2048 -R -D ${DFU_FIRMWARE_PATH}/${DFU_FIRMWARE} || true
+  #COMMAND ${NXP_PROG} ${NXP_PROG_FLAGS} -flash-load-exec=openMMC_full.bin -load-base=0x0
   )

@@ -135,9 +135,6 @@ void set_vadj_volt( uint8_t fmc_slot, float v )
     res_total = (uint32_t) (1162.5/(v-0.775)) - 453;
     res_dac = (1800*res_total)/(1800-res_total);
 
-    /* Use only the lower 8-bits (the dac only has 256 steps) */
-    res_dac &= 0xFF;
-
     dac_ad84xx_set_res( fmc_slot, res_dac );
 }
 #endif
@@ -183,17 +180,6 @@ void payload_init( void )
 #endif
 
     gpio_set_pin_state( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_HIGH );
-
-    /* Flash CS Mux - Only valid to AFC v3.1 */
-    /* 0 = FPGA reads bitstream from Program memory
-     * 1 = FPGA reads bitstream from User memory
-     */
-    gpio_set_pin_state( PIN_PORT(GPIO_FLASH_CS_MUX), PIN_NUMBER(GPIO_FLASH_CS_MUX), GPIO_LEVEL_LOW );
-
-    /* Init_B */
-    /* TODO: Check Init_b pin for error on initialization, then use it as output control */
-
-    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_INITB), PIN_NUMBER(GPIO_FPGA_INITB), GPIO_LEVEL_HIGH );
 }
 
 void vTaskPayload( void *pvParameters )
@@ -301,8 +287,6 @@ void vTaskPayload( void *pvParameters )
 
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON( false );
-            hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
-            hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_BP_SDOWN );
 
             if ( QUIESCED_req ) {
                 hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
