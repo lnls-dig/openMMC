@@ -41,10 +41,18 @@ To clean the compilation files (binaries, objects and dependence files), just ru
 
     make clean
 
-## Programming LPC1764
-If you own a *LPCLink* board, you can use it to program the LPC1764 processor via its JTAG interface
+## Programming
+After creating the binaries, you can program them to your chip any way you want, using a JTAG cable, ISP Programmer, custom bootloader, etc.
+There are 2 program interfaces supported so far: *LPCLink* and *LPCLink2*
+In order to select which interface will be used, include the flag `-DDEBUG_PROBE=<probe_name>` when running CMake (this option defaults to `LPCLink`).
 
-**NOTE**: You **must** have the LPCXpresso installed in your machine, since we need to use some installation binaries that they provide, which are not open source.
+	cmake ~/openmmc/ -DBOARD=afc -DVERSION=3.1 -DDEBUG_PROBE=LPCLink2
+
+
+### LPCLink
+If you own a *LPCLink* or *LPCLink2* board, you can use it to program the LPC1764 processor via its JTAG interface
+
+**NOTE**: In this case you **must** have the LPCXpresso installed in your machine, since we need to use the binaries for the interface chip on the LPCLink that they provide.
 
 The CMake script should be able to find LPCXpresso path, but if this is not possible, open the `<openMMC_root_folder>/CMakeLists.txt` and change the following line
 
