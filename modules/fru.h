@@ -35,8 +35,8 @@ enum {
 };
 
 typedef size_t (* fru_build_t)(uint8_t **buffer);
-typedef size_t (* fru_st_read_t)(uint8_t id, uint16_t address, uint8_t *buffer, size_t len, uint32_t timeout);
-typedef size_t (* fru_st_write_t)(uint8_t id, uint16_t address, uint8_t *buffer, size_t len, uint32_t timeout);
+typedef uint8_t (* fru_st_read_t)(uint8_t id, uint16_t address, uint8_t *buffer, uint8_t len, uint32_t timeout);
+typedef uint8_t (* fru_st_write_t)(uint8_t id, uint16_t address, uint8_t *buffer, uint8_t len, uint32_t timeout);
 
 typedef struct fru_cfg {
     uint8_t eeprom_id;
@@ -55,5 +55,6 @@ typedef struct fru_data {
 void fru_init( uint8_t id );
 size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len );
 size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len );
+uint8_t fru_check_integrity( uint8_t id, size_t *fru_size );
 
 #endif
