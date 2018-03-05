@@ -230,6 +230,8 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
     }
 
     printf("[FRU] FRU info is healthy!\n");
+
+    vPortFree(rec_buff);
     return 1;
 }
 
