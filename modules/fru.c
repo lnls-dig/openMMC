@@ -68,7 +68,7 @@ void fru_init( uint8_t id )
     fru[id].fru_size = fru[id].cfg.build_f( &fru[id].buffer );
 
     printf(" Writing FRU info to EEPROM... \n");
-    fru[id].cfg.write_f( fru[id].cfg.eeprom_id, 0x00, fru[id].buffer, fru[id].fru_size, 0 );
+    fru[id].cfg.write_f( fru[id].cfg.eeprom_id, 0x00, fru[id].buffer, fru[id].fru_size, 10 );
 #endif
 
     /* Read FRU info Common Header */
