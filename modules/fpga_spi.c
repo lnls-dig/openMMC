@@ -80,7 +80,7 @@ void vTaskFPGA_COMM( void * Parameters )
     /* Initialize diagnostic struct with static data */
 
     /* Read Card ID from EEPROM (4 bytes) */
-    at24mac_read_eui(CHIP_ID_EEPROM, &diag->cardID[0], 4,  10);
+    at24mac_read_eui(CHIP_ID_EEPROM, (uint8_t *)&diag->cardID[0], 4,  10);
 
     /* AMC IPMI address */
     diag->ipmi_addr = ipmb_addr;
