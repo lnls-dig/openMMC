@@ -89,10 +89,6 @@ typedef struct __attribute__ ((__packed__)) {
     uint32_t slot_id:16,
         ipmi_addr:16;
     uint32_t data_valid;
-typedef union {
-    board_diagnostic info;
-    uint32_t buffer[sizeof(board_diagnostic)/sizeof(uint32_t)];
-} t_board_diagnostic;
     sensor_diag_t sensor[NUM_SENSOR];
     fmc_diag_t fmc_slot;
 } board_diagnostic_t;

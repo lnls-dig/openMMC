@@ -45,7 +45,7 @@ static void write_fpga_byte( uint16_t address, uint32_t data )
     ssp_write( FPGA_SPI, tx_buff, sizeof(tx_buff) );
 }
 
-static void write_fpga_buffer( t_board_diagnostic diag )
+static void write_fpga_buffer( board_diagnostic_t *diag )
 {
     uint16_t i;
     /* Send all bytes sequentially, except the last, whose address is different (0xFF) */
