@@ -22,8 +22,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "port.h"
+
+#include "i2c_mapping.h"
 #include "fpga_spi.h"
 #include "task_priorities.h"
+#include "at24mac.h"
 #include "sdr.h"
 
 #define FPGA_SPI_BITRATE                10000000
@@ -76,6 +79,9 @@ void vTaskFPGA_COMM( void * Parameters )
 
     /* Initialize diagnostic struct with static data */
 
+    /* Read Card ID from EEPROM (4 bytes) */
+    at24mac_read_eui(CHIP_ID_EEPROM, &diag->cardID[0], 4,  10);
+
     /* AMC IPMI address */
     diag->ipmi_addr = ipmb_addr;
 
@@ -85,6 +91,7 @@ void vTaskFPGA_COMM( void * Parameters )
     /* Data Valid byte - indicates that LPC is transfering data */
     /* Since every time this buffer is written the bus is held by the LPC, keep this field always as 0x55555555 */
     diag->data_valid = 0x55555555;
+
     for ( ;; ) {
         /* Update diagnostic struct information */
 
@@ -92,7 +99,6 @@ void vTaskFPGA_COMM( void * Parameters )
         write_fpga_dword( 0x05, 0x55555555 );
 
         /* Update Sensors Readings */
-
         for ( i = 0, temp_sensor = sdr_head; (temp_sensor != NULL) && (i <= NUM_SENSOR); temp_sensor = temp_sensor->next) {
             if (temp_sensor->diag_devID != NO_DIAG) {
                 diag->sensor[i].dev_id = temp_sensor->diag_devID;
