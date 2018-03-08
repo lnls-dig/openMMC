@@ -30,7 +30,7 @@
 #define FPGA_SPI_FRAME_SIZE             8
 
 /* Write one byte on the specified address on the FPGA RAM */
-static void write_fpga_byte( uint16_t address, uint32_t data )
+static void write_fpga_dword( uint16_t address, uint32_t data )
 {
     uint8_t tx_buff[7];
 
@@ -116,11 +116,15 @@ void vTaskFPGA_COMM( void * Parameters )
 
     ssp_init( FPGA_SPI, FPGA_SPI_BITRATE, FPGA_SPI_FRAME_SIZE, SSP_MASTER, SSP_POLLING );
 
+
+    /* Data Valid byte - indicates that LPC is transfering data */
+    /* Since every time this buffer is written the bus is held by the LPC, keep this field always as 0x55555555 */
+    diag->data_valid = 0x55555555;
     for ( ;; ) {
         /* Update diagnostic struct information */
 
-        /* Data Valid byte - indicates that LPC is transferring data */
-        diag->data_valid = 0x55555555;
+        /* Data Valid byte - indicates that LPC is transfering data */
+        write_fpga_dword( 0x05, 0x55555555 );
 
         /* Update Sensors Readings */
 
@@ -141,7 +145,9 @@ void vTaskFPGA_COMM( void * Parameters )
 
         write_fpga_buffer( diag_struct );
 
-        write_fpga_byte( 0x05, 0x55555555 );
+        /* Data Valid byte - indicates that the bus is idle */
+        write_fpga_dword( 0x05, 0xAAAAAAAA );
+
         vTaskDelay(FPGA_UPDATE_RATE);
     }
 }
