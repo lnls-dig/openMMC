@@ -33,6 +33,10 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+
+/* Place FreeRTOS Heap in a special section of the RAM */
+__attribute__ ((section(".noinit_RAM2"))) uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+
 /* For backward compatibility, ensure configKERNEL_INTERRUPT_PRIORITY is
 defined.  The value should also ensure backward compatibility.
 FreeRTOS.org versions prior to V4.4.0 did not include this definition. */
