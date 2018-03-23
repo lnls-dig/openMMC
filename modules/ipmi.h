@@ -72,7 +72,7 @@
  *
  * Minor Firmware Revision. BCD encoded.
  */
-#define IPMI_APP_DEV_FW_REV_LOWER       0x00
+#define IPMI_APP_DEV_FW_REV_LOWER       0x01
 
 /**
  * @brief Supported IPMI Version ( BCD encoded )
