@@ -35,7 +35,7 @@
 #define AMC_BOARD_MANUFACTURER      "Creotech"
 #define AMC_BOARD_NAME              "AMC-FMC-Carrier"
 #define AMC_BOARD_SN                ""
-#define AMC_BOARD_PN                "AFC v3.1"
+#define AMC_BOARD_PN                "AFC"
 
 /*********************************************
  * Product information area
@@ -43,9 +43,9 @@
 #define AMC_PRODUCT_MANUFACTURER    "LNLS"
 #define AMC_PRODUCT_NAME            "AFC Timing"
 #define AMC_PRODUCT_PN              ""
-#define AMC_PRODUCT_VERSION         ""
+#define AMC_PRODUCT_VERSION         "v3.1"
 #define AMC_PRODUCT_SN              ""
-#define AMC_PRODUCT_ASSET_TAG       "No tag"
+#define AMC_PRODUCT_ASSET_TAG       "Generic FRU"
 
 /*********************************************
  * AMC: Point to point connectivity record
@@ -60,7 +60,7 @@
    DIRECT_CLOCK_CONNECTION(CLOCK_ID, ACTIVATION, PLL_USE, SOURCE/RECEIVER, CLOCK_FAMILY, ACCURACY, FREQUENCY, MIN FREQUENCY, MAX FREQUENCY) */
 #define AMC_CLOCK_CONFIGURATION_LIST                                    \
     DIRECT_CLOCK_CONNECTION(FCLKA, CIPMC, NO_PLL, RECEIVER, PCI_RESERVED, 0, MHz(100), MHz(99), MHz(101)) \
-    DIRECT_CLOCK_CONNECTION(TCLKA, APP, NO_PLL, SOURCE, UNSPEC_FAMILY, 0, KHz(62500), MHz(10), MHz(100))
+    DIRECT_CLOCK_CONNECTION(TCLKA, APP, NO_PLL, SOURCE, UNSPEC_FAMILY, 0, KHz(62500), KHz(62450), KHz(62550))
 /**********************************************
  * PICMG: Module current record
  **********************************************/

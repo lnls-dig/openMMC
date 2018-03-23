@@ -42,10 +42,10 @@
  *********************************************/
 #define RTM_PRODUCT_MANUFACTURER    "LNLS"
 #define RTM_PRODUCT_NAME            "AFC SFP Module"
-#define RTM_PRODUCT_PN              "00001"
-#define RTM_PRODUCT_VERSION         "v1.0"
+#define RTM_PRODUCT_PN              ""
+#define RTM_PRODUCT_VERSION         "v1.1"
 #define RTM_PRODUCT_SN              ""
-#define RTM_PRODUCT_ASSET_TAG       "No tag"
+#define RTM_PRODUCT_ASSET_TAG       "Generic FRU"
 
 /*********************************************
  * RTM Compatibility Record
