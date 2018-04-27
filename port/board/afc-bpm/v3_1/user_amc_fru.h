@@ -34,7 +34,7 @@
 #define AMC_BOARD_MANUFACTURING_TIME 10463040               /* Amount of minutes since 0:00 1/1/96 */
 #define AMC_BOARD_MANUFACTURER      "Creotech"
 #define AMC_BOARD_NAME              "AMC-FMC-Carrier"
-#define AMC_BOARD_SN                ""
+#define AMC_BOARD_SN                "CNxxxxx"
 #define AMC_BOARD_PN                "AFC"
 
 /*********************************************
@@ -42,9 +42,9 @@
  *********************************************/
 #define AMC_PRODUCT_MANUFACTURER    "LNLS"
 #define AMC_PRODUCT_NAME            "AFC BPM"
-#define AMC_PRODUCT_PN              ""
-#define AMC_PRODUCT_VERSION         "v3.1"
-#define AMC_PRODUCT_SN              ""
+#define AMC_PRODUCT_PN              "AFC:3.1"
+#define AMC_PRODUCT_VERSION         "3.1"
+#define AMC_PRODUCT_SN              "CNxxxxx"
 #define AMC_PRODUCT_ASSET_TAG       "Generic FRU"
 
 /*********************************************
