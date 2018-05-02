@@ -117,7 +117,7 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
 
     /* Link the sdr list */
     if (sdr_tail) {
-    	sdr_tail->next = entry;
+        sdr_tail->next = entry;
     }
     sdr_tail = entry;
     entry->next = NULL;

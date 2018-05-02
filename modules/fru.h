@@ -55,5 +55,6 @@ typedef struct fru_data {
 void fru_init( uint8_t id );
 size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len );
 size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len );
+uint8_t fru_check_integrity( uint8_t id, size_t *fru_size );
 
 #endif

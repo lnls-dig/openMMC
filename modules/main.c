@@ -94,6 +94,26 @@ int main( void )
 
 /*-----------------------------------------------------------*/
 /* Put the MCU in sleep state when no task is running */
-void vApplicationIdleHook (void) {
+void vApplicationIdleHook (void)
+{
     pm_sleep();
 }
+
+/* FreeRTOS debug functions */
+#if (configUSE_MALLOC_FAILED_HOOK == 1)
+void vApplicationMallocFailedHook( void ) {}
+#endif
+
+#if (configCHECK_FOR_STACK_OVERFLOW == 1)
+void vApplicationStackOverflowHook ( TaskHandle_t pxTask, signed char * pcTaskName)
+{
+    (void) pxTask;
+    (void) pcTaskName;
+    taskDISABLE_INTERRUPTS();
+    /* Place a breakpoint here, so we know when there's a stack overflow */
+    for ( ; ; ) {
+        uxTaskGetStackHighWaterMark(pxTask);
+    }
+}
+#endif
+

@@ -74,7 +74,7 @@ size_t eeprom_24xx64_write( uint8_t id, uint16_t address, uint8_t *tx_data, size
     size_t tx_len = 0;
 
     if ( tx_data == NULL ) {
-    	return 0;
+        return 0;
     }
 
     if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout)) {

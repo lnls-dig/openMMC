@@ -51,7 +51,7 @@
 #define FMC2_VADJ_DEVID         0x11
 
 
-typedef struct {
+typedef struct __attribute__ ((__packed__)) {
 #ifdef BF_MS_FIRST
     uint8_t dev_id;
     uint32_t measure:24;
@@ -59,7 +59,7 @@ typedef struct {
     uint32_t measure:24;
     uint8_t dev_id;
 #endif
-} t_sensor_diag;
+} sensor_diag_t;
 
 typedef struct __attribute__ ((__packed__)) {
 #ifdef BF_MS_FIRST
@@ -79,7 +79,7 @@ typedef struct __attribute__ ((__packed__)) {
         fmc2_pg_c2m:1,
         reserved:26;
 #endif
-} t_fmc_diag;
+} fmc_diag_t;
 
 /**
  * @brief AFC diagnostic struct sent to FPGA via SPI
@@ -89,14 +89,9 @@ typedef struct __attribute__ ((__packed__)) {
     uint32_t slot_id:16,
         ipmi_addr:16;
     uint32_t data_valid;
-    t_sensor_diag sensor[NUM_SENSOR];
-    t_fmc_diag fmc_slot;
-} board_diagnostic;
-
-typedef union {
-    board_diagnostic info;
-    uint32_t buffer[sizeof(board_diagnostic)/sizeof(uint32_t)];
-} t_board_diagnostic;
+    sensor_diag_t sensor[NUM_SENSOR];
+    fmc_diag_t fmc_slot;
+} board_diagnostic_t;
 
 /**
  * @brief FPGA Diagnostics Task

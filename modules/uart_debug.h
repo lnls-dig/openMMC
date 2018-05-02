@@ -29,9 +29,11 @@
 #ifndef UART_DEBUG_H_
 #define UART_DEBUG_H_
 
-#ifdef MODULE_UART_DEBUG
-
 #include "port.h"
+
+#undef putchar
+
+#ifdef MODULE_UART_DEBUG
 
 /**
  * @brief Macro to call uart debug printf function
@@ -41,14 +43,9 @@
  * @param msg Formatted string to print
  *
  */
-
-#undef putchar
-
 #define putchar(c) uart_send(UART_DEBUG, &c, 1)
 
 #else
-
-#undef putchar
 
 #define putchar(c) (void)0
 

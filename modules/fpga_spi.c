@@ -22,15 +22,18 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "port.h"
+
+#include "i2c_mapping.h"
 #include "fpga_spi.h"
 #include "task_priorities.h"
+#include "at24mac.h"
 #include "sdr.h"
 
 #define FPGA_SPI_BITRATE                10000000
 #define FPGA_SPI_FRAME_SIZE             8
 
 /* Write one byte on the specified address on the FPGA RAM */
-static void write_fpga_byte( uint16_t address, uint32_t data )
+static void write_fpga_dword( uint16_t address, uint32_t data )
 {
     uint8_t tx_buff[7];
 
@@ -45,26 +48,39 @@ static void write_fpga_byte( uint16_t address, uint32_t data )
     ssp_write( FPGA_SPI, tx_buff, sizeof(tx_buff) );
 }
 
-static void write_fpga_buffer( t_board_diagnostic diag )
+static void write_fpga_buffer( board_diagnostic_t *diag )
 {
     uint16_t i;
-    /* Send all bytes sequentially, except the last, whose address is different (0xFF) */
-    for( i = 0; i < ((sizeof(diag.buffer)/sizeof(diag.buffer[0]))- 1); i++) {
-        write_fpga_byte( i, diag.buffer[i] );
+    uint32_t *buffer = (uint32_t *)diag;
+
+    /* Send all bytes sequentially, except the last record (FMC slot status), whose address is 0xFF */
+    for( i = 0; i < sizeof(board_diagnostic_t)- 1; i++) {
+        write_fpga_dword( i, buffer[i] );
     }
-    write_fpga_byte( diag.buffer[i] , 0xFF );
+    write_fpga_dword( 0xFF, buffer[i] );
 }
 
-static void init_diag_struct( board_diagnostic * diag )
+/* Send board data to the FPGA RAM via SPI periodically */
+void vTaskFPGA_COMM( void * Parameters )
 {
+    board_diagnostic_t * diag = pvPortMalloc(sizeof(board_diagnostic_t));
     uint8_t i;
     sensor_t * temp_sensor;
 
-    /* Card ID */
-    diag->cardID[0] = 0;
-    diag->cardID[1] = 0;
-    diag->cardID[2] = 0;
-    diag->cardID[3] = 0;
+    /* Zero fill the diag struct */
+    memset( &diag[0], 0, sizeof(board_diagnostic_t));
+
+    /* Check if the FPGA has finished programming itself from the FLASH */
+    while (!gpio_read_pin( PIN_PORT(GPIO_FPGA_DONE_B), PIN_NUMBER(GPIO_FPGA_DONE_B))) {
+        vTaskDelay(FPGA_UPDATE_RATE);
+    }
+
+    ssp_init( FPGA_SPI, FPGA_SPI_BITRATE, FPGA_SPI_FRAME_SIZE, SSP_MASTER, SSP_POLLING );
+
+    /* Initialize diagnostic struct with static data */
+
+    /* Read Card ID from EEPROM (4 bytes) */
+    at24mac_read_eui(CHIP_ID_EEPROM, (uint8_t *)&diag->cardID[0], 4,  10);
 
     /* AMC IPMI address */
     diag->ipmi_addr = ipmb_addr;
@@ -72,58 +88,17 @@ static void init_diag_struct( board_diagnostic * diag )
     /* AMC Slot Number */
     diag->slot_id = (ipmb_addr-0x70)/2;
 
-    /* Data Valid */
-    /* Indicates that LPC is transfering data */
+    /* Data Valid byte - indicates that LPC is transfering data */
+    /* Since every time this buffer is written the bus is held by the LPC, keep this field always as 0x55555555 */
     diag->data_valid = 0x55555555;
-
-    /* Sensors Readings */
-    for ( i = 0, temp_sensor = sdr_head; (temp_sensor != NULL) && (i <= NUM_SENSOR); temp_sensor = temp_sensor->next) {
-        if (temp_sensor->diag_devID != NO_DIAG) {
-            diag->sensor[i].dev_id = temp_sensor->diag_devID;
-            diag->sensor[i].measure = temp_sensor->readout_value;
-            i++;
-        }
-    }
-
-    diag->fmc_slot.fmc2_pg_c2m = gpio_read_pin( 1, 19 );
-    diag->fmc_slot.fmc1_pg_c2m = gpio_read_pin( 1, 18 );
-    diag->fmc_slot.fmc2_pg_m2c = gpio_read_pin( 1, 17 );
-    diag->fmc_slot.fmc1_pg_m2c = gpio_read_pin( 1, 16 );
-    diag->fmc_slot.fmc2_prsnt_m2c_n = gpio_read_pin( 1, 15 );
-    diag->fmc_slot.fmc2_prsnt_m2c_n = gpio_read_pin( 1, 14 );
-}
-
-/* Send board data to the FPGA RAM via SPI periodically */
-void vTaskFPGA_COMM( void * Parameters )
-{
-    t_board_diagnostic diag_struct;
-    board_diagnostic * diag = &(diag_struct.info);
-    uint8_t i;
-    sensor_t * temp_sensor;
-
-    /* Zero fill the diag struct */
-    memset( &(diag_struct.buffer[0]), 0, sizeof(diag_struct.buffer));
-
-    /* Initialize diagnostic struct with known data */
-    init_diag_struct( diag );
-
-    /* Check if the FPGA has finished programming itself from the FLASH */
-    while (!gpio_read_pin( PIN_PORT(GPIO_FPGA_DONE_B), PIN_NUMBER(GPIO_FPGA_DONE_B))) {
-        vTaskDelay(FPGA_UPDATE_RATE);
-    }
-
-    gpio_set_pin_state(0, 19, GPIO_LEVEL_HIGH);
-
-    ssp_init( FPGA_SPI, FPGA_SPI_BITRATE, FPGA_SPI_FRAME_SIZE, SSP_MASTER, SSP_POLLING );
 
     for ( ;; ) {
         /* Update diagnostic struct information */
 
-        /* Data Valid byte - indicates that LPC is transferring data */
-        diag->data_valid = 0x55555555;
+        /* Data Valid byte - indicates that LPC is transfering data */
+        write_fpga_dword( 0x05, 0x55555555 );
 
         /* Update Sensors Readings */
-
         for ( i = 0, temp_sensor = sdr_head; (temp_sensor != NULL) && (i <= NUM_SENSOR); temp_sensor = temp_sensor->next) {
             if (temp_sensor->diag_devID != NO_DIAG) {
                 diag->sensor[i].dev_id = temp_sensor->diag_devID;
@@ -132,16 +107,18 @@ void vTaskFPGA_COMM( void * Parameters )
             }
         }
 
-        diag->fmc_slot.fmc2_pg_c2m = gpio_read_pin( PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M) );
         diag->fmc_slot.fmc1_pg_c2m = gpio_read_pin( PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M) );
-        diag->fmc_slot.fmc2_pg_m2c = gpio_read_pin( PIN_PORT(GPIO_FMC2_PG_M2C), PIN_NUMBER(GPIO_FMC2_PG_M2C) );
+        diag->fmc_slot.fmc2_pg_c2m = gpio_read_pin( PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M) );
         diag->fmc_slot.fmc1_pg_m2c = gpio_read_pin( PIN_PORT(GPIO_FMC1_PG_M2C), PIN_NUMBER(GPIO_FMC1_PG_M2C) );
-        diag->fmc_slot.fmc2_prsnt_m2c_n = gpio_read_pin( PIN_PORT(GPIO_FMC2_PRSNT_M2C), PIN_NUMBER(GPIO_FMC2_PRSNT_M2C) );
+        diag->fmc_slot.fmc2_pg_m2c = gpio_read_pin( PIN_PORT(GPIO_FMC2_PG_M2C), PIN_NUMBER(GPIO_FMC2_PG_M2C) );
         diag->fmc_slot.fmc1_prsnt_m2c_n = gpio_read_pin( PIN_PORT(GPIO_FMC1_PRSNT_M2C), PIN_NUMBER(GPIO_FMC1_PRSNT_M2C) );
+        diag->fmc_slot.fmc2_prsnt_m2c_n = gpio_read_pin( PIN_PORT(GPIO_FMC2_PRSNT_M2C), PIN_NUMBER(GPIO_FMC2_PRSNT_M2C) );
 
-        write_fpga_buffer( diag_struct );
+        write_fpga_buffer( diag );
 
-        write_fpga_byte( 0x05, 0x55555555 );
+        /* Data Valid byte - indicates that the bus is idle */
+        write_fpga_dword( 0x05, 0xAAAAAAAA );
+
         vTaskDelay(FPGA_UPDATE_RATE);
     }
 }
