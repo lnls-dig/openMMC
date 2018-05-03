@@ -42,7 +42,7 @@ fru_data_t fru[FRU_COUNT] = {
             .read_f = at24mac_read,
             .write_f = at24mac_write,
         },
-        .runtime = true
+        .runtime = false
     },
 #ifdef MODULE_RTM
     [FRU_RTM] = {
@@ -52,7 +52,7 @@ fru_data_t fru[FRU_COUNT] = {
             .read_f = eeprom_24xx64_read,
             .write_f = eeprom_24xx64_write,
         },
-        .runtime = true
+        .runtime = false
     }
 #endif
 };
