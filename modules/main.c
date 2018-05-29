@@ -48,6 +48,7 @@ int main( void )
 #endif
 
     printf("openMMC Starting!\n");
+    printf("Build date: %s %s\n", __DATE__, __TIME__);
 
 #ifdef MODULE_WATCHDOG
     watchdog_init();
