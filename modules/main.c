@@ -24,6 +24,7 @@
 #include "FreeRTOS.h"
 
 /* Project includes */
+#include "GitSHA1.h"
 #include "port.h"
 #include "led.h"
 #include "ipmi.h"
@@ -48,7 +49,7 @@ int main( void )
 #endif
 
     printf("openMMC Starting!\n");
-    printf("Build date: %s %s\n", __DATE__, __TIME__);
+    printf("Build date: %s %s\nSHA1: %s\n", __DATE__, __TIME__, g_GIT_SHA1);
 
 #ifdef MODULE_WATCHDOG
     watchdog_init();
