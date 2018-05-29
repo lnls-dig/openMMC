@@ -7,6 +7,8 @@ include( ${CMAKE_SOURCE_DIR}/toolchain/colors.cmake )
 #Prevent in-source builds
 include( ${CMAKE_SOURCE_DIR}/toolchain/PreventInSourceBuilds.cmake )
 
+include( ${CMAKE_SOURCE_DIR}/toolchain/cmake-modules/GetGitRevisionDescription.cmake )
+
 # Project definition
 project(openMMC C CXX ASM)
 
@@ -70,6 +72,11 @@ if(BENCH_TEST)
   set(MODULES_FLAGS "${MODULES_FLAGS} -DBENCH_TEST")
   message( STATUS "${Magenta}Bench mode activated! ${ColourReset}")
 endif()
+
+# Get Git information
+get_git_head_revision(GIT_REFSPEC GIT_SHA1 "--abbrev=4 --tags")
+configure_file("${CMAKE_SOURCE_DIR}/modules/GitSHA1.c.in" "${CMAKE_SOURCE_DIR}/modules/GitSHA1.c" @ONLY)
+list(APPEND PROJ_SRCS "${CMAKE_SOURCE_DIR}/modules/GitSHA1.c" "${CMAKE_SOURCE_DIR}/modules/GitSHA1.h")
 
 # Libraries path
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
