@@ -65,3 +65,5 @@ out/*
 
 TAGS
 .dir-locals.el
+
+modules/GitSHA1.c
