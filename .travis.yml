@@ -37,9 +37,7 @@ script:
   - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Release && make
 
   # Generate and deploy documentation
-before_deploy:
-  - cd docs \
-  - && doxygen Doxyfile.dox
+before_deploy: "cd docs && doxygen Doxyfile.dox"
 
 deploy:
   provider: pages
