@@ -37,9 +37,15 @@ script:
   - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Release && make
 
   # Generate and deploy documentation
+before_deploy:
+  skip-cleanup: true
+  script:
+    - cd docs && doxygen Doxyfile.dox
+
 deploy:
   provider: pages
   skip-cleanup: true
+  local-dir: docs/html
   github-token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
   keep-history: true
   on:
