@@ -19,9 +19,9 @@ before_script:
 
 env:
   matrix:
-  - BOARD='afc'        -VERSION='3.0' -RTM=''
-  - BOARD='afc'        -VERSION='3.1' -RTM='rtm-8sfp'
-  - BOARD='afc-timing' -VERSION=''    -RTM='rtm-8sfp'
+  - BOARD='afc-bpm'        -VERSION='3.0' -RTM=''
+  - BOARD='afc-bpm'        -VERSION='3.1' -RTM=''
+  - BOARD='afc-timing'     -VERSION=''    -RTM='rtm-8sfp'
 
 # Install dependencies
 addons:
