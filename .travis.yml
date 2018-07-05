@@ -37,13 +37,14 @@ script:
   - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Release && make
 
   # Generate and deploy documentation
-before_deploy: "cd $TRAVIS_BUILD_DIR/docs && doxygen Doxyfile.dox"
+before_deploy: "cd $TRAVIS_BUILD_DIR/docs && ls ../ && doxygen Doxyfile.dox"
+  skip-cleanup: true
 
 deploy:
   provider: pages
   skip-cleanup: true
-  local-dir: $TRAVIS_BUILD_DIR/docs/html
+  local-dir: docs/html
   github-token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
-  keep-history: true
+  keep-history: false
   on:
     branch: master
