@@ -42,7 +42,7 @@ before_deploy: "cd docs && doxygen Doxyfile.dox"
 deploy:
   provider: pages
   skip-cleanup: true
-  local-dir: docs/html
+  local-dir: $TRAVIS_BUILD_DIR/docs/html
   github-token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
   keep-history: true
   on:
