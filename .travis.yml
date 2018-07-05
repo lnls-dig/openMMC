@@ -37,6 +37,10 @@ script:
   - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Release && make
 
   # Generate and deploy documentation
-after_success:
-  - cd $TRAVIS_BUILD_DIR/docs
-  - bash deploy_docs.sh
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep-history: true
+  on:
+    branch: master
