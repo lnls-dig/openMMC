@@ -38,9 +38,8 @@ script:
 
   # Generate and deploy documentation
 before_deploy:
-  skip-cleanup: true
-  script:
-    - cd docs && doxygen Doxyfile.dox
+  - cd docs \
+  - && doxygen Doxyfile.dox
 
 deploy:
   provider: pages
