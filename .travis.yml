@@ -37,7 +37,7 @@ script:
   - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Release && make
 
   # Generate and deploy documentation
-before_deploy: "cd $TRAVIS_BUILD_DIR/docs && ls ../ && doxygen Doxyfile.dox"
+before_deploy: "cd $TRAVIS_BUILD_DIR/docs && ls ../ && ls . && doxygen Doxyfile.dox"
   skip-cleanup: true
 
 deploy:
