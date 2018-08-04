@@ -66,7 +66,7 @@
 /**
  * @brief MAX6642 monitor Task Handle
  */
-TaskHandle_t vTaskMAX6642_Handle;
+extern TaskHandle_t vTaskMAX6642_Handle;
 
 extern const SDR_type_01h_t SDR_MAX6642_FPGA;
 
