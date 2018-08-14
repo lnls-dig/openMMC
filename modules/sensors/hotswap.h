@@ -71,7 +71,7 @@ enum {
 /**
  * @brief Hotswap Task handle
  */
-TaskHandle_t vTaskHotSwap_Handle;
+extern TaskHandle_t vTaskHotSwap_Handle;
 
 /**
  * @brief Periodically reads the Hotswap sensor state and checks if its state has changed

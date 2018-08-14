@@ -43,6 +43,8 @@
 #include "fpga_spi.h"
 #include "fru.h"
 
+TaskHandle_t vTaskINA220_Handle;
+
 const ina220_config_t ina220_cfg = {
     .config_reg_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
                                        .pga_gain = INA220_PGA_GAIN_40MV,

@@ -41,6 +41,8 @@
 #include "utils.h"
 #include "uart_debug.h"
 
+TaskHandle_t vTaskHotSwap_Handle;
+
 static bool hotswap_get_handle_status( uint8_t *state )
 {
     static uint8_t falling, rising;
