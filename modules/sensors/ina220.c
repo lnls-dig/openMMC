@@ -195,7 +195,7 @@ void ina220_init( void )
     sensor_t *temp_sensor;
     uint8_t i = 0;
 
-    xTaskCreate( vTaskINA220, "INA220", 100, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
+    xTaskCreate( vTaskINA220, "INA220", 200, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
 
     /* Iterate through the SDR Table to find all the INA220 entries */
     for ( temp_sensor = sdr_head; temp_sensor != NULL; temp_sensor = temp_sensor->next) {

@@ -75,7 +75,7 @@ void vTaskMAX6642( void* Parameters )
 
 void MAX6642_init( void )
 {
-    xTaskCreate( vTaskMAX6642, "MAX6642", 100, (void *) NULL, tskMAX6642SENSOR_PRIORITY, &vTaskMAX6642_Handle );
+    xTaskCreate( vTaskMAX6642, "MAX6642", 200, (void *) NULL, tskMAX6642SENSOR_PRIORITY, &vTaskMAX6642_Handle );
 }
 
 Bool max6642_read_local( sensor_t *sensor, uint8_t *temp )
