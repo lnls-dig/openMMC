@@ -395,7 +395,7 @@ ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
     if ( IS_RESPONSE( (*msg) ) ) {
         msg->completion_code = buffer[i++];
     }
-    msg->data_len = len - i - 1;
+    msg->data_len = (len > i + 1) ? len - i - 1 : 0;
     memcpy( &msg->data[0], &buffer[i], msg->data_len);
     msg->msg_chksum = buffer[len-1];
 
