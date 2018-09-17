@@ -43,17 +43,12 @@
  */
 enum {
     PAYLOAD_NO_POWER = 0,
-    PAYLOAD_SWITCHING_ON,
     PAYLOAD_POWER_GOOD_WAIT,
     PAYLOAD_STATE_FPGA_SETUP,
-    PAYLOAD_FPGA_BOOTING,
-    PAYLOAD_FPGA_WORKING,
+    PAYLOAD_FPGA_ON,
     PAYLOAD_SWITCHING_OFF,
     PAYLOAD_QUIESCED,
-    PAYLOAD_OFF,
-    PAYLOAD_STATE_NO_CHANGE = 253,
-    PAYLOAD_STATE_UNKNOWN = 254,
-    PAYLOAD_POWER_FAIL = 255
+    PAYLOAD_MAX_STATES
 } payload_state;
 
 /**
@@ -61,14 +56,10 @@ enum {
  * @ingroup AFC_V3_1_PAYLOAD
  * @{
  */
-#define PAYLOAD_MESSAGE_PPGOOD          (1 << 0)
-#define PAYLOAD_MESSAGE_PPGOODn         (1 << 1)
-#define PAYLOAD_MESSAGE_DCDC_PGOOD      (1 << 2)
-#define PAYLOAD_MESSAGE_DCDC_PGOODn     (1 << 3)
-#define PAYLOAD_MESSAGE_COLD_RST        (1 << 4)
-#define PAYLOAD_MESSAGE_WARM_RST        (1 << 5)
-#define PAYLOAD_MESSAGE_REBOOT          (1 << 6)
-#define PAYLOAD_MESSAGE_QUIESCED        (1 << 7)
+#define PAYLOAD_MESSAGE_COLD_RST        (1 << 0)
+#define PAYLOAD_MESSAGE_WARM_RST        (1 << 1)
+#define PAYLOAD_MESSAGE_REBOOT          (1 << 2)
+#define PAYLOAD_MESSAGE_QUIESCED        (1 << 3)
 /**
  * @}
  */
