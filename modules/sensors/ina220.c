@@ -43,6 +43,8 @@
 #include "fpga_spi.h"
 #include "fru.h"
 
+TaskHandle_t vTaskINA220_Handle;
+
 const ina220_config_t ina220_cfg = {
     .config_reg_default.cfg_struct = { .bus_voltage_range = INA220_16V_SCALE_RANGE,
                                        .pga_gain = INA220_PGA_GAIN_40MV,
@@ -193,7 +195,7 @@ void ina220_init( void )
     sensor_t *temp_sensor;
     uint8_t i = 0;
 
-    xTaskCreate( vTaskINA220, "INA220", 100, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
+    xTaskCreate( vTaskINA220, "INA220", 200, (void *) NULL, tskINA220SENSOR_PRIORITY, &vTaskINA220_Handle);
 
     /* Iterate through the SDR Table to find all the INA220 entries */
     for ( temp_sensor = sdr_head; temp_sensor != NULL; temp_sensor = temp_sensor->next) {

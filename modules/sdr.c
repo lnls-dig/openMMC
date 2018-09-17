@@ -233,7 +233,7 @@ IPMI_HANDLER(ipmi_se_get_sdr_info, NETFN_SE, IPMI_GET_DEVICE_SDR_INFO_CMD, ipmi_
  * @param[out] rsp Message with data, data length and completion code.
  *
  */
-uint8_t event_receiver_addr = 0xFF;
+uint8_t event_receiver_addr = 0x20;
 uint8_t event_receiver_lun = 0x00;
 
 IPMI_HANDLER(ipmi_se_set_event_receiver, NETFN_SE, IPMI_SET_EVENT_RECEIVER_CMD, ipmi_msg *req, ipmi_msg *rsp)
@@ -808,7 +808,7 @@ void check_sensor_event( sensor_t * sensor )
 
     sensor->old_state = sensor->state;
 
-    if ((ev != 0xFF) && (event_receiver_addr != 0xFF)) {
+    if ((ev != 0xFF)) {
         ipmi_event_send(sensor, ev_type, &ev, 1);
     }
 }

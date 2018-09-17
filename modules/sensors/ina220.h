@@ -195,7 +195,7 @@ typedef struct {
     uint16_t regs[INA220_REGISTERS];
 } ina220_data_t;
 
-TaskHandle_t vTaskINA220_Handle;
+extern TaskHandle_t vTaskINA220_Handle;
 
 uint8_t ina220_config( ina220_data_t * data );
 Bool ina220_calibrate( ina220_data_t * data );

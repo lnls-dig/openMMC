@@ -1,9 +1,5 @@
 // Some Doxygen commands to order the final documentation
 
 /**
- * @defgroup BOARD_PORTS Board Ports
- */
-
-/**
  * @defgroup PERIPH_IC Peripheral ICs
  */

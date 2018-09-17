@@ -19,9 +19,9 @@ before_script:
 
 env:
   matrix:
-  - BOARD='afc'        -VERSION='3.0' -RTM=''
-  - BOARD='afc'        -VERSION='3.1' -RTM='rtm-8sfp'
-  - BOARD='afc-timing' -VERSION=''    -RTM='rtm-8sfp'
+  - BOARD='afc-bpm'        -VERSION='3.0' -RTM=''
+  - BOARD='afc-bpm'        -VERSION='3.1' -RTM=''
+  - BOARD='afc-timing'     -VERSION=''    -RTM='rtm-8sfp'
 
 # Install dependencies
 addons:
@@ -37,6 +37,13 @@ script:
   - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Release && make
 
   # Generate and deploy documentation
-after_success:
-  - cd $TRAVIS_BUILD_DIR/docs
-  - bash deploy_docs.sh
+after_success: "cd $TRAVIS_BUILD_DIR/docs && doxygen Doxyfile.dox"
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  local-dir: docs/html
+  github-token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
+  keep-history: false
+  on:
+    branch: master
