@@ -205,7 +205,8 @@ void payload_init( void )
 void vTaskPayload( void *pvParameters )
 {
     uint8_t state = PAYLOAD_NO_POWER;
-    uint8_t new_state = PAYLOAD_STATE_NO_CHANGE;
+    /* Use arbitrary state value to force the first state update */
+    uint8_t new_state = -1;
 
     /* Payload power good flag */
     uint8_t PP_good = 0;
@@ -234,22 +235,6 @@ void vTaskPayload( void *pvParameters )
 
         current_evt = xEventGroupGetBits( amc_payload_evt );
 
-        if ( current_evt & PAYLOAD_MESSAGE_PPGOOD ) {
-            PP_good = 1;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PPGOOD );
-        }
-        if ( current_evt & PAYLOAD_MESSAGE_PPGOODn ) {
-            PP_good = 0;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_PPGOODn );
-        }
-        if ( current_evt & PAYLOAD_MESSAGE_DCDC_PGOOD ) {
-            DCDC_good = 1;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_DCDC_PGOOD );
-        }
-        if ( current_evt & PAYLOAD_MESSAGE_DCDC_PGOODn ) {
-            DCDC_good = 0;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_DCDC_PGOODn );
-        }
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
             QUIESCED_req = 1;
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCED );
@@ -275,7 +260,6 @@ void vTaskPayload( void *pvParameters )
             if (PP_good) {
                 new_state = PAYLOAD_POWER_GOOD_WAIT;
             }
-            QUIESCED_req = 0;
             break;
 
         case PAYLOAD_POWER_GOOD_WAIT:
@@ -295,12 +279,13 @@ void vTaskPayload( void *pvParameters )
 
         case PAYLOAD_STATE_FPGA_SETUP:
 #ifdef MODULE_ADN4604
+            /* Configure clock switch */
             adn4604_init();
 #endif
-            new_state = PAYLOAD_FPGA_BOOTING;
+            new_state = PAYLOAD_FPGA_ON;
             break;
 
-        case PAYLOAD_FPGA_BOOTING:
+        case PAYLOAD_FPGA_ON:
             if ( QUIESCED_req == 1 || PP_good == 0 || DCDC_good == 0 ) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             }
@@ -309,19 +294,21 @@ void vTaskPayload( void *pvParameters )
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON( false );
 
+            /* Respond to quiesce event if any */
             if ( QUIESCED_req ) {
                 hotswap_set_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
-                if ( hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_QUIESCED ) == ipmb_error_success ) {
-                    QUIESCED_req = 0;
-                    hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
-                    new_state = PAYLOAD_NO_POWER;
-                }
-            } else {
+                hotswap_send_event( hotswap_amc_sensor, HOTSWAP_STATE_QUIESCED );
+                hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_QUIESCED_MASK );
+                QUIESCED_req = 0;
+            }
+            new_state = PAYLOAD_QUIESCED;
+            break;
+
+        case PAYLOAD_QUIESCED:
+            /* Wait until power goes down to restart the cycle */
+            if (PP_good == 0 && DCDC_good == 0) {
                 new_state = PAYLOAD_NO_POWER;
             }
-            /* Reset the power good flags to avoid the state machine to start over without a new read from the sensors */
-            PP_good = 0;
-            DCDC_good = 0;
             break;
 
         default:
@@ -332,7 +319,6 @@ void vTaskPayload( void *pvParameters )
         vTaskDelayUntil( &xLastWakeTime, PAYLOAD_BASE_DELAY );
     }
 }
-
 
 /* HPM Functions */
 #ifdef MODULE_HPM
