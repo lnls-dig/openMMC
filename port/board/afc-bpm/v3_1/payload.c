@@ -68,6 +68,16 @@
  * 255 - power fail
  */
 
+static void fpga_soft_reset( void )
+{
+    gpio_set_pin_low( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
+    asm("NOP");
+    gpio_set_pin_high( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
+
+    /* Blink RED LED to indicate to the user that the Reset was performed */
+    LEDUpdate( FRU_AMC, LED1, LEDMODE_LAMPTEST, LEDINIT_ON, 5, 0 );
+}
+
 static void check_fpga_reset( void )
 {
     static TickType_t edge_time;
@@ -88,15 +98,9 @@ static void check_fpga_reset( void )
     diff = getTickDifference( cur_time, edge_time );
 
     if ( (diff > pdMS_TO_TICKS(2000)) && (reset_lock == 0) && (cur_state == 0) ) {
-        gpio_set_pin_low( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
-        asm("NOP");
-        gpio_set_pin_high( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
-
+        fpga_soft_reset();
         /* If the user continues to press the button after the 2s, prevent this action to be repeated */
         reset_lock = 1;
-
-        /* Blink RED LED to indicate to the user that the Reset was performed */
-        LEDUpdate( FRU_AMC, LED1, LEDMODE_LAMPTEST, LEDINIT_ON, 5, 0 );
     }
 
     last_state = cur_state;
@@ -225,7 +229,6 @@ void vTaskPayload( void *pvParameters )
     gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_HIGH );
 
     for ( ;; ) {
-
         check_fpga_reset();
 
         /* Initialize one of the FMC's DCDC so we can measure when the Payload Power is present */
@@ -239,14 +242,14 @@ void vTaskPayload( void *pvParameters )
             QUIESCED_req = 1;
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCED );
         }
+
         if ( current_evt & PAYLOAD_MESSAGE_COLD_RST ) {
             state = PAYLOAD_SWITCHING_OFF;
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_COLD_RST );
         }
-        if ( current_evt & PAYLOAD_MESSAGE_REBOOT ) {
-            gpio_set_pin_low( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
-            asm("NOP");
-            gpio_set_pin_high( PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET) );
+
+        if ( (current_evt & PAYLOAD_MESSAGE_REBOOT) || (current_evt & PAYLOAD_MESSAGE_WARM_RST) ) {
+            fpga_soft_reset();
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_REBOOT );
         }
 
