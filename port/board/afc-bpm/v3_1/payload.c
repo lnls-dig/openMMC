@@ -102,6 +102,26 @@ static void check_fpga_reset( void )
     last_state = cur_state;
 }
 
+uint8_t payload_check_pgood( uint8_t *pgood_flag )
+{
+    sensor_t * p_sensor;
+    SDR_type_01h_t *sdr;
+
+    extern const SDR_type_01h_t SDR_FMC1_12V;
+
+    /* Iterate through the SDR Table to find all the LM75 entries */
+    for ( p_sensor = sdr_head; (p_sensor != NULL) || (p_sensor->task_handle == NULL); p_sensor = p_sensor->next) {
+        if (p_sensor->sdr == &SDR_FMC1_12V) {
+            sdr = ( SDR_type_01h_t * ) p_sensor->sdr;
+            *pgood_flag = ( ( p_sensor->readout_value >= (sdr->lower_critical_thr ) ) &&
+                            ( p_sensor->readout_value <= (sdr->upper_critical_thr ) ) );
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
 /**
  * @brief Set AFC's DCDC Converters state
  *
@@ -245,6 +265,7 @@ void vTaskPayload( void *pvParameters )
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_REBOOT );
         }
 
+        payload_check_pgood(&PP_good);
         DCDC_good = gpio_read_pin( PIN_PORT(GPIO_DCDC_PGOOD), PIN_NUMBER(GPIO_DCDC_PGOOD) );
 
         switch(state) {
