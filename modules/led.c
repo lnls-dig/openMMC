@@ -364,10 +364,32 @@ IPMI_HANDLER(ipmi_picmg_get_fru_led_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_GET
 {
     uint8_t len = rsp->data_len = 0;
     uint8_t fru = req->data[1];
+    uint8_t led_bitf = 0;
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
-    /* FRU can control the BLUE LED, LED 1 (RED) and LED 2 (GREEN) */
-    rsp->data[len++] = sizeof(led_config[fru])/sizeof(led_config[fru][0]);
+
+    /* Check which LEDs are controllable */
+    for (uint8_t i = 0; i < sizeof(led_config[fru])/sizeof(led_config[fru][0]); i++) {
+        switch (led_config[fru][i].id) {
+        case LED_BLUE:
+            led_bitf |= (1 << 0);
+            break;
+        case LED1:
+            led_bitf |= (1 << 1);
+            break;
+        case LED2:
+            led_bitf |= (1 << 2);
+            break;
+        case LED3:
+            led_bitf |= (1 << 3);
+            break;
+        default:
+            /* Bits [7:4] are reserved */
+            break;
+        }
+    }
+    rsp->data[len++] = led_bitf;
+
     /* Application specific LED count */
     rsp->data[len++] = 0x00;
 
