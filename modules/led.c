@@ -31,13 +31,13 @@
 #include "string.h"
 #include "task_priorities.h"
 
-const uint32_t amc_led_pincfg[LED_CNT] = {
+const uint32_t amc_led_pincfg[] = {
     [LED_BLUE] = GPIO_LEDBLUE,
     [LED1] = GPIO_LEDRED,
     [LED2] = GPIO_LEDGREEN
 };
 
-LEDConfig_t amc_leds_config[LED_CNT] = {
+LEDConfig_t amc_leds_config[] = {
     [LED_BLUE] = {
         .id = LED_BLUE,
         .color = LEDCOLOR_BLUE,
@@ -159,8 +159,8 @@ void LED_Task( void *Parameters )
     for ( ;; ) {
         cycle++;
 
-        for ( int i=0; i < LEDCONFIG_SIZE; i++ ) {
-            for ( int j=0; j < LED_CNT; j++ ) {
+        for ( uint8_t i = 0; i < sizeof(led_config)/sizeof(led_config[0]); i++ ) {
+            for ( uint8_t j = 0; j < sizeof(led_config[i])/sizeof(led_config[i][0]); j++ ) {
                 LEDManage( &led_config[i][j] );
             }
         }
