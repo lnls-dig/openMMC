@@ -39,33 +39,24 @@
 #include "led.h"
 
 /* payload states
- *   0 - no power
- *   1 - power switching on
- *       Power Up sequence
+ *   0 - No power
  *
- *   2 - power good wait
- *       Since power supply switching
- *       Until detect power good
+ *   1 - Power Good wait
+ *       Enable DCDC Converters
+ *       Hotswap backend power failure and shutdown status clear
  *
- *   3 - power good
- *       Here you can configure devices such as clock crossbar and others
- *       We have to reset pin state program b
+ *   2 - FPGA setup
+ *       One-time configurations (clock switch - ADN4604)
  *
- *   4 - fpga booting
- *       Since DCDC converters initialization
- *       Until FPGA DONE signal
- *       about 30 sec
+ *   3 - FPGA on
  *
- *   5 - fpga working
+ *   4 - Power switching off
+ *       Disable DCDC Converters
+ *       Send "quiesced" event if requested
  *
- *   6 - power switching off
- *       Power-off sequence
- *
- *   7 - power QUIESCED
- *       It continues until a power outage on the line 12v
- *       or for 30 seconds (???)
- *
- * 255 - power fail
+ *   5 - Power quiesced
+ *       Payload was safely turned off
+ *       Wait until payload power goes down to restart the cycle
  */
 
 static void fpga_soft_reset( void )
@@ -259,7 +250,6 @@ void vTaskPayload( void *pvParameters )
         switch(state) {
 
         case PAYLOAD_NO_POWER:
-
             if (PP_good) {
                 new_state = PAYLOAD_POWER_GOOD_WAIT;
             }
