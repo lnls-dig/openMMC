@@ -323,14 +323,26 @@ void vTaskPayload( void *pvParameters )
 #include "flash_spi.h"
 #include "string.h"
 
-uint8_t hpm_page[256];
+uint8_t *hpm_page = NULL;
 uint8_t hpm_pg_index;
 uint32_t hpm_page_addr;
 
 uint8_t payload_hpm_prepare_comp( void )
 {
     /* Initialize variables */
+    if (hpm_page != NULL) {
+        vPortFree(hpm_page);
+    }
+
+    hpm_page = (uint8_t *) pvPortMalloc(PAYLOAD_HPM_PAGE_SIZE);
+
+    if (hpm_page == NULL) {
+        /* Malloc failed */
+        return IPMI_CC_OUT_OF_SPACE;
+    }
+
     memset(hpm_page, 0xFF, sizeof(hpm_page));
+
     hpm_pg_index = 0;
     hpm_page_addr = 0;
 
@@ -386,6 +398,8 @@ uint8_t payload_hpm_upload_block( uint8_t * block, uint16_t size )
 
 uint8_t payload_hpm_finish_upload( uint32_t image_size )
 {
+    uint8_t cc = IPMI_CC_OK;
+
     /* Check if the last page was already programmed */
     if (!hpm_pg_index) {
         /* Program the complete page in the Flash */
@@ -393,10 +407,14 @@ uint8_t payload_hpm_finish_upload( uint32_t image_size )
         hpm_pg_index = 0;
         hpm_page_addr = 0;
 
-        return IPMI_CC_COMMAND_IN_PROGRESS;
+        cc = IPMI_CC_COMMAND_IN_PROGRESS;
     }
 
-    return IPMI_CC_OK;
+    /* Free page buffer */
+    vPortFree(hpm_page);
+    hpm_page = NULL;
+
+    return cc;
 }
 
 uint8_t payload_hpm_get_upgrade_status( void )

@@ -70,6 +70,11 @@ enum {
 #define PAYLOAD_BASE_DELAY 100
 
 /**
+ * @brief Payload task handle variable
+ */
+extern TaskHandle_t vTaskPayload_Handle;
+
+/**
  * @brief Sends a message to the payload task
  *
  * This function basically sets a flag that the Payload task reads and advances (or not) on the state machine
@@ -92,6 +97,9 @@ void vTaskPayload( void *pvParameters );
 void payload_init( void );
 
 #ifdef MODULE_HPM
+
+#define PAYLOAD_HPM_PAGE_SIZE    256
+
 uint8_t payload_hpm_prepare_comp( void );
 uint8_t payload_hpm_upload_block( uint8_t * block, uint16_t size );
 uint8_t payload_hpm_finish_upload( uint32_t image_size );
