@@ -22,11 +22,7 @@
 #ifndef LED_H_
 #define LED_H_
 
-#ifdef MODULE_RTM
-#define LEDCONFIG_SIZE 2
-#else
-#define LEDCONFIG_SIZE 1
-#endif
+#define LED_CNT 3
 
 #include "port.h"
 
@@ -35,7 +31,7 @@ enum LED_ID {
     LED1, /* Red */
     LED2,  /* Green */
     LED3,
-    LED_CNT
+    LED_MAX_CNT
 };
 
 enum LEDColor {
@@ -100,6 +96,7 @@ typedef struct LEDUpdate {
 
 void LED_init( void );
 void LED_Task( void *Parameters );
+void LEDManage( LEDConfig_t *led_cfg );
 void LEDUpdate( uint8_t fru, uint8_t led_num, uint8_t mode, uint8_t init_status, uint16_t t_init, uint16_t t_toggle );
 void amc_led_act( uint8_t id, uint8_t action );
 #ifdef MODULE_RTM

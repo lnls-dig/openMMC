@@ -30,6 +30,7 @@
 #include "led.h"
 #include "string.h"
 #include "task_priorities.h"
+#include "fru.h"
 
 const uint32_t amc_led_pincfg[] = {
     [LED_BLUE] = GPIO_LEDBLUE,
@@ -37,7 +38,7 @@ const uint32_t amc_led_pincfg[] = {
     [LED2] = GPIO_LEDGREEN
 };
 
-LEDConfig_t amc_leds_config[] = {
+const LEDConfig_t amc_leds_config[] = {
     [LED_BLUE] = {
         .id = LED_BLUE,
         .color = LEDCOLOR_BLUE,
@@ -82,7 +83,7 @@ LEDConfig_t amc_leds_config[] = {
 };
 
 #ifdef MODULE_RTM
-LEDConfig_t rtm_leds_config[LED_CNT] = {
+const LEDConfig_t rtm_leds_config[] = {
     [LED_BLUE] = {
         .id = LED_BLUE,
         .color = LEDCOLOR_BLUE,
@@ -127,9 +128,7 @@ LEDConfig_t rtm_leds_config[LED_CNT] = {
 };
 #endif
 
-void LEDManage( LEDConfig_t *led_cfg );
-
-LEDConfig_t led_config[LEDCONFIG_SIZE][LED_CNT];
+LEDConfig_t led_config[FRU_COUNT][LED_CNT];
 QueueHandle_t led_update_queue;
 
 void LED_init( void )
@@ -368,6 +367,11 @@ IPMI_HANDLER(ipmi_picmg_get_fru_led_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_GET
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
 
+    if (fru >= FRU_COUNT) {
+        rsp->data_len = len;
+        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+        return;
+    }
     /* Check which LEDs are controllable */
     for (uint8_t i = 0; i < sizeof(led_config[fru])/sizeof(led_config[fru][0]); i++) {
         switch (led_config[fru][i].id) {
