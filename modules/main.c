@@ -51,6 +51,10 @@ int main( void )
     printf("openMMC Starting!\n");
     printf("Build date: %s %s\nSHA1: %s\n", __DATE__, __TIME__, g_GIT_SHA1);
 
+#ifdef BENCH_TEST
+    printf("BENCH_TEST mode activated! This will enable some debug functions, be careful!\n");
+#endif
+
 #ifdef MODULE_WATCHDOG
     watchdog_init();
 #endif
