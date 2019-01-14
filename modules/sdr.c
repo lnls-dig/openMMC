@@ -315,7 +315,7 @@ IPMI_HANDLER(ipmi_se_get_sdr, NETFN_SE, IPMI_GET_DEVICE_SDR_CMD, ipmi_msg *req, 
         if (index == 0) {
             tmp_c = record_id;
         } else if (index == 5) {
-            tmp_c = cur_sensor->ownerID;
+            tmp_c = ipmb_addr;
         } else if ( sdr_type == TYPE_01 || sdr_type == TYPE_02 ) {
             if (index == 9) {
                 tmp_c = cur_sensor->entityinstance;

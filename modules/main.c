@@ -62,6 +62,8 @@ int main( void )
     LED_init();
     i2c_init();
 
+    ipmb_addr = get_ipmb_addr( );
+
 #ifdef MODULE_FRU
     fru_init(FRU_AMC);
 #endif

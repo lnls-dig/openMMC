@@ -232,7 +232,7 @@ void IPMB_RXTask ( void *pvParameters )
 void ipmb_init ( void )
 {
     vI2CConfig( IPMB_I2C, IPMB_I2C_FREQ );
-    ipmb_addr = get_ipmb_addr( );
+
     vI2CSlaveSetup( IPMB_I2C, ipmb_addr );
 
     ipmb_txqueue = xQueueCreate( IPMB_TXQUEUE_LEN, sizeof(ipmi_msg_cfg *) );
