@@ -367,11 +367,34 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
         rsp->data[len++] = cur_sensor->readout_value;
     } else {
         rsp->data[len++] = cur_sensor->readout_value;
-        rsp->data[len++] = 0x40;
-        /* Present threshold status */
-        /* TODO: Implement threshold reading */
         rsp->data[len++] = 0xC0;
+
+        /* Present threshold status ( [7:6] Reserved, return as 1b )*/
+        rsp->data[len] = 0xC0;
+
+        if (cur_sensor->state == SENSOR_STATE_LOW) {
+            rsp->data[len] |= 0x01;
+        }
+        if (cur_sensor->state == SENSOR_STATE_LOW_CRIT) {
+            rsp->data[len] |= 0x02;
+        }
+        if (cur_sensor->state == SENSOR_STATE_LOW_NON_REC) {
+            rsp->data[len] |= 0x04;
+        }
+
+        if (cur_sensor->state == SENSOR_STATE_HIGH) {
+            rsp->data[len] |= 0x08;
+        }
+        if (cur_sensor->state == SENSOR_STATE_HIGH_CRIT) {
+            rsp->data[len] |= 0x10;
+        }
+        if (cur_sensor->state == SENSOR_STATE_HIGH_NON_REC) {
+            rsp->data[len] |= 0x20;
+        }
+        len++;
     }
+
+    rsp->data[len++] = 0x00;
 
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
