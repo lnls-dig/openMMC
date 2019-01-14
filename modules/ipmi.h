@@ -96,7 +96,7 @@
  * [1] SDR Repository Device <br>
  * [0] Sensor Device
  */
-#define IPMI_APP_DEV_SUP                0x3B
+#define IPMI_APP_DEV_SUP                0x29
 
 /**
  * @brief Manufacturer ID LSB
