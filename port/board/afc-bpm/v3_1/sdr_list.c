@@ -150,16 +150,16 @@ const SDR_type_01h_t SDR_FMC1_12V = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: Voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -193,7 +193,6 @@ const SDR_type_01h_t SDR_FMC1_12V = {
 
 /* FMC1 PVADJ */
 const SDR_type_01h_t SDR_FMC1_VADJ = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -207,16 +206,16 @@ const SDR_type_01h_t SDR_FMC1_VADJ = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -250,7 +249,6 @@ const SDR_type_01h_t SDR_FMC1_VADJ = {
 
 /* FMC1 P3V3 */
 const SDR_type_01h_t SDR_FMC1_P3V3 = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -264,16 +262,16 @@ const SDR_type_01h_t SDR_FMC1_P3V3 = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: VOLTAGE*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -306,7 +304,6 @@ const SDR_type_01h_t SDR_FMC1_P3V3 = {
 
 /* FMC2 12V */
 const SDR_type_01h_t SDR_FMC2_12V = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -320,16 +317,16 @@ const SDR_type_01h_t SDR_FMC2_12V = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: Voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -363,7 +360,6 @@ const SDR_type_01h_t SDR_FMC2_12V = {
 
 /* FMC2 PVADJ */
 const SDR_type_01h_t SDR_FMC2_VADJ = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -377,16 +373,16 @@ const SDR_type_01h_t SDR_FMC2_VADJ = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -434,16 +430,16 @@ const SDR_type_01h_t SDR_FMC2_P3V3 = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: VOLTAGE*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -493,16 +489,16 @@ const SDR_type_01h_t SDR_FMC1_12V_CURR = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: Voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -536,7 +532,6 @@ const SDR_type_01h_t SDR_FMC1_12V_CURR = {
 
 /* FMC1 PVADJ Current */
 const SDR_type_01h_t SDR_FMC1_VADJ_CURR = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -550,16 +545,16 @@ const SDR_type_01h_t SDR_FMC1_VADJ_CURR = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -593,7 +588,6 @@ const SDR_type_01h_t SDR_FMC1_VADJ_CURR = {
 
 /* FMC1 P3V3 Current */
 const SDR_type_01h_t SDR_FMC1_P3V3_CURR = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -607,16 +601,16 @@ const SDR_type_01h_t SDR_FMC1_P3V3_CURR = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: VOLTAGE*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -649,7 +643,6 @@ const SDR_type_01h_t SDR_FMC1_P3V3_CURR = {
 
 /* FMC2 12V Current */
 const SDR_type_01h_t SDR_FMC2_12V_CURR = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -663,16 +656,16 @@ const SDR_type_01h_t SDR_FMC2_12V_CURR = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: Voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -706,7 +699,6 @@ const SDR_type_01h_t SDR_FMC2_12V_CURR = {
 
 /* FMC2 PVADJ Current */
 const SDR_type_01h_t SDR_FMC2_VADJ_CURR = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -720,16 +712,16 @@ const SDR_type_01h_t SDR_FMC2_VADJ_CURR = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -763,7 +755,6 @@ const SDR_type_01h_t SDR_FMC2_VADJ_CURR = {
 
 /* FMC2 P3V3 Current */
 const SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -777,16 +768,16 @@ const SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: VOLTAGE*/
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -821,7 +812,6 @@ const SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
 #ifdef MODULE_LM75
 /* LM75 SDR List */
 const SDR_type_01h_t SDR_LM75_uC = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -835,16 +825,16 @@ const SDR_type_01h_t SDR_LM75_uC = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x01, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -877,7 +867,6 @@ const SDR_type_01h_t SDR_LM75_uC = {
 };
 
 const SDR_type_01h_t SDR_LM75_ADN4604 = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -891,16 +880,16 @@ const SDR_type_01h_t SDR_LM75_ADN4604 = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x01, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -933,7 +922,6 @@ const SDR_type_01h_t SDR_LM75_ADN4604 = {
 };
 
 const SDR_type_01h_t SDR_LM75_DCDC = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -947,16 +935,16 @@ const SDR_type_01h_t SDR_LM75_DCDC = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x01, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -989,7 +977,6 @@ const SDR_type_01h_t SDR_LM75_DCDC = {
 };
 
 const SDR_type_01h_t SDR_LM75_RAM = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -1003,16 +990,16 @@ const SDR_type_01h_t SDR_LM75_RAM = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x01, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -1047,7 +1034,6 @@ const SDR_type_01h_t SDR_LM75_RAM = {
 
 #ifdef MODULE_MAX6642
 const SDR_type_01h_t SDR_MAX6642_FPGA = {
-
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -1061,16 +1047,16 @@ const SDR_type_01h_t SDR_MAX6642_FPGA = {
     /* record body bytes */
     .entityID = 0xC1, /* entity id: AMC Module */
     .entityinstance = 0x00, /* entity instance -> SDR_Init */
-    .sensorinit = 0x7f, /* init: event generation + scanning enabled */
-    .sensorcap = 0x68, /* capabilities: auto re-arm,*/
+    .sensorinit = 0x7F, /* init: event generation + scanning enabled */
+    .sensorcap = 0x56, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
     .event_reading_type = 0x01, /* sensor reading*/
     .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
                               0x0F }, /* MSB assert event mask */
     .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
                                 0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x0, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x01, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -1137,6 +1123,7 @@ void amc_sdr_init( void )
 #endif
 
 #ifdef MODULE_MAX6642
+    /* FPGA Die Temperature */
     sdr_insert_entry( TYPE_01, (void *) &SDR_MAX6642_FPGA, &vTaskMAX6642_Handle, 0, CHIP_ID_MAX6642 );
 #endif
 
