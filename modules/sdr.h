@@ -93,8 +93,8 @@ typedef struct {
     uint8_t event_reading_type;
     uint8_t assertion_event_mask[2];
     uint8_t deassertion_event_mask[2];
-    uint8_t readable_threshold_mask;
     uint8_t settable_threshold_mask;
+    uint8_t readable_threshold_mask;
     uint8_t sensor_units_1;
     uint8_t sensor_units_2;
     uint8_t sensor_units_3;
@@ -141,8 +141,8 @@ typedef struct {
     uint8_t event_reading_type;
     uint8_t assertion_event_mask[2];
     uint8_t deassertion_event_mask[2];
-    uint8_t readable_threshold_mask;
     uint8_t settable_threshold_mask;
+    uint8_t readable_threshold_mask;
     uint8_t sensor_units_1;
     uint8_t sensor_units_2;
     uint8_t sensor_units_3;
