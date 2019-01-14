@@ -124,7 +124,7 @@ typedef struct {
     uint8_t OEM;
     uint8_t IDtypelen;
     char IDstring[16];      // bits 49-64 (0x40 length max)
-} SDR_type_01h_t; /* Temperature Sensor */
+} SDR_type_01h_t; /* Full sensor */
 
 typedef struct {
     SDR_entry_hdr_t hdr;
@@ -155,7 +155,7 @@ typedef struct {
     uint8_t OEM;
     uint8_t IDtypelen;
     char IDstring[16];     // bits 32-64 (0x40 length max)
-} SDR_type_02h_t; /* Voltage Sensor */
+} SDR_type_02h_t; /* Compact Sensor */
 
 typedef struct {
     SDR_entry_hdr_t hdr;
