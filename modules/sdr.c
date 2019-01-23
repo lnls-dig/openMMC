@@ -102,6 +102,7 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
     uint8_t sdr_len = sdr_get_size_by_type(type);
 
     sensor_t * entry = pvPortMalloc( sizeof(sensor_t) );
+    memset( entry, 0, sizeof(sensor_t) );
 
     entry->num = sdr_count;
     entry->sdr_type = type;
@@ -381,7 +382,6 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
         if (cur_sensor->state == SENSOR_STATE_LOW_NON_REC) {
             rsp->data[len] |= 0x04;
         }
-
         if (cur_sensor->state == SENSOR_STATE_HIGH) {
             rsp->data[len] |= 0x08;
         }
