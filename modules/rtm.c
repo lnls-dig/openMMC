@@ -72,6 +72,8 @@ void RTM_Manage( void * Parameters )
 
                 rtm_present = true;
 
+                /* Initialize basic hardware to enable communication */
+                rtm_hardware_init();
                 /* Create/Read the RTM FRU info before sending the hotswap event */
                 fru_init(FRU_RTM);
 
@@ -88,7 +90,6 @@ void RTM_Manage( void * Parameters )
                     hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_COMPATIBLE );
                     hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
 
-                    rtm_hardware_init();
                 } else {
                     printf("RTM Board is not compatible.\n");
                     /* Send RTM Incompatible message */
