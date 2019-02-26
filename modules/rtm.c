@@ -159,7 +159,7 @@ void rtm_manage_init( void )
 {
     rtm_power_level = 0;
 
-    xTaskCreate( RTM_Manage, "RTM Manage", 100, (void *) NULL, tskRTM_MANAGE_PRIORITY, (TaskHandle_t *) NULL );
+    xTaskCreate( RTM_Manage, "RTM Manage", 150, (void *) NULL, tskRTM_MANAGE_PRIORITY, (TaskHandle_t *) NULL );
 }
 
 /* Set Power Level Request handler */
