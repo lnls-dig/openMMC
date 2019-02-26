@@ -73,16 +73,15 @@ void rtm_check_presence( uint8_t *status )
     uint8_t i2c_addr, i2c_interface;
     uint8_t dumb;
 
-    if (i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_interface, 0)) {
+    /* Defaults to absent - in case of I2C failure */
+    *status = HOTSWAP_STATE_URTM_ABSENT;
+
+    if (i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_interface, 100)) {
         if (xI2CMasterRead( i2c_interface, i2c_addr, &dumb, 1)) {
             *status = HOTSWAP_STATE_URTM_PRSENT;
-        } else {
-            *status = HOTSWAP_STATE_URTM_ABSENT;
         }
         i2c_give(i2c_interface);
     }
-
-    //return gpio_read_pin( GPIO_RTM_PS_PORT, GPIO_RTM_PS_PIN );
 }
 
 void rtm_hardware_init( void )
