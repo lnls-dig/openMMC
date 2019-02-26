@@ -44,9 +44,8 @@ void RTM_Manage( void * Parameters )
 {
     uint8_t ps_old_state = 0xFF;
     uint8_t ps_new_state;
-    bool rtm_compatible;
+    bool rtm_compatible = false;
     extern sensor_t * hotswap_rtm_sensor;
-
     EventBits_t current_evt;
     uint8_t rtm_hs_state;
 
@@ -131,7 +130,7 @@ void RTM_Manage( void * Parameters )
         if ( rtm_pwr_lvl_change ^ rtm_power_level ) {
             rtm_pwr_lvl_change = rtm_power_level;
 
-            if ( rtm_power_level == 0x01 ) {
+            if ( rtm_power_level == 0x01 && rtm_compatible ) {
                 hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
 
                 printf("[RTM] Enabling RTM Payload power...\n");
