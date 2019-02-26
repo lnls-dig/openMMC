@@ -61,7 +61,7 @@ void RTM_Manage( void * Parameters )
 #endif
 
     for ( ;; ) {
-        vTaskDelay(100);
+        vTaskDelay(500);
 
         rtm_check_presence( &ps_new_state );
 
