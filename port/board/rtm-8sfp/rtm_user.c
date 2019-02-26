@@ -35,19 +35,11 @@
 void rtm_enable_payload_power( void )
 {
     gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 1 );
-    /* Debug LEDs */
-    pca9554_write_pin( RTM_GPIO_LED_RED, 1 );
-    pca9554_write_pin( RTM_GPIO_LED_BLUE, 1 );
-    pca9554_write_pin( RTM_GPIO_LED_GREEN, 0 );
 }
 
 void rtm_disable_payload_power( void )
 {
     gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 0 );
-    /* Debug LEDs */
-    pca9554_write_pin( RTM_GPIO_LED_RED, 0 );
-    pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
-    pca9554_write_pin( RTM_GPIO_LED_GREEN, 1 );
 }
 
 uint8_t rtm_get_hotswap_handle_status( uint8_t *state )
@@ -97,11 +89,6 @@ void rtm_hardware_init( void )
 {
     rtm_enable_i2c();
     pca9554_set_port_dir( 0x1F );
-
-    /* Turn on Blue LED and off Red and Green */
-    pca9554_write_pin( RTM_GPIO_LED_BLUE, 0 );
-    pca9554_write_pin( RTM_GPIO_LED_RED, 1 );
-    pca9554_write_pin( RTM_GPIO_LED_GREEN, 1 );
 }
 
 void rtm_enable_i2c( void )
