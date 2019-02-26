@@ -37,7 +37,6 @@
 #include "uart_debug.h"
 #include "led.h"
 
-volatile bool rtm_present = false;
 volatile uint8_t rtm_power_level = 0;
 extern EventGroupHandle_t rtm_payload_evt;
 
@@ -50,6 +49,9 @@ void RTM_Manage( void * Parameters )
 
     EventBits_t current_evt;
     uint8_t rtm_hs_state;
+
+    /* Defaults to not present */
+    rtm_present = false;
 
     /* A local copy of rtm_power_level to check if it's changed status */
     uint8_t rtm_pwr_lvl_change = rtm_power_level;

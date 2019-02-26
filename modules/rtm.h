@@ -33,6 +33,8 @@
 
 #include "rtm_user.h"
 
+volatile bool rtm_present;
+
 /**
  * @brief Initialize RTM Manage task
  *

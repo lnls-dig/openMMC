@@ -40,7 +40,9 @@
 #include "fru.h"
 #include "utils.h"
 #include "uart_debug.h"
-
+#ifdef MODULE_RTM
+#include "rtm.h"
+#endif
 TaskHandle_t vTaskHotSwap_Handle;
 
 static bool hotswap_get_handle_status( uint8_t *state )
@@ -106,7 +108,6 @@ void vTaskHotSwap( void *Parameters )
     static uint8_t new_state_amc = 0x01, old_state_amc = 0xFF;
 #ifdef MODULE_RTM
     static uint8_t new_state_rtm = 0x01, old_state_rtm = 0xFF;
-    extern bool rtm_present;
 #endif
 
     TickType_t xLastWakeTime;
