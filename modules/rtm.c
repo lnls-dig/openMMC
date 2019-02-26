@@ -35,6 +35,7 @@
 #include "hotswap.h"
 #include "payload.h"
 #include "uart_debug.h"
+#include "led.h"
 
 volatile bool rtm_present = false;
 volatile uint8_t rtm_power_level = 0;
@@ -48,6 +49,7 @@ void RTM_Manage( void * Parameters )
     extern sensor_t * hotswap_rtm_sensor;
 
     EventBits_t current_evt;
+    uint8_t rtm_hs_state;
 
     /* A local copy of rtm_power_level to check if it's changed status */
     uint8_t rtm_pwr_lvl_change = rtm_power_level;
@@ -90,6 +92,15 @@ void RTM_Manage( void * Parameters )
                     hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_COMPATIBLE );
                     hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
 
+                    /* Perform hotswap first read */
+                    while (!rtm_get_hotswap_handle_status( &rtm_hs_state ));
+
+                    /* Override RTM Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
+                    if ( rtm_hs_state == 0 ) {
+                    	LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
+                    } else {
+                    	LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
+                    }
                 } else {
                     printf("RTM Board is not compatible.\n");
                     /* Send RTM Incompatible message */

@@ -122,17 +122,6 @@ void vTaskHotSwap( void *Parameters )
         LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
     }
 
-#ifdef MODULE_RTM
-    /* Perform hotswap first read */
-    while (!rtm_get_hotswap_handle_status( &new_state_rtm ));
-
-    /* Override RTM Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
-    if ( new_state_rtm == 0 ) {
-        LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
-    } else {
-        LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
-    }
-#endif
     /* Initialise the xLastWakeTime variable with the current time. */
     xLastWakeTime = xTaskGetTickCount();
 
