@@ -88,11 +88,14 @@ void RTM_Manage( void * Parameters )
                     /* Perform hotswap first read */
                     while (!rtm_get_hotswap_handle_status( &rtm_hs_state ));
 
-                    /* Override RTM Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
+                    /* Override RTM state so that if the handle is closed when the MMC is starting,
+                     * the LED and payload power remains in the correct state */
                     if ( rtm_hs_state == 0 ) {
                     	LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
+                        payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_RTM_ENABLE);
                     } else {
                     	LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
+                        payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_QUIESCE);
                     }
                 } else {
                     printf("[RTM] Rear Board is not compatible.\n");
