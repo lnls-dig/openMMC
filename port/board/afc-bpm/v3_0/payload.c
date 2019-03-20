@@ -224,9 +224,9 @@ void vTaskPayload( void *pvParameters )
             DCDC_good = 0;
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_DCDC_PGOODn );
         }
-        if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
+        if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
             QUIESCED_req = 1;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCED );
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCE );
         }
         if ( current_evt & PAYLOAD_MESSAGE_COLD_RST ) {
             state = PAYLOAD_SWITCHING_OFF;

@@ -143,7 +143,7 @@ void RTM_Manage( void * Parameters )
 
         current_evt = xEventGroupGetBits( rtm_payload_evt );
 
-        if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
+        if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
             if ( rtm_quiesce() ) {
                 /* Quiesced event */
                 printf("[RTM] Quiesced RTM successfuly!\n");
