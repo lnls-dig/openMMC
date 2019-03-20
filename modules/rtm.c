@@ -37,7 +37,6 @@
 #include "uart_debug.h"
 #include "led.h"
 
-volatile uint8_t rtm_power_level = 0;
 extern EventGroupHandle_t rtm_payload_evt;
 
 void RTM_Manage( void * Parameters )
@@ -52,16 +51,8 @@ void RTM_Manage( void * Parameters )
     /* Defaults to not present */
     rtm_present = false;
 
-    /* A local copy of rtm_power_level to check if it's changed status */
-    uint8_t rtm_pwr_lvl_change = rtm_power_level;
-
     /* Start with RTM payload disabled */
     rtm_disable_payload_power();
-
-#ifdef BENCH_TEST
-    rtm_power_level = 0x01;
-    rtm_pwr_lvl_change = 0x00;
-#endif
 
     for ( ;; ) {
         vTaskDelay(500);
@@ -127,20 +118,7 @@ void RTM_Manage( void * Parameters )
             ps_old_state = ps_new_state;
         }
 
-        if ( rtm_pwr_lvl_change ^ rtm_power_level ) {
-            rtm_pwr_lvl_change = rtm_power_level;
-
-            if ( rtm_power_level == 0x01 && rtm_compatible ) {
-                hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
-
-                printf("[RTM] Enabling RTM Payload power...\n");
-                rtm_enable_payload_power();
-            } else {
-                printf("[RTM] Disabling RTM Payload power...\n");
-                rtm_disable_payload_power();
-            }
-        }
-
+        /* Check enable/disable events */
         current_evt = xEventGroupGetBits( rtm_payload_evt );
 
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
@@ -149,16 +127,26 @@ void RTM_Manage( void * Parameters )
                 printf("[RTM] Quiesced RTM successfuly!\n");
                 hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_QUIESCED );
-                xEventGroupClearBits( rtm_payload_evt, PAYLOAD_MESSAGE_QUIESCED );
+            } else {
+                printf("[RTM] RTM failed to quiesce!\n");
             }
+            xEventGroupClearBits( rtm_payload_evt, PAYLOAD_MESSAGE_QUIESCE );
+
+        } else if ( current_evt & PAYLOAD_MESSAGE_RTM_ENABLE ) {
+            if (rtm_compatible) {
+                hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
+                printf("[RTM] Enabling RTM Payload power...\n");
+                rtm_enable_payload_power();
+            } else {
+                printf("[RTM] Impossible to enable payload power to an incompatible RTM board!\n");
+            }
+            xEventGroupClearBits( rtm_payload_evt, PAYLOAD_MESSAGE_RTM_ENABLE );
         }
     }
 }
 
 void rtm_manage_init( void )
 {
-    rtm_power_level = 0;
-
     xTaskCreate( RTM_Manage, "RTM Manage", 150, (void *) NULL, tskRTM_MANAGE_PRIORITY, (TaskHandle_t *) NULL );
 }
 
@@ -168,9 +156,20 @@ IPMI_HANDLER(ipmi_picmg_set_power_level, NETFN_GRPEXT, IPMI_PICMG_CMD_SET_POWER_
 {
     int len = rsp->data_len = 0;
     uint8_t fru_id = req->data[1];
+    uint8_t power_level = req->data[2];
 
-    if ( fru_id == FRU_RTM ) {
-        rtm_power_level = req->data[2];
+    /*
+     * Power Level:
+     * 00h = Power off
+     * 01h - 14h = Select power level, if available
+     * 0xFF = Do not change power level
+     */
+    if ( fru_id == FRU_RTM && power_level != 0xFF ) {
+        if (power_level == 0x00) {
+            payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_QUIESCE);
+        } else {
+            payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_RTM_ENABLE);
+        }
     }
 
     rsp->completion_code = IPMI_CC_OK;
