@@ -40,9 +40,11 @@
 #include "fru.h"
 #include "utils.h"
 #include "uart_debug.h"
+
 #ifdef MODULE_RTM
 #include "rtm.h"
 #endif
+
 TaskHandle_t vTaskHotSwap_Handle;
 
 static bool hotswap_get_handle_status( uint8_t *state )
@@ -108,9 +110,6 @@ void vTaskHotSwap( void *Parameters )
     static uint8_t new_state_amc = 0x01, old_state_amc = 0xFF;
 #ifdef MODULE_RTM
     static uint8_t new_state_rtm = 0x01, old_state_rtm = 0xFF;
-#ifdef BENCH_TEST
-    extern volatile uint8_t rtm_power_level;
-#endif
 #endif
 
     TickType_t xLastWakeTime;
@@ -167,12 +166,12 @@ void vTaskHotSwap( void *Parameters )
             if ( new_state_rtm == 0 ) {
                 printf("RTM Hotswap handle pressed!\n");
 #ifdef BENCH_TEST
-                rtm_power_level = 1;
+                payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_RTM_ENABLE);
 #endif
             } else {
             	printf("RTM Hotswap handle released!\n");
 #ifdef BENCH_TEST
-            	rtm_power_level = 0;
+                payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_QUIESCE);
 #endif
             }
             if ( hotswap_send_event( hotswap_rtm_sensor, new_state_rtm ) == ipmb_error_success ) {
