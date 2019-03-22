@@ -281,22 +281,8 @@ IPMI_HANDLER(ipmi_picmg_get_fru_led_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_GET
     }
     /* Check which LEDs are controllable */
     for (uint8_t i = 0; i < sizeof(led_config[fru])/sizeof(led_config[fru][0]); i++) {
-        switch (led_config[fru][i].id) {
-        case LED_BLUE:
-            led_bitf |= (1 << 0);
-            break;
-        case LED1:
-            led_bitf |= (1 << 1);
-            break;
-        case LED2:
-            led_bitf |= (1 << 2);
-            break;
-        case LED3:
-            led_bitf |= (1 << 3);
-            break;
-        default:
-            /* Bits [7:4] are reserved */
-            break;
+        if (led_config[fru][i].id < LED_MAX_CNT) {
+            led_bitf |= (1 << led_config[fru][i].id);
         }
     }
     rsp->data[len++] = led_bitf;
