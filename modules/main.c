@@ -28,7 +28,9 @@
 #include "port.h"
 #include "led.h"
 #include "ipmi.h"
+#ifdef MODULE_PAYLOAD
 #include "payload.h"
+#endif
 #include "i2c.h"
 #include "fru.h"
 #include "scansta1101.h"
