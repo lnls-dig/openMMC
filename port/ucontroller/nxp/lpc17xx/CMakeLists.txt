@@ -38,6 +38,7 @@ set(LIBLPCOPEN_SRCS
   ${LPC17XX_PATH}/lpc17_spi.c
   ${LPC17XX_PATH}/lpc17_ssp.c
   ${LPC17XX_PATH}/lpc17_hpm.c
+  ${LPC17XX_PATH}/lpc17_pincfg.c
   )
 
 if( UART_RINGBUFFER )
