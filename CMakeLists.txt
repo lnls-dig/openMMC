@@ -92,7 +92,7 @@ else()
   message(FATAL_ERROR "${BOARD} not supported!")
 endif()
 
-add_executable(bootloader ${BOOT_SRCS})
+
 
 # Linker flags
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
@@ -100,17 +100,12 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
   SUFFIX ".axf"
   LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.map" )
 
-set_target_properties(bootloader PROPERTIES
-  SUFFIX ".axf"
-  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.map")
-
-
 # Headers path
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
-target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
 # Link libraries
 target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS c gcc m ${PROJ_LIBS})
-target_link_libraries(bootloader gcc c m lpcopen)
+
+
 
 ##Generate binary file
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
@@ -119,11 +114,24 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
   COMMENT "Converting the AXF output to a binary file"
   )
 
-add_custom_command(TARGET bootloader POST_BUILD
-  COMMAND ${CMAKE_OBJCOPY} -O binary bootloader.axf bootloader.bin
-  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  COMMENT "Converting the AXF output to a binary file"
-  )
+
+if(${BOARD} MATCHES "^(afc)")
+  add_executable(bootloader ${BOOT_SRCS})
+  set_target_properties(bootloader PROPERTIES
+    SUFFIX ".axf"
+    LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.map")
+  # Headers path
+  target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
+  # Link libraries
+  target_link_libraries(bootloader gcc c m lpcopen)
+
+  add_custom_command(TARGET bootloader POST_BUILD
+    COMMAND ${CMAKE_OBJCOPY} -O binary bootloader.axf bootloader.bin
+    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    COMMENT "Converting the AXF output to a binary file"
+    )
+endif()
+
 
 ##Program command
 if(NOT DEBUG_PROBE)
