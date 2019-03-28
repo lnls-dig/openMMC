@@ -86,6 +86,12 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 add_executable(${CMAKE_PROJECT_NAME} ${UCONTROLLER_SRCS} ${PROJ_SRCS})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${MODULES_FLAGS})
 
+if(${BOARD} MATCHES "^(afc)")
+  set(PROJ_LIBS lpcopen)
+else()
+  message(FATAL_ERROR "${BOARD} not supported!")
+endif()
+
 add_executable(bootloader ${BOOT_SRCS})
 
 # Linker flags
@@ -103,7 +109,7 @@ set_target_properties(bootloader PROPERTIES
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
 target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
 # Link libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS c gcc m lpcopen)
+target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS c gcc m ${PROJ_LIBS})
 target_link_libraries(bootloader gcc c m lpcopen)
 
 ##Generate binary file
