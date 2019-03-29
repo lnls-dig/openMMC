@@ -41,6 +41,10 @@ To clean the compilation files (binaries, objects and dependence files), just ru
 
     make clean
 
+To make a debug build (to include symbols into axf file, turn off optimizations, etc.) add `-DCMAKE_BUILD_TYPE=Debug` option to `cmake` command. Example:
+
+	cmake ~/openmmc/ -DBOARD=afc -DVERSION=3.1 -DCMAKE_BUILD_TYPE=Debug
+
 ## Programming
 After creating the binaries, you can program them to your chip any way you want, using a JTAG cable, ISP Programmer, custom bootloader, etc.
 There are 2 program interfaces supported so far: *LPCLink* and *LPCLink2*
