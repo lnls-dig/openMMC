@@ -23,6 +23,9 @@ set(CMAKE_ASM_COMPILER ${CROSS_COMPILE}gcc)
 set( CMAKE_OBJCOPY ${TC_PATH}${CROSS_COMPILE}objcopy
     CACHE FILEPATH "The toolchain objcopy command " FORCE )
 
+set( CMAKE_OBJDUMP ${TC_PATH}${CROSS_COMPILE}objdump
+    CACHE FILEPATH "The toolchain objdump command " FORCE )
+
 set(COMMON_FLAGS "-fno-builtin -ffunction-sections -fdata-sections -fno-strict-aliasing -fmessage-length=0")
 set(CMAKE_C_FLAGS "${COMMON_FLAGS} -std=gnu99")
 set(CMAKE_CXX_FLAGS "${COMMON_FLAGS} -std=gnu++0x")
