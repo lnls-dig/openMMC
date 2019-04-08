@@ -27,6 +27,7 @@
 #include "GitSHA1.h"
 #include "port.h"
 #include "led.h"
+#include "pin_cfg.h"
 #include "ipmi.h"
 #ifdef MODULE_PAYLOAD
 #include "payload.h"
