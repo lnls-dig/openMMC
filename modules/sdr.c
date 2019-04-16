@@ -94,6 +94,8 @@ void sensor_init( void )
 
 #ifdef MODULE_HOTSWAP
     hotswap_init();
+#else
+#define vTaskHotSwap_Handle NULL
 #endif
 #ifdef MODULE_LM75
     LM75_init();
@@ -393,7 +395,7 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
         return;
     }
 
-    if (*(cur_sensor->task_handle) == vTaskHotSwap_Handle) {
+    if (vTaskHotSwap_Handle != NULL && *(cur_sensor->task_handle) == vTaskHotSwap_Handle) {
         rsp->data[len++] = 0x00;
         rsp->data[len++] = cur_sensor->event_scan;
         /* Current State Mask */
