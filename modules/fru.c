@@ -34,28 +34,7 @@
 #include "i2c_mapping.h"
 #include "uart_debug.h"
 
-fru_data_t fru[FRU_COUNT] = {
-    [FRU_AMC] = {
-        .cfg = {
-            .eeprom_id = CHIP_ID_EEPROM,
-            .build_f = amc_fru_info_build,
-            .read_f = at24mac_read,
-            .write_f = at24mac_write,
-        },
-        .runtime = false
-    },
-#ifdef MODULE_RTM
-    [FRU_RTM] = {
-        .cfg = {
-            .eeprom_id = CHIP_ID_RTM_EEPROM,
-            .build_f = rtm_fru_info_build,
-            .read_f = eeprom_24xx64_read,
-            .write_f = eeprom_24xx64_write,
-        },
-        .runtime = false
-    }
-#endif
-};
+extern fru_data_t fru[FRU_COUNT];
 
 void fru_init( uint8_t id )
 {

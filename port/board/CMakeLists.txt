@@ -4,10 +4,6 @@ if(NOT BOARD)
   message(FATAL_ERROR "${BoldRed}Target board was not selected! You must pass the flag -DBOARD=<board_name>${ColourReset}")
 endif()
 
-if(${BOARD} MATCHES "^(afc)")
-  add_subdirectory(afc-common)
-endif()
-
 if(${BOARD} MATCHES "^(afc-bpm)$")
 
   if(NOT VERSION)
@@ -26,6 +22,10 @@ elseif(${BOARD} MATCHES "^(afc-timing)$" )
 
 else()
   message(FATAL_ERROR "${BoldRed}Selected board \"${BOARD}\" is not implemented!${ColourReset}")
+endif()
+
+if(${BOARD} MATCHES "^(afc)")
+  add_subdirectory(afc-common)
 endif()
 
 #RTM Board
