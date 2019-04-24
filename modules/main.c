@@ -49,7 +49,9 @@ int main( void )
 #endif
 
     printf("openMMC Starting!\n");
-    printf("Build date: %s %s\nSHA1: %s\n", __DATE__, __TIME__, g_GIT_SHA1);
+    printf("Build date: %s %s\n" __DATE__, __TIME__);
+    printf("Version: %s\n", g_GIT_TAG);
+    printf("SHA1: %s\n", g_GIT_SHA1);
 
 #ifdef BENCH_TEST
     printf("BENCH_TEST mode activated! This will enable some debug functions, be careful!\n");
