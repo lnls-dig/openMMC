@@ -13,8 +13,8 @@ set( CROSS_COMPILE arm-none-eabi- )
 # specify the cross compiler. We force the compiler so that CMake doesn't
 # attempt to build a simple test program as this will fail without us using
 # the -nostartfiles option on the command line
-cmake_force_c_compiler(${CROSS_COMPILE}gcc GNU)
-cmake_force_cxx_compiler(${CROSS_COMPILE}g++ GNU)
+set(CMAKE_C_COMPILER ${CROSS_COMPILE}gcc)
+set(CMAKE_CXX_COMPILER ${CROSS_COMPILE}g++)
 
 # We must set the OBJCOPY setting into cache so that it's available to the
 # whole project. Otherwise, this does not get set into the CACHE and therefore

@@ -30,14 +30,15 @@
 #include "led.h"
 #include "string.h"
 #include "task_priorities.h"
+#include "fru.h"
 
-const uint32_t amc_led_pincfg[LED_CNT] = {
+const uint32_t amc_led_pincfg[] = {
     [LED_BLUE] = GPIO_LEDBLUE,
     [LED1] = GPIO_LEDRED,
     [LED2] = GPIO_LEDGREEN
 };
 
-LEDConfig_t amc_leds_config[LED_CNT] = {
+const LEDConfig_t amc_leds_config[] = {
     [LED_BLUE] = {
         .id = LED_BLUE,
         .color = LEDCOLOR_BLUE,
@@ -82,7 +83,7 @@ LEDConfig_t amc_leds_config[LED_CNT] = {
 };
 
 #ifdef MODULE_RTM
-LEDConfig_t rtm_leds_config[LED_CNT] = {
+const LEDConfig_t rtm_leds_config[] = {
     [LED_BLUE] = {
         .id = LED_BLUE,
         .color = LEDCOLOR_BLUE,
@@ -127,9 +128,7 @@ LEDConfig_t rtm_leds_config[LED_CNT] = {
 };
 #endif
 
-void LEDManage( LEDConfig_t *led_cfg );
-
-LEDConfig_t led_config[LEDCONFIG_SIZE][LED_CNT];
+LEDConfig_t led_config[FRU_COUNT][LED_CNT];
 QueueHandle_t led_update_queue;
 
 void LED_init( void )
@@ -159,8 +158,8 @@ void LED_Task( void *Parameters )
     for ( ;; ) {
         cycle++;
 
-        for ( int i=0; i < LEDCONFIG_SIZE; i++ ) {
-            for ( int j=0; j < LED_CNT; j++ ) {
+        for ( uint8_t i = 0; i < sizeof(led_config)/sizeof(led_config[0]); i++ ) {
+            for ( uint8_t j = 0; j < sizeof(led_config[i])/sizeof(led_config[i][0]); j++ ) {
                 LEDManage( &led_config[i][j] );
             }
         }
@@ -364,10 +363,37 @@ IPMI_HANDLER(ipmi_picmg_get_fru_led_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_GET
 {
     uint8_t len = rsp->data_len = 0;
     uint8_t fru = req->data[1];
+    uint8_t led_bitf = 0;
 
     rsp->data[len++] = IPMI_PICMG_GRP_EXT;
-    /* FRU can control the BLUE LED, LED 1 (RED) and LED 2 (GREEN) */
-    rsp->data[len++] = sizeof(led_config[fru])/sizeof(led_config[fru][0]);
+
+    if (fru >= FRU_COUNT) {
+        rsp->data_len = len;
+        rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;
+        return;
+    }
+    /* Check which LEDs are controllable */
+    for (uint8_t i = 0; i < sizeof(led_config[fru])/sizeof(led_config[fru][0]); i++) {
+        switch (led_config[fru][i].id) {
+        case LED_BLUE:
+            led_bitf |= (1 << 0);
+            break;
+        case LED1:
+            led_bitf |= (1 << 1);
+            break;
+        case LED2:
+            led_bitf |= (1 << 2);
+            break;
+        case LED3:
+            led_bitf |= (1 << 3);
+            break;
+        default:
+            /* Bits [7:4] are reserved */
+            break;
+        }
+    }
+    rsp->data[len++] = led_bitf;
+
     /* Application specific LED count */
     rsp->data[len++] = 0x00;
 

@@ -102,6 +102,7 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
     uint8_t sdr_len = sdr_get_size_by_type(type);
 
     sensor_t * entry = pvPortMalloc( sizeof(sensor_t) );
+    memset( entry, 0, sizeof(sensor_t) );
 
     entry->num = sdr_count;
     entry->sdr_type = type;
@@ -197,7 +198,7 @@ void sdr_pop( void )
 /******************************/
 
 IPMI_HANDLER(ipmi_se_get_sdr_info, NETFN_SE, IPMI_GET_DEVICE_SDR_INFO_CMD, ipmi_msg *req, ipmi_msg *rsp) {
-    int len = rsp->data_len;
+    int len = rsp->data_len = 0;
 
     if (req->data_len == 0 || req->data[0] == 0) {
         /* Return number of sensors only (minus the dev locator fields) */
@@ -210,13 +211,13 @@ IPMI_HANDLER(ipmi_se_get_sdr_info, NETFN_SE, IPMI_GET_DEVICE_SDR_INFO_CMD, ipmi_
         /* Return number of SDR entries */
         rsp->data[len++] = sdr_count-1;
     }
-    /* Static Sensor population and LUN 0 has sensors */
-    rsp->data[len++] = (1 << 7) | (1 << 1) | (1 << 0) ; // if dynamic, additional 4 bytes required (see Table 20-2 Get Device SDR INFO Command)
 
-    rsp->data[len++] = (sdr_change_count << 0 ) & 0x000000FF;
-    rsp->data[len++] = (sdr_change_count << 8 ) & 0x0000FF00;
-    rsp->data[len++] = (sdr_change_count << 16) & 0x00FF0000;
-    rsp->data[len++] = (sdr_change_count << 24) & 0xFF000000;
+    /* Static Sensor population and LUN 0 has sensors (LUN 1 also if RTM is present) */
+#ifdef MODULE_RTM
+    rsp->data[len++] = (1 << 1) | (1 << 0);
+#else
+    rsp->data[len++] = (1 << 0);
+#endif
 
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
@@ -315,7 +316,7 @@ IPMI_HANDLER(ipmi_se_get_sdr, NETFN_SE, IPMI_GET_DEVICE_SDR_CMD, ipmi_msg *req, 
         if (index == 0) {
             tmp_c = record_id;
         } else if (index == 5) {
-            tmp_c = cur_sensor->ownerID;
+            tmp_c = ipmb_addr;
         } else if ( sdr_type == TYPE_01 || sdr_type == TYPE_02 ) {
             if (index == 9) {
                 tmp_c = cur_sensor->entityinstance;
@@ -367,11 +368,33 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
         rsp->data[len++] = cur_sensor->readout_value;
     } else {
         rsp->data[len++] = cur_sensor->readout_value;
-        rsp->data[len++] = 0x40;
-        /* Present threshold status */
-        /* TODO: Implement threshold reading */
         rsp->data[len++] = 0xC0;
+
+        /* Present threshold status ( [7:6] Reserved, return as 1b )*/
+        rsp->data[len] = 0xC0;
+
+        if (cur_sensor->state == SENSOR_STATE_LOW) {
+            rsp->data[len] |= 0x01;
+        }
+        if (cur_sensor->state == SENSOR_STATE_LOW_CRIT) {
+            rsp->data[len] |= 0x02;
+        }
+        if (cur_sensor->state == SENSOR_STATE_LOW_NON_REC) {
+            rsp->data[len] |= 0x04;
+        }
+        if (cur_sensor->state == SENSOR_STATE_HIGH) {
+            rsp->data[len] |= 0x08;
+        }
+        if (cur_sensor->state == SENSOR_STATE_HIGH_CRIT) {
+            rsp->data[len] |= 0x10;
+        }
+        if (cur_sensor->state == SENSOR_STATE_HIGH_NON_REC) {
+            rsp->data[len] |= 0x20;
+        }
+        len++;
     }
+
+    rsp->data[len++] = 0x00;
 
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;

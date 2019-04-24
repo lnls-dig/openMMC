@@ -38,7 +38,6 @@
 #include "task_priorities.h"
 #include "i2c.h"
 #include "i2c_mapping.h"
-#include "payload.h"
 #include "ina220.h"
 #include "fpga_spi.h"
 #include "fru.h"
@@ -68,8 +67,6 @@ void vTaskINA220( void *Parameters )
     TickType_t xLastWakeTime;
     /* Task will run every 100ms */
     const TickType_t xFrequency = INA220_UPDATE_RATE / portTICK_PERIOD_MS;
-
-    extern const SDR_type_01h_t SDR_FMC1_12V;
 
     sensor_t * ina220_sensor;
     ina220_data_t * data_ptr;
@@ -105,18 +102,6 @@ void vTaskINA220( void *Parameters )
             /* Check for threshold events */
             check_sensor_event(ina220_sensor);
 
-#ifdef MODULE_PAYLOAD
-            if( ina220_sensor->sdr == &SDR_FMC1_12V ) {
-                /* Check if the Payload power is in an acceptable zone */
-                SDR_type_01h_t * ina220_sdr = ( SDR_type_01h_t * ) ina220_sensor->sdr;
-                if ( ( ina220_sensor->readout_value >= (ina220_sdr->lower_critical_thr ) ) &&
-                     ( ina220_sensor->readout_value <= (ina220_sdr->upper_critical_thr ) ) ) {
-                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_PPGOOD );
-                } else {
-                    payload_send_message( FRU_AMC, PAYLOAD_MESSAGE_PPGOODn );
-                }
-            }
-#endif
             vTaskDelayUntil( &xLastWakeTime, xFrequency );
         }
     }

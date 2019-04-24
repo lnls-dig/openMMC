@@ -93,8 +93,8 @@ typedef struct {
     uint8_t event_reading_type;
     uint8_t assertion_event_mask[2];
     uint8_t deassertion_event_mask[2];
-    uint8_t readable_threshold_mask;
     uint8_t settable_threshold_mask;
+    uint8_t readable_threshold_mask;
     uint8_t sensor_units_1;
     uint8_t sensor_units_2;
     uint8_t sensor_units_3;
@@ -124,7 +124,7 @@ typedef struct {
     uint8_t OEM;
     uint8_t IDtypelen;
     char IDstring[16];      // bits 49-64 (0x40 length max)
-} SDR_type_01h_t; /* Temperature Sensor */
+} SDR_type_01h_t; /* Full sensor */
 
 typedef struct {
     SDR_entry_hdr_t hdr;
@@ -141,8 +141,8 @@ typedef struct {
     uint8_t event_reading_type;
     uint8_t assertion_event_mask[2];
     uint8_t deassertion_event_mask[2];
-    uint8_t readable_threshold_mask;
     uint8_t settable_threshold_mask;
+    uint8_t readable_threshold_mask;
     uint8_t sensor_units_1;
     uint8_t sensor_units_2;
     uint8_t sensor_units_3;
@@ -155,7 +155,7 @@ typedef struct {
     uint8_t OEM;
     uint8_t IDtypelen;
     char IDstring[16];     // bits 32-64 (0x40 length max)
-} SDR_type_02h_t; /* Voltage Sensor */
+} SDR_type_02h_t; /* Compact Sensor */
 
 typedef struct {
     SDR_entry_hdr_t hdr;

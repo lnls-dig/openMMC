@@ -232,7 +232,7 @@ void IPMB_RXTask ( void *pvParameters )
 void ipmb_init ( void )
 {
     vI2CConfig( IPMB_I2C, IPMB_I2C_FREQ );
-    ipmb_addr = get_ipmb_addr( );
+
     vI2CSlaveSetup( IPMB_I2C, ipmb_addr );
 
     ipmb_txqueue = xQueueCreate( IPMB_TXQUEUE_LEN, sizeof(ipmi_msg_cfg *) );
@@ -412,7 +412,7 @@ ipmb_error ipmb_decode ( ipmi_msg * msg, uint8_t * buffer, uint8_t len )
  * @brief Table holding all possible address values in IPMB specification
  * @see get_ipmb_addr()
  */
-unsigned char IPMBL_TABLE[IPMBL_TABLE_SIZE] = {
+const unsigned char IPMBL_TABLE[IPMBL_TABLE_SIZE] = {
     0x70, 0x8A, 0x72, 0x8E, 0x92, 0x90, 0x74, 0x8C, 0x76,
     0x98, 0x9C, 0x9A, 0xA0, 0xA4, 0x88, 0x9E, 0x86, 0x84,
     0x78, 0x94, 0x7A, 0x96, 0x82, 0x80, 0x7C, 0x7E, 0xA2 };
@@ -466,7 +466,7 @@ uint8_t get_ipmb_addr( void )
     /* Transform the 3-based code in a decimal number */
     index = (9 * ga2) + (3 * ga1) + (1 * ga0);
 
-    if ( index >= IPMBL_TABLE_SIZE ){
+    if ( index >= IPMBL_TABLE_SIZE ) {
         return 0;
     }
 
