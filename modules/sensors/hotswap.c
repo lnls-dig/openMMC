@@ -41,6 +41,10 @@
 #include "utils.h"
 #include "uart_debug.h"
 
+#ifdef MODULE_RTM
+#include "rtm.h"
+#endif
+
 TaskHandle_t vTaskHotSwap_Handle;
 
 static bool hotswap_get_handle_status( uint8_t *state )
@@ -106,7 +110,6 @@ void vTaskHotSwap( void *Parameters )
     static uint8_t new_state_amc = 0x01, old_state_amc = 0xFF;
 #ifdef MODULE_RTM
     static uint8_t new_state_rtm = 0x01, old_state_rtm = 0xFF;
-    extern bool rtm_present;
 #endif
 
     TickType_t xLastWakeTime;
@@ -122,17 +125,6 @@ void vTaskHotSwap( void *Parameters )
         LEDUpdate( FRU_AMC, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
     }
 
-#ifdef MODULE_RTM
-    /* Perform hotswap first read */
-    while (!rtm_get_hotswap_handle_status( &new_state_rtm ));
-
-    /* Override RTM Blue LED state so that if the handle is closed when the MMC is starting, the LED remains in the correct state */
-    if ( new_state_rtm == 0 ) {
-        LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
-    } else {
-        LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
-    }
-#endif
     /* Initialise the xLastWakeTime variable with the current time. */
     xLastWakeTime = xTaskGetTickCount();
 
@@ -173,8 +165,14 @@ void vTaskHotSwap( void *Parameters )
         if ( new_state_rtm ^ old_state_rtm ) {
             if ( new_state_rtm == 0 ) {
                 printf("RTM Hotswap handle pressed!\n");
+#ifdef BENCH_TEST
+                payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_RTM_ENABLE);
+#endif
             } else {
-                printf("RTM Hotswap handle released!\n");
+            	printf("RTM Hotswap handle released!\n");
+#ifdef BENCH_TEST
+                payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_QUIESCE);
+#endif
             }
             if ( hotswap_send_event( hotswap_rtm_sensor, new_state_rtm ) == ipmb_error_success ) {
                 hotswap_set_mask_bit( HOTSWAP_RTM, 1 << new_state_rtm );

@@ -289,16 +289,16 @@ IPMI_HANDLER(ipmi_picmg_cmd_fru_control, NETFN_GRPEXT, IPMI_PICMG_CMD_FRU_CONTRO
 
     switch (fru_ctl) {
     case FRU_CTLCODE_COLD_RST:
-        payload_send_message( fru_id, PAYLOAD_MESSAGE_COLD_RST);
+        payload_send_message(fru_id, PAYLOAD_MESSAGE_COLD_RST);
         break;
     case FRU_CTLCODE_WARM_RST:
-        payload_send_message( fru_id, PAYLOAD_MESSAGE_WARM_RST);
+        payload_send_message(fru_id, PAYLOAD_MESSAGE_WARM_RST);
         break;
     case FRU_CTLCODE_REBOOT:
-        payload_send_message( fru_id, PAYLOAD_MESSAGE_REBOOT);
+        payload_send_message(fru_id, PAYLOAD_MESSAGE_REBOOT);
         break;
     case FRU_CTLCODE_QUIESCE:
-        payload_send_message( fru_id, PAYLOAD_MESSAGE_QUIESCED);
+        payload_send_message(fru_id, PAYLOAD_MESSAGE_QUIESCE);
         break;
     default:
         rsp->completion_code = IPMI_CC_INV_DATA_FIELD_IN_REQ;

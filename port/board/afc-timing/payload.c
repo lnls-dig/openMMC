@@ -232,9 +232,9 @@ void vTaskPayload( void *pvParameters )
 
         current_evt = xEventGroupGetBits( amc_payload_evt );
 
-        if ( current_evt & PAYLOAD_MESSAGE_QUIESCED ) {
+        if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
             QUIESCED_req = 1;
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCED );
+            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCE );
         }
 
         if ( current_evt & PAYLOAD_MESSAGE_COLD_RST ) {

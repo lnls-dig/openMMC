@@ -68,7 +68,7 @@ enum {
 #define PAYLOAD_MESSAGE_COLD_RST        (1 << 4)
 #define PAYLOAD_MESSAGE_WARM_RST        (1 << 5)
 #define PAYLOAD_MESSAGE_REBOOT          (1 << 6)
-#define PAYLOAD_MESSAGE_QUIESCED        (1 << 7)
+#define PAYLOAD_MESSAGE_QUIESCE         (1 << 7)
 /**
  * @}
  */
