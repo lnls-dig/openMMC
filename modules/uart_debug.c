@@ -41,5 +41,5 @@ void uart_printf( uint8_t id, const char *format, ... )
     va_start( args, format );
     ( void )vsprintf( debug_buf, format, args );
 
-    uart_send( id, debug_buf, strlen(debug_buf)+1 );
+    uart_send( id, debug_buf, strlen(debug_buf) );
 }
