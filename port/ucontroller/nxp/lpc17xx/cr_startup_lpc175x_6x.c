@@ -143,6 +143,8 @@ extern int main(void);
 //*****************************************************************************
 extern void _vStackTop(void);
 
+void _VectorChecksum(void);
+
 //*****************************************************************************
 #if defined (__cplusplus)
 } // extern "C"
@@ -164,7 +166,7 @@ void (* const g_pfnVectors[])(void) = {
     MemManage_Handler,                      // The MPU fault handler
     BusFault_Handler,                       // The bus fault handler
     UsageFault_Handler,                     // The usage fault handler
-    0,                                      // Reserved
+    _VectorChecksum,                        // Reserved
     0,                                      // Reserved
     0,                                      // Reserved
     0,                                      // Reserved
