@@ -90,11 +90,11 @@ add_executable(bootloader ${BOOT_SRCS})
 # Linker flags
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-  SUFFIX ".axf"
+  SUFFIX ".elf"
   LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.map" )
 
 set_target_properties(bootloader PROPERTIES
-  SUFFIX ".axf"
+  SUFFIX ".elf"
   LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.map")
 
 
@@ -107,15 +107,15 @@ target_link_libraries(bootloader gcc c m lpcopen)
 
 ##Generate binary file
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-  COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_PROJECT_NAME}.axf ${CMAKE_PROJECT_NAME}.bin
+  COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_PROJECT_NAME}.elf ${CMAKE_PROJECT_NAME}.bin
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  COMMENT "Converting the AXF output to a binary file"
+  COMMENT "Converting the ELF output to a binary file"
   )
 
 add_custom_command(TARGET bootloader POST_BUILD
-  COMMAND ${CMAKE_OBJCOPY} -O binary bootloader.axf bootloader.bin
+  COMMAND ${CMAKE_OBJCOPY} -O binary bootloader.elf bootloader.bin
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  COMMENT "Converting the AXF output to a binary file"
+  COMMENT "Converting the ELF output to a binary file"
   )
 
 ##Program command

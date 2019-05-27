@@ -35,7 +35,7 @@ After creating the build files with CMake, you can compile the firmware using `m
 
 	make [VERBOSE=1]
 
-Both a `.axf` file and a `.bin` file will be generated in the `out` folder. You can use any one you prefer to program your processor.
+Both a `.elf` file and a `.bin` file will be generated in the `out` folder. You can use any one you prefer to program your processor.
 
 To clean the compilation files (binaries, objects and dependence files), just run
 
