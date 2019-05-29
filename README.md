@@ -42,23 +42,13 @@ To clean the compilation files (binaries, objects and dependence files), just ru
     make clean
 
 ## Programming
-After creating the binaries, you can program them to your chip any way you want, using a JTAG cable, ISP Programmer, custom bootloader, etc.
-There are 2 program interfaces supported so far: *LPCLink* and *LPCLink2*
-In order to select which interface will be used, include the flag `-DDEBUG_PROBE=<probe_name>` when running CMake (this option defaults to `LPCLink`).
+After creating the binaries, you can program them to your chip any way you want, using a JTAG/SWD cable, ISP Programmer, custom bootloader, etc.
 
-	cmake ~/openmmc/ -DBOARD=afc -DVERSION=3.1 -DDEBUG_PROBE=LPCLink2
+There are 2 debug probes supported so far: *jlink* and *cmsis-dap*.
+In order to select which interface will be used, include the flag `-DDEBUG_PROBE=<probe_name>` when running CMake (this option defaults to `cmsis-dap`).
 
+	cmake ~/openmmc/ -DBOARD=afc -DVERSION=3.1 -DDEBUG_PROBE=cmsis-dap
 
-### LPCLink
-If you own a *LPCLink* or *LPCLink2* board, you can use it to program the LPC1764 processor via its JTAG interface
-
-**NOTE**: In this case you **must** have the LPCXpresso installed in your machine, since we need to use the binaries for the interface chip on the LPCLink that they provide.
-
-The CMake script should be able to find LPCXpresso path, but if this is not possible, open the `<openMMC_root_folder>/CMakeLists.txt` and change the following line
-
-	set(LPCXPRESSO_PATH <lpcxpresso_path>)
-
-*NOTE*: You can also use cmake-gui to set this option.
 
 To transfer only the application firmware, run
 
@@ -71,5 +61,8 @@ To transfer only the bootloader firmware, run
 If you want to erase the whole Flash and copy both firmwares:
 
 	make program_all
+
+### LPCLink
+If you own a *LPCLink* or *LPCLink2* board, first make sure it was already flashed with the latest cmsis-dap or jlink firmware.
 
 **NOTE 2**: We only have linker scripts to LPC1764 and LPC1769, so if you wish to compile to a different controller, you'll have to change the `linker/lpc1764_boot.ld` and `linker/lpc1764_app.ld` files, which defines the memory regions, otherwise you'll run into several HardFault errors.

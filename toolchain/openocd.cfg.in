@@ -1,0 +1,7 @@
+source [find interface/${DEBUG_PROBE}.cfg]
+
+transport select swd
+
+source [find target/${OPENOCD_TARGET}.cfg]
+
+adapter_khz 2000
