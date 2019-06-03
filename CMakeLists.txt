@@ -74,7 +74,8 @@ if(BENCH_TEST)
 endif()
 
 # Get Git information
-get_git_head_revision(GIT_REFSPEC GIT_SHA1 "--abbrev=4 --tags")
+git_describe(GIT_TAG "--tags")
+get_git_head_revision(GIT_REFSPEC GIT_SHA1)
 configure_file("${CMAKE_SOURCE_DIR}/modules/GitSHA1.c.in" "${CMAKE_SOURCE_DIR}/modules/GitSHA1.c" @ONLY)
 list(APPEND PROJ_SRCS "${CMAKE_SOURCE_DIR}/modules/GitSHA1.c" "${CMAKE_SOURCE_DIR}/modules/GitSHA1.h")
 
