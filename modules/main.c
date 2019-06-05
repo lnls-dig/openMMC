@@ -104,12 +104,6 @@ int main( void )
 
 }
 
-/*-----------------------------------------------------------*/
-/* Put the MCU in sleep state when no task is running */
-void vApplicationIdleHook (void)
-{
-    pm_sleep();
-}
 
 /* FreeRTOS debug functions */
 #if (configUSE_MALLOC_FAILED_HOOK == 1)
