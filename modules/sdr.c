@@ -456,14 +456,11 @@ void check_sensor_event( sensor_t * sensor )
     uint8_t ev[3] = {0x0F, 0xFF, 0xFF};
     uint8_t ev_type;
 
-    configASSERT(sensor);
+    if (sensor == NULL) return;
 
     SDR_type_01h_t * sdr = ( SDR_type_01h_t * ) sensor->sdr;
-    configASSERT(sdr);
 
-    if( sdr->hdr.rectype != TYPE_01 ) {
-        return;
-    }
+    if( sdr == NULL || sdr->hdr.rectype != TYPE_01 ) return;
 
     /** Compare value with threshold */
     switch(sensor->state) {
