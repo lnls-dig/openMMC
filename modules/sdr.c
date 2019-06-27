@@ -722,7 +722,7 @@ void check_sensor_event( sensor_t * sensor )
         if(sensor->signed_flag){
             if(((int8_t)sensor->readout_value) <= ((int8_t)sdr->lower_nonrecover_thr)){
                 ev = IPMI_THRESHOLD_LNR_GH;
-                sensor->asserted_event.lower_non_recorverable_go_high = 1;
+                sensor->asserted_event.lower_non_recoverable_go_high = 1;
                 ev_type = ASSERTION_EVENT;
                 sensor->state = SENSOR_STATE_LOW_NON_REC;
             }
@@ -751,7 +751,7 @@ void check_sensor_event( sensor_t * sensor )
         else{
             if(sensor->readout_value <= sdr->lower_nonrecover_thr){
                 ev = IPMI_THRESHOLD_LNR_GH;
-                sensor->asserted_event.lower_non_recorverable_go_high = 1;
+                sensor->asserted_event.lower_non_recoverable_go_high = 1;
                 ev_type = ASSERTION_EVENT;
                 sensor->state = SENSOR_STATE_LOW_NON_REC;
             }
@@ -784,7 +784,7 @@ void check_sensor_event( sensor_t * sensor )
             if(((int8_t)sensor->readout_value) >= (((int8_t)sdr->lower_nonrecover_thr) + (1+((int8_t)sdr->pos_thr_hysteresis)))){
                 if(sensor->asserted_event.upper_non_recoverable_go_high){
                     ev = IPMI_THRESHOLD_LNR_GH;
-                    sensor->asserted_event.lower_non_recorverable_go_high = 0;
+                    sensor->asserted_event.lower_non_recoverable_go_high = 0;
                     ev_type = DEASSERTION_EVENT;
                 }
                 sensor->state = SENSOR_STATE_LOW_CRIT;
@@ -807,7 +807,7 @@ void check_sensor_event( sensor_t * sensor )
             if(sensor->readout_value >= (sdr->lower_nonrecover_thr + (1+sdr->pos_thr_hysteresis))){
                 if(sensor->asserted_event.upper_non_recoverable_go_high){
                     ev = IPMI_THRESHOLD_LNR_GH;
-                    sensor->asserted_event.lower_non_recorverable_go_high = 0;
+                    sensor->asserted_event.lower_non_recoverable_go_high = 0;
                     ev_type = DEASSERTION_EVENT;
                 }
                 sensor->state = SENSOR_STATE_LOW_CRIT;

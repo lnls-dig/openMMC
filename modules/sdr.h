@@ -192,7 +192,7 @@ typedef struct sensor_t {
         uint16_t upper_critical_go_low:1;
         uint16_t upper_non_critical_go_high:1;
         uint16_t upper_non_critical_go_low:1;
-        uint16_t lower_non_recorverable_go_high:1;
+        uint16_t lower_non_recoverable_go_high:1;
         uint16_t lower_non_recoverable_go_low:1;
         uint16_t lower_critical_go_high:1;
         uint16_t lower_critical_go_low:1;
