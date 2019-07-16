@@ -182,6 +182,7 @@ typedef struct sensor_t {
     uint16_t readout_value;
     uint8_t chipid;
     uint8_t signed_flag;
+    uint8_t event_scan;
     uint8_t ownerID; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
     uint8_t entityinstance; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
     TaskHandle_t * task_handle;
@@ -219,6 +220,8 @@ void amc_sdr_init( void );
 void rtm_sdr_init( void );
 #endif
 void sensor_init( void );
+void sensor_enable(sensor_t *sensor);
+void sensor_disable(sensor_t *sensor);
 void check_sensor_event( sensor_t * sensor );
 
 sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr);

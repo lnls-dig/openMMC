@@ -115,6 +115,7 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
     entry->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
     entry->readout_value = 0;
     entry->state = SENSOR_STATE_LOW_NON_REC;
+    entry->event_scan = 0xC0; /* Start with sensor enabled */
 
     /* Link the sdr list */
     if (sdr_tail) {
@@ -191,6 +192,16 @@ void sdr_pop( void )
         vPortFree( sdr_head );
         sdr_head = new_head;
     }
+}
+
+void sensor_enable(sensor_t *sensor)
+{
+    sensor->event_scan = 0xC0;
+}
+
+void sensor_disable(sensor_t *sensor)
+{
+    sensor->event_scan = 0x00;
 }
 
 /******************************/
@@ -363,34 +374,16 @@ IPMI_HANDLER(ipmi_se_get_sensor_reading, NETFN_SE, IPMI_GET_SENSOR_READING_CMD, 
 
     if (*(cur_sensor->task_handle) == vTaskHotSwap_Handle) {
         rsp->data[len++] = 0x00;
-        rsp->data[len++] = 0xC0;
+        rsp->data[len++] = cur_sensor->event_scan;
         /* Current State Mask */
         rsp->data[len++] = cur_sensor->readout_value;
     } else {
         rsp->data[len++] = cur_sensor->readout_value;
-        rsp->data[len++] = 0xC0;
+        rsp->data[len++] = cur_sensor->event_scan;
 
         /* Present threshold status ( [7:6] Reserved, return as 1b )*/
         rsp->data[len] = 0xC0;
-
-        if (cur_sensor->state == SENSOR_STATE_LOW) {
-            rsp->data[len] |= 0x01;
-        }
-        if (cur_sensor->state == SENSOR_STATE_LOW_CRIT) {
-            rsp->data[len] |= 0x02;
-        }
-        if (cur_sensor->state == SENSOR_STATE_LOW_NON_REC) {
-            rsp->data[len] |= 0x04;
-        }
-        if (cur_sensor->state == SENSOR_STATE_HIGH) {
-            rsp->data[len] |= 0x08;
-        }
-        if (cur_sensor->state == SENSOR_STATE_HIGH_CRIT) {
-            rsp->data[len] |= 0x10;
-        }
-        if (cur_sensor->state == SENSOR_STATE_HIGH_NON_REC) {
-            rsp->data[len] |= 0x20;
-        }
+        rsp->data[len] |= cur_sensor->state;
         len++;
     }
 
