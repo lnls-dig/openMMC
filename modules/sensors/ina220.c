@@ -100,6 +100,7 @@ void vTaskINA220( void *Parameters )
             }
 
             /* Check for threshold events */
+            sensor_state_check(ina220_sensor);
             check_sensor_event(ina220_sensor);
 
             vTaskDelayUntil( &xLastWakeTime, xFrequency );

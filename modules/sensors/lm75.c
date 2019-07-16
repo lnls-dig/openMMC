@@ -77,6 +77,7 @@ void vTaskLM75( void* Parameters )
                 }
                 /* Check for threshold events */
                 i2c_give(i2c_interf);
+                sensor_state_check(temp_sensor);
                 check_sensor_event(temp_sensor);
             }
         }

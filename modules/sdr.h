@@ -64,6 +64,13 @@
 #define IPMI_THRESHOLD_UNR_GL           0x0A    // upper non recoverable going low
 #define IPMI_THRESHOLD_UNR_GH           0x0B    // upper non recoverable going high
 
+/* Constants for comparison function */
+#define UNSIGNED	0x00
+#define SIGNED		0x01
+
+#define LOWER_EQ	0x00
+#define UPPER_EQ	0x01
+
 
 typedef enum {
     TYPE_01 = 0x1,
@@ -223,7 +230,7 @@ void sensor_init( void );
 void sensor_enable(sensor_t *sensor);
 void sensor_disable(sensor_t *sensor);
 void check_sensor_event( sensor_t * sensor );
-
+void sensor_state_check( sensor_t *sensor );
 sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr);
 void sdr_remove_entry( sensor_t * entry );
 void sdr_pop( void );
