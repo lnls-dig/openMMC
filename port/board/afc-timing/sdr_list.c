@@ -69,10 +69,8 @@ const SDR_type_02h_t SDR_HOTSWAP_AMC = {
     .sensorcap = 0xc1, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_HOT_SWAP, /* sensor type: HOT SWAP*/
     .event_reading_type = 0x6f, /* sensor reading*/
-    .assertion_event_mask = { 0x00, /* LSB assert event mask: 3 bit value */
-                              0x00 }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0x00, /* LSB deassert event mask: 3 bit value */
-                                0x00 }, /* MSB deassert event mask */
+    .assertion_event_mask = 0x0000, /* assertion event mask */
+    .deassertion_event_mask = 0x0000, /* deassertion event mask */
     .readable_threshold_mask = 0x00, /* LSB: readable Threshold mask: no thresholds are readable:  */
     .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: no thresholds are setable: */
     .sensor_units_1 = 0xc0, /* sensor units 1 : Does not return analog reading*/
@@ -113,12 +111,10 @@ const SDR_type_01h_t SDR_FMC1_12V = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: Voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -170,12 +166,10 @@ const SDR_type_01h_t SDR_FMC1_VADJ = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -227,12 +221,10 @@ const SDR_type_01h_t SDR_FMC1_P3V3 = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: VOLTAGE*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -283,12 +275,10 @@ const SDR_type_01h_t SDR_FMC2_12V = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: Voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -340,12 +330,10 @@ const SDR_type_01h_t SDR_FMC2_VADJ = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -397,12 +385,10 @@ const SDR_type_01h_t SDR_FMC2_P3V3 = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_VOLTAGE, /* sensor type: VOLTAGE*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -456,12 +442,10 @@ const SDR_type_01h_t SDR_FMC1_12V_CURR = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: Voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -513,12 +497,10 @@ const SDR_type_01h_t SDR_FMC1_VADJ_CURR = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -570,12 +552,10 @@ const SDR_type_01h_t SDR_FMC1_P3V3_CURR = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: VOLTAGE*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -626,12 +606,10 @@ const SDR_type_01h_t SDR_FMC2_12V_CURR = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: Voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -683,12 +661,10 @@ const SDR_type_01h_t SDR_FMC2_VADJ_CURR = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: voltage*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -740,12 +716,10 @@ const SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_CURRENT, /* sensor type: VOLTAGE*/
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x80, /* sensor units 1 :*/
     .sensor_units_2 = 0x05, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -798,12 +772,10 @@ const SDR_type_01h_t SDR_LM75_uC = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x01, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -854,12 +826,10 @@ const SDR_type_01h_t SDR_LM75_ADN4604 = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x01, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -910,12 +880,10 @@ const SDR_type_01h_t SDR_LM75_DCDC = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x01, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -966,12 +934,10 @@ const SDR_type_01h_t SDR_LM75_RAM = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x01, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
@@ -1024,12 +990,10 @@ const SDR_type_01h_t SDR_MAX6642_FPGA = {
     .sensorcap = 0x68, /* capabilities: auto re-arm,*/
     .sensortype = SENSOR_TYPE_TEMPERATURE, /* sensor type */
     .event_reading_type = 0x01, /* sensor reading*/
-    .assertion_event_mask = { 0xFF, /* LSB assert event mask: 3 bit value */
-                              0x0F }, /* MSB assert event mask */
-    .deassertion_event_mask = { 0xFF, /* LSB deassert event mask: 3 bit value */
-                                0x0F }, /* MSB deassert event mask */
-    .readable_threshold_mask = 0x3F, /* LSB: readabled Threshold mask: all thresholds are readabled:  */
-    .settable_threshold_mask = 0x3F, /* MSB: setabled Threshold mask: all thresholds are setabled: */
+    .assertion_event_mask = 0x7A95, /* assertion event mask (All upper going-high and lower going-low events) */
+    .deassertion_event_mask = 0x7A95, /* deassertion event mask (All upper going-high and lower going-low events) */
+    .readable_threshold_mask = 0x3F, /* LSB: readable Threshold mask: all thresholds are readable:  */
+    .settable_threshold_mask = 0x00, /* MSB: setable Threshold mask: none of the thresholds are setable: */
     .sensor_units_1 = 0x00, /* sensor units 1 :*/
     .sensor_units_2 = 0x01, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
