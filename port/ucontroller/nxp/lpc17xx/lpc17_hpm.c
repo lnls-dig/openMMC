@@ -114,12 +114,12 @@ uint8_t ipmc_hpm_finish_upload( uint32_t image_size )
         return 0x81;
     }
     /* Copy the last page (we'll change only the last word) */
-    memcpy(ipmc_page, (uint32_t *) (UPGRADE_FLASH_END_ADDR-IPMC_UPDATE_ADDRESS_OFFSET-256), sizeof(ipmc_page));
+    memcpy(ipmc_page, (uint32_t *) (UPGRADE_FLASH_END_ADDR-256), sizeof(ipmc_page));
 
     /* TODO: Write actual firmware ID */
     /* Write bootloader magic word */
     ipmc_page[63] = 0x55555555;
-    ipmc_program_page( UPGRADE_FLASH_END_ADDR-256, ipmc_page, sizeof(ipmc_page));
+    ipmc_program_page( UPGRADE_FLASH_END_ADDR-IPMC_UPDATE_ADDRESS_OFFSET-256, ipmc_page, sizeof(ipmc_page));
 
     return IPMI_CC_OK;
 }
