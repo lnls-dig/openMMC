@@ -103,8 +103,8 @@ void vTaskINA220( void *Parameters )
             sensor_state_check(ina220_sensor);
             check_sensor_event(ina220_sensor);
 
-            vTaskDelayUntil( &xLastWakeTime, xFrequency );
         }
+        vTaskDelayUntil( &xLastWakeTime, xFrequency );
     }
 }
 
