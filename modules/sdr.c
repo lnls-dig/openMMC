@@ -458,6 +458,9 @@ void sensor_state_check( sensor_t *sensor )
     SDR_type_01h_t * sdr = (SDR_type_01h_t *) sensor->sdr;
     if(sdr == NULL || sdr->hdr.rectype != TYPE_01) return;
 
+    /* Only check enabled sensors */
+    if (!(sensor->event_scan & 0xC0)) return;
+
     if(compare_val(sensor->readout_value, sdr->lower_noncritical_thr, UPPER_EQ, sensor->signed_flag) && compare_val(sensor->readout_value, sdr->upper_noncritical_thr, LOWER_EQ, sensor->signed_flag)) {
         sensor->state = SENSOR_STATE_NORMAL;
     } else if(compare_val(sensor->readout_value, sdr->upper_noncritical_thr, UPPER_EQ, sensor->signed_flag) && compare_val(sensor->readout_value, sdr->upper_critical_thr, LOWER_EQ, sensor->signed_flag)) {
