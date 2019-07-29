@@ -48,11 +48,12 @@
 /**
  * @brief Maximum count of messages to be sent
  */
-#define IPMB_TXQUEUE_LEN        2
+#define IPMB_TXQUEUE_LEN        10
+
 /**
- * @brief Maximum count if received messages to be delivered to client task
+ * @brief Maximum count of received messages to be delivered to client task
  */
-#define IPMB_CLIENT_QUEUE_LEN   2
+#define IPMB_CLIENT_QUEUE_LEN   10
 
 /**
  * @brief Maximum retries made by IPMB TX Task when sending a message
