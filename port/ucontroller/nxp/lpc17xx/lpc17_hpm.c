@@ -32,6 +32,7 @@
 #include "modules/ipmi.h"
 #include "boot/boot.h"
 #include "modules/watchdog.h"
+#include "string.h"
 
 uint32_t ipmc_page_addr = 0;
 uint32_t ipmc_image_size = 0;
@@ -108,19 +109,18 @@ uint8_t ipmc_hpm_finish_upload( uint32_t image_size )
         ipmc_page_addr = 0;
     }
 
-    for(uint16_t i=0; i<(sizeof(ipmc_page)/sizeof(uint32_t)); i++) {
-        ipmc_page[i] = 0xFFFFFFFF;
-    }
-
-    /* BUG: This will overwrite the last page in the flash */
-    /* TODO: Write actual firmware ID */
-    ipmc_page[63] = 0x55555555;
-    ipmc_program_page( UPGRADE_FLASH_END_ADDR-IPMC_UPDATE_ADDRESS_OFFSET-256, ipmc_page, sizeof(ipmc_page));
-
     if (ipmc_image_size != image_size) {
         /* HPM CC: Number of bytes received does not match the size provided in the "Finish firmware upload" request */
         return 0x81;
     }
+    /* Copy the last page (we'll change only the last word) */
+    memcpy(ipmc_page, (uint32_t *) (UPGRADE_FLASH_END_ADDR-256), sizeof(ipmc_page));
+
+    /* TODO: Write actual firmware ID */
+    /* Write bootloader magic word */
+    ipmc_page[63] = 0x55555555;
+    ipmc_program_page( UPGRADE_FLASH_END_ADDR-IPMC_UPDATE_ADDRESS_OFFSET-256, ipmc_page, sizeof(ipmc_page));
+
     return IPMI_CC_OK;
 }
 

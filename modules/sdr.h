@@ -64,6 +64,13 @@
 #define IPMI_THRESHOLD_UNR_GL           0x0A    // upper non recoverable going low
 #define IPMI_THRESHOLD_UNR_GH           0x0B    // upper non recoverable going high
 
+/* Constants for comparison function */
+#define UNSIGNED	0x00
+#define SIGNED		0x01
+
+#define LOWER_EQ	0x00
+#define UPPER_EQ	0x01
+
 
 typedef enum {
     TYPE_01 = 0x1,
@@ -91,8 +98,8 @@ typedef struct {
     uint8_t sensorcap;
     uint8_t sensortype;
     uint8_t event_reading_type;
-    uint8_t assertion_event_mask[2];
-    uint8_t deassertion_event_mask[2];
+    uint16_t assertion_event_mask;
+    uint16_t deassertion_event_mask;
     uint8_t settable_threshold_mask;
     uint8_t readable_threshold_mask;
     uint8_t sensor_units_1;
@@ -139,8 +146,8 @@ typedef struct {
     uint8_t sensorcap;
     uint8_t sensortype;
     uint8_t event_reading_type;
-    uint8_t assertion_event_mask[2];
-    uint8_t deassertion_event_mask[2];
+    uint16_t assertion_event_mask;
+    uint16_t deassertion_event_mask;
     uint8_t settable_threshold_mask;
     uint8_t readable_threshold_mask;
     uint8_t sensor_units_1;
@@ -182,6 +189,7 @@ typedef struct sensor_t {
     uint16_t readout_value;
     uint8_t chipid;
     uint8_t signed_flag;
+    uint8_t event_scan;
     uint8_t ownerID; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
     uint8_t entityinstance; /* This field is repeated here because its value is assigned during initialization, so it can't be const */
     TaskHandle_t * task_handle;
@@ -192,7 +200,7 @@ typedef struct sensor_t {
         uint16_t upper_critical_go_low:1;
         uint16_t upper_non_critical_go_high:1;
         uint16_t upper_non_critical_go_low:1;
-        uint16_t lower_non_recorverable_go_high:1;
+        uint16_t lower_non_recoverable_go_high:1;
         uint16_t lower_non_recoverable_go_low:1;
         uint16_t lower_critical_go_high:1;
         uint16_t lower_critical_go_low:1;
@@ -219,8 +227,10 @@ void amc_sdr_init( void );
 void rtm_sdr_init( void );
 #endif
 void sensor_init( void );
+void sensor_enable(sensor_t *sensor);
+void sensor_disable(sensor_t *sensor);
 void check_sensor_event( sensor_t * sensor );
-
+void sensor_state_check( sensor_t *sensor );
 sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr);
 void sdr_remove_entry( sensor_t * entry );
 void sdr_pop( void );

@@ -49,7 +49,7 @@ int main( void )
 #endif
 
     printf("openMMC Starting!\n");
-    printf("Build date: %s %s\n" __DATE__, __TIME__);
+    printf("Build date: %s %s\n", __DATE__, __TIME__);
     printf("Version: %s\n", g_GIT_TAG);
     printf("SHA1: %s\n", g_GIT_SHA1);
 

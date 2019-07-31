@@ -67,7 +67,8 @@ void vTaskMAX6642( void* Parameters )
             max6642_read_remote( temp_sensor, (uint8_t *) &(temp_sensor->readout_value) );
 
             /* Check for threshold events */
-            check_sensor_event( temp_sensor );
+            sensor_state_check(temp_sensor);
+            check_sensor_event(temp_sensor);
         }
         vTaskDelay(xFrequency);
     }
