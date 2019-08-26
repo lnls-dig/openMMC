@@ -36,6 +36,7 @@
 #include "payload.h"
 #include "uart_debug.h"
 #include "led.h"
+#include "board_led.h"
 
 extern EventGroupHandle_t rtm_payload_evt;
 

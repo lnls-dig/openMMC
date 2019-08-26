@@ -31,114 +31,21 @@
 #include "string.h"
 #include "task_priorities.h"
 #include "fru.h"
+#include "led.h"
+#include "board_led.h"
 
-const uint32_t amc_led_pincfg[] = {
-    [LED_BLUE] = GPIO_LEDBLUE,
-    [LED1] = GPIO_LEDRED,
-    [LED2] = GPIO_LEDGREEN
-};
-
-const LEDConfig_t amc_leds_config[] = {
-    [LED_BLUE] = {
-        .id = LED_BLUE,
-        .color = LEDCOLOR_BLUE,
-        .act_func = amc_led_act,
-        .mode = LEDMODE_LOCAL,
-        .mode_cfg = {
-            [LEDMODE_LOCAL] = {
-                .t_init = 0,
-                .t_toggle = 0,
-                .init_status = LEDINIT_ON,
-            }
-        }
-    },
-
-    [LED1] = {
-        .id = LED1,
-        .color = LEDCOLOR_RED,
-        .act_func = amc_led_act,
-        .mode = LEDMODE_LOCAL,
-        .mode_cfg = {
-            [LEDMODE_LOCAL] = {
-                .t_init = 0,
-                .t_toggle = 0,
-                .init_status = LEDINIT_OFF,
-            }
-        }
-    },
-
-    [LED2] = {
-        .id = LED2,
-        .color = LEDCOLOR_GREEN,
-        .act_func = amc_led_act,
-        .mode = LEDMODE_LOCAL,
-        .mode_cfg = {
-            [LEDMODE_LOCAL] = {
-                .t_init = 5,
-                .t_toggle = 5,
-                .init_status = LEDINIT_ON,
-            }
-        }
-    },
-};
-
-#ifdef MODULE_RTM
-const LEDConfig_t rtm_leds_config[] = {
-    [LED_BLUE] = {
-        .id = LED_BLUE,
-        .color = LEDCOLOR_BLUE,
-        .act_func = rtm_led_act,
-        .mode = LEDMODE_LOCAL,
-        .mode_cfg = {
-            [LEDMODE_LOCAL] = {
-                .t_init = 0xFF,
-                .t_toggle = 0,
-                .init_status = LEDINIT_ON,
-            }
-        }
-    },
-
-    [LED1] = {
-        .id = LED1,
-        .color = LEDCOLOR_RED,
-        .act_func = rtm_led_act,
-        .mode = LEDMODE_LOCAL,
-        .mode_cfg = {
-            [LEDMODE_LOCAL] = {
-                .t_init = 0,
-                .t_toggle = 0,
-                .init_status = LEDINIT_OFF,
-            }
-        }
-    },
-
-    [LED2] = {
-        .id = LED2,
-        .color = LEDCOLOR_GREEN,
-        .act_func = rtm_led_act,
-        .mode = LEDMODE_LOCAL,
-        .mode_cfg = {
-            [LEDMODE_LOCAL] = {
-                .t_init = 5,
-                .t_toggle = 5,
-                .init_status = LEDINIT_ON,
-            }
-        }
-    },
-};
-#endif
 
 LEDConfig_t led_config[FRU_COUNT][LED_CNT];
 QueueHandle_t led_update_queue;
 
 void LED_init( void )
 {
-    /* AMC LED Pins initialization */
+    /* LED Pins initialization */
     gpio_init();
 
     led_update_queue = xQueueCreate( 3, sizeof(LEDUpdate_t) );
 
-    memcpy( &led_config[0], &amc_leds_config, sizeof(amc_leds_config) );
+    memcpy( &led_config[0], &leds_config, sizeof(leds_config) );
 #ifdef MODULE_RTM
     memcpy( &led_config[1], &rtm_leds_config, sizeof(rtm_leds_config) );
 #endif
@@ -258,19 +165,19 @@ void LEDUpdate( uint8_t fru, uint8_t led_num, uint8_t mode, uint8_t init_status,
 }
 
 /* AMC LED acting function */
-void amc_led_act( uint8_t id, uint8_t action )
+void led_act( uint8_t id, uint8_t action )
 {
     switch( action ) {
     case LEDACT_TURN_ON:
-        gpio_set_pin_low( PIN_PORT(amc_led_pincfg[id]), PIN_NUMBER(amc_led_pincfg[id]) );
+        gpio_set_pin_low( PIN_PORT(led_pincfg[id]), PIN_NUMBER(led_pincfg[id]) );
         break;
 
     case LEDACT_TURN_OFF:
-        gpio_set_pin_high( PIN_PORT(amc_led_pincfg[id]), PIN_NUMBER(amc_led_pincfg[id]) );
+        gpio_set_pin_high( PIN_PORT(led_pincfg[id]), PIN_NUMBER(led_pincfg[id]) );
         break;
 
     case LEDACT_TOGGLE:
-        gpio_pin_toggle( PIN_PORT(amc_led_pincfg[id]), PIN_NUMBER(amc_led_pincfg[id]) );
+        gpio_pin_toggle( PIN_PORT(led_pincfg[id]), PIN_NUMBER(led_pincfg[id]) );
         break;
 
     default:
@@ -374,22 +281,8 @@ IPMI_HANDLER(ipmi_picmg_get_fru_led_properties, NETFN_GRPEXT, IPMI_PICMG_CMD_GET
     }
     /* Check which LEDs are controllable */
     for (uint8_t i = 0; i < sizeof(led_config[fru])/sizeof(led_config[fru][0]); i++) {
-        switch (led_config[fru][i].id) {
-        case LED_BLUE:
-            led_bitf |= (1 << 0);
-            break;
-        case LED1:
-            led_bitf |= (1 << 1);
-            break;
-        case LED2:
-            led_bitf |= (1 << 2);
-            break;
-        case LED3:
-            led_bitf |= (1 << 3);
-            break;
-        default:
-            /* Bits [7:4] are reserved */
-            break;
+        if (led_config[fru][i].id < LED_MAX_CNT) {
+            led_bitf |= (1 << led_config[fru][i].id);
         }
     }
     rsp->data[len++] = led_bitf;

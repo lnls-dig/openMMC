@@ -22,17 +22,8 @@
 #ifndef LED_H_
 #define LED_H_
 
-#define LED_CNT 3
-
 #include "port.h"
-
-enum LED_ID {
-    LED_BLUE = 0,
-    LED1, /* Red */
-    LED2,  /* Green */
-    LED3,
-    LED_MAX_CNT
-};
+#include <stdbool.h>
 
 enum LEDColor {
     LEDCOLOR_BLUE = 1,
@@ -98,7 +89,7 @@ void LED_init( void );
 void LED_Task( void *Parameters );
 void LEDManage( LEDConfig_t *led_cfg );
 void LEDUpdate( uint8_t fru, uint8_t led_num, uint8_t mode, uint8_t init_status, uint16_t t_init, uint16_t t_toggle );
-void amc_led_act( uint8_t id, uint8_t action );
+void led_act( uint8_t id, uint8_t action );
 #ifdef MODULE_RTM
 void rtm_led_act( uint8_t id, uint8_t action );
 #endif

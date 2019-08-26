@@ -2,8 +2,6 @@ set(LPC17XX_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 set(LPCOPEN_SRCPATH ${LPC17XX_PATH}/lpcopen/src)
 set(LPCOPEN_INCPATH ${LPC17XX_PATH}/lpcopen/inc)
 
-include_directories(${LPC17XX_PATH})
-include_directories(${PROJ_HDRS})
 
 #Silence GCC Warnings
 add_compile_options( -Wno-switch -Wno-unused-but-set-variable )
@@ -38,6 +36,7 @@ set(LIBLPCOPEN_SRCS
   ${LPC17XX_PATH}/lpc17_spi.c
   ${LPC17XX_PATH}/lpc17_ssp.c
   ${LPC17XX_PATH}/lpc17_hpm.c
+  ${LPC17XX_PATH}/lpc17_pincfg.c
   )
 
 if( UART_RINGBUFFER )
@@ -47,7 +46,6 @@ else()
   set(LIBLPCOPEN_SRCS ${LIBLPCOPEN_SRCS} ${LPC17XX_PATH}/lpc17_uart.c)
 endif()
 
-include_directories(${LPCOPEN_INCPATH})
 
 set(TARGET_ARCH     "armv7-m" )
 set(TARGET_CPU      "cortex-m3")
@@ -72,4 +70,7 @@ set(UCONTROLLER_HDRS ${UCONTROLLER_HDRS} PARENT_SCOPE)
 
 add_library(lpcopen STATIC ${LIBLPCOPEN_SRCS})
 
-add_dependencies(lpcopen FreeRTOS)
+target_link_libraries(lpcopen PUBLIC FreeRTOS)
+target_include_directories(lpcopen PUBLIC ${LPCOPEN_INCPATH})
+target_include_directories(lpcopen PUBLIC ${LPC17XX_PATH})
+target_include_directories(lpcopen PUBLIC ${PROJ_HDRS})

@@ -37,6 +37,7 @@
 #include "task_priorities.h"
 #include "ipmi.h"
 #include "led.h"
+#include "board_led.h"
 #include "fru.h"
 #include "utils.h"
 #include "uart_debug.h"

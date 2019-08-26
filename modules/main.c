@@ -27,8 +27,11 @@
 #include "GitSHA1.h"
 #include "port.h"
 #include "led.h"
+#include "pin_cfg.h"
 #include "ipmi.h"
+#ifdef MODULE_PAYLOAD
 #include "payload.h"
+#endif
 #include "i2c.h"
 #include "fru.h"
 #include "scansta1101.h"
@@ -102,12 +105,6 @@ int main( void )
 
 }
 
-/*-----------------------------------------------------------*/
-/* Put the MCU in sleep state when no task is running */
-void vApplicationIdleHook (void)
-{
-    pm_sleep();
-}
 
 /* FreeRTOS debug functions */
 #if (configUSE_MALLOC_FAILED_HOOK == 1)

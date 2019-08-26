@@ -29,6 +29,7 @@
 #include "fru.h"
 #include "utils.h"
 #include "led.h"
+#include "board_led.h"
 #include "uart_debug.h"
 /* RTM Management functions */
 

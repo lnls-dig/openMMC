@@ -34,16 +34,8 @@
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+#include "board_ipmb.h"
 
-/**
- * @brief Default I2C interface to use in IPMB protocol
- */
-#define IPMB_I2C                I2C0
-
-/**
- * @brief I2C Clock Frequency for IPMB - 100kHz
- */
-#define IPMB_I2C_FREQ 100000
 
 /**
  * @brief Maximum count of messages to be sent
@@ -129,11 +121,6 @@
  * @brief Size of #IPMBL_TABLE
  */
 #define IPMBL_TABLE_SIZE                27
-
-/**
- * @brief Minimum clock cycles to the GPIO pin change take effect on some boards
- */
-#define GPIO_GA_DELAY 10
 
 /**
  * @brief GA pins definition

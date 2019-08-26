@@ -19,27 +19,25 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/**
- * @file uart_debug.c
- * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- *
- * @brief UART interface implementation
- */
+#ifndef BOARD_LED_H_
+#define BOARD_LED_H_
 
-/* Project includes */
+#define LED_CNT 3
+
 #include "port.h"
-#include "uart_debug.h"
-#include "stdarg.h"
 
-char debug_buf[100];
+enum LED_ID {
+    LED_BLUE = 0,
+    LED1, /* Red */
+    LED2,  /* Green */
+    LED3,
+    LED_MAX_CNT
+};
 
+extern const uint32_t led_pincfg[LED_MAX_CNT];
+extern const LEDConfig_t leds_config[LED_MAX_CNT];
+#ifdef MODULE_RTM
+extern const LEDConfig_t rtm_leds_config[LED_MAX_CNT];
+#endif
 
-void uart_printf( uint8_t id, const char *format, ... )
-{
-    va_list args;
-
-    va_start( args, format );
-    ( void )vsprintf( debug_buf, format, args );
-
-    uart_send( id, debug_buf, strlen(debug_buf) );
-}
+#endif /* BOARD_LED_H_ */
