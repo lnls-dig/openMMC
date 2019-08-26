@@ -36,9 +36,20 @@
 #ifndef SENSORS_H_
 #define SENSORS_H_
 
+#if defined(MODULE_INA220_VOLTAGE) || defined(MODULE_INA220_CURRENT)
 #include "ina220.h"
+#endif
+
+#ifdef MODULE_HOTSWAP
 #include "hotswap.h"
+#endif
+
+#ifdef MODULE_LM75
 #include "lm75.h"
+#endif
+
+#ifdef MODULE_MAX6642
 #include "max6642.h"
+#endif
 
 #endif

@@ -18,14 +18,11 @@
  */
 
 /**
- * @file lpc17_pincfg.h
+ * @file lpc17_pincfg.c
  * @brief Pin Config functions redirection for LPC17xx
  *
  * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
  */
-
-#ifndef LPC17_PINCFG_H_
-#define LPC17_PINCFG_H_
 
 #include "port.h"
 
@@ -37,21 +34,17 @@
  * @see IOCON_17XX_40XX_MODE_FUNC
  */
 
-/* 32 bit value in the format -> [port][pin][func][dir] each field [] is one byte */
-#define PIN_DEF( port, pin, func, dir ) ( (port << 24) | (pin << 16) | (func << 8) | dir )
+void pin_init( void )
+{
+    uint8_t i;
+    uint32_t cfg[] = { PIN_CFG_LIST };
+    uint8_t list_len = sizeof(cfg)/(sizeof(cfg[0]));
 
-#define PIN_PORT( pin_def )      ((pin_def & 0xFF000000) >> 24)
-#define PIN_NUMBER( pin_def )    ((pin_def & 0x00FF0000) >> 16)
-#define PIN_FUNC( pin_def )      ((pin_def & 0x0000FF00) >> 8)
-#define PIN_DIR( pin_def )       ((pin_def & 0x000000FF) >> 0)
-
-/* For other mcus like Atmel's it should be PORTA, PORTB, etc */
-#define PORT0 0
-#define PORT1 1
-#define PORT2 2
-#define PORT3 3
-#define PORT4 4
-
-#define NON_GPIO 0xFF
-
-#endif
+    for ( i = 0; i < list_len; i++ ) {
+        Chip_IOCON_PinMuxSet(LPC_IOCON, PIN_PORT(cfg[i]), PIN_NUMBER(cfg[i]), PIN_FUNC(cfg[i]));
+        if ( PIN_DIR(cfg[i]) != NON_GPIO ) {
+            /* Config GPIO direction */
+            gpio_set_pin_dir( PIN_PORT(cfg[i]), PIN_NUMBER(cfg[i]), PIN_DIR(cfg[i]));
+        }
+    }
+}

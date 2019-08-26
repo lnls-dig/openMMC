@@ -24,6 +24,10 @@ else()
   message(FATAL_ERROR "${BoldRed}Selected board \"${BOARD}\" is not implemented!${ColourReset}")
 endif()
 
+if(${BOARD} MATCHES "^(afc)")
+  add_subdirectory(afc-common)
+endif()
+
 #RTM Board
 if(BOARD_RTM AND (";${TARGET_MODULES};" MATCHES ";RTM;"))
   message(STATUS "Selected RTM Board support: ${BOARD_RTM}")

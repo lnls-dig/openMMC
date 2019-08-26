@@ -40,8 +40,6 @@
 #ifndef PIN_MAPPING_H_
 #define PIN_MAPPING_H_
 
-#include "../../../../modules/pin_cfg.h"
-
 /* SPI Interfaces */
 #define FPGA_SPI        0
 #define FLASH_SPI       1

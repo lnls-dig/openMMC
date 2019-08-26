@@ -34,6 +34,7 @@
  #else
  #include "board.h"
  #endif
+#include "lpc17_power.h"
 
 /*****************************************************************************
  * Private types/enumerations/variables
@@ -88,4 +89,11 @@ void SystemInit(void)
 #endif
 	/* Update clock register value */
 	SystemCoreClockUpdate();
+}
+
+/*-----------------------------------------------------------*/
+/* Put the MCU in sleep state when no task is running */
+void vApplicationIdleHook (void)
+{
+    pm_sleep();
 }

@@ -37,6 +37,7 @@
 #include "utils.h"
 #include "fru.h"
 #include "led.h"
+#include "board_led.h"
 
 /* payload states
  *   0 - no power

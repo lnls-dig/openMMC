@@ -19,27 +19,35 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/**
- * @file uart_debug.c
- * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- *
- * @brief UART interface implementation
+/*! @file fru.c
  */
 
-/* Project includes */
 #include "port.h"
-#include "uart_debug.h"
-#include "stdarg.h"
+#include "fru.h"
+#include "fru_editor.h"
+#include "at24mac.h"
+#include "eeprom_24xx64.h"
+#include "i2c_mapping.h"
 
-char debug_buf[100];
-
-
-void uart_printf( uint8_t id, const char *format, ... )
-{
-    va_list args;
-
-    va_start( args, format );
-    ( void )vsprintf( debug_buf, format, args );
-
-    uart_send( id, debug_buf, strlen(debug_buf) );
-}
+fru_data_t fru[FRU_COUNT] = {
+    [FRU_AMC] = {
+        .cfg = {
+            .eeprom_id = CHIP_ID_EEPROM,
+            .build_f = amc_fru_info_build,
+            .read_f = at24mac_read,
+            .write_f = at24mac_write,
+        },
+        .runtime = false
+    },
+#ifdef MODULE_RTM
+    [FRU_RTM] = {
+        .cfg = {
+            .eeprom_id = CHIP_ID_RTM_EEPROM,
+            .build_f = rtm_fru_info_build,
+            .read_f = eeprom_24xx64_read,
+            .write_f = eeprom_24xx64_write,
+        },
+        .runtime = false
+    }
+#endif
+};

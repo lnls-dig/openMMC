@@ -138,8 +138,11 @@ static void I2C_Slave_Event(I2C_ID_T id, I2C_EVENT_T event)
     }
 }
 
+
 void vI2CSlaveSetup ( I2C_ID_T id, uint8_t slave_addr )
 {
+    /* expects i2c addr < 0x80 */
+    slave_addr <<= 1;
     slave_cfg.slaveAddr = slave_addr;
     slave_cfg.txBuff = NULL; /* Not using Slave transmitter right now */
     slave_cfg.txSz = 0;
