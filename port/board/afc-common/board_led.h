@@ -30,7 +30,6 @@ enum LED_ID {
     LED_BLUE = 0,
     LED1, /* Red */
     LED2,  /* Green */
-    LED3,
     LED_MAX_CNT
 };
 
