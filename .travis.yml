@@ -3,11 +3,6 @@ sudo: required
 notifications:
   email: false
 
-#Test only in travis branch for now
-branches:
-  only:
-    - master
-
 language: c
 
 before_script:
