@@ -4,6 +4,8 @@
 
 Open Source modular IPM Controller firmware
 
+Documentation: https://lnls-dig.github.io/openMMC
+
 ## Installation:
 The following packages are needed in your system in order to compile the firmware:
 - **gcc-arm-none-eabi**
