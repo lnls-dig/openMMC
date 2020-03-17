@@ -32,7 +32,7 @@ script:
   - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Release && make
 
   # Generate and deploy documentation
-after_success: "cd $TRAVIS_BUILD_DIR/docs && doxygen Doxyfile.dox && echo "" > html/.nojekyll && ls -la html"
+after_success: "cd $TRAVIS_BUILD_DIR/docs && doxygen Doxyfile.dox && echo \"\" > html/.nojekyll && ls -la html"
 
 deploy:
   provider: pages
