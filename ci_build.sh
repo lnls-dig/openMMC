@@ -13,8 +13,8 @@ export LANG LC_ALL
 mkdir build && \
     cd build && \
     cmake ../ \
-        -DBOARD=$BOARD \
-        -DVERSION=$VERSION \
-        -DBOARD_RTM=$RTM \
+        -DBOARD=${BOARD} \
+        -DVERSION=${VERSION} \
+        -DBOARD_RTM=${RTM} \
         -DCMAKE_BUILD_TYPE=Release && \
     make
