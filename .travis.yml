@@ -38,7 +38,7 @@ script:
 
   # Generate and deploy documentation
 after_success:
-  - cd $TRAVIS_BUILD_DIR/docs && cp $TRAVIS_BUILD_DIR/.travis.yml html/ && doxygen Doxyfile.dox && echo \"\" > html/.nojekyll && ls -la html
+  - cd $TRAVIS_BUILD_DIR/docs && cp $TRAVIS_BUILD_DIR/.travis.yml html/ && doxygen Doxyfile.dox && echo "" > html/.nojekyll && ls -la html
 
 deploy:
   provider: pages
