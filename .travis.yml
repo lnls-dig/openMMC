@@ -30,8 +30,9 @@ addons:
       - doxygen-gui
       - graphviz
 
+#   Build and check this project
 script:
-  - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Release && make
+  - ./ci_build.sh
 
   # Generate and deploy documentation
 after_success:
