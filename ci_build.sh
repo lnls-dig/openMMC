@@ -10,8 +10,8 @@ LANG=C
 LC_ALL=C
 export LANG LC_ALL
 
-mkdir build_$BOARD_$VERSION && \
-    cd build_$BOARD_$VERSION && \
+mkdir build && \
+    cd build && \
     cmake ../ \
         -DBOARD=$BOARD \
         -DVERSION=$VERSION \
