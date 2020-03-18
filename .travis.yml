@@ -1,5 +1,7 @@
 sudo: false
 dist: bionic
+os: linux
+arch: arm64
 
 notifications:
   email: false
