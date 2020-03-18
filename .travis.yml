@@ -39,12 +39,3 @@ script:
   # Generate and deploy documentation
 after_success:
   - cd $TRAVIS_BUILD_DIR/docs && doxygen Doxyfile.dox && echo "" > html/.nojekyll && ls -la html
-
-deploy:
-  provider: pages
-  skip-cleanup: true
-  local-dir: docs/html
-  github-token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
-  keep-history: false
-  on:
-    branch: travis-gh-pages-test
