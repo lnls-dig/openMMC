@@ -12,10 +12,17 @@ branches:
     - gh-pages
 
 env:
+  global:
+    - BUILD_DIR=build
+    - RELEASE_DIR=release
   jobs:
-    - BOARD='afc-bpm'        -VERSION='3.0' -RTM=''
-    - BOARD='afc-bpm'        -VERSION='3.1' -RTM=''
-    - BOARD='afc-timing'     -VERSION=''    -RTM='rtm-8sfp'
+    - BUILD_TYPE='Release'  BOARD='afc-bpm'        -VERSION='3.0' -RTM=''
+    - BUILD_TYPE='Release'  BOARD='afc-bpm'        -VERSION='3.1' -RTM=''
+    - BUILD_TYPE='Release'  BOARD='afc-timing'     -VERSION=''    -RTM='rtm-8sfp'
+
+jobs:
+  include:
+    - env: DEPLOY='all'
 
 # Install dependencies
 addons:
@@ -39,6 +46,17 @@ after_success:
   - ./ci_gen_doxy.sh
 
 deploy:
+  - provider: releases
+    token:
+      secure: "ammPjSoAPm1RFwXJq2O4JSBHrtOlf/2LNtdB462IpCRek4p9EY/jFEoMhRnYlXWrRdYC0EAk/GSAtCLC7u22G66pACezg1Q0xJdfFSMwo7MWcU2ukSeRoFugw09OuB6E/LZ6NcDVYxXVhht/qqV4Em1N3H/rc+0qkEHUPg1YxjB/YIayuY+LsBQsXXiBBc0NVhNv3L1Lx7uKzvwPnsDtIDSbd8cLmWs3XiHnjbcshhZynHiV3I3eQD0hvCKQ3pK2TItcY7BPPGZbQI6UhVEsjcqDQov2sdw1VhVFSwqlPnpGvLJgvvMBDbdfQfMVdYui0eaSLB52+ZC3HyrQxAJotz43OAZEWzrShts548M2xZDklUhFRu9KovDC8pYNJU+pwumpela9pW3YSBroRwxtfEyeplCaaR0iT0rL9CdQBVRKhmwbVwPsUCKQ1/fngbFRJbSksFf6GXCiykbjkwkPXRdrwdZpff0sUjKmapH1iFBQIQ5k92k7qfd+MFoTgCKovpMWVMpYcBLGK0rxJIZy5gjvuJLX5NwGs+rdDO/oFVVDxXWldcaqDetFYhVZVVKkewdaTDDQb1Pr7FeP8iI6t+JwtsmVjFbrjBs5siN/YhHRzu6Jm0taL7NnktYEXKumlLS0Nn9sQWhKlC86R2pJGKF9+iuweIN1JBaw0y4ScHM="
+    file_glob: true
+    file: ${OPENMMC_DEPLOYMENT}
+    skip_cleanup: true
+    on:
+      all_branches: true
+      tags: true
+      condition: $DEPLOY = "all"
+
   - provider: pages
     skip_cleanup: true
     local_dir: docs/html
