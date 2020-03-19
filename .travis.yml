@@ -34,6 +34,15 @@ addons:
 script:
   - ./ci_build.sh
 
-  # Generate and deploy documentation
+# Generate and deploy documentation
 after_success:
   - ./ci_gen_doxy.sh
+
+deploy:
+  - provider: pages
+    skip_cleanup: true
+    local_dir: docs/html
+    token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
+    keep_history: false
+    on:
+      all_branches: true
