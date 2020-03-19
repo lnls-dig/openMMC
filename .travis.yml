@@ -1,49 +1,69 @@
-sudo: required
+dist: bionic
+os: linux
 
 notifications:
   email: false
 
-#Test only in travis branch for now
-branches:
-  only:
-    - master
-
 language: c
 
-before_script:
-  - sudo apt-add-repository -y 'deb http://archive.ubuntu.com/ubuntu trusty main universe multiverse restricted'
-  - sudo add-apt-repository -y ppa:george-edison55/cmake-3.x
-  - sudo apt-get update -y -qq
-  - sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi
-  - sudo apt-get install -y cmake -qq
+# blocklist
+branches:
+  except:
+    - gh-pages
 
 env:
-  matrix:
-  - BOARD='afc-bpm'        -VERSION='3.0' -RTM=''
-  - BOARD='afc-bpm'        -VERSION='3.1' -RTM=''
-  - BOARD='afc-timing'     -VERSION=''    -RTM='rtm-8sfp'
+  global:
+    - BUILD_DIR=build
+    - RELEASE_DIR=release
+  jobs:
+    - BUILD_TYPE='Release'  BOARD='afc-bpm'        -VERSION='3.0' -RTM=''
+    - BUILD_TYPE='Release'  BOARD='afc-bpm'        -VERSION='3.1' -RTM=''
+    - BUILD_TYPE='Release'  BOARD='afc-timing'     -VERSION=''    -RTM='rtm-8sfp'
+
+jobs:
+  include:
+    - env: DEPLOY='all'
 
 # Install dependencies
 addons:
   apt:
     packages:
+      - gcc-arm-none-eabi
+      - libnewlib-arm-none-eabi
+      - cmake
       - doxygen
       - doxygen-doc
       - doxygen-latex
       - doxygen-gui
       - graphviz
 
+#   Build and check this project
 script:
-  - mkdir build_$BOARD_$VERSION && cd build_$BOARD_$VERSION && cmake ../ -DBOARD=$BOARD -DVERSION=$VERSION -DBOARD_RTM=$RTM -DCMAKE_BUILD_TYPE=Release && make
+  - ./ci_build.sh
 
-  # Generate and deploy documentation
-after_success: "cd $TRAVIS_BUILD_DIR/docs && doxygen Doxyfile.dox"
+# Generate and deploy documentation
+after_success:
+  - ./ci_gen_doxy.sh
+
+before_deploy:
+  - . ./ci_deploy.sh
 
 deploy:
-  provider: pages
-  skip-cleanup: true
-  local-dir: docs/html
-  github-token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
-  keep-history: false
-  on:
-    branch: master
+  - provider: releases
+    token:
+      secure: "ammPjSoAPm1RFwXJq2O4JSBHrtOlf/2LNtdB462IpCRek4p9EY/jFEoMhRnYlXWrRdYC0EAk/GSAtCLC7u22G66pACezg1Q0xJdfFSMwo7MWcU2ukSeRoFugw09OuB6E/LZ6NcDVYxXVhht/qqV4Em1N3H/rc+0qkEHUPg1YxjB/YIayuY+LsBQsXXiBBc0NVhNv3L1Lx7uKzvwPnsDtIDSbd8cLmWs3XiHnjbcshhZynHiV3I3eQD0hvCKQ3pK2TItcY7BPPGZbQI6UhVEsjcqDQov2sdw1VhVFSwqlPnpGvLJgvvMBDbdfQfMVdYui0eaSLB52+ZC3HyrQxAJotz43OAZEWzrShts548M2xZDklUhFRu9KovDC8pYNJU+pwumpela9pW3YSBroRwxtfEyeplCaaR0iT0rL9CdQBVRKhmwbVwPsUCKQ1/fngbFRJbSksFf6GXCiykbjkwkPXRdrwdZpff0sUjKmapH1iFBQIQ5k92k7qfd+MFoTgCKovpMWVMpYcBLGK0rxJIZy5gjvuJLX5NwGs+rdDO/oFVVDxXWldcaqDetFYhVZVVKkewdaTDDQb1Pr7FeP8iI6t+JwtsmVjFbrjBs5siN/YhHRzu6Jm0taL7NnktYEXKumlLS0Nn9sQWhKlC86R2pJGKF9+iuweIN1JBaw0y4ScHM="
+    file_glob: true
+    file: ${OPENMMC_DEPLOYMENT}
+    skip_cleanup: true
+    on:
+      all_branches: true
+      tags: true
+      condition: $DEPLOY = "all"
+
+  - provider: pages
+    skip_cleanup: true
+    local_dir: docs/html
+    token: $GH_TOKEN  # Set in the settings page of your repository, as a secure variable
+    keep_history: false
+    on:
+      all_branches: true

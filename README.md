@@ -1,6 +1,10 @@
 # openMMC
-![Travis build status](https://travis-ci.org/lnls-dig/openMMC.svg?branch=master)
+
+[![Travis build status](https://travis-ci.org/lnls-dig/openMMC.svg?branch=master)](https://travis-ci.org/lnls-dig/openMMC)
+
 Open Source modular IPM Controller firmware
+
+Documentation: https://lnls-dig.github.io/openMMC
 
 ## Installation:
 The following packages are needed in your system in order to compile the firmware:
