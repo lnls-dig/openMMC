@@ -45,6 +45,9 @@ script:
 after_success:
   - ./ci_gen_doxy.sh
 
+before_deploy:
+  - . ./ci_deploy.sh
+
 deploy:
   - provider: releases
     token:
