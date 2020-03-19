@@ -50,8 +50,7 @@ before_deploy:
 
 deploy:
   - provider: releases
-    token:
-      secure: "ammPjSoAPm1RFwXJq2O4JSBHrtOlf/2LNtdB462IpCRek4p9EY/jFEoMhRnYlXWrRdYC0EAk/GSAtCLC7u22G66pACezg1Q0xJdfFSMwo7MWcU2ukSeRoFugw09OuB6E/LZ6NcDVYxXVhht/qqV4Em1N3H/rc+0qkEHUPg1YxjB/YIayuY+LsBQsXXiBBc0NVhNv3L1Lx7uKzvwPnsDtIDSbd8cLmWs3XiHnjbcshhZynHiV3I3eQD0hvCKQ3pK2TItcY7BPPGZbQI6UhVEsjcqDQov2sdw1VhVFSwqlPnpGvLJgvvMBDbdfQfMVdYui0eaSLB52+ZC3HyrQxAJotz43OAZEWzrShts548M2xZDklUhFRu9KovDC8pYNJU+pwumpela9pW3YSBroRwxtfEyeplCaaR0iT0rL9CdQBVRKhmwbVwPsUCKQ1/fngbFRJbSksFf6GXCiykbjkwkPXRdrwdZpff0sUjKmapH1iFBQIQ5k92k7qfd+MFoTgCKovpMWVMpYcBLGK0rxJIZy5gjvuJLX5NwGs+rdDO/oFVVDxXWldcaqDetFYhVZVVKkewdaTDDQb1Pr7FeP8iI6t+JwtsmVjFbrjBs5siN/YhHRzu6Jm0taL7NnktYEXKumlLS0Nn9sQWhKlC86R2pJGKF9+iuweIN1JBaw0y4ScHM="
+    token: $GH_RELEASES_TOKEN
     file_glob: true
     file: ${OPENMMC_DEPLOYMENT}
     skip_cleanup: true
