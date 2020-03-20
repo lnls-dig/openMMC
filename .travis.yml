@@ -23,6 +23,7 @@ env:
 jobs:
   include:
     - env: BUILD_ARTIFACT='all_binaries' DEPLOY='all_binaries'
+    - env: BUILD_ARTIFACT='docs'         DEPLOY='docs'
 
 # Install dependencies
 addons:
@@ -67,3 +68,4 @@ deploy:
     keep_history: false
     on:
       all_branches: true
+      condition: $DEPLOY = "docs"
