@@ -48,9 +48,10 @@ BUILDS[debug-afc-timing-${GIT_DESCRIBE}]="\
 
 TOP=$(pwd)
 
-case "${DEPLOY}" in
-    all)
-        # Generate builds for all list items
+case "${BUILD_ARTIFACT}" in
+    # Generate builds for all list items. Both "all_binaries"
+    # and "docs" needs to build everyting and pass all tests.
+    all_binaries|docs)
         for build in "${!BUILDS[@]}"; do
             echo "Generating build for:" ${build} && \
             mkdir -p ${BUILD_DIR}-${build} && \
@@ -66,25 +67,28 @@ case "${DEPLOY}" in
             cd ${TOP}
         done
 
-        # Copy the generated files to the release folder
-        mkdir -p ${RELEASE_DIR}
-        for build in "${!BUILDS[@]}"; do
-            case "${build}" in
-                debug*)
-                    cp ${BUILD_DIR}-${build}/out/openMMC.axf ${RELEASE_DIR}/openMMC-${build}.axf
-                    ;;
+        # Extra step for "all_binaries" is to copy
+        # the artifacts to a release folder
+        if [ "${BUILD_ARTIFACT}" = "all_binaries" ]; then
+            # Copy the generated files to the release folder
+            mkdir -p ${RELEASE_DIR}
+            for build in "${!BUILDS[@]}"; do
+                case "${build}" in
+                    debug*)
+                        cp ${BUILD_DIR}-${build}/out/openMMC.axf ${RELEASE_DIR}/openMMC-${build}.axf
+                        ;;
 
-                *)
-                    cp ${BUILD_DIR}-${build}/out/openMMC.bin ${RELEASE_DIR}/openMMC-${build}.bin
-                    cp ${BUILD_DIR}-${build}/out/openMMC_full.bin ${RELEASE_DIR}/openMMC-full-${build}.bin
-                    ;;
-            esac
-        done
-
+                    *)
+                        cp ${BUILD_DIR}-${build}/out/openMMC.bin ${RELEASE_DIR}/openMMC-${build}.bin
+                        cp ${BUILD_DIR}-${build}/out/openMMC_full.bin ${RELEASE_DIR}/openMMC-full-${build}.bin
+                        ;;
+                esac
+            done
+        fi
         ;;
 
     # Regular build
-    *)
+    binary)
         mkdir -p ${BUILD_DIR} && \
         cd ${BUILD_DIR} && \
         cmake ../ \
@@ -93,6 +97,11 @@ case "${DEPLOY}" in
         -DBOARD_RTM=${RTM} \
         -DCMAKE_BUILD_TYPE=${BUILD_TYPE} && \
         make
+        ;;
+
+    *)
+        echo "BUILD_ARTIFACT invalid: "${BUILD_ARTIFACT}
+        exit 0
         ;;
 
 esac
