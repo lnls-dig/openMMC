@@ -37,14 +37,15 @@ addons:
       - doxygen-gui
       - graphviz
 
-#   Build and check this project
+# Build and check this project
 script:
   - ./ci_build.sh
 
-# Generate and deploy documentation
+# Generate documentation
 after_success:
   - ./ci_gen_doxy.sh
 
+# Prepare for deploy
 before_deploy:
   - . ./ci_deploy.sh
 
