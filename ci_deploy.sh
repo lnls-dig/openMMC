@@ -5,7 +5,7 @@ set -x
 
 TOP=$(pwd)
 
-if [ "${DEPLOY}" = "all" ]; then
+if [ "${DEPLOY}" = "all_binaries" ]; then
     mkdir dist
     export OPENMMC_DEPLOYMENT=dist/*
 

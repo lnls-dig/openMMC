@@ -16,13 +16,13 @@ env:
     - BUILD_DIR=build
     - RELEASE_DIR=release
   jobs:
-    - BUILD_TYPE='Release'  BOARD='afc-bpm'    VERSION='3.0' RTM=''
-    - BUILD_TYPE='Release'  BOARD='afc-bpm'    VERSION='3.1' RTM=''
-    - BUILD_TYPE='Release'  BOARD='afc-timing' VERSION=''    RTM='rtm-8sfp'
+    - BUILD_ARTIFACT='binary' BUILD_TYPE='Release'  BOARD='afc-bpm'    VERSION='3.0' RTM=''
+    - BUILD_ARTIFACT='binary' BUILD_TYPE='Release'  BOARD='afc-bpm'    VERSION='3.1' RTM=''
+    - BUILD_ARTIFACT='binary' BUILD_TYPE='Release'  BOARD='afc-timing' VERSION=''    RTM='rtm-8sfp'
 
 jobs:
   include:
-    - env: DEPLOY='all'
+    - env: BUILD_ARTIFACT='all_binaries' DEPLOY='all_binaries'
 
 # Install dependencies
 addons:
@@ -57,7 +57,7 @@ deploy:
     on:
       all_branches: true
       tags: true
-      condition: $DEPLOY = "all"
+      condition: $DEPLOY = "all_binaries"
 
   - provider: pages
     skip_cleanup: true

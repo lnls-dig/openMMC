@@ -48,9 +48,9 @@ BUILDS[debug-afc-timing-${GIT_DESCRIBE}]="\
 
 TOP=$(pwd)
 
-case "${DEPLOY}" in
-    all)
-        # Generate builds for all list items
+case "${BUILD_ARTIFACT}" in
+    # Generate builds for all list items
+    all_binaries)
         for build in "${!BUILDS[@]}"; do
             echo "Generating build for:" ${build} && \
             mkdir -p ${BUILD_DIR}-${build} && \
@@ -84,7 +84,7 @@ case "${DEPLOY}" in
         ;;
 
     # Regular build
-    *)
+    binary)
         mkdir -p ${BUILD_DIR} && \
         cd ${BUILD_DIR} && \
         cmake ../ \
@@ -93,6 +93,11 @@ case "${DEPLOY}" in
         -DBOARD_RTM=${RTM} \
         -DCMAKE_BUILD_TYPE=${BUILD_TYPE} && \
         make
+        ;;
+
+    *)
+        echo "BUILD_ARTIFACT invalid: "${BUILD_ARTIFACT}
+        exit 0
         ;;
 
 esac
