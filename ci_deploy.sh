@@ -17,8 +17,8 @@ if [ "${DEPLOY}" = "all_binaries" ]; then
 
     # Generate hash sums
     cd dist
-    md5sum ${TOP}/${RELEASE_DIR}/{*.bin,*.axf} > MD5SUMS
-    sha1sum ${TOP}/${RELEASE_DIR}/{*.bin,*.axf} > SHA1SUMS
+    md5sum *.bin *.axf > MD5SUMS
+    sha1sum *.bin *.axf > SHA1SUMS
     cd -
 fi
 
