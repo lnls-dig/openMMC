@@ -16,7 +16,7 @@ i2c_bus_mapping_t i2c_bus_map[I2C_BUS_CNT] = {
     [I2C_BUS_CLOCK_ID]           = { I2C2,  4, 1 },
     [I2C_BUS_RTM_ID]             = { I2C2,  5, 1 },
     [I2C_BUS_FMC2_ID]            = { I2C2,  6, 1 },
-    [I2C_BUS_FMC2_ID]            = { I2C2,  7, 1 },
+    [I2C_BUS_FMC1_ID]            = { I2C2,  7, 1 },
     [I2C_BUS_MUX_ID]             = { I2C2, -1, 1 },
     [I2C_BUS_MCP_ID]             = { I2C1, -1, 1 }
 };
@@ -32,7 +32,7 @@ i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT] = {
 
     [CHIP_ID_RTC_EEPROM]  = { I2C_BUS_RTCE_ID,         0x57 },
     [CHIP_ID_SRAM_RTCC]   = { I2C_BUS_RTCE_ID,         0x6F },
-    [CHIP_ID_EEPROM_2K]   = { I2C_BUS_RTCE_ID,         0x50 },
+    [CHIP_ID_EEPROM]      = { I2C_BUS_RTCE_ID,         0x50 },
     [CHIP_ID_EUI]         = { I2C_BUS_RTCE_ID,         0x58 },
     [CHIP_ID_EEPROM_64K]  = { I2C_BUS_RTCE_ID,         0x51 },
 
@@ -50,7 +50,7 @@ i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT] = {
     [CHIP_ID_FMC1_LM75_0] = { I2C_BUS_FMC1_ID,         0x48 },
     [CHIP_ID_FMC1_LM75_1] = { I2C_BUS_FMC1_ID,         0x49 },
 
-    [CHIP_ID_MCP]         = { I2C_BUS_MCP_ID,          0x20 }
+    [CHIP_ID_MCP23016]         = { I2C_BUS_MCP_ID,          0x20 }
 };
 
 bool i2c_set_mux_bus( uint8_t bus_id, i2c_mux_state_t *i2c_mux, int8_t new_state )
