@@ -31,13 +31,14 @@
 #include "payload.h"
 #include "ipmi.h"
 #include "task_priorities.h"
-#include "adn4604.h"
+#include "mcp23016.h"
 #include "ad84xx.h"
 #include "hotswap.h"
 #include "utils.h"
 #include "fru.h"
 #include "led.h"
 #include "board_led.h"
+
 
 /* payload states
  *   0 - No power
@@ -60,7 +61,7 @@
  *       Wait until payload power goes down to restart the cycle
  */
 
-extender_gpio_t ext_gpios[15] = {
+const extender_gpio_t ext_gpios[15] = {
         [EXT_GPIO_P1V5_VTT_EN] =     { 0, 1 },
         [EXT_GPIO_EN_P1V8] =         { 0, 2 },
         [EXT_GPIO_EN_P1V2] =         { 0, 3 },
@@ -244,7 +245,7 @@ TaskHandle_t vTaskPayload_Handle;
 void payload_init( void )
 {
     bool standalone_mode = false;
-    if (get_ipmb_address() == 0xA2) {
+    if (get_ipmb_addr() == 0xA2) {
         standalone_mode = true;
     }
 
@@ -273,8 +274,8 @@ void payload_init( void )
 #endif
 
     if (!dcdc_check_pgood()){
-        gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESETn), PIN_NUMBER(GPIO_FPGA_RESETn), GPIO_LEVEL_LOW);
-        mcp23016_write_pin( ext_gpios[EXT_GPIO_FPGA_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_FPGA_PROGRAM_B].pin_num, false );
+        gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_LOW);
+        mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
         gpio_set_pin_state(PIN_PORT(GPIO_FPGA_INITB), PIN_NUMBER(GPIO_FPGA_INITB), GPIO_LEVEL_LOW);
     }
 }
@@ -348,8 +349,8 @@ void vTaskPayload( void *pvParameters )
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
 
                 gpio_set_pin_state(PIN_PORT(GPIO_FPGA_INITB), PIN_NUMBER(GPIO_FPGA_INITB), GPIO_LEVEL_HIGH);
-                mcp23016_write_pin( ext_gpios[EXT_GPIO_FPGA_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_FPGA_PROGRAM_B].pin_num, true );
-                gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESETn), PIN_NUMBER(GPIO_FPGA_RESETn), GPIO_LEVEL_HIGH);
+                mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
+                gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_HIGH);
             }
             break;
 
@@ -365,9 +366,9 @@ void vTaskPayload( void *pvParameters )
             break;
 
         case PAYLOAD_SWITCHING_OFF:
-            gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESETn), PIN_NUMBER(GPIO_FPGA_RESETn), GPIO_LEVEL_LOW);
-            mcp23016_write_pin( ext_gpios[EXT_GPIO_FPGA_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_FPGA_PROGRAM_B].pin_num, false );
-            gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESETn), PIN_NUMBER(GPIO_FPGA_RESETn), GPIO_LEVEL_LOW);
+            gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_LOW);
+            mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+            gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_LOW);
 
             setDC_DC_ConvertersON( false );
 
@@ -431,10 +432,10 @@ uint8_t payload_hpm_prepare_comp( void )
     ssp_init( FLASH_SPI, FLASH_SPI_BITRATE, FLASH_SPI_FRAME_SIZE, SSP_MASTER, SSP_INTERRUPT );
 
     /* Prevent the FPGA from accessing the Flash to configure itself now */
-    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_HIGH );
-    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_LOW );
-    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_HIGH );
-    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_LOW );
+    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
+    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
+    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
 
     /* Erase FLASH */
     flash_bulk_erase();
@@ -510,8 +511,8 @@ uint8_t payload_hpm_get_upgrade_status( void )
 uint8_t payload_hpm_activate_firmware( void )
 {
     /* Reset FPGA - Pulse PROGRAM_B pin */
-    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_LOW);
-    gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_HIGH);
+    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
 
     return IPMI_CC_OK;
 }

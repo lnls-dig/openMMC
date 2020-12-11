@@ -22,6 +22,7 @@
 /* Table 42 ipmi-second-gen */
 
 /* Project Includes */
+#include "port.h"
 #include "sdr.h"
 #include "utils.h"
 #include "i2c_mapping.h"
@@ -147,7 +148,7 @@ const SDR_type_01h_t SDR_AMC_12V = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x00, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_1, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_12V_ID) , /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_AMC_12V_ID /* sensor string */
 };
@@ -202,7 +203,7 @@ const SDR_type_01h_t SDR_RTM_12V = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x01, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_2, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_12V_ID) , /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_RTM_12V_ID /* sensor string */
 };
@@ -257,7 +258,7 @@ const SDR_type_01h_t SDR_FMC1_12V = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x01, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_2, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_12V_ID) , /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC1_12V_ID /* sensor string */
 };
@@ -311,7 +312,7 @@ const SDR_type_01h_t SDR_FMC1_VADJ = {
     .neg_thr_hysteresis = 1, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x02, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_3, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_VADJ_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC1_VADJ_ID /* sensor string */
 };
@@ -364,7 +365,7 @@ const SDR_type_01h_t SDR_FMC1_P3V3 = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x00, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_1, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_P3V3_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC1_P3V3_ID /* sensor string */
 };
@@ -418,7 +419,7 @@ const SDR_type_01h_t SDR_FMC2_12V = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x01, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_2, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC2_12V_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC2_12V_ID /* sensor string */
 };
@@ -472,7 +473,7 @@ const SDR_type_01h_t SDR_FMC2_VADJ = {
     .neg_thr_hysteresis = 1, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x02, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_3, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC2_VADJ_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC2_VADJ_ID /* sensor string */
 };
@@ -527,7 +528,7 @@ const SDR_type_01h_t SDR_FMC2_P3V3 = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x00, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_1, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC2_P3V3_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC2_P3V3_ID /* sensor string */
 };
@@ -585,7 +586,7 @@ const SDR_type_01h_t SDR_AMC_12V_CURR = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x00, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_1, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_12V_CURR_ID) , /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_AMC_12V_CURR_ID /* sensor string */
 };
@@ -640,9 +641,9 @@ const SDR_type_01h_t SDR_RTM_12V_CURR = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x01, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_2, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_12V_CURR_ID) , /* 8 bit ASCII, number of bytes */
-    .IDstring = SDR_FMC1_RTM_CURR_ID /* sensor string */
+    .IDstring = SDR_RTM_12V_CURR_ID /* sensor string */
 };
 
 /* FMC1 12V Current */
@@ -695,7 +696,7 @@ const SDR_type_01h_t SDR_FMC1_12V_CURR = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x01, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_2, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_12V_CURR_ID) , /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC1_12V_CURR_ID /* sensor string */
 };
@@ -749,7 +750,7 @@ const SDR_type_01h_t SDR_FMC1_VADJ_CURR = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x02, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_3, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_VADJ_CURR_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC1_VADJ_CURR_ID /* sensor string */
 };
@@ -802,7 +803,7 @@ const SDR_type_01h_t SDR_FMC1_P3V3_CURR = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x00, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_1, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_P3V3_CURR_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC1_P3V3_CURR_ID /* sensor string */
 };
@@ -856,7 +857,7 @@ const SDR_type_01h_t SDR_FMC2_12V_CURR = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x01, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_2, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC2_12V_CURR_ID) , /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC2_12V_CURR_ID /* sensor string */
 };
@@ -910,7 +911,7 @@ const SDR_type_01h_t SDR_FMC2_VADJ_CURR = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x02, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_3, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC2_VADJ_CURR_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC2_VADJ_CURR_ID /* sensor string */
 };
@@ -963,7 +964,7 @@ const SDR_type_01h_t SDR_FMC2_P3V3_CURR = {
     .neg_thr_hysteresis = 2, /* negative going Threshold hysteresis value */
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
-    .OEM = 0x00, /* OEM reserved */
+    .OEM = INA3221_CHANNEL_1, /* OEM reserved */
     .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC2_P3V3_CURR_ID), /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_FMC2_P3V3_CURR_ID /* sensor string */
 };
@@ -1024,7 +1025,7 @@ const SDR_type_01h_t SDR_LM75_uC = {
     .IDstring = "TEMP UC" /*  sensor string */
 };
 
-const SDR_type_01h_t SDR_LM75_CLOCKS = {
+const SDR_type_01h_t SDR_LM75_ADN4604 = {
     .hdr.recID_LSB = 0x00, /* Filled by sdr_insert_entry() */
     .hdr.recID_MSB = 0x00,
     .hdr.SDRversion = 0x51,
@@ -1248,8 +1249,8 @@ void amc_sdr_init( void )
 #ifdef MODULE_INA3221_VOLTAGE
 
     /* AMC RTM Voltage */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_AMC_12V, &vTaskINA3221_Handle, AMC_12V_DEVID, CHIP_ID_INA_0 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_RTM_12V, &vTaskINA3221_Handle, RTM_12V_DEVID, CHIP_ID_INA_0 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_AMC_12V, &vTaskINA3221_Handle, 0, CHIP_ID_INA_0 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_RTM_12V, &vTaskINA3221_Handle, 0, CHIP_ID_INA_0 );
 
     /* FMC1 Voltage */
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V, &vTaskINA3221_Handle, FMC1_12V_DEVID, CHIP_ID_INA_1 );
@@ -1265,8 +1266,8 @@ void amc_sdr_init( void )
 #ifdef MODULE_INA3221_CURRENT
 
     /* AMC RTM Current */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_AMC_12V, &vTaskINA3221_Handle, AMC_12V_CURR_DEVID, CHIP_ID_INA_0 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_RTM_12V, &vTaskINA3221_Handle, RTM_12V_CURR_DEVID, CHIP_ID_INA_0 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_AMC_12V, &vTaskINA3221_Handle, 0, CHIP_ID_INA_0 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_RTM_12V, &vTaskINA3221_Handle, 0, CHIP_ID_INA_0 );
 
     /* FMC1 Current */
     sdr_insert_entry( TYPE_01, (void *) &SDR_FMC1_12V_CURR, &vTaskINA3221_Handle, FMC1_12V_CURR_DEVID, CHIP_ID_INA_1 );

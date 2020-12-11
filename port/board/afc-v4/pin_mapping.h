@@ -42,7 +42,6 @@
 
 /* SPI Interfaces */
 #define FPGA_SPI        0
-#define FLASH_SPI       1
 
 /* UART Interfaces */
 #define UART_DEBUG      3
@@ -52,10 +51,10 @@
 /* I2C ports */
 #define I2C0_SDA                        PIN_DEF( PORT0, 27, (IOCON_FUNC1 | IOCON_MODE_INACT), NON_GPIO )
 #define I2C0_SCL                        PIN_DEF( PORT0, 28, (IOCON_FUNC1 | IOCON_MODE_INACT), NON_GPIO )
-#define I2C1_SDA                        PIN_DEF( PORT0,  0, (IOCON_FUNC3 | IOCON_OPENDRAIN_EN), NON_GPIO )
-#define I2C1_SCL                        PIN_DEF( PORT0,  1, (IOCON_FUNC3 | IOCON_OPENDRAIN_EN), NON_GPIO )
-#define I2C2_SDA                        PIN_DEF( PORT0, 10, (IOCON_FUNC2 | IOCON_OPENDRAIN_EN), NON_GPIO )
-#define I2C2_SCL                        PIN_DEF( PORT0, 11, (IOCON_FUNC2 | IOCON_OPENDRAIN_EN), NON_GPIO )
+#define I2C1_SDA                        PIN_DEF( PORT0,  0, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
+#define I2C1_SCL                        PIN_DEF( PORT0,  1, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
+#define I2C2_SDA                        PIN_DEF( PORT0, 10, (IOCON_FUNC2 | IOCON_MODE_INACT), NON_GPIO )
+#define I2C2_SCL                        PIN_DEF( PORT0, 11, (IOCON_FUNC2 | IOCON_MODE_INACT), NON_GPIO )
 
 /* UART Debug port */
 #define UART_DEBUG_TXD                  PIN_DEF( PORT0, 2, (IOCON_FUNC1 | IOCON_MODE_INACT), NON_GPIO )
@@ -69,8 +68,9 @@
 
 /* SPI Legacy port - should be updated to SSP interface */
 /* DAC SPI Port (SSEL is GPIO for word transfers larger than 8bits) */
-#define SPI_DAC_VADJ_CLK                PIN_DEF( PORT0, 15, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
-#define SPI_DAC_VADJ_SDI                PIN_DEF( PORT0, 18, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
+#define SPI_SCK                         PIN_DEF( PORT0, 15, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
+#define SPI_SSEL                        PIN_DEF( PORT0, 16, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_OUTPUT )
+#define SPI_MOSI                        PIN_DEF( PORT0, 18, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
 
 /* Tracedata */
 #define TRACEDATA3                      PIN_DEF( PORT2,  2, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
@@ -80,7 +80,7 @@
 #define TRACECLK                        PIN_DEF( PORT2,  6, (IOCON_FUNC3 | IOCON_MODE_INACT), NON_GPIO )
 
 /*ADC Payload detector*/
-#define ADC_PAYLOAD_DETECTOR            PIN_DEF( PORT0,  24, (IOCON_FUNC1 | IOCON_ADMODE_EN), NON_GPIO )
+#define ADC_PAYLOAD_DETECTOR            PIN_DEF( PORT0,  24, (IOCON_FUNC1 | IOCON_MODE_INACT), NON_GPIO )
 
 
 /* GPIO definitions */
@@ -105,8 +105,8 @@
 /* FMC Power Good pins */
 #define GPIO_FMC1_PG_M2C                PIN_DEF( PORT1, 16, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_INPUT )
 #define GPIO_FMC2_PG_M2C                PIN_DEF( PORT1, 17, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_INPUT )
-#define GPIO_FMC1_PG_C2M                PIN_DEF( PORT1, 18, (IOCON_FUNC0 | IOCON_OPENDRAIN_EN), GPIO_DIR_OUTPUT )
-#define GPIO_FMC2_PG_C2M                PIN_DEF( PORT1, 19, (IOCON_FUNC0 | IOCON_OPENDRAIN_EN), GPIO_DIR_OUTPUT )
+#define GPIO_FMC1_PG_C2M                PIN_DEF( PORT1, 18, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_OUTPUT )
+#define GPIO_FMC2_PG_C2M                PIN_DEF( PORT1, 19, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_OUTPUT )
 
 #define GPIO_FMC1_CRITICAL              PIN_DEF( PORT0,  23, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_INPUT )
 #define GPIO_FMC1_TC                    PIN_DEF( PORT0,  25, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_INPUT )
@@ -137,12 +137,11 @@
 
 /* FPGA Control */
 #define GPIO_FPGA_DONE_B                PIN_DEF( PORT0, 22, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_INPUT )
-#define GPIO_FPGA_INITB                 PIN_DEF( PORT0, 20, (IOCON_FUNC0 | IOCON_OPENDRAIN_EN), GPIO_DIR_OUTPUT )
-#define GPIO_FPGA_RESETn                PIN_DEF( PORT2,  9, (IOCON_FUNC0 | IOCON_OPENDRAIN_EN), GPIO_DIR_OUTPUT )
+#define GPIO_FPGA_INITB                 PIN_DEF( PORT0, 20, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_OUTPUT )
+#define GPIO_FPGA_RESET                 PIN_DEF( PORT2,  9, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_OUTPUT )
 
 /* VADJ DAC */
 #define GPIO_DAC_VADJ_RST               PIN_DEF( PORT0, 21, (IOCON_FUNC0 | IOCON_MODE_PULLUP), GPIO_DIR_OUTPUT )
-#define GPIO_DAC_VADJ_CSN               PIN_DEF( PORT0, 16, (IOCON_FUNC0 | IOCON_MODE_PULLUP), GPIO_DIR_OUTPUT )
 
 /* MMC ENABLE# */
 #define GPIO_MMC_ENABLE                 PIN_DEF( PORT2,  8, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_INPUT )
@@ -151,12 +150,12 @@
 #define GPIO_OVERTEMPn                  PIN_DEF( PORT2, 11, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_INPUT )
 
 /* JTAG */
-#define GPIO_FMC1_JTAG_Override         PIN_DEF( PORT2,  1, (IOCON_FUNC0 | IOCON_OPENDRAIN_EN), GPIO_DIR_OUTPUT )
-#define GPIO_FMC2_JTAG_Override         PIN_DEF( PORT0,  8, (IOCON_FUNC0 | IOCON_OPENDRAIN_EN), GPIO_DIR_OUTPUT )
-#define GPIO_RTM _JTAG_Override         PIN_DEF( PORT2,  0, (IOCON_FUNC0 | IOCON_OPENDRAIN_EN), GPIO_DIR_OUTPUT )
+#define GPIO_FMC1_JTAG_Override         PIN_DEF( PORT2,  1, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_OUTPUT )
+#define GPIO_FMC2_JTAG_Override         PIN_DEF( PORT0,  8, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_OUTPUT )
+#define GPIO_RTM_JTAG_Override          PIN_DEF( PORT2,  0, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_OUTPUT )
 
 /* EEPROM WP signal */
-#define GPIO_EEPROM_WP                  PIN_DEF( PORT1,  30, (IOCON_FUNC0 | IOCON_OPENDRAIN_EN), GPIO_DIR_OUTPUT )
+#define GPIO_EEPROM_WP                  PIN_DEF( PORT1,  30, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_OUTPUT )
 
 /* FMC CLK signals */
 #define GPIO_CLK_DIR_FMC2               PIN_DEF( PORT0,  6, (IOCON_FUNC0 | IOCON_MODE_INACT), GPIO_DIR_INPUT )
@@ -184,8 +183,9 @@
          SSP0_SSEL,                             \
          SSP0_MISO,                             \
          SSP0_MOSI,                             \
-         SPI_DAC_VADJ_CLK,                      \
-         SPI_DAC_VADJ_SDI,                      \
+         SPI_SCK,                               \
+         SPI_SSEL,                              \
+         SPI_MOSI,                              \
          TRACEDATA3,                            \
          TRACEDATA2,                            \
          TRACEDATA1,                            \
@@ -225,14 +225,13 @@
          GPIO_HOT_SWAP_HANDLE,                  \
          GPIO_FPGA_DONE_B,                      \
          GPIO_FPGA_INITB,                       \
-         GPIO_FPGA_RESETn,                      \
+         GPIO_FPGA_RESET,                       \
          GPIO_DAC_VADJ_RST,                     \
-         GPIO_DAC_VADJ_CSN,                     \
          GPIO_MMC_ENABLE,                       \
          GPIO_OVERTEMPn,                        \
          GPIO_FMC1_JTAG_Override,               \
          GPIO_FMC2_JTAG_Override,               \
-         GPIO_RTM _JTAG_Override,               \
+         GPIO_RTM_JTAG_Override,                \
          GPIO_EEPROM_WP,                        \
          GPIO_CLK_DIR_FMC2,                     \
          GPIO_CLK_DIR_FMC1,                     \
