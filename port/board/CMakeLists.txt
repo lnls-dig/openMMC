@@ -17,6 +17,17 @@ if(${BOARD} MATCHES "^(afc-bpm)$")
     add_subdirectory(afc-bpm/v3_1)
   endif()
 
+elseif(${BOARD} MATCHES "^(afc-fofb-ctrl)$")
+
+  if(NOT VERSION)
+    message(FATAL_ERROR "${BoldRed}AFC board version was not selected! You must pass the flag -DVERSION=<major>.<minor>${ColourReset}")
+  endif()
+
+  message(STATUS "Selected Board version: ${VERSION}")
+  if(${VERSION} MATCHES "(3.1)")
+    add_subdirectory(afc-fofb-ctrl/v3_1)
+  endif()
+
 elseif(${BOARD} MATCHES "^(afc-timing)$" )
   add_subdirectory(afc-timing)
 
