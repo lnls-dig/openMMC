@@ -4,7 +4,7 @@ if (NOT TARGET_CONTROLLER)
 endif()
 
 if (NOT TARGET_BOARD_NAME)
-    set(TARGET_BOARD_NAME "AFC FOFBXXX" CACHE STRING "Board Name")
+    set(TARGET_BOARD_NAME "AFC FOFB" CACHE STRING "Board Name")
 endif()
 
 # Check if TARGET_BOARD_NAME fits in out field structure. Must fit
