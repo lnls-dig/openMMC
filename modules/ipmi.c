@@ -324,3 +324,18 @@ IPMI_HANDLER(ipmi_picmg_cmd_get_fru_control_capabilities, NETFN_GRPEXT, IPMI_PIC
     rsp->data_len = len;
     rsp->completion_code = IPMI_CC_OK;
 }
+
+IPMI_HANDLER(ipmi_custom_cmd_get_free_heap, NETFN_CUSTOM, IPMI_CUSTOM_CMD_MMC_GET_FREE_HEAP, ipmi_msg *req, ipmi_msg *rsp)
+{
+    uint8_t len = rsp->data_len = 0;
+
+    uint32_t free_heap = xPortGetFreeHeapSize();
+
+    rsp->data[len++] = free_heap & 0xFF;
+    rsp->data[len++] = (free_heap >> 8) & 0xFF;
+    rsp->data[len++] = (free_heap >> 16) & 0xFF;
+    rsp->data[len++] = (free_heap >> 24) & 0xFF;
+
+    rsp->data_len = len;
+    rsp->completion_code = IPMI_CC_OK;
+}

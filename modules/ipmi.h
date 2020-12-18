@@ -295,7 +295,7 @@
 #define IPMI_GET_WATCHDOG_TIMER_CMD                             0x25
 #define IPMI_SET_BMC_GLOBAL_ENABLES_CMD                         0x2E
 #define IPMI_GET_BMC_GLOBAL_ENABLES_CMD                         0x2F
-#define IPMI_CLEAR_MSG_FLAGS_CMD                                0x30
+ #define IPMI_CLEAR_MSG_FLAGS_CMD                                0x30
 #define IPMI_GET_MSG_FLAGS_CMD                                  0x31
 #define IPMI_ENABLE_MESSAGE_CHANNEL_RCV_CMD                     0x32
 #define IPMI_GET_MSG_CMD                                        0x33
@@ -457,6 +457,16 @@
 #define IPMI_PICMG_CMD_HPM_QUERY_SELF_RESULTS                   0x36
 #define IPMI_PICMG_CMD_HPM_QUERY_ROLLBACK_STATUS                0x37
 #define IPMI_PICMG_CMD_HPM_INITIATE_MANUAL_ROLLBACK             0x38
+/**
+ * @}
+ */
+
+/**
+ * @defgroup IPMI_CUSTOM_CMD IPMI Commands - Custom (0x32)
+ * @ingroup IPMI_CMD
+ * @{
+ */
+#define IPMI_CUSTOM_CMD_MMC_GET_FREE_HEAP                       0x01
 /**
  * @}
  */
