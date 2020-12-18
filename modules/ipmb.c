@@ -215,8 +215,12 @@ void IPMB_RXTask ( void *pvParameters )
                     /* Seq number checking is enough to match the messages */
                     if ( current_msg_rx->buffer.seq == last_sent_req->buffer.seq ) {
                         ipmb_notify_client ( current_msg_rx );
+                    } else {
+                        vPortFree(current_msg_rx);
                     }
                     /* If we received a response that doesn't match a previously sent request, just discard it */
+                } else {
+                    vPortFree(current_msg_rx);
                 }
 
             }else {
