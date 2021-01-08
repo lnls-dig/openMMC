@@ -211,11 +211,11 @@ typedef struct sensor_t {
 } sensor_t;
 
 extern volatile uint8_t sdr_count;
-sensor_t *sdr_head;
-sensor_t *sdr_tail;
+extern sensor_t *sdr_head;
+extern sensor_t *sdr_tail;
 
-const SDR_type_12h_t SDR0;
-const SDR_type_12h_t SDR_RTM_DEV_LOCATOR;
+extern const SDR_type_12h_t SDR0;
+extern const SDR_type_12h_t SDR_RTM_DEV_LOCATOR;
 
 #define GET_SENSOR_TYPE(sensor)     ((SDR_type_01h_t *)sensor->sdr)->sensortype
 

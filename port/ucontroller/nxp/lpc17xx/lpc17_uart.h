@@ -36,7 +36,7 @@ typedef struct lpc_uart_cfg {
     CHIP_SYSCTL_PCLK_T sysclk;
 } lpc_uart_cfg_t;
 
-const lpc_uart_cfg_t usart_cfg[4];
+extern const lpc_uart_cfg_t usart_cfg[4];
 
 #define uart_set_baud( id, baud ) Chip_UART_SetBaud( usart_cfg[id].ptr, baud )
 #define uart_config_data( id, cfg ) Chip_UART_ConfigData( usart_cfg[id].ptr, cfg )
