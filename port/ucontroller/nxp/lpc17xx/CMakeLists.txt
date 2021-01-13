@@ -9,6 +9,7 @@ add_compile_options( -Wno-switch -Wno-unused-but-set-variable )
 set(UCONTROLLER_SRCS
   ${LPC17XX_PATH}/cr_startup_lpc175x_6x.c
   ${LPC17XX_PATH}/sysinit.c
+  ${LPC17XX_PATH}/faults.c
   )
 
 set(UCONTROLLER_HDRS
