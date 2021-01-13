@@ -43,7 +43,7 @@ set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat
 
 # Build specific flags
 set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_ERROR_FLAGS}")
-set(CMAKE_C_FLAGS_DEBUG     "-O0 -g3 -DDEBUG")
+set(CMAKE_C_FLAGS_DEBUG     "-Og -g3 -DDEBUG")
 set(CMAKE_C_FLAGS_RELEASE   "-Os")
 
 # When we break up long strings in CMake we get semicolon
