@@ -295,7 +295,7 @@
 #define IPMI_GET_WATCHDOG_TIMER_CMD                             0x25
 #define IPMI_SET_BMC_GLOBAL_ENABLES_CMD                         0x2E
 #define IPMI_GET_BMC_GLOBAL_ENABLES_CMD                         0x2F
- #define IPMI_CLEAR_MSG_FLAGS_CMD                                0x30
+#define IPMI_CLEAR_MSG_FLAGS_CMD                                0x30
 #define IPMI_GET_MSG_FLAGS_CMD                                  0x31
 #define IPMI_ENABLE_MESSAGE_CHANNEL_RCV_CMD                     0x32
 #define IPMI_GET_MSG_CMD                                        0x33
