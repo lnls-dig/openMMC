@@ -38,6 +38,9 @@
 
 volatile uint8_t sdr_count = 0;
 
+sensor_t *sdr_head = NULL;
+sensor_t *sdr_tail = NULL;
+
 static uint16_t reservationID;
 static uint32_t sdr_change_count;
 

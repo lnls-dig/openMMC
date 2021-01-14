@@ -25,25 +25,9 @@
 #include "i2c.h"
 #include "i2c_mapping.h"
 
-/**
- * @brief Number of I2C peripheral buses that are being controlled
- * @note This value is contabilized at compile time and may change from board to board. Check the board's i2c_mapping.c file for more info
- *
- * @see i2c_mapping.c
- */
-#define I2C_MUX_COUNT (sizeof(i2c_mux) / sizeof(i2c_mux_state_t))
-
-/**
- * @brief Number of I2C Chips that are being controlled
- * @note This value is contabilized at compile time and may change from board to board. Check the board's i2c_mapping.c file for more info
- *
- * @see i2c_mapping.c
- */
-#define I2C_CHIP_MAP_COUNT (sizeof(i2c_chip_map)/sizeof(i2c_chip_mapping_t))
-
 void i2c_init( void )
 {
-    for ( uint8_t i = 0; i < sizeof(i2c_mux)/sizeof(i2c_mux_state_t); i++ ) {
+    for ( uint8_t i = 0; i < I2C_MUX_CNT; i++ ) {
         i2c_mux[i].semaphore = xSemaphoreCreateBinary();
         vI2CConfig( i2c_mux[i].i2c_interface, SPEED_100KHZ );
         xSemaphoreGive( i2c_mux[i].semaphore );
@@ -101,7 +85,7 @@ bool i2c_take_by_busid( uint8_t bus_id, uint8_t *i2c_interface, TickType_t timeo
 
 bool i2c_take_by_chipid( uint8_t chip_id, uint8_t *i2c_address, uint8_t *i2c_interface,  uint32_t timeout )
 {
-    if ( chip_id > I2C_CHIP_MAP_COUNT ) {
+    if ( chip_id > I2C_BUS_CNT ) {
         return false;
     }
 

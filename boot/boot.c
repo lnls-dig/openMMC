@@ -97,5 +97,5 @@ void update_firmware( void )
         }
     }
 
-    //erase_sector( UPGRADE_FLASH_START_SECTOR , UPGRADE_FLASH_END_SECTOR );
+    erase_sector( UPGRADE_FLASH_START_SECTOR , UPGRADE_FLASH_END_SECTOR );
 }

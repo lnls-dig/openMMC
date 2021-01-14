@@ -12,6 +12,11 @@ MEMORY
   __top_RamAHB16 = 0x2007c000 + 16K;
 
 ENTRY(ResetISR)
+EXTERN(NMI_Handler)
+EXTERN(HardFault_Handler)
+EXTERN(MemManage_Handler)
+EXTERN(BusFault_Handler)
+EXTERN(UsageFault_Handler)
 
 SECTIONS
 {
@@ -147,4 +152,6 @@ SECTIONS
 
     PROVIDE(_pvHeapStart = DEFINED(__user_heap_base) ? __user_heap_base : .);
     PROVIDE(_vStackTop = DEFINED(__user_stack_top) ? __user_stack_top : __top_RamLoc16 - 0);
+    /* Add 6 to the sum to compensate for the lacking of the less significant bit (thumb mode) */
+    PROVIDE(_VectorChecksum = 0 - (_vStackTop + ResetISR + NMI_Handler + HardFault_Handler + MemManage_Handler + BusFault_Handler + UsageFault_Handler + 6 ));
 }
