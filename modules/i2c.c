@@ -85,7 +85,7 @@ bool i2c_take_by_busid( uint8_t bus_id, uint8_t *i2c_interface, TickType_t timeo
 
 bool i2c_take_by_chipid( uint8_t chip_id, uint8_t *i2c_address, uint8_t *i2c_interface,  uint32_t timeout )
 {
-    if ( chip_id > I2C_BUS_CNT ) {
+    if ( chip_id > I2C_CHIP_CNT ) {
         return false;
     }
 
