@@ -63,16 +63,10 @@ case "${BUILD_ARTIFACT}" in
             # Copy the generated files to the release folder
             mkdir -p ${RELEASE_DIR}
             for build in "${!BUILDS[@]}"; do
-                case "${build}" in
-                    debug*)
-                        cp ${BUILD_DIR}-${build}/out/openMMC.axf ${RELEASE_DIR}/openMMC-${build}.axf
-                        ;;
-
-                    *)
-                        cp ${BUILD_DIR}-${build}/out/openMMC.bin ${RELEASE_DIR}/openMMC-${build}.bin
-                        cp ${BUILD_DIR}-${build}/out/openMMC_full.bin ${RELEASE_DIR}/openMMC-full-${build}.bin
-                        ;;
-                esac
+                cp ${BUILD_DIR}-${build}/out/openMMC.axf ${RELEASE_DIR}/openMMC-${build}.axf
+                cp ${BUILD_DIR}-${build}/out/openMMC.bin ${RELEASE_DIR}/openMMC-${build}.bin
+				cp ${BUILD_DIR}-${build}/out/bootloader.axf ${RELEASE_DIR}/bootloader-${build}.axf
+                cp ${BUILD_DIR}-${build}/out/bootloader.bin ${RELEASE_DIR}/bootloader-${build}.bin
             done
         fi
         ;;
