@@ -10,7 +10,12 @@ LC_ALL=C
 export LANG LC_ALL
 
 # Location of releases
+set +e
 GIT_DESCRIBE=$(git describe --tags --abbrev=10)
+if [ $? -ne 0 ]; then
+    GIT_DESCRIBE=devel
+fi
+set -e
 
 # Declare all combinations for deploy all
 # Note that the key is the name of the release object
@@ -19,28 +24,13 @@ BUILDS[afc-bpm-3.0-${GIT_DESCRIBE}]="\
      -DBOARD=afc-bpm \
      -DVERSION=3.0 \
      -DBOARD_RTM= \
-     -DCMAKE_BUILD_TYPE=Release"
+     -DCMAKE_BUILD_TYPE=RelWithDebInfo"
 BUILDS[afc-bpm-3.1-${GIT_DESCRIBE}]="\
      -DBOARD=afc-bpm \
      -DVERSION=3.1 \
      -DBOARD_RTM= \
-     -DCMAKE_BUILD_TYPE=Release"
+     -DCMAKE_BUILD_TYPE=RelWithDebInfo"
 BUILDS[afc-timing-${GIT_DESCRIBE}]="\
-     -DBOARD=afc-timing \
-     -DVERSION= \
-     -DBOARD_RTM=rtm-8sfp \
-     -DCMAKE_BUILD_TYPE=Release"
-BUILDS[debug-afc-bpm-3.0-${GIT_DESCRIBE}]="\
-     -DBOARD=afc-bpm \
-     -DVERSION=3.0 \
-     -DBOARD_RTM= \
-     -DCMAKE_BUILD_TYPE=RelWithDebInfo"
-BUILDS[debug-afc-bpm-3.1-${GIT_DESCRIBE}]="\
-     -DBOARD=afc-bpm \
-     -DVERSION=3.1 \
-     -DBOARD_RTM= \
-     -DCMAKE_BUILD_TYPE=RelWithDebInfo"
-BUILDS[debug-afc-timing-${GIT_DESCRIBE}]="\
      -DBOARD=afc-timing \
      -DVERSION= \
      -DBOARD_RTM=rtm-8sfp \
@@ -73,16 +63,10 @@ case "${BUILD_ARTIFACT}" in
             # Copy the generated files to the release folder
             mkdir -p ${RELEASE_DIR}
             for build in "${!BUILDS[@]}"; do
-                case "${build}" in
-                    debug*)
-                        cp ${BUILD_DIR}-${build}/out/openMMC.axf ${RELEASE_DIR}/openMMC-${build}.axf
-                        ;;
-
-                    *)
-                        cp ${BUILD_DIR}-${build}/out/openMMC.bin ${RELEASE_DIR}/openMMC-${build}.bin
-                        cp ${BUILD_DIR}-${build}/out/openMMC_full.bin ${RELEASE_DIR}/openMMC-full-${build}.bin
-                        ;;
-                esac
+                cp ${BUILD_DIR}-${build}/out/openMMC.axf ${RELEASE_DIR}/openMMC-${build}.axf
+                cp ${BUILD_DIR}-${build}/out/openMMC.bin ${RELEASE_DIR}/openMMC-${build}.bin
+				cp ${BUILD_DIR}-${build}/out/bootloader.axf ${RELEASE_DIR}/bootloader-${build}.axf
+                cp ${BUILD_DIR}-${build}/out/bootloader.bin ${RELEASE_DIR}/bootloader-${build}.bin
             done
         fi
         ;;

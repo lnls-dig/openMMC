@@ -65,8 +65,8 @@ enum {
 #define I2C_BUS_CNT    7
 #define I2C_CHIP_CNT   28
 
-i2c_mux_state_t i2c_mux[I2C_MUX_CNT];
-i2c_bus_mapping_t i2c_bus_map[I2C_BUS_CNT];
-i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT];
+extern i2c_mux_state_t i2c_mux[];
+extern i2c_bus_mapping_t i2c_bus_map[];
+extern i2c_chip_mapping_t i2c_chip_map[];
 
 #endif

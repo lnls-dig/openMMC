@@ -461,6 +461,16 @@
  * @}
  */
 
+/**
+ * @defgroup IPMI_CUSTOM_CMD IPMI Commands - Custom (0x32)
+ * @ingroup IPMI_CMD
+ * @{
+ */
+#define IPMI_CUSTOM_CMD_MMC_GET_FREE_HEAP                       0x01
+/**
+ * @}
+ */
+
 #define IPMI_EVENT_MESSAGE_REV                                  0x04
 
 /**

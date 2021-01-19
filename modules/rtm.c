@@ -38,6 +38,7 @@
 #include "led.h"
 #include "board_led.h"
 
+volatile bool rtm_present;
 extern EventGroupHandle_t rtm_payload_evt;
 
 void RTM_Manage( void * Parameters )
