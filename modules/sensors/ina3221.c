@@ -39,7 +39,7 @@
 #include "i2c_mapping.h"
 #include "fpga_spi.h"
 #include "fru.h"
-#include "old_ina3221.h"
+#include "ina3221.h"
 
 TaskHandle_t vTaskINA3221_Handle;
 
@@ -130,10 +130,12 @@ uint8_t ina3221_read_reg( ina3221_data_t * data, uint8_t reg, uint16_t *read )
 
 uint8_t ina3221_read_voltages( ina3221_data_t * data )
 {
+	uint8_t ret = 0xFF;
     /* Read INA3221 Bus Voltage and Shunt Voltage Registers */
     for ( uint8_t i = 0; i < INA3221_VOLTAGE_REGISTERS; i++ ) {
-        return ina3221_read_reg( data, i+1, &(data->regs[i]) );
+        ret &= ina3221_read_reg( data, i+1, &(data->regs[i]) );
     }
+    return ret;
 }
 
 

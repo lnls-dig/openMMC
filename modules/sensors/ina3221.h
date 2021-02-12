@@ -127,8 +127,8 @@ typedef struct {
 
 extern TaskHandle_t vTaskINA3221_Handle;
 
-Bool ina3221_read_reg( ina3221_data_t * data, uint8_t reg, uint16_t *read );
-void ina3221_read_voltages( ina3221_data_t * data );
+uint8_t ina3221_read_reg( ina3221_data_t * data, uint8_t reg, uint16_t *read );
+uint8_t ina3221_read_voltages( ina3221_data_t * data );
 void ina3221_init( void );
 void vTaskINA3221( void* Parameters );
 
