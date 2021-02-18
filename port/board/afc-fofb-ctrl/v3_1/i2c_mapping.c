@@ -48,10 +48,13 @@ i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT] = {
     [CHIP_ID_FMC2_LM75_0] = { I2C_BUS_FMC2_ID,    0x48 },
     [CHIP_ID_FMC2_LM75_1] = { I2C_BUS_FMC2_ID,    0x49 },
 
-    [CHIP_ID_RTM_PCA9554] = { I2C_BUS_RTM_ID,     0x20 },
-    [CHIP_ID_RTM_EEPROM]  = { I2C_BUS_RTM_ID,     0x50 },
-    [CHIP_ID_RTM_LM75_0]  = { I2C_BUS_RTM_ID,     0x48 },
-    [CHIP_ID_RTM_LM75_1]  = { I2C_BUS_RTM_ID,     0x49 },
+    [CHIP_ID_RTM_PCA9554_LEDS] = { I2C_BUS_RTM_ID,     0x20 },
+    [CHIP_ID_RTM_PCA9554_PWR]  = { I2C_BUS_RTM_ID,     0x21 },
+    [CHIP_ID_RTM_EEPROM]       = { I2C_BUS_RTM_ID,     0x50 },
+    [CHIP_ID_RTM_LM75_0]       = { I2C_BUS_RTM_ID,     0x48 },
+    [CHIP_ID_RTM_LM75_1]       = { I2C_BUS_RTM_ID,     0x49 },
+    [CHIP_ID_RTM_LM75_2]       = { I2C_BUS_RTM_ID,     0x4B },
+    [CHIP_ID_RTM_MAX11609]     = { I2C_BUS_RTM_ID,     0x33 },
 };
 
 bool i2c_set_mux_bus( uint8_t bus_id, i2c_mux_state_t *i2c_mux, int8_t new_state )
