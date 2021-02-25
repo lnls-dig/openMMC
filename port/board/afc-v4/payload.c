@@ -61,21 +61,22 @@
  *       Wait until payload power goes down to restart the cycle
  */
 
-const extender_gpio_t ext_gpios[15] = {
-        [EXT_GPIO_P1V5_VTT_EN] =     { 0, 1 },
-        [EXT_GPIO_EN_P1V8] =         { 0, 2 },
-        [EXT_GPIO_EN_P1V2] =         { 0, 3 },
-        [EXT_GPIO_EN_FMC1_P12V] =    { 0, 4 },
-        [EXT_GPIO_EN_FMC2_P12V] =    { 0, 5 },
-        [EXT_GPIO_EN_FMC1_PVADJ] =   { 0, 6 },
-        [EXT_GPIO_EN_FMC2_PVADJ] =   { 0, 7 },
+const external_gpio_t ext_gpios[15] = {
+        [EXT_GPIO_P1V5_VTT_EN] =     { 1, 7 },
+        [EXT_GPIO_EN_P1V8] =         { 1, 6 },
+        [EXT_GPIO_EN_P1V2] =         { 1, 5 },
+        [EXT_GPIO_EN_FMC1_P12V] =    { 1, 4 },
+        [EXT_GPIO_EN_FMC2_P12V] =    { 1, 3 },
+        [EXT_GPIO_EN_FMC1_PVADJ] =   { 1, 2 },
+        [EXT_GPIO_EN_FMC2_PVADJ] =   { 1, 1 },
         [EXT_GPIO_EN_FMC1_P3V3] =    { 1, 0 },
-        [EXT_GPIO_EN_FMC2_P3V3] =    { 1, 1 },
-        [EXT_GPIO_EN_P1V0] =         { 1, 2 },
-        [EXT_GPIO_EN_P3V3] =         { 1, 3 },
-        [EXT_GPIO_EN_RTM_PWR] =      { 1, 4 },
-        [EXT_GPIO_FPGA_I2C_RESET] =  { 1, 5 },
-        [EXT_GPIO_PROGRAM_B]=        { 1, 7 }
+        [EXT_GPIO_EN_FMC2_P3V3] =    { 0, 7 },
+        [EXT_GPIO_EN_P1V0] =         { 0, 6 },
+        [EXT_GPIO_EN_P3V3] =         { 0, 5 },
+        [EXT_GPIO_EN_RTM_PWR] =      { 0, 4 },
+        [EXT_GPIO_EN_RTM_MP] =       { 0, 3 },
+        [EXT_GPIO_FPGA_I2C_RESET] =  { 0, 2 },
+        [EXT_GPIO_PROGRAM_B] =       { 0, 0 }
 };
 
 
@@ -273,11 +274,18 @@ void payload_init( void )
     Chip_ADC_EnableChannel(LPC_ADC, ADC_CH1, ENABLE);
 #endif
 
+#ifdef MCP_23016
     if (!dcdc_check_pgood()){
+
+    	//set output on all pins
+        mcp23016_set_port_dir(0, 0);
+        mcp23016_set_port_dir(1, 0);
+
         gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_LOW);
         mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
         gpio_set_pin_state(PIN_PORT(GPIO_FPGA_INITB), PIN_NUMBER(GPIO_FPGA_INITB), GPIO_LEVEL_LOW);
     }
+#endif
 }
 
 void vTaskPayload( void *pvParameters )

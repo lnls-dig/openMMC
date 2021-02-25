@@ -65,10 +65,10 @@ enum {
 /**
  * @}
  */
-typedef struct extender_gpio {
+typedef struct external_gpio {
     uint8_t port_num;
     uint8_t pin_num;
-} extender_gpio_t;
+} external_gpio_t;
 
 enum {
 	EXT_GPIO_EN_P1V0,
@@ -83,6 +83,7 @@ enum {
 	EXT_GPIO_EN_FMC2_P12V,
 	EXT_GPIO_EN_FMC2_P3V3,
 	EXT_GPIO_EN_RTM_PWR,
+	EXT_GPIO_EN_RTM_MP,
 	EXT_GPIO_FPGA_I2C_RESET,
 	EXT_GPIO_PROGRAM_B,
 };
