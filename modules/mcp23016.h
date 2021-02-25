@@ -152,4 +152,7 @@ uint8_t mcp23016_set_port_dir( uint8_t port_num, uint8_t dir );
  */
 uint8_t mcp23016_get_port_dir( uint8_t port_num, uint8_t *dir );
 
+uint8_t mcp23016_read_reg_pair( uint8_t reg, uint16_t *readout);
+uint8_t mcp23016_write_reg_pair( uint8_t reg, uint16_t data);
+
 #endif

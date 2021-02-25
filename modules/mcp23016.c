@@ -42,22 +42,26 @@
  * @param[in]  reg     Selected register
  * @param[out] readout Register value read
  *
- * @return Number of bytes read (1 if successful, 0 if failure)
+ * @return Number of bytes read (0 if failure)
  */
 static uint8_t mcp23016_read_reg ( uint8_t reg, uint8_t *readout )
 {
     uint8_t i2c_addr;
     uint8_t i2c_id;
     uint8_t rx_len = 0;
+    uint8_t data[2] = {0};
 
     if (readout == NULL) {
         return 0;
     }
 
     if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, readout, 1);
+        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, data, 2);
         i2c_give(i2c_id);
     }
+
+    *readout = data[0];
+
     return rx_len;
 }
 
@@ -69,12 +73,27 @@ static uint8_t mcp23016_read_reg ( uint8_t reg, uint8_t *readout )
  *
  * @return Number of bytes written
  */
-static uint8_t mcp23016_write_reg ( uint8_t reg, uint8_t data )
-{
+
+static uint8_t mcp23016_write_reg (uint8_t reg, uint8_t data) {
+
     uint8_t i2c_addr;
     uint8_t i2c_id;
-    uint8_t cmd_data[2] = {reg, data};
-    uint8_t tx_len = 0;
+    uint8_t rx_len = 0, tx_len = 0;
+    uint8_t read[2] = {0};
+    uint8_t cmd_data[3];
+
+    if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
+        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, read, 2);
+        i2c_give(i2c_id);
+    }
+
+    if (!rx_len) {
+    	return 0;
+    }
+
+    cmd_data[0] = reg;
+    cmd_data[1] = data;
+    cmd_data[2] = read[1];
 
     if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
         tx_len = xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
@@ -84,6 +103,7 @@ static uint8_t mcp23016_write_reg ( uint8_t reg, uint8_t data )
     return tx_len;
 }
 
+
 /* Pins Read/Write */
 uint8_t mcp23016_read_port( uint8_t port_num, uint8_t *readout )
 {
@@ -92,7 +112,7 @@ uint8_t mcp23016_read_port( uint8_t port_num, uint8_t *readout )
 
 uint8_t mcp23016_read_pin( uint8_t port_num, uint8_t pin, uint8_t *status )
 {
-    uint8_t rx_len, pin_read = 0;
+    uint8_t rx_len = 0, pin_read = 0;
 
     rx_len = mcp23016_read_port(port_num, &pin_read );
 
@@ -139,4 +159,40 @@ uint8_t mcp23016_set_port_dir( uint8_t port_num, uint8_t dir )
 uint8_t mcp23016_get_port_dir( uint8_t port_num, uint8_t *dir )
 {
     return mcp23016_read_reg( MCP23016_IODIR_REG + port_num, dir );
+}
+
+
+uint8_t mcp23016_read_reg_pair ( uint8_t reg, uint16_t *readout ) {
+    uint8_t i2c_addr;
+    uint8_t i2c_id;
+    uint8_t rx_len = 0;
+    uint8_t read[2] = {0};
+
+    if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
+        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, read, 2);
+        i2c_give(i2c_id);
+    }
+
+    *readout = (read[0] << 8) | read[1];
+
+    return rx_len;
+}
+
+uint8_t mcp23016_write_reg_pair ( uint8_t reg, uint16_t data )
+{
+    uint8_t i2c_addr;
+    uint8_t i2c_id;
+    uint8_t cmd_data[3] = {
+    		reg,
+			(data >> 8) & 0xFF,
+			(data) & 0xFF
+    };
+    uint8_t tx_len = 0;
+
+    if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
+        tx_len = xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
+        i2c_give(i2c_id);
+    }
+
+    return tx_len;
 }
