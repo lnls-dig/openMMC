@@ -32,6 +32,7 @@ set(LIBFREERTOS_SRCS ${LIBFREERTOS_SRCS}
   timers.c
   tasks.c
   event_groups.c
+  openocd.c
   )
 
 include_directories(${UCONTROLLER_HDRS})
