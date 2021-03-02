@@ -44,7 +44,7 @@
 #define FPGA_SPI        0
 
 /* UART Interfaces */
-#define UART_DEBUG      3
+#define UART_DEBUG      0
 
 /* Pin definitions */
 

@@ -9,16 +9,16 @@ i2c_mux_state_t i2c_mux[I2C_MUX_CNT] = {
 
 i2c_bus_mapping_t i2c_bus_map[I2C_BUS_CNT] = {
     [I2C_BUS_UNKNOWN_ID]         = { I2C1, -1, 0 },
-    [I2C_BUS_TEMP_SENSORS_ID]    = { I2C2,  0, 1 },
-    [I2C_BUS_RTCE_ID]            = { I2C2,  1, 1 },
-    [I2C_BUS_PORT2_ID]           = { I2C2,  2, 1 },
-    [I2C_BUS_POWER_ID]           = { I2C2,  3, 1 },
-    [I2C_BUS_CLOCK_ID]           = { I2C2,  4, 1 },
-    [I2C_BUS_RTM_ID]             = { I2C2,  5, 1 },
-    [I2C_BUS_FMC2_ID]            = { I2C2,  6, 1 },
-    [I2C_BUS_FMC1_ID]            = { I2C2,  7, 1 },
-    [I2C_BUS_MUX_ID]             = { I2C2, -1, 1 },
-    [I2C_BUS_MCP_ID]             = { I2C1, -1, 1 }
+    [I2C_BUS_TEMP_SENSORS_ID]    = { I2C1,  0, 1 },
+    [I2C_BUS_RTCE_ID]            = { I2C1,  1, 1 },
+    [I2C_BUS_PORT2_ID]           = { I2C1,  2, 1 },
+    [I2C_BUS_POWER_ID]           = { I2C1,  3, 1 },
+    [I2C_BUS_CLOCK_ID]           = { I2C1,  4, 1 },
+    [I2C_BUS_RTM_ID]             = { I2C1,  5, 1 },
+    [I2C_BUS_FMC2_ID]            = { I2C1,  6, 1 },
+    [I2C_BUS_FMC1_ID]            = { I2C1,  7, 1 },
+    [I2C_BUS_MUX_ID]             = { I2C1, -1, 1 },
+    [I2C_BUS_MCP_ID]             = { I2C2, -1, 1 }
 };
 
 i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT] = {

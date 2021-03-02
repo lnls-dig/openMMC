@@ -274,10 +274,10 @@ void payload_init( void )
     Chip_ADC_EnableChannel(LPC_ADC, ADC_CH1, ENABLE);
 #endif
 
-#ifdef MCP_23016
+#ifdef MCP23016
     if (!dcdc_check_pgood()){
 
-    	//set output on all pins
+        //set output on all pins
         mcp23016_set_port_dir(0, 0);
         mcp23016_set_port_dir(1, 0);
 
