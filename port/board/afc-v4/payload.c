@@ -28,6 +28,7 @@
 
 /* Project Includes */
 #include "port.h"
+#include "adc_17xx_40xx.h"
 #include "payload.h"
 #include "ipmi.h"
 #include "task_priorities.h"
@@ -164,19 +165,20 @@ static void check_fpga_reset( void )
 
 uint8_t payload_check_pgood()
 {
-//    const uint16_t PAYLOAD_THRESHOLD = ;
-//    uint16_t dataADC;
-//
-//    Chip_ADC_SetStartMode(LPC_ADC, ADC_START_NOW, ADC_TRIGGERMODE_RISING);
-//
-//    /* Waiting for A/D conversion complete */
-//    while (Chip_ADC_ReadStatus(LPC_ADC, ADC_CH1, ADC_DR_DONE_STAT) != SET) {}
-//    /* Read ADC value */
-//    Chip_ADC_ReadValue(LPC_ADC, ADC_CH1, &dataADC);
-//
-//    if (dataADC > PAYLOAD_THRESHOLD ){
-//        return 1;
-//    }
+    /* Threshold set to ~8V */
+    const uint16_t PAYLOAD_THRESHOLD = 0x9B2;
+    uint16_t dataADC;
+
+    Chip_ADC_SetStartMode(LPC_ADC, ADC_START_NOW, ADC_TRIGGERMODE_RISING);
+
+    /* Waiting for A/D conversion complete */
+    while (Chip_ADC_ReadStatus(LPC_ADC, ADC_CH1, ADC_DR_DONE_STAT) != SET) {}
+    /* Read ADC value */
+    Chip_ADC_ReadValue(LPC_ADC, ADC_CH1, &dataADC);
+
+    if (dataADC > PAYLOAD_THRESHOLD){
+        return 1;
+    }
     return 0;
 }
 
@@ -270,6 +272,7 @@ void payload_init( void )
 #endif
 
 #ifdef MODULE_ADC
+    ADC_CLOCK_SETUP_T ADCSetup;
     Chip_ADC_Init(LPC_ADC, &ADCSetup);
     Chip_ADC_EnableChannel(LPC_ADC, ADC_CH1, ENABLE);
 #endif

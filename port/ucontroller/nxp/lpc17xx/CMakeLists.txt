@@ -17,6 +17,7 @@ set(UCONTROLLER_HDRS
   )
 
 set(LIBLPCOPEN_SRCS
+  ${LPCOPEN_SRCPATH}/adc_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/chip_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/clock_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/gpio_17xx_40xx.c
