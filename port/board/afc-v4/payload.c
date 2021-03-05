@@ -264,6 +264,11 @@ void payload_init( void )
     rtm_payload_evt = xEventGroupCreate();
 #endif
 
+    /* I2C MUX Init */
+    gpio_set_pin_state(PIN_PORT(GPIO_I2C_MUX_ADDR1), PIN_NUMBER(GPIO_I2C_MUX_ADDR1), GPIO_LEVEL_LOW);
+    gpio_set_pin_state(PIN_PORT(GPIO_I2C_MUX_ADDR2), PIN_NUMBER(GPIO_I2C_MUX_ADDR2), GPIO_LEVEL_LOW);
+    gpio_set_pin_state(PIN_PORT(GPIO_I2C_SW_RESETn), PIN_NUMBER(GPIO_I2C_SW_RESETn), GPIO_LEVEL_HIGH);
+
 #ifdef MODULE_DAC_AD84XX
     /* Configure the PVADJ DAC */
     dac_ad84xx_init();
@@ -277,7 +282,7 @@ void payload_init( void )
     Chip_ADC_EnableChannel(LPC_ADC, ADC_CH1, ENABLE);
 #endif
 
-#ifdef MCP23016
+#ifdef MODULE_MCP23016
     if (!dcdc_check_pgood()){
 
         //set output on all pins

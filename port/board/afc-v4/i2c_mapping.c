@@ -22,7 +22,7 @@ i2c_bus_mapping_t i2c_bus_map[I2C_BUS_CNT] = {
 };
 
 i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT] = {
-    [CHIP_ID_MUX]         = { I2C_BUS_MUX_ID,    0x70 },
+    [CHIP_ID_MUX]         = { I2C_BUS_MUX_ID,    0x71 },
     [CHIP_ID_MAX6642]     = { I2C_BUS_TEMP_SENSORS_ID, 0x48 },
     [CHIP_ID_LM75AIM_0]   = { I2C_BUS_TEMP_SENSORS_ID, 0x4C },
     [CHIP_ID_LM75AIM_1]   = { I2C_BUS_TEMP_SENSORS_ID, 0x4D },
