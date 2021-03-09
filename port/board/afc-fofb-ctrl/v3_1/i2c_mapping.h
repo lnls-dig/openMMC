@@ -61,12 +61,13 @@ enum {
     CHIP_ID_RTM_LM75_0,
     CHIP_ID_RTM_LM75_1,
     CHIP_ID_RTM_LM75_2,
-    CHIP_ID_RTM_MAX11609
+    CHIP_ID_RTM_MAX11609,
+    CHIP_ID_RTM_CDCE906
 };
 
 #define I2C_MUX_CNT    2
 #define I2C_BUS_CNT    7
-#define I2C_CHIP_CNT   31
+#define I2C_CHIP_CNT   32
 
 extern i2c_mux_state_t i2c_mux[];
 extern i2c_bus_mapping_t i2c_bus_map[];
