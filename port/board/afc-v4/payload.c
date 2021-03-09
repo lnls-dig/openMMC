@@ -182,34 +182,6 @@ uint8_t payload_check_pgood()
     return 0;
 }
 
-uint8_t dcdc_check_pgood()
-{
-    const uint8_t POWER_GOOD = 0xF;
-    const uint32_t pg_pins[] = {
-        GPIO_FMC1_PV,
-        GPIO_FMC2_PV,
-        GPIO_AMC_RTM_PV,
-        GPIO_PGOOD_P1V0
-    };
-
-    uint8_t pg = 0;
-    uint8_t DCDC_flags = 0;
-
-    for (uint8_t pin_num = 0; pin_num < sizeof(pg_pins) / sizeof(pg_pins[0]); pin_num++) {
-        pg = gpio_read_pin(PIN_PORT(pg_pins[pin_num]), PIN_NUMBER(pg_pins[pin_num]));
-        if (pg){
-            DCDC_flags |= pg << pin_num;
-        } else {
-            DCDC_flags &= ~(1 << pin_num);
-        }
-    }
-
-    if (DCDC_flags == POWER_GOOD){
-        return 1;
-    }
-    return 0;
-}
-
 #ifdef MODULE_DAC_AD84XX
 void set_vadj_volt( uint8_t fmc_slot, float v )
 {
@@ -283,7 +255,7 @@ void payload_init( void )
 #endif
 
 #ifdef MODULE_MCP23016
-    if (!dcdc_check_pgood()){
+    if (!gpio_read_pin(PIN_PORT(GPIO_PGOOD_P1V0), PIN_NUMBER(GPIO_PGOOD_P1V0))){
 
         //set output on all pins
         mcp23016_set_port_dir(0, 0);
@@ -339,7 +311,7 @@ void vTaskPayload( void *pvParameters )
         }
 
         PP_good = payload_check_pgood();
-        DCDC_good = dcdc_check_pgood();
+        DCDC_good = gpio_read_pin(PIN_PORT(GPIO_PGOOD_P1V0), PIN_NUMBER(GPIO_PGOOD_P1V0));
 
         switch(state) {
 
