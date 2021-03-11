@@ -30,8 +30,8 @@
 #include "lpc17_hpm.h"
 #include "iap.h"
 #include "modules/ipmi.h"
+#include "modules/sys_utils.h"
 #include "boot/boot.h"
-#include "modules/watchdog.h"
 #include "string.h"
 
 uint32_t ipmc_page_addr = 0;
@@ -132,8 +132,8 @@ uint8_t ipmc_hpm_get_upgrade_status( void )
 
 uint8_t ipmc_hpm_activate_firmware( void )
 {
-    /* Schedule a reset in the next watchdog task cycle, inhibiting the task to feed its counter */
-    watchdog_reset_mcu();
+    /* Schedule a reset to 500ms from now */
+    sys_schedule_reset(500);
     return IPMI_CC_OK;
 }
 

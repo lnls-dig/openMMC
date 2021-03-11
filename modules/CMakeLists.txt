@@ -77,6 +77,11 @@ if (";${TARGET_MODULES};" MATCHES ";PCA9554;")
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_PCA9554")
 endif()
 
+if (";${TARGET_MODULES};" MATCHES ";SYSUTILS;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/sys_utils.c )
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_SYSUTILS")
+endif()
+
 if (";${TARGET_MODULES};" MATCHES ";RTM;")
   if (NOT BOARD_RTM)
     message( FATAL_ERROR "${BoldRed}RTM Module included but no RTM Board specified${ColourReset}")
