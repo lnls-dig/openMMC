@@ -41,6 +41,7 @@
 #include "fru.h"
 #include "utils.h"
 #include "uart_debug.h"
+#include "payload.h"
 
 #ifdef MODULE_RTM
 #include "rtm.h"
