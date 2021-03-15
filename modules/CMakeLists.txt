@@ -82,6 +82,11 @@ if (";${TARGET_MODULES};" MATCHES ";MCP23016;")
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_MCP23016")
 endif()
 
+if (";${TARGET_MODULES};" MATCHES ";IDT_8V54816;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/idt_8v54816.c )
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_IDT_8V54816")
+endif()
+
 if (";${TARGET_MODULES};" MATCHES ";RTM;")
   if (NOT BOARD_RTM)
     message( FATAL_ERROR "${BoldRed}RTM Module included but no RTM Board specified${ColourReset}")
