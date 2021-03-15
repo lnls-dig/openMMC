@@ -58,11 +58,10 @@ bool i2c_set_mux_bus( uint8_t bus_id, i2c_mux_state_t *i2c_mux, int8_t new_state
     portENABLE_INTERRUPTS();
 
     if (i2c_mux->i2c_interface == i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface) {
-        /* Include enable bit (fourth bit) on channel selection byte */
-        uint8_t pca_channel = new_state | (1 << 3);
+        uint8_t tca_channel = 1 << new_state;
 
         /* Select desired channel in the I2C switch */
-        if( xI2CMasterWrite( i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface, i2c_chip_map[CHIP_ID_MUX].i2c_address, &pca_channel, 1 ) != 1 ) {
+        if( xI2CMasterWrite( i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface, i2c_chip_map[CHIP_ID_MUX].i2c_address, &tca_channel, 1 ) != 1 ) {
             /* We failed to configure the I2C Mux, release the semaphore */
             xSemaphoreGive( i2c_mux->semaphore );
             return false;
@@ -77,13 +76,21 @@ uint8_t i2c_get_mux_bus( uint8_t bus_id, i2c_mux_state_t *i2c_mux )
 {
     if (i2c_mux->i2c_interface == i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface) {
         /* Include enable bit (fourth bit) on channel selection byte */
-        uint8_t pca_channel;
+        uint8_t tca_channel;
 
         portENABLE_INTERRUPTS();
         /* Read bus state (other master on the bus may have switched it */
-        xI2CMasterRead( i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface, i2c_chip_map[CHIP_ID_MUX].i2c_address, &pca_channel, 1 );
+        xI2CMasterRead( i2c_bus_map[i2c_chip_map[CHIP_ID_MUX].bus_id].i2c_interface, i2c_chip_map[CHIP_ID_MUX].i2c_address, &tca_channel, 1 );
 
-        return (pca_channel & 0x07);
+        /* Convert bit position from tca register to actual channel number */
+        uint8_t num;
+        for (num = 0; num <= 8 ; num++)
+        {
+        	if (tca_channel & 1 << num)
+        		break;
+        }
+        return num;
+
     } else {
         return i2c_mux->state;
     }
