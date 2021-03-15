@@ -23,6 +23,7 @@ set(TARGET_MODULES
   "UART_DEBUG"
   "MCP23016"
   "ADC"
+  "BOARD_CONFIG"
   )
 
 set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
@@ -39,6 +40,11 @@ endif()
 
 if (";${TARGET_MODULES};" MATCHES ";ADC;")
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_ADC")
+endif()
+
+if (";${TARGET_MODULES};" MATCHES ";BOARD_CONFIG;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/board_config.c)
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_BOARD_CONFIG")
 endif()
 
 #Extra definitions
