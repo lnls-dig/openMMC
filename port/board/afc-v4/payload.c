@@ -241,13 +241,6 @@ void payload_init( void )
     gpio_set_pin_state(PIN_PORT(GPIO_I2C_MUX_ADDR2), PIN_NUMBER(GPIO_I2C_MUX_ADDR2), GPIO_LEVEL_LOW);
     gpio_set_pin_state(PIN_PORT(GPIO_I2C_SW_RESETn), PIN_NUMBER(GPIO_I2C_SW_RESETn), GPIO_LEVEL_HIGH);
 
-#ifdef MODULE_DAC_AD84XX
-    /* Configure the PVADJ DAC */
-    dac_ad84xx_init();
-    set_vadj_volt( 0, 2.5 );
-    set_vadj_volt( 1, 2.5 );
-#endif
-
 #ifdef MODULE_ADC
     ADC_CLOCK_SETUP_T ADCSetup;
     Chip_ADC_Init(LPC_ADC, &ADCSetup);
@@ -256,6 +249,13 @@ void payload_init( void )
 
 #ifdef MODULE_MCP23016
     if (!gpio_read_pin(PIN_PORT(GPIO_PGOOD_P1V0), PIN_NUMBER(GPIO_PGOOD_P1V0))){
+
+#ifdef MODULE_DAC_AD84XX
+        /* Configure the PVADJ DAC */
+        dac_ad84xx_init();
+        set_vadj_volt( 0, 2.5 );
+        set_vadj_volt( 1, 2.5 );
+#endif
 
         //set output on all pins
         mcp23016_set_port_dir(0, 0);
