@@ -236,11 +236,6 @@ void payload_init( void )
     rtm_payload_evt = xEventGroupCreate();
 #endif
 
-    /* I2C MUX Init */
-    gpio_set_pin_state(PIN_PORT(GPIO_I2C_MUX_ADDR1), PIN_NUMBER(GPIO_I2C_MUX_ADDR1), GPIO_LEVEL_LOW);
-    gpio_set_pin_state(PIN_PORT(GPIO_I2C_MUX_ADDR2), PIN_NUMBER(GPIO_I2C_MUX_ADDR2), GPIO_LEVEL_LOW);
-    gpio_set_pin_state(PIN_PORT(GPIO_I2C_SW_RESETn), PIN_NUMBER(GPIO_I2C_SW_RESETn), GPIO_LEVEL_HIGH);
-
 #ifdef MODULE_ADC
     ADC_CLOCK_SETUP_T ADCSetup;
     Chip_ADC_Init(LPC_ADC, &ADCSetup);
