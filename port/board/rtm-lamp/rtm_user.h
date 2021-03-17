@@ -29,6 +29,12 @@
 #define RTM_GPIO_LED_GREEN              6
 #define RTM_GPIO_LED_BLUE               7
 
+#define RTM_GPIO_VS1_EN                 0
+#define RTM_GPIO_VS2_EN                 1
+#define RTM_GPIO_7V_EN                  2
+#define RTM_GPIO_5V_EN                  3
+#define RTM_GPIO_NEG_7V_EN              4
+
 /* Mandatory RTM module functions */
 void rtm_enable_payload_power( void );
 void rtm_disable_payload_power( void );
