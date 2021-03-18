@@ -73,17 +73,17 @@
 #define CDCE906_PLL3_REF_DIV_N_HIGH_SHIFT     1
 #define CDCE906_PLL3_REF_DIV_N_HIGH_MASK      0x1E
 
-#define CDCE906_PLL1_MUX_OUT_BYTE             3
-#define CDCE906_PLL1_MUX_OUT_SHIFT            7
-#define CDCE906_PLL1_MUX_OUT_MASK             0x80
+#define CDCE906_PLL1_VCO_MUX_BYTE             3
+#define CDCE906_PLL1_VCO_MUX_SHIFT            7
+#define CDCE906_PLL1_VCO_MUX_MASK             0x80
 
-#define CDCE906_PLL2_MUX_OUT_BYTE             3
-#define CDCE906_PLL2_MUX_OUT_SHIFT            6
-#define CDCE906_PLL2_MUX_OUT_MASK             0x40
+#define CDCE906_PLL2_VCO_MUX_BYTE             3
+#define CDCE906_PLL2_VCO_MUX_SHIFT            6
+#define CDCE906_PLL2_VCO_MUX_MASK             0x40
 
-#define CDCE906_PLL3_MUX_OUT_BYTE             3
-#define CDCE906_PLL3_MUX_OUT_SHIFT            5
-#define CDCE906_PLL3_MUX_OUT_MASK             0x20
+#define CDCE906_PLL3_VCO_MUX_BYTE             3
+#define CDCE906_PLL3_VCO_MUX_SHIFT            5
+#define CDCE906_PLL3_VCO_MUX_MASK             0x20
 
 #define CDCE906_PLL1_FVCO_BYTE                6
 #define CDCE906_PLL1_FVCO_SHIFT               7

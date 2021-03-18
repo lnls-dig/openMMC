@@ -37,6 +37,102 @@
 #include "cdce906_reg.h"
 #include "i2c.h"
 
+static inline void cdce906_get_ssc(cdce906_cfg* cfg, const uint8_t* buff)
+{
+    uint8_t reg;
+
+    reg = (buff[CDCE906_SSC_MOD_SEL_BYTE] & CDCE906_SSC_MOD_SEL_MASK) >>
+        CDCE906_SSC_MOD_SEL_SHIFT;
+    cfg->ssc_mod_amount = (enum cdce906_ssc_mod_amount)reg;
+
+    reg = (buff[CDCE906_SSC_FREQ_SEL_BYTE] & CDCE906_SSC_FREQ_SEL_MASK) >>
+        CDCE906_SSC_FREQ_SEL_SHIFT;
+    cfg->ssc_mod_freq = (enum cdce906_ssc_mod_freq)reg;
+}
+
+static inline void cdce906_set_ssc(const cdce906_cfg* cfg, uint8_t* buff)
+{
+    uint8_t reg;
+
+    reg = (uint8_t)cfg->ssc_mod_amount << CDCE906_SSC_MOD_SEL_SHIFT;
+    buff[CDCE906_SSC_MOD_SEL_BYTE] |= reg;
+
+    reg = (uint8_t)cfg->ssc_mod_freq << CDCE906_SSC_FREQ_SEL_SHIFT;
+    buff[CDCE906_SSC_FREQ_SEL_BYTE] |= reg;
+}
+
+static inline void cdce906_get_pll_fvco(cdce906_cfg* cfg, const uint8_t* buff)
+{
+    if (buff[CDCE906_PLL1_FVCO_BYTE] & CDCE906_PLL1_FVCO_MASK) {
+        cfg->pll_fvco[0] = CDCE906_PLL_FVCO_180_300MHZ;
+    } else {
+        cfg->pll_fvco[0] = CDCE906_PLL_FVCO_80_200MHZ;
+    }
+
+    if (buff[CDCE906_PLL2_FVCO_BYTE] & CDCE906_PLL2_FVCO_MASK) {
+        cfg->pll_fvco[1] = CDCE906_PLL_FVCO_180_300MHZ;
+    } else {
+        cfg->pll_fvco[1] = CDCE906_PLL_FVCO_80_200MHZ;
+    }
+
+    if (buff[CDCE906_PLL3_FVCO_BYTE] & CDCE906_PLL3_FVCO_MASK) {
+        cfg->pll_fvco[2] = CDCE906_PLL_FVCO_180_300MHZ;
+    } else {
+        cfg->pll_fvco[2] = CDCE906_PLL_FVCO_80_200MHZ;
+    }
+}
+
+static inline void cdce906_set_pll_fvco(const cdce906_cfg* cfg, uint8_t* buff)
+{
+    if (cfg->pll_fvco[0] == CDCE906_PLL_FVCO_180_300MHZ) {
+        buff[CDCE906_PLL1_FVCO_BYTE] |= CDCE906_PLL1_FVCO_MASK;
+    }
+
+    if (cfg->pll_fvco[1] == CDCE906_PLL_FVCO_180_300MHZ) {
+        buff[CDCE906_PLL2_FVCO_BYTE] |= CDCE906_PLL2_FVCO_MASK;
+    }
+
+    if (cfg->pll_fvco[2] == CDCE906_PLL_FVCO_180_300MHZ) {
+        buff[CDCE906_PLL3_FVCO_BYTE] |= CDCE906_PLL3_FVCO_MASK;
+    }
+}
+
+static inline void cdce906_get_pll_mux(cdce906_cfg* cfg, const uint8_t* buff)
+{
+    if (buff[CDCE906_PLL1_VCO_MUX_BYTE] & CDCE906_PLL1_VCO_MUX_MASK) {
+        cfg->pll_vco_mux[0] = CDCE906_PLL_VCO_MUX_VCO;
+    } else {
+        cfg->pll_vco_mux[0] = CDCE906_PLL_VCO_MUX_PLL;
+    }
+
+    if (buff[CDCE906_PLL2_VCO_MUX_BYTE] & CDCE906_PLL2_VCO_MUX_MASK) {
+        cfg->pll_vco_mux[1] = CDCE906_PLL_VCO_MUX_VCO;
+    } else {
+        cfg->pll_vco_mux[1] = CDCE906_PLL_VCO_MUX_PLL;
+    }
+
+    if (buff[CDCE906_PLL3_VCO_MUX_BYTE] & CDCE906_PLL3_VCO_MUX_MASK) {
+        cfg->pll_vco_mux[2] = CDCE906_PLL_VCO_MUX_VCO;
+    } else {
+        cfg->pll_vco_mux[2] = CDCE906_PLL_VCO_MUX_PLL;
+    }
+}
+
+static inline void cdce906_set_pll_mux(const cdce906_cfg* cfg, uint8_t* buff)
+{
+    if (cfg->pll_vco_mux[0] == CDCE906_PLL_VCO_MUX_VCO) {
+        buff[CDCE906_PLL1_VCO_MUX_BYTE] |= CDCE906_PLL1_VCO_MUX_MASK;
+    }
+
+    if (cfg->pll_vco_mux[1] == CDCE906_PLL_VCO_MUX_VCO) {
+        buff[CDCE906_PLL2_VCO_MUX_BYTE] |= CDCE906_PLL2_VCO_MUX_MASK;
+    }
+
+    if (cfg->pll_vco_mux[2] == CDCE906_PLL_VCO_MUX_VCO) {
+        buff[CDCE906_PLL3_VCO_MUX_BYTE] |= CDCE906_PLL3_VCO_MUX_MASK;
+    }
+}
+
 static inline void cdce906_get_clksrc(cdce906_cfg* cfg, const uint8_t* buff)
 {
     switch(buff[CDCE906_CLKIN_SRC_BYTE] & CDCE906_CLKIN_SRC_MASK)
@@ -479,6 +575,10 @@ int cdce906_read_cfg(uint8_t chip_id, cdce906_cfg* cfg)
     }
 
     if (i2c_trans == sizeof(data)) {
+        /*
+         * Ignore the first byte from the data buffer as it is the
+         * number of bytes read, not the register 0
+         */
         cdce906_get_clksrc(cfg, &data[1]);
         cdce906_get_px_pll_sel(cfg, &data[1]);
         cdce906_get_pll_div(cfg, &data[1]);
@@ -486,6 +586,9 @@ int cdce906_read_cfg(uint8_t chip_id, cdce906_cfg* cfg)
         cdce906_get_yx_slew(cfg, &data[1]);
         cdce906_get_px_div(cfg, &data[1]);
         cdce906_get_yx_out_cfg(cfg, &data[1]);
+        cdce906_get_pll_fvco(cfg, &data[1]);
+        cdce906_get_pll_mux(cfg, &data[1]);
+        cdce906_get_ssc(cfg, &data[1]);
     } else {
         ret = -1;
     }
@@ -495,11 +598,12 @@ int cdce906_read_cfg(uint8_t chip_id, cdce906_cfg* cfg)
 
 int cdce906_write_cfg(uint8_t chip_id, const cdce906_cfg* cfg)
 {
-    uint8_t data[27] = {0, 25, 1};
+    uint8_t data[28] = {0, 25, 1}; // Write 25 bytes starting from
+                                   // address 0
+    uint8_t tmp[2];
     uint8_t i2c_addr;
     uint8_t i2c_id;
     int i2c_trans = 0;
-    int ret = 0;
 
     cdce906_set_clksrc(cfg, &data[2]);
     cdce906_set_px_pll_sel(cfg, &data[2]);
@@ -508,11 +612,76 @@ int cdce906_write_cfg(uint8_t chip_id, const cdce906_cfg* cfg)
     cdce906_set_yx_slew(cfg, &data[2]);
     cdce906_set_px_div(cfg, &data[2]);
     cdce906_set_yx_out_cfg(cfg, &data[2]);
+    cdce906_set_pll_fvco(cfg, &data[2]);
+    cdce906_set_pll_mux(cfg, &data[2]);
+    cdce906_set_ssc(cfg, &data[2]);
 
     /*
      * Clear EELOCK bit to avoid permanently locking the EEPROM
      */
-    data[26] &= 0x7F;
+    data[CDCE906_EELOCK_BYTE + 2] &= 0x7F;
+
+    /*
+     * Bypass PLL2 to change the SSC configuration on-the-fly
+     */
+    tmp[0] = 0x80 | CDCE906_PLL2_VCO_MUX_BYTE;
+    tmp[1] = data[CDCE906_PLL2_VCO_MUX_BYTE + 2] | CDCE906_PLL2_VCO_MUX_MASK;
+    if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, (TickType_t)10)) {
+        i2c_trans = xI2CMasterWrite(i2c_id, i2c_addr, tmp, sizeof(tmp));
+        i2c_give(i2c_id);
+    }
+
+    if (i2c_trans != sizeof(tmp)) {
+        return -1;
+    }
+
+    /*
+     * Write the SSC configuration
+     */
+    tmp[0] = 0x80 | CDCE906_SSC_FREQ_SEL_BYTE;
+    tmp[1] = data[CDCE906_SSC_FREQ_SEL_BYTE + 2];
+    if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, (TickType_t)10)) {
+        i2c_trans = xI2CMasterWrite(i2c_id, i2c_addr, tmp, sizeof(tmp));
+        i2c_give(i2c_id);
+    }
+
+    if (i2c_trans != sizeof(tmp)) {
+        return -1;
+    }
+
+    /*
+     * Write to all registers except for SSC
+     */
+    if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, (TickType_t)10)) {
+        i2c_trans = xI2CMasterWrite(i2c_id, i2c_addr, data, sizeof(data) - 1);
+        i2c_give(i2c_id);
+    }
+
+    if (i2c_trans != sizeof(data)) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int cdce906_write_eeprom(uint8_t chip_id)
+{
+    uint8_t data[2];
+    uint8_t i2c_addr;
+    uint8_t i2c_id;
+    int i2c_trans = 0;
+    int ret = 0;
+
+    /*
+     * Byte write operation, address 26
+     */
+    data[0] = 26 | 0x80;
+
+    /*
+     * Starts an EEPROM write cycle, keep the default block read size
+     * (27 bytes)
+     */
+    data[1] = CDCE906_EEWRITE_MASK | 27;
 
     if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, (TickType_t)10)) {
         i2c_trans = xI2CMasterWrite(i2c_id, i2c_addr, data, sizeof(data));

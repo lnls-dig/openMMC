@@ -41,9 +41,9 @@ enum cdce906_clk_src {
     CDCE906_CLK_SRC_INVALID,
 };
 
-enum cdce906_pll_mux {
-    CDCE906_PLL_MUX_PLL,
-    CDCE906_PLL_MUX_VCO,
+enum cdce906_pll_vco_mux {
+    CDCE906_PLL_VCO_MUX_PLL,
+    CDCE906_PLL_VCO_MUX_VCO,
 };
 
 enum cdce906_pll_fvco {
@@ -98,12 +98,44 @@ enum cdce906_yx_px_sel {
     CDCE906_Yx_Px_SEL_INVALID,
 };
 
+enum cdce906_ssc_mod_amount {
+    CDCE906_SSC_MOD_AMOUNT_OFF = 0,
+    CDCE906_SSC_MOD_AMOUNT_0P1_CENTER,
+    CDCE906_SSC_MOD_AMOUNT_0P25_CENTER,
+    CDCE906_SSC_MOD_AMOUNT_0P4_CENTER,
+    CDCE906_SSC_MOD_AMOUNT_1P0_DOWN,
+    CDCE906_SSC_MOD_AMOUNT_1P5_DOWN,
+    CDCE906_SSC_MOD_AMOUNT_2P0_DOWN,
+    CDCE906_SSC_MOD_AMOUNT_3P0_DOWN,
+};
+
+enum cdce906_ssc_mod_freq {
+    CDCE906_SSC_MOD_FREQ_5680 = 0,
+    CDCE906_SSC_MOD_FREQ_5412,
+    CDCE906_SSC_MOD_FREQ_5144,
+    CDCE906_SSC_MOD_FREQ_4876,
+    CDCE906_SSC_MOD_FREQ_4608,
+    CDCE906_SSC_MOD_FREQ_4340,
+    CDCE906_SSC_MOD_FREQ_4072,
+    CDCE906_SSC_MOD_FREQ_3804,
+    CDCE906_SSC_MOD_FREQ_3536,
+    CDCE906_SSC_MOD_FREQ_3286,
+    CDCE906_SSC_MOD_FREQ_3000,
+    CDCE906_SSC_MOD_FREQ_2732,
+    CDCE906_SSC_MOD_FREQ_2464,
+    CDCE906_SSC_MOD_FREQ_2196,
+    CDCE906_SSC_MOD_FREQ_1928,
+    CDCE906_SSC_MOD_FREQ_1660,
+};
+
 typedef struct {
     enum cdce906_clk_src clksrc;
     uint16_t pll_div_m[3];
     uint16_t pll_div_n[3];
-    enum cdce906_pll_mux pll_mux[3];
+    enum cdce906_pll_vco_mux pll_vco_mux[3];
     enum cdce906_pll_fvco pll_fvco[3];
+    enum cdce906_ssc_mod_amount ssc_mod_amount;
+    enum cdce906_ssc_mod_freq ssc_mod_freq;
     enum cdce906_s0_cfg s0_cfg;
     enum cdce906_s1_cfg s1_cfg;
     enum cdce906_px_pll_sel pll_sel[6];
@@ -132,5 +164,14 @@ int cdce906_read_cfg(uint8_t chip_id, cdce906_cfg* cfg);
  * @return 0 if successful, non zero if there was an I2C error
  */
 int cdce906_write_cfg(uint8_t chip_id, const cdce906_cfg* cfg);
+
+/**
+ * @brief Save the current CDCE906 configuration to internal eeprom
+ *
+ * @param[in]  chip_id Chip ID to communicate
+ *
+ * @return 0 if successful, non zero if there was an I2C error
+ */
+int cdce906_write_eeprom(uint8_t chip_id);
 
 #endif
