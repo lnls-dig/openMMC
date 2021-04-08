@@ -31,16 +31,39 @@
 #include "led.h"
 #include "board_led.h"
 #include "uart_debug.h"
+#include "cdce906_config.h"
 /* RTM Management functions */
 
 void rtm_enable_payload_power( void )
 {
     gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 1 );
+
+    /*
+     * RTM-LAMP power up sequence
+     */
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_5V_EN, 1);
+    vTaskDelay(pdMS_TO_TICKS(10));
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_NEG_7V_EN, 1);
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_7V_EN, 0);
+    vTaskDelay(pdMS_TO_TICKS(10));
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_VS1_EN, 1);
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_VS2_EN, 1);
 }
 
 void rtm_disable_payload_power( void )
 {
     gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 0 );
+
+    /*
+     * RTM-LAMP power down sequence
+     */
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_VS1_EN, 0);
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_VS2_EN, 0);
+    vTaskDelay(pdMS_TO_TICKS(10));
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_NEG_7V_EN, 0);
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_7V_EN, 1);
+    vTaskDelay(pdMS_TO_TICKS(10));
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_5V_EN, 0);
 }
 
 uint8_t rtm_get_hotswap_handle_status( uint8_t *state )
@@ -89,6 +112,19 @@ void rtm_hardware_init( void )
 {
     rtm_enable_i2c();
     pca9554_set_port_dir( CHIP_ID_RTM_PCA9554_LEDS, 0x1F );
+
+    /*
+     * Clock configuration
+     */
+    cdce906_write_cfg(CHIP_ID_RTM_CDCE906, &cdce906_rtm_cfg);
+
+    /*
+     * Disable all power rails
+     */
+    pca9554_set_port_dir(CHIP_ID_RTM_PCA9554_PWR, 0x00);
+    pca9554_write_port(CHIP_ID_RTM_PCA9554_PWR, (0 << RTM_GPIO_NEG_7V_EN) |
+                       (1 << RTM_GPIO_7V_EN) | (0 << RTM_GPIO_VS1_EN) |
+                       (0 << RTM_GPIO_VS2_EN) | (0 << RTM_GPIO_5V_EN));
 }
 
 void rtm_enable_i2c( void )
