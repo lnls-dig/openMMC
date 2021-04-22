@@ -44,9 +44,9 @@
 #define MAX_INA3221_COUNT        6
 #define INA3221_UPDATE_RATE      100
 
-#define INA3221_CHANNEL_1        1
-#define INA3221_CHANNEL_2        2
-#define INA3221_CHANNEL_3        3
+#define INA3221_CHANNEL_1        0
+#define INA3221_CHANNEL_2        1
+#define INA3221_CHANNEL_3        2
 
 /**
  * @defgroup INA3221_REGS INA3221 Registers
@@ -111,9 +111,7 @@ typedef union {
 } ina3221_config_reg_t;
 
 typedef struct {
-    uint8_t registers;
-    uint16_t bus_voltage_lsb;    /* mV */
-    uint16_t shunt_voltage_lsb;  /* uV */
+    uint16_t shunt_resistor[3]; /* mOhm */
 } ina3221_config_t;
 
 typedef struct {

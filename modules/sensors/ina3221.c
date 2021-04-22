@@ -43,12 +43,6 @@
 
 TaskHandle_t vTaskINA3221_Handle;
 
-const ina3221_config_t ina3221_cfg = {
-    .registers = INA3221_VOLTAGE_REGISTERS,
-    .bus_voltage_lsb = 8, /* in mV */
-    .shunt_voltage_lsb = 40  /* in uV */
-};
-
 static ina3221_data_t ina3221_data[MAX_INA3221_COUNT];
 
 void vTaskINA3221( void *Parameters )
@@ -79,6 +73,7 @@ void vTaskINA3221( void *Parameters )
             }
 
             for ( uint8_t i = 0; i < 6; i++ ) {
+
                 ina3221_sensor = ina3221_data[chip_num].sensors[i];
                 data_ptr = &ina3221_data[chip_num];
 
@@ -91,19 +86,19 @@ void vTaskINA3221( void *Parameters )
 
                 switch ((GET_SENSOR_TYPE(ina3221_sensor))) {
                 case SENSOR_TYPE_VOLTAGE:
-                    ina3221_sensor->readout_value = data_ptr->regs[INA3221_BUS_VOLTAGE + 2*channel];
+                    ina3221_sensor->readout_value = data_ptr->regs[2 * channel + 1] >> 6;
                     break;
                 case SENSOR_TYPE_CURRENT:
-                    ina3221_sensor->readout_value = data_ptr->regs[INA3221_SHUNT_VOLTAGE + 2*channel];
+                    ina3221_sensor->readout_value = (((data_ptr->regs[2 * channel] >> 3) * 40) / ina3221_data[chip_num].config->shunt_resistor[channel]) >> 5;
                     break;
                 default:
                     break;
                 }
-            }
 
-            /* Check for threshold events */
-            sensor_state_check(ina3221_sensor);
-            check_sensor_event(ina3221_sensor);
+                /* Check for threshold events */
+                sensor_state_check(ina3221_sensor);
+                check_sensor_event(ina3221_sensor);
+            }
 
         }
         vTaskDelayUntil( &xLastWakeTime, xFrequency );
@@ -133,7 +128,7 @@ uint8_t ina3221_read_voltages( ina3221_data_t * data )
 	uint8_t ret = 0xFF;
     /* Read INA3221 Bus Voltage and Shunt Voltage Registers */
     for ( uint8_t i = 0; i < INA3221_VOLTAGE_REGISTERS; i++ ) {
-        ret &= ina3221_read_reg( data, i+1, &(data->regs[i]) );
+        ret &= ina3221_read_reg(data, i + 1, &(data->regs[i]) );
     }
     return ret;
 }
@@ -165,7 +160,7 @@ void ina3221_init( void )
         sdr = (SDR_type_01h_t*)tmp_sensor->sdr;
         ina_channel_num = sdr->OEM;
 
-        for ( chip_num=0; chip_num < MAX_INA3221_COUNT; chip_num++ ) {
+        for (chip_num = 0; chip_num < MAX_INA3221_COUNT; chip_num++) {
 
             if (tmp_sensor->chipid == ina3221_data[chip_num].chipid
                     || !(ina3221_data[chip_num].chipid)) {
@@ -181,6 +176,7 @@ void ina3221_init( void )
                 }
 
                 ina3221_data[chip_num].chipid = tmp_sensor->chipid;
+                ina3221_data[chip_num].config = (ina3221_config_t *) tmp_sensor->settings;
                 ina3221_data[chip_num].sensors[sens_num] = tmp_sensor;
                 ina3221_data[chip_num].sensors[sens_num]->signed_flag = signed_flag;
 
