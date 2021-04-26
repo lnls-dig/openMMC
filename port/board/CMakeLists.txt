@@ -30,6 +30,9 @@ elseif(${BOARD} MATCHES "^(afc-fofb-ctrl)$")
 
 elseif(${BOARD} MATCHES "^(afc-timing)$" )
   add_subdirectory(afc-timing)
+  
+elseif(${BOARD} MATCHES "^(afc-v4)$" )
+  add_subdirectory(afc-v4)
 
 else()
   message(FATAL_ERROR "${BoldRed}Selected board \"${BOARD}\" is not implemented!${ColourReset}")

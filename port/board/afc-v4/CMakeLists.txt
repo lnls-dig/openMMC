@@ -1,10 +1,10 @@
 #Select which microcontroller and board are being used
 if (NOT TARGET_CONTROLLER)
-  set(TARGET_CONTROLLER "LPC1764" CACHE STRING "Target MMC Controller")
+  set(TARGET_CONTROLLER "LPC1768" CACHE STRING "Target MMC Controller")
 endif()
 
 if (NOT TARGET_BOARD_NAME)
-  set(TARGET_BOARD_NAME "AFC 3.1" CACHE STRING "Board Name")
+  set(TARGET_BOARD_NAME "AFC v4" CACHE STRING "Board Name")
 endif()
 
 #List all modules used by this board
@@ -12,37 +12,40 @@ set(TARGET_MODULES
   "FRU"
   "PAYLOAD"
   "SDR"
-  "SCANSTA1101"
-  "ADN4604"
-  "FPGA_SPI"
+  "WATCHDOG"
   "DAC_AD84XX"
-  "EEPROM_AT24MAC"
-  "EEPROM_24XX64"
   "HOTSWAP_SENSOR"
+  "EEPROM_AT24MAC"
   "LM75"
   "MAX6642"
-  "INA220_VOLTAGE"
-  "INA220_CURRENT"
-  "HPM"
+  "INA3221_VOLTAGE"
+  "INA3221_CURRENT"
   "UART_DEBUG"
-  "SYSUTILS"
-  "FLASH_SPI"
+  "MCP23016"
+  "ADC"
+  "BOARD_CONFIG"
+  "IDT_8V54816"
   )
-
-if (NOT DISABLE_WATCHDOG)
-  list(APPEND TARGET_MODULES "WATCHDOG")
-endif()
 
 set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 #Include the modules sources
-set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c)
-set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/i2c_mapping.c)
-set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/ipmi_oem.c)
+##Sensors SDR list
+set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c )
+set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/i2c_mapping.c )
 
 if (";${TARGET_MODULES};" MATCHES ";PAYLOAD;")
   set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/payload.c)
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_PAYLOAD")
+endif()
+
+if (";${TARGET_MODULES};" MATCHES ";ADC;")
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_ADC")
+endif()
+
+if (";${TARGET_MODULES};" MATCHES ";BOARD_CONFIG;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/board_config.c)
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_BOARD_CONFIG")
 endif()
 
 #Extra definitions
