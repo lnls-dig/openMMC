@@ -41,6 +41,7 @@
 #include "lpc17_power.h"
 #include "lpc17_pincfg.h"
 #include "pin_mapping.h"
+#include "arm_cm3_reset.h"
 
 #ifdef UART_RINGBUFFER
 #include "lpc17_uartrb.h"

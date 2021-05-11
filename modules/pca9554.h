@@ -75,104 +75,129 @@
 /**
  * @brief Read all pins status
  *
- * @return 8-bit value with the pins status
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[out] readout 8-bit value with the pins status
+ *
+ * @return Number of bytes read from the device
  */
-uint8_t pca9554_read_port( uint8_t *readout );
+uint8_t pca9554_read_port( uint8_t chip_id, uint8_t *readout );
 
 /**
  * @brief Read a pin status
  *
- * @param pin Selected pin to read
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[in]  pin     Selected pin to read
+ * @param[out] status  Pin logical status
  *
- * @return Pin logical status
+ * @return Number of bytes read from the device
  */
-uint8_t pca9554_read_pin( uint8_t pin, uint8_t *status );
+uint8_t pca9554_read_pin( uint8_t chip_id, uint8_t pin, uint8_t *status );
 
 /**
  * @brief Write all output pins
  *
- * @param data 8-bit value with the pins status
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[in]  data    8-bit value with the pins status
  *
- * @return None
+ * @return Number of bytes written to the device
  */
-uint8_t pca9554_write_port( uint8_t data );
+uint8_t pca9554_write_port( uint8_t chip_id, uint8_t data );
 
 /**
  * @brief Write a output pin
  *
- * @param pin Selected pin to write
- * @param data Logical status to be set
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[in]  pin     Selected pin to write
+ * @param[in]  data    Logical status to be set
  *
- * @return None
+ * @return Number of bytes written to the device
  */
-uint8_t pca9554_write_pin( uint8_t pin, bool data );
+uint8_t pca9554_write_pin( uint8_t chip_id, uint8_t pin, bool data );
 
 /* Polarity Control */
 /**
  * @brief Set all pins polarity
  *
- * @param pol Polarity (active-high/low)
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[in]  pol     Polarity (active-high/low)
+ *
+ * @return Number of bytes written to the device
  */
-uint8_t pca9554_set_port_pol( uint8_t pol );
+uint8_t pca9554_set_port_pol( uint8_t chip_id, uint8_t pol );
 
 /**
  * @brief Set pin polarity
  *
- * @param pin Selected pin
- * @param pol Pin Polarity (active-high/low)
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[in]  pin     Selected pin
+ * @param[in]  pol     Pin Polarity (active-high/low)
+ *
+ * @return Number of bytes written to the device
  */
-uint8_t pca9554_set_pin_pol( uint8_t pin, bool pol );
+uint8_t pca9554_set_pin_pol( uint8_t chip_id, uint8_t pin, bool pol );
 
 /**
  * @brief Read all pins polarity
  *
- * @return Pins polarity (active-high/low)
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[out] pol     Pins polarity (active-high/low)
+ *
+ * @return Number of bytes written to the device
  */
-uint8_t pca9554_get_port_pol( uint8_t *pol );
+uint8_t pca9554_get_port_pol( uint8_t chip_id, uint8_t *pol );
 
 /**
  * @brief Read pin polarity
  *
- * @param pin Selected pin
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[in]  pin     Selected pin
+ * @param[out] pol     Pin polarity value
  *
- * @return Pin polarity value
+ * @return Number of bytes read from the device
  */
-uint8_t pca9554_get_pin_pol( uint8_t pin, uint8_t *pol );
+uint8_t pca9554_get_pin_pol( uint8_t chip_id, uint8_t pin, uint8_t *pol );
 
 /* Pins direction (output/input) */
 /**
  * @brief Set all pins direction
  *
- * @param dir Pin direction ( 0-Output 1-Input )
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[in]  dir     Pin direction ( 0-Output 1-Input )
  *
- * @return None
+ * @return Number of bytes read from the device
  */
-uint8_t pca9554_set_port_dir( uint8_t dir );
+uint8_t pca9554_set_port_dir( uint8_t chip_id, uint8_t dir );
 
 /**
  * @brief Set pin direction
  *
- * @param pin Selected pin
- * @param dir Pin direction ( 0-Output 1-Input )
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[in]  pin     Selected pin
+ * @param[in]  dir     Pin direction ( 0-Output 1-Input )
  *
- * @return None
+ * @return Number of bytes written to the device
  */
-uint8_t pca9554_set_pin_dir( uint8_t pin, bool dir );
+uint8_t pca9554_set_pin_dir( uint8_t chip_id, uint8_t pin, bool dir );
 
 /**
  * @brief Read all pins direction
  *
- * @return 8-bit value with the pins direction setup
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[out] dir     8-bit value with the pins direction setup
+ *
+ * @return Number of bytes written to the device
  */
-uint8_t pca9554_get_port_dir( uint8_t *dir );
+uint8_t pca9554_get_port_dir( uint8_t chip_id, uint8_t *dir );
 
 /**
  * @brief Read pin direction
  *
- * @param pin Selected pin
+ * @param[in]  chip_id Chip ID to communicate
+ * @param[in]  pin     Selected pin
+ * @param[out] dir     Pin direction
  *
- * @return Pin direction
+ * @return Number of bytes read from the device
  */
-uint8_t pca9554_get_pin_dir( uint8_t pin, uint8_t *dir );
+uint8_t pca9554_get_pin_dir( uint8_t chip_id, uint8_t pin, uint8_t *dir );
 
 #endif

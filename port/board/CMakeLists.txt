@@ -17,6 +17,17 @@ if(${BOARD} MATCHES "^(afc-bpm)$")
     add_subdirectory(afc-bpm/v3_1)
   endif()
 
+elseif(${BOARD} MATCHES "^(afc-fofb-ctrl)$")
+
+  if(NOT VERSION)
+    message(FATAL_ERROR "${BoldRed}AFC board version was not selected! You must pass the flag -DVERSION=<major>.<minor>${ColourReset}")
+  endif()
+
+  message(STATUS "Selected Board version: ${VERSION}")
+  if(${VERSION} MATCHES "(3.1)")
+    add_subdirectory(afc-fofb-ctrl/v3_1)
+  endif()
+
 elseif(${BOARD} MATCHES "^(afc-timing)$" )
   add_subdirectory(afc-timing)
   
@@ -36,6 +47,8 @@ if(BOARD_RTM AND (";${TARGET_MODULES};" MATCHES ";RTM;"))
   message(STATUS "Selected RTM Board support: ${BOARD_RTM}")
   if(${BOARD_RTM} MATCHES "(8sfp)")
     add_subdirectory(rtm-8sfp)
+  elseif(${BOARD_RTM} MATCHES "(lamp)")
+    add_subdirectory(rtm-lamp)
   else()
     message(FATAL_ERROR "${BoldRed}Selected RTM board \"${BOARD_RTM}\" is not implemented!${ColourReset}")
   endif()

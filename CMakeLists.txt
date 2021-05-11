@@ -1,6 +1,8 @@
 # Define minimal required version of CMake.
 cmake_minimum_required(VERSION 2.8.8)
 
+option(DISABLE_WATCHDOG "Disable watchdog module to aid debugging" OFF)
+
 #Include text color definitions
 include( ${CMAKE_SOURCE_DIR}/toolchain/colors.cmake )
 

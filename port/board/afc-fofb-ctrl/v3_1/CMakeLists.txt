@@ -4,7 +4,21 @@ if (NOT TARGET_CONTROLLER)
 endif()
 
 if (NOT TARGET_BOARD_NAME)
-  set(TARGET_BOARD_NAME "AFC 3.1" CACHE STRING "Board Name")
+    set(TARGET_BOARD_NAME "AFC FOFB" CACHE STRING "Board Name")
+endif()
+
+# Check if TARGET_BOARD_NAME fits in out field structure. Must fit
+# the TARGET_BOARD_NAME length plus "-RTM". But let's give some extra
+# room for a little bit more in case we want to change "-RTM" to
+# something else.
+set(TARGET_BOARD_NAME_MAX_LENGTH 10)
+
+string(LENGTH ${TARGET_BOARD_NAME} TARGET_BOARD_NAME_LENGTH)
+if(${TARGET_BOARD_NAME_LENGTH} GREATER ${TARGET_BOARD_NAME_MAX_LENGTH})
+    message(FATAL_ERROR
+        "${ColourBold}${Red}TARGET_BOARD_NAME (${TARGET_BOARD_NAME}) length \
+        (${TARGET_BOARD_NAME_LENGTH}) is greater than \
+        ${TARGET_BOARD_NAME_MAX_LENGTH}.${ColourReset}")
 endif()
 
 #List all modules used by this board
@@ -16,17 +30,18 @@ set(TARGET_MODULES
   "ADN4604"
   "FPGA_SPI"
   "DAC_AD84XX"
+  "HOTSWAP_SENSOR"
   "EEPROM_AT24MAC"
   "EEPROM_24XX64"
-  "HOTSWAP_SENSOR"
   "LM75"
   "MAX6642"
   "INA220_VOLTAGE"
   "INA220_CURRENT"
   "HPM"
+  "RTM"
   "UART_DEBUG"
+  "PCA9554"
   "SYSUTILS"
-  "FLASH_SPI"
   )
 
 if (NOT DISABLE_WATCHDOG)
