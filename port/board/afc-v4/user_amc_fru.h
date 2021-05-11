@@ -3,6 +3,7 @@
  *
  *   Copyright (C) 2015  Julian Mendez  <julian.mendez@cern.ch>
  *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
+ *   Copyright (C) 2021  Krzysztof Macias <krzysztof.macias@creotech.pl>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
