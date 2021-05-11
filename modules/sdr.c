@@ -109,6 +109,9 @@ void sensor_init( void )
 #if defined(MODULE_INA220_CURRENT) || defined(MODULE_INA220_VOLTAGE)
     ina220_init();
 #endif
+#if defined(MODULE_INA3221_CURRENT) || defined(MODULE_INA3221_VOLTAGE)
+    ina3221_init();
+#endif
 }
 
 void sdr_init( void )
@@ -154,6 +157,19 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
     sdr_change_count++;
 
     return entry;
+}
+
+sensor_t * sdr_add_settings(uint8_t chipid, void * settings)
+{
+    sensor_t * sensor;
+
+    for (sensor = sdr_head; sensor != NULL; sensor = sensor->next) {
+        if (sensor->chipid == chipid) {
+            sensor->settings = settings;
+        }
+    }
+
+    return NULL;
 }
 
 sensor_t * find_sensor_by_sdr( void * sdr )

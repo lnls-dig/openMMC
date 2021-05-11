@@ -1,7 +1,7 @@
 /*
  *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
+ *   Copyright (C) 2021  Krzysztof Macias <krzysztof.macias@creotech.pl>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -19,43 +19,21 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-/**
- * @defgroup SENSORS Sensors
- * @ingroup PERIPH_IC
- */
-
-/**
- * @file sensors.h
- * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- *
- * @brief Shortcut to include all sensors headers (not mandatory, user can include each sensor separately)
- *
- * @ingroup SENSORS
- */
-
-#ifndef SENSORS_H_
-#define SENSORS_H_
-
+/* Project Includes */
 #include "port.h"
 
-#if defined(MODULE_INA220_VOLTAGE) || defined(MODULE_INA220_CURRENT)
-#include "ina220.h"
-#endif
 
-#if defined(MODULE_INA3221_VOLTAGE) || defined(MODULE_INA3221_CURRENT)
-#include "ina3221.h"
-#endif
+uint8_t clock_switch_default_config() {
 
-#ifdef MODULE_HOTSWAP
-#include "hotswap.h"
-#endif
+}
 
-#ifdef MODULE_LM75
-#include "lm75.h"
-#endif
+void board_init() {
+    /* I2C MUX Init */
+    gpio_set_pin_state(PIN_PORT(GPIO_I2C_MUX_ADDR1), PIN_NUMBER(GPIO_I2C_MUX_ADDR1), GPIO_LEVEL_LOW);
+    gpio_set_pin_state(PIN_PORT(GPIO_I2C_MUX_ADDR2), PIN_NUMBER(GPIO_I2C_MUX_ADDR2), GPIO_LEVEL_LOW);
+    gpio_set_pin_state(PIN_PORT(GPIO_I2C_SW_RESETn), PIN_NUMBER(GPIO_I2C_SW_RESETn), GPIO_LEVEL_HIGH);
+}
 
-#ifdef MODULE_MAX6642
-#include "max6642.h"
-#endif
-
-#endif
+void board_config() {
+	clock_switch_default_config();
+}

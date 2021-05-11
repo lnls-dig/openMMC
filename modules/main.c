@@ -3,6 +3,7 @@
  *
  *   Copyright (C) 2015  Henrique Silva <henrique.silva@lnls.br>
  *   Copyright (C) 2015  Piotr Miedzik  <P.Miedzik@gsi.de>
+ *   Copyright (C) 2021  Krzysztof Macias <krzysztof.macias@creotech.pl>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -41,11 +42,18 @@
 #ifdef MODULE_RTM
 #include "rtm.h"
 #endif
+#ifdef MODULE_BOARD_CONFIG
+#include "board_config.h"
+#endif
 
 /*-----------------------------------------------------------*/
 int main( void )
 {
     pin_init();
+
+#ifdef MODULE_BOARD_CONFIG
+    board_init();
+#endif
 
 #ifdef MODULE_UART_DEBUG
     uart_init( UART_DEBUG );
@@ -65,6 +73,7 @@ int main( void )
 #endif
 
     LED_init();
+
     i2c_init();
 
     ipmb_addr = get_ipmb_addr( );
@@ -94,6 +103,10 @@ int main( void )
     /*  Init IPMI interface */
     /* NOTE: ipmb_init() is called inside this function */
     ipmi_init();
+
+#ifdef MODULE_BOARD_CONFIG
+    board_config();
+#endif
 
     /* Start the tasks running. */
     vTaskStartScheduler();

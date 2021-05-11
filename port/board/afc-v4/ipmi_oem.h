@@ -1,7 +1,8 @@
 /*
  *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   Copyright (C) 2015-2016  Henrique Silva <henrique.silva@lnls.br>
+ *   Copyright (C) 2016  Henrique Silva <henrique.silva@lnls.br>
+ *   Copyright (C) 2015  Piotr Miedzik  <P.Miedzik@gsi.de>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -19,43 +20,33 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
+#ifndef IPMI_OEM_H_
+#define IPMI_OEM_H_
+
 /**
- * @defgroup SENSORS Sensors
- * @ingroup PERIPH_IC
+ * @file afc-v4/ipmi_oem.h
+ * @brief Custom IPMI commands for AFC
+ *
+ * @ingroup AFC_V4_0_IPMI_OEM
  */
 
 /**
- * @file sensors.h
- * @author Henrique Silva <henrique.silva@lnls.br>, LNLS
- *
- * @brief Shortcut to include all sensors headers (not mandatory, user can include each sensor separately)
- *
- * @ingroup SENSORS
+ * @defgroup AFC_V4_0_IPMI_OEM AFCv4.0 IPMI OEM Commands
+ * @ingroup AFC_V4_0
+ * @{
  */
 
-#ifndef SENSORS_H_
-#define SENSORS_H_
+#include "ipmi.h"
 
-#include "port.h"
+/**
+ * @brief Custom NetFN (User defined, value greater than 0x2C)
+ */
+#define NETFN_CUSTOM_OEM                    0x30
 
-#if defined(MODULE_INA220_VOLTAGE) || defined(MODULE_INA220_CURRENT)
-#include "ina220.h"
-#endif
-
-#if defined(MODULE_INA3221_VOLTAGE) || defined(MODULE_INA3221_CURRENT)
-#include "ina3221.h"
-#endif
-
-#ifdef MODULE_HOTSWAP
-#include "hotswap.h"
-#endif
-
-#ifdef MODULE_LM75
-#include "lm75.h"
-#endif
-
-#ifdef MODULE_MAX6642
-#include "max6642.h"
-#endif
+#define IPMI_OEM_CMD_I2C_TRANSFER               0x00
+#define IPMI_OEM_CMD_GPIO_PIN                   0x04
+/**
+ * @}
+ */
 
 #endif
