@@ -36,6 +36,8 @@
 #ifndef SENSORS_H_
 #define SENSORS_H_
 
+#include "port.h"
+
 #if defined(MODULE_INA220_VOLTAGE) || defined(MODULE_INA220_CURRENT)
 #include "ina220.h"
 #endif
