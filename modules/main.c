@@ -38,6 +38,11 @@
 #include "fpga_spi.h"
 #include "watchdog.h"
 #include "uart_debug.h"
+
+#ifdef MODULE_CLI
+#include "cli.h"
+#endif
+
 #ifdef MODULE_RTM
 #include "rtm.h"
 #endif
@@ -46,6 +51,10 @@
 int main( void )
 {
     pin_init();
+
+#ifdef MODULE_CUSTOM
+    custom_init();
+#endif
 
 #ifdef MODULE_UART_DEBUG
     uart_init( UART_DEBUG );
@@ -90,6 +99,10 @@ int main( void )
 #endif
 #ifdef MODULE_RTM
     rtm_manage_init();
+#endif
+
+#ifdef MODULE_CLI
+    cli_init();
 #endif
     /*  Init IPMI interface */
     /* NOTE: ipmb_init() is called inside this function */

@@ -125,5 +125,11 @@ extern void vConfigureTimerForRunTimeStats( void );
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
 
+/* Dimensions a buffer that can be used by the FreeRTOS+CLI command
+ interpreter.  Set this value to 1 to save RAM if FreeRTOS+CLI does not supply
+ the output butter.  See the FreeRTOS+CLI documentation for more information:
+ http://www.FreeRTOS.org/FreeRTOS-Plus/FreeRTOS_Plus_CLI/ */
+#define configCOMMAND_INT_MAX_OUTPUT_SIZE     1024
+
 #endif /* FREERTOS_CONFIG_H */
 
