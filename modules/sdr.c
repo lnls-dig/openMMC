@@ -109,6 +109,9 @@ void sensor_init( void )
 #if defined(MODULE_INA220_CURRENT) || defined(MODULE_INA220_VOLTAGE)
     ina220_init();
 #endif
+#ifdef MODULE_INA219
+    ina219_init();
+#endif
 }
 
 void sdr_init( void )

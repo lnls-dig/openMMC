@@ -52,4 +52,8 @@
 #include "max6642.h"
 #endif
 
+#ifdef MODULE_INA219
+#include "ina219.h"
+#endif
+
 #endif
