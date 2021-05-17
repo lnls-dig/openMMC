@@ -365,7 +365,7 @@ uint8_t amc_point_to_point_clock_build( uint8_t **buffer, clock_config_descripto
     return len;
 }
 
-uint8_t zone3_compatibility_record_build( uint8_t **buffer, uint32_t compat_code )
+uint8_t zone3_compatibility_record_build( uint8_t **buffer, uint32_t manuf_id, uint32_t compat_code )
 {
     uint8_t len = sizeof(zone3_compatibility_rec_t);
     uint8_t *z3_ptr;
@@ -389,9 +389,9 @@ uint8_t zone3_compatibility_record_build( uint8_t **buffer, uint32_t compat_code
     zone3_compat->rec_fmt_ver = 0x01;
 
     zone3_compat->interface_id_type = 0x03;
-    zone3_compat->user_manuf_id[0] = 0x5A;
-    zone3_compat->user_manuf_id[1] = 0x31;
-    zone3_compat->user_manuf_id[2] = 0x00;
+    zone3_compat->user_manuf_id[0] = (manuf_id >> 0) & 0xFF;
+    zone3_compat->user_manuf_id[1] = (manuf_id >> 8) & 0xFF;
+    zone3_compat->user_manuf_id[2] = (manuf_id >> 16) & 0xFF;
 
     zone3_compat->compat_designator[0] = (compat_code & 0x000000FF) >> 0;
     zone3_compat->compat_designator[1] = (compat_code & 0x0000FF00) >> 8;

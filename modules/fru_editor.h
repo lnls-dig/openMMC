@@ -434,7 +434,7 @@ uint8_t product_info_area_build( uint8_t **buffer, uint8_t lang, const char *man
 uint8_t amc_point_to_point_record_build( uint8_t **buffer, amc_p2p_descriptor_t * p2p_desc, uint8_t desc_count );
 uint8_t amc_point_to_point_clock_build( uint8_t **buffer, clock_config_descriptor_t * clk_desc, uint8_t desc_count );
 uint8_t module_current_record_build( uint8_t **buffer, uint8_t current );
-uint8_t zone3_compatibility_record_build( uint8_t **buffer, uint32_t compat_code );
+uint8_t zone3_compatibility_record_build( uint8_t **buffer, uint32_t manuf_id, uint32_t compat_code );
 uint8_t fmc_subtype_record_build( uint8_t **buffer, uint8_t clock_dir, uint8_t module_size, uint8_t p1_conn_size, uint8_t p2_conn_size, uint8_t p1_a_count, uint8_t p1_b_count, uint8_t p2_a_count, uint8_t p2_b_count, uint8_t p1_gbt, uint8_t p2_gbt, uint8_t eol );
 uint8_t dc_load_record_build( uint8_t **buffer, uint16_t nominal_volt, uint16_t min_volt, uint16_t max_volt, uint16_t ripple_noise, uint16_t min_load, uint16_t max_load, uint8_t eol );
 uint8_t dc_output_record_build( uint8_t **buffer, uint16_t nominal_volt, uint16_t neg_dev, uint16_t pos_dev, uint16_t ripple_noise, uint16_t min_draw, uint16_t max_draw, uint8_t eol );

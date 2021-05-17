@@ -3,6 +3,10 @@
 #include "utils.h"
 #include "uart_debug.h"
 
+#ifndef AMC_COMPATIBILITY_MANUFACTURER_ID
+#define AMC_COMPATIBILITY_MANUFACTURER_ID   0x315A
+#endif
+
 size_t amc_fru_info_build( uint8_t **buffer )
 {
     uint8_t *hdr_ptr, *board_ptr, *product_ptr, *current_ptr, *clk_ptr, *p2p_ptr, *z3_ptr;
@@ -77,7 +81,7 @@ size_t amc_fru_info_build( uint8_t **buffer )
     /* Zone3 Connector Compatibility */
     z3_compat_off = offset;
     printf("\t\t-Zone3 Compatibility code: 0x%X\n", AMC_COMPATIBILITY_CODE);
-    z3_compat_sz += zone3_compatibility_record_build( &z3_ptr, AMC_COMPATIBILITY_CODE );
+    z3_compat_sz += zone3_compatibility_record_build( &z3_ptr, AMC_COMPATIBILITY_MANUFACTURER_ID, AMC_COMPATIBILITY_CODE );
     offset += z3_compat_sz;
 
     /* Common Header */
