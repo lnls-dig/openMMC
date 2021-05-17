@@ -38,6 +38,7 @@
 #define tskLM75SENSOR_PRIORITY          (tskIDLE_PRIORITY+3)
 #define tskMAX6642SENSOR_PRIORITY       (tskIDLE_PRIORITY+3)
 #define tskINA220SENSOR_PRIORITY        (tskIDLE_PRIORITY+3)
+#define tskADT7420SENSOR_PRIORITY       (tskIDLE_PRIORITY+3)
 
 #define tskIPMI_HANDLERS_PRIORITY       (tskIDLE_PRIORITY+4)
 #define tskIPMI_PRIORITY                (tskIDLE_PRIORITY+4)
