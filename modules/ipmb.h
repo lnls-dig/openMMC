@@ -29,6 +29,8 @@
 #ifndef IPMB_H_
 #define IPMB_H_
 
+#include <stdbool.h>
+
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
 #include "task.h"
@@ -192,6 +194,8 @@ typedef enum ipmb_error {
  * @see get_ipmb_addr
  */
 extern uint8_t ipmb_addr;
+
+extern bool bench_test;
 
 /* Function Prototypes */
 

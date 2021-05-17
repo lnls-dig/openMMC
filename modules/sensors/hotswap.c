@@ -148,9 +148,9 @@ void vTaskHotSwap( void *Parameters )
                 hotswap_clear_mask_bit( HOTSWAP_AMC, 1 << (!new_state_amc) );
                 old_state_amc = new_state_amc;
             }
-#ifdef BENCH_TEST
+            if (bench_test) {
             old_state_amc = new_state_amc;
-#endif
+            }
         }
 
 #ifdef MODULE_RTM
@@ -167,23 +167,23 @@ void vTaskHotSwap( void *Parameters )
         if ( new_state_rtm ^ old_state_rtm ) {
             if ( new_state_rtm == 0 ) {
                 printf("RTM Hotswap handle pressed!\n");
-#ifdef BENCH_TEST
+                if (bench_test) {
                 payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_RTM_ENABLE);
-#endif
+                }
             } else {
             	printf("RTM Hotswap handle released!\n");
-#ifdef BENCH_TEST
+            	if (bench_test) {
                 payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_QUIESCE);
-#endif
+            	}
             }
             if ( hotswap_send_event( hotswap_rtm_sensor, new_state_rtm ) == ipmb_error_success ) {
                 hotswap_set_mask_bit( HOTSWAP_RTM, 1 << new_state_rtm );
                 hotswap_clear_mask_bit( HOTSWAP_RTM, 1 << (!new_state_rtm) );
                 old_state_rtm = new_state_rtm;
             }
-#ifdef BENCH_TEST
+            if (bench_test) {
             old_state_rtm = new_state_rtm;
-#endif
+            }
         }
 #endif
     }

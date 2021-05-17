@@ -94,5 +94,10 @@ uint8_t get_ipmb_addr( void )
         return 0;
     }
 
+    // If all address pins (GA) are unconnected activate bench test (outside uTCA crate)
+    if (IPMBL_TABLE[index] == 0xA2) {
+        bench_test = true;
+    }
+
     return IPMBL_TABLE[index];
 }

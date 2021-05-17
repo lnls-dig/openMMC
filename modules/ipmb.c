@@ -90,6 +90,8 @@ ipmb_error ipmb_notify_client ( ipmi_msg_cfg * msg_cfg );
 /* Local variables */
 uint8_t ipmb_addr = 0xFF;
 
+bool bench_test = false;
+
 QueueHandle_t ipmb_txqueue = NULL;
 QueueHandle_t client_queue = NULL;
 

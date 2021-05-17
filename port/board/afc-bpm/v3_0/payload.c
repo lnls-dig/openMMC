@@ -157,10 +157,10 @@ TaskHandle_t vTaskPayload_Handle;
 void payload_init( void )
 {
 
-#ifndef BENCH_TEST
+    if (!bench_test) {
     /* Wait until ENABLE# signal is asserted ( ENABLE == 0) */
     while ( gpio_read_pin( PIN_PORT(GPIO_MMC_ENABLE), PIN_NUMBER(GPIO_MMC_ENABLE) ) == 1 ) {};
-#endif
+    }
 
     xTaskCreate( vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
 
