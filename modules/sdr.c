@@ -115,6 +115,9 @@ void sensor_init( void )
 #ifdef MODULE_INA219
     ina219_init();
 #endif
+#if defined(MODULE_INA3221_CURRENT) || defined(MODULE_INA3221_VOLTAGE)
+    ina3221_init();
+#endif
 }
 
 void sdr_init( void )
