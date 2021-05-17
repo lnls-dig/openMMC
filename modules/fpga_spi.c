@@ -107,12 +107,17 @@ void vTaskFPGA_COMM( void * Parameters )
             }
         }
 
-        diag->fmc_slot.fmc1_pg_c2m = gpio_read_pin( PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M) );
-        diag->fmc_slot.fmc2_pg_c2m = gpio_read_pin( PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M) );
-        diag->fmc_slot.fmc1_pg_m2c = gpio_read_pin( PIN_PORT(GPIO_FMC1_PG_M2C), PIN_NUMBER(GPIO_FMC1_PG_M2C) );
-        diag->fmc_slot.fmc2_pg_m2c = gpio_read_pin( PIN_PORT(GPIO_FMC2_PG_M2C), PIN_NUMBER(GPIO_FMC2_PG_M2C) );
+#ifdef GPIO_FMC1_PRSNT_M2C
         diag->fmc_slot.fmc1_prsnt_m2c_n = gpio_read_pin( PIN_PORT(GPIO_FMC1_PRSNT_M2C), PIN_NUMBER(GPIO_FMC1_PRSNT_M2C) );
+        diag->fmc_slot.fmc1_pg_c2m = gpio_read_pin( PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M) );
+        diag->fmc_slot.fmc1_pg_m2c = gpio_read_pin( PIN_PORT(GPIO_FMC1_PG_M2C), PIN_NUMBER(GPIO_FMC1_PG_M2C) );
+#endif
+
+#ifdef GPIO_FMC2_PRSNT_M2C
         diag->fmc_slot.fmc2_prsnt_m2c_n = gpio_read_pin( PIN_PORT(GPIO_FMC2_PRSNT_M2C), PIN_NUMBER(GPIO_FMC2_PRSNT_M2C) );
+        diag->fmc_slot.fmc2_pg_c2m = gpio_read_pin( PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M) );
+        diag->fmc_slot.fmc2_pg_m2c = gpio_read_pin( PIN_PORT(GPIO_FMC2_PG_M2C), PIN_NUMBER(GPIO_FMC2_PG_M2C) );
+#endif
 
         write_fpga_buffer( diag );
 
