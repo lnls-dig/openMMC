@@ -47,6 +47,10 @@
 #include "rtm.h"
 #endif
 
+#ifdef MODULE_CUSTOM
+#include "custom.h"
+#endif
+
 /*-----------------------------------------------------------*/
 int main( void )
 {
