@@ -91,6 +91,10 @@ void rtm_hardware_init( void )
     pca9554_set_port_dir( CHIP_ID_RTM_PCA9554, 0x1F );
 }
 
+void rtm_hardware_close(void)
+{
+}
+
 void rtm_enable_i2c( void )
 {
     /* Enable I2C communication with RTM */

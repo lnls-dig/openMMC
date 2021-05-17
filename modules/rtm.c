@@ -49,12 +49,16 @@ void RTM_Manage( void * Parameters )
     extern sensor_t * hotswap_rtm_sensor;
     EventBits_t current_evt;
     uint8_t rtm_hs_state;
+    uint8_t payload_ready_new_state = 0x0;
+    uint8_t payload_ready_old_state = 0x0;
+
+    bool start = true;
 
     /* Defaults to not present */
     rtm_present = false;
 
     /* Start with RTM payload disabled */
-    rtm_disable_payload_power();
+    // rtm_disable_payload_power();
 
     for ( ;; ) {
         vTaskDelay(500);
@@ -62,6 +66,7 @@ void RTM_Manage( void * Parameters )
         rtm_check_presence( &ps_new_state );
 
         if ( ps_new_state ^ ps_old_state ) {
+
             if ( ps_new_state == HOTSWAP_STATE_URTM_PRSENT ) {
 
                 printf("[RTM] Rear Board detected!\n");
@@ -82,25 +87,17 @@ void RTM_Manage( void * Parameters )
                 /* Check the Zone3 compatibility records */
                 rtm_compatible = rtm_compatibility_check();
                 if ( rtm_compatible ) {
-                    printf("[RTM] Rear Board is compatible! Initializing...\n");
+
+                    printf("[RTM] Rear Board is compatible!\n");
+
                     /* Send RTM Compatible message */
                     hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_COMPATIBLE );
                     hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
 
-                    /* Perform hotswap first read */
-                    while (!rtm_get_hotswap_handle_status( &rtm_hs_state ));
-
-                    /* Override RTM state so that if the handle is closed when the MMC is starting,
-                     * the LED and payload power remains in the correct state */
-                    if ( rtm_hs_state == 0 ) {
-                    	LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0 );
-                        payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_RTM_ENABLE);
-                    } else {
-                    	LEDUpdate( FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0 );
-                        payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_QUIESCE);
-                    }
                 } else {
-                    printf("[RTM] Rear Board is not compatible.\n");
+
+                    printf("[RTM] Rear Board is not compatible!\n");
+
                     /* Send RTM Incompatible message */
                     hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_INCOMPATIBLE );
                     hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_COMPATIBLE_MASK );
@@ -110,17 +107,46 @@ void RTM_Manage( void * Parameters )
                 //sdr_activate_sensors(); /* Not implemented yet */
 
             } else if ( ps_new_state == HOTSWAP_STATE_URTM_ABSENT ) {
+
+                /* Disable RTM sensors */
                 //sdr_disable_sensors(); /* Not implemented yet */
 
                 printf("[RTM] Rear Board disconnected!\n");
 
+                /* Close hardware communication */
+                rtm_hardware_close();
+
                 rtm_present = false;
 
+                /* RTM Absent event */
                 hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_ABSENT_MASK );
                 hotswap_clear_mask_bit( HOTSWAP_RTM, HOTSWAP_URTM_PRESENT_MASK );
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_URTM_ABSENT );
             }
+
             ps_old_state = ps_new_state;
+        }
+
+        if (payload_ready_new_state ^ payload_ready_old_state) {
+            if (payload_ready_new_state == 0x1 && rtm_present && start && rtm_compatible) {
+
+                /* Perform hotswap first read */
+                while (!rtm_get_hotswap_handle_status(&rtm_hs_state))
+                    ;
+
+                /* Override RTM state so that if the handle is closed when the MMC is starting,
+                 * the LED and payload power remains in the correct state */
+                if (rtm_hs_state == 0) {
+                    LEDUpdate(FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_OFF, 0, 0);
+                    payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_RTM_ENABLE);
+                } else {
+                    LEDUpdate(FRU_RTM, LED_BLUE, LEDMODE_OVERRIDE, LEDINIT_ON, 0, 0);
+                    payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_QUIESCE);
+                }
+
+            }
+            payload_ready_old_state = payload_ready_new_state;
+            start = false;
         }
 
         /* Check enable/disable events */
@@ -128,10 +154,12 @@ void RTM_Manage( void * Parameters )
 
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
             if ( rtm_quiesce() ) {
+                rtm_disable_payload_power();
                 /* Quiesced event */
-                printf("[RTM] Quiesced RTM successfuly!\n");
+                printf("[RTM] Quiesced RTM successfully!\n");
                 hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
                 hotswap_send_event( hotswap_rtm_sensor, HOTSWAP_STATE_QUIESCED );
+                payload_ready_new_state = 0;
             } else {
                 printf("[RTM] RTM failed to quiesce!\n");
             }
@@ -146,6 +174,9 @@ void RTM_Manage( void * Parameters )
                 printf("[RTM] Impossible to enable payload power to an incompatible RTM board!\n");
             }
             xEventGroupClearBits( rtm_payload_evt, PAYLOAD_MESSAGE_RTM_ENABLE );
+        } else if (current_evt & PAYLOAD_MESSAGE_RTM_READY) {
+            payload_ready_new_state = 1;
+            xEventGroupClearBits(rtm_payload_evt, PAYLOAD_MESSAGE_RTM_READY);
         }
     }
 }

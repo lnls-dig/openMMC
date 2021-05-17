@@ -264,6 +264,11 @@ void vTaskPayload( void *pvParameters )
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if ( DCDC_good == 1 ) {
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
+
+#ifdef MODULE_RTM
+                /* Send payload ready message to RTM */
+                payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_RTM_READY);
+#endif
             }
             break;
 
