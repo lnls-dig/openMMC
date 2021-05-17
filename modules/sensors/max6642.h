@@ -35,6 +35,8 @@
 #ifndef MAX6642_H_
 #define MAX6642_H_
 
+#include "port.h"
+
 #define MAX6642_UPDATE_RATE             500
 
 #define MAX6642_CMD_READ_LOCAL          0x00
