@@ -131,8 +131,7 @@ void RTM_Manage( void * Parameters )
             if (payload_ready_new_state == 0x1 && rtm_present && start && rtm_compatible) {
 
                 /* Perform hotswap first read */
-                while (!rtm_get_hotswap_handle_status(&rtm_hs_state))
-                    ;
+                while (!rtm_get_hotswap_handle_status(&rtm_hs_state));
 
                 /* Override RTM state so that if the handle is closed when the MMC is starting,
                  * the LED and payload power remains in the correct state */
