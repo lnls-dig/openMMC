@@ -30,11 +30,16 @@
 
 /* List of all LPC17xx specific headers to be included */
 
+#ifdef CHIP_LPC177X_8X
+#include "chip_lpc177x_8x.h"
+#else
 #include "chip_lpc175x_6x.h"
+#include "lpc17_spi.h"
+#endif
+
 #include "lpc17_gpio.h"
 #include "lpc17_i2c.h"
 #include "lpc17_ssp.h"
-#include "lpc17_spi.h"
 #include "lpc17_watchdog.h"
 #include "lpc17_interruptions.h"
 #include "lpc17_hpm.h"

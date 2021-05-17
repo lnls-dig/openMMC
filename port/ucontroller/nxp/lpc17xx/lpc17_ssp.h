@@ -27,7 +27,12 @@
 #ifndef LPC17xx_SSP_H_
 #define LPC17xx_SSP_H_
 
+#ifdef CHIP_LPC177X_8X
+#include "chip_lpc177x_8x.h"
+#else
 #include "chip_lpc175x_6x.h"
+#endif
+
 #include "ssp_17xx_40xx.h"
 #include "FreeRTOS.h"
 #include "task.h"

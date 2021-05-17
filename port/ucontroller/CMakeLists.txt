@@ -4,6 +4,12 @@ if(NOT TARGET_CONTROLLER)
   message(FATAL_ERROR "${BoldRed}Target controller was not selected! You can pass the flag -DTARGET_CONTROLLER=<controller> or set it on the board CMakeLists.txt${ColourReset}")
 endif()
 
+if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)1776")
+  set(LPC17_FLAGS ${LPC17_FLAGS} -DCHIP_LPC177X_8X)
+else ()
+  set(LPC17_FLAGS ${LPC17_FLAGS} -DCHIP_LPC175X_6X)
+endif()
+
 if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
   add_subdirectory(nxp/lpc17xx)
 

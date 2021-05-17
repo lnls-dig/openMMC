@@ -27,6 +27,7 @@ set(LIBLPCOPEN_SRCS
   ${LPCOPEN_SRCPATH}/iocon_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/spi_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/ssp_17xx_40xx.c
+  ${LPCOPEN_SRCPATH}/enet_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/sysctl_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/sysinit_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/timer_17xx_40xx.c
@@ -34,11 +35,14 @@ set(LIBLPCOPEN_SRCS
   ${LPCOPEN_SRCPATH}/wwdt_17xx_40xx.c
 
   ${LPC17XX_PATH}/lpc17_i2c.c
-  ${LPC17XX_PATH}/lpc17_spi.c
   ${LPC17XX_PATH}/lpc17_ssp.c
   ${LPC17XX_PATH}/lpc17_hpm.c
   ${LPC17XX_PATH}/lpc17_pincfg.c
   )
+  
+if (NOT ";${TARGET_CONTROLLER};" MATCHES ";LPC1776;")
+  set(LIBLPCOPEN_SRCS ${LIBLPCOPEN_SRCS} ${LPC17XX_PATH}/lpc17_spi.c)
+endif()
 
 if( UART_RINGBUFFER )
   set(LIBLPCOPEN_SRCS ${LIBLPCOPEN_SRCS} ${LPCOPEN_SRCPATH}/ring_buffer.c ${LPC17XX_PATH}/lpc17_uartrb.c)
@@ -51,6 +55,7 @@ endif()
 set(TARGET_ARCH     "armv7-m" )
 set(TARGET_CPU      "cortex-m3")
 
+set(LPC17_FLAGS ${LPC17_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER})
 set(LPC17_FLAGS ${LPC17_FLAGS} -D__CODE_RED)
 set(LPC17_FLAGS ${LPC17_FLAGS} -DCORE_M3)
 set(LPC17_FLAGS ${LPC17_FLAGS} -D__USE_LPCOPEN)

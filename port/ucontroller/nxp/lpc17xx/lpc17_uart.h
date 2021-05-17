@@ -33,7 +33,9 @@
 typedef struct lpc_uart_cfg {
     LPC_USART_T * ptr;
     IRQn_Type irq;
+#ifdef CHIP_LPC175X_6X
     CHIP_SYSCTL_PCLK_T sysclk;
+#endif
 } lpc_uart_cfg_t;
 
 extern const lpc_uart_cfg_t usart_cfg[4];

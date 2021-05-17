@@ -27,6 +27,29 @@
 
 #include "port.h"
 
+#ifdef CHIP_LPC177X_8X
+const lpc_uart_cfg_t usart_cfg[4] = {
+    {LPC_UART0, UART0_IRQn},
+    {LPC_UART1, UART1_IRQn},
+    {LPC_UART2, UART2_IRQn},
+    {LPC_UART3, UART3_IRQn}
+};
+
+void uart_init( uint8_t id )
+{
+    Chip_UART_Init( usart_cfg[id].ptr );
+    
+    Chip_IOCON_PinMuxSet(LPC_IOCON, UART_DEBUG_PORT, UART_DEBUG_TXD_PIN, ( IOCON_MODE_INACT | IOCON_FUNC2 ) );
+    Chip_IOCON_PinMuxSet(LPC_IOCON, UART_DEBUG_PORT, UART_DEBUG_RXD_PIN, ( IOCON_MODE_INACT | IOCON_FUNC2 ) );
+
+    uart_set_baud( UART_DEBUG, 115200 );
+
+    /* Defaults to 8N1, no parity */
+    uart_config_data( UART_DEBUG, ( UART_LCR_WLEN8 | UART_LCR_SBS_1BIT | UART_LCR_PARITY_DIS ) );
+
+    uart_tx_enable ( UART_DEBUG );
+}
+#else
 const lpc_uart_cfg_t usart_cfg[4] = {
     { LPC_UART0, UART0_IRQn, SYSCTL_PCLK_UART0 },
     { LPC_UART1, UART1_IRQn, SYSCTL_PCLK_UART1 },
@@ -48,3 +71,4 @@ void uart_init ( uint8_t id )
 
     uart_tx_enable ( UART_DEBUG );
 }
+#endif

@@ -51,6 +51,9 @@
 #define PORT2 2
 #define PORT3 3
 #define PORT4 4
+#ifdef CHIP_LPC177X_8X
+#define PORT5 5
+#endif
 
 #define NON_GPIO 0xFF
 

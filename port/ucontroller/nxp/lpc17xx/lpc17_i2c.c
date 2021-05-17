@@ -67,19 +67,25 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed )
     case I2C0:
         irq = I2C0_IRQn;
         /* Set special I2C pins configuration */
+#ifdef CHIP_LPC175X_6X
         Chip_IOCON_SetI2CPad(LPC_IOCON, I2CPADCFG_STD_MODE);
+#endif
         break;
     case I2C1:
         irq = I2C1_IRQn;
+#ifdef CHIP_LPC175X_6X
         /* Set special I2C pins configuration */
         Chip_IOCON_EnableOD(LPC_IOCON, PIN_PORT(I2C1_SDA), PIN_NUMBER(I2C1_SDA));
         Chip_IOCON_EnableOD(LPC_IOCON, PIN_PORT(I2C1_SCL), PIN_NUMBER(I2C1_SCL));
+#endif
         break;
     case I2C2:
         irq = I2C2_IRQn;
+#ifdef CHIP_LPC175X_6X
         /* Set special I2C pins configuration */
         Chip_IOCON_EnableOD(LPC_IOCON, PIN_PORT(I2C2_SDA), PIN_NUMBER(I2C2_SDA));
         Chip_IOCON_EnableOD(LPC_IOCON, PIN_PORT(I2C2_SCL), PIN_NUMBER(I2C2_SCL));
+#endif
         break;
     default:
         return;
