@@ -156,6 +156,19 @@ sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_ta
     return entry;
 }
 
+sensor_t * sdr_add_settings(uint8_t chipid, void * settings)
+{
+    sensor_t * sensor;
+
+    for (sensor = sdr_head; sensor != NULL; sensor = sensor->next) {
+        if (sensor->chipid == chipid) {
+            sensor->settings = settings;
+        }
+    }
+
+    return NULL;
+}
+
 sensor_t * find_sensor_by_sdr( void * sdr )
 {
     sensor_t * cur;

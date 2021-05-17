@@ -207,6 +207,7 @@ typedef struct sensor_t {
         uint16_t lower_non_critical_go_high:1;
         uint16_t lower_non_critical_go_low:1;
     } asserted_event;
+    void* settings;
     struct sensor_t *next;
 } sensor_t;
 
@@ -232,6 +233,7 @@ void sensor_disable(sensor_t *sensor);
 void check_sensor_event( sensor_t * sensor );
 void sensor_state_check( sensor_t *sensor );
 sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t slave_addr);
+sensor_t * sdr_add_settings(uint8_t chipid, void * settings);
 void sdr_remove_entry( sensor_t * entry );
 void sdr_pop( void );
 sensor_t * find_sensor_by_sdr( void * sdr );
