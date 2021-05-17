@@ -83,7 +83,7 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 add_executable(${CMAKE_PROJECT_NAME} ${UCONTROLLER_SRCS} ${PROJ_SRCS})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${MODULES_FLAGS})
 
-if(${BOARD} MATCHES "^(afc)")
+if((${BOARD} MATCHES "^(afc)") OR (${BOARD} MATCHES "^(sayma)"))
   set(PROJ_LIBS lpcopen)
 else()
   message(FATAL_ERROR "${BOARD} not supported!")
