@@ -3,6 +3,7 @@
  *
  *   Copyright (C) 2015  Henrique Silva <henrique.silva@lnls.br>
  *   Copyright (C) 2015  Piotr Miedzik  <P.Miedzik@gsi.de>
+ *   Copyright (C) 2021  Krzysztof Macias <krzysztof.macias@creotech.pl>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -47,8 +48,8 @@
 #include "rtm.h"
 #endif
 
-#ifdef MODULE_CUSTOM
-#include "custom.h"
+#ifdef MODULE_BOARD_CONFIG
+#include "board_config.h"
 #endif
 
 /*-----------------------------------------------------------*/
@@ -56,8 +57,8 @@ int main( void )
 {
     pin_init();
 
-#ifdef MODULE_CUSTOM
-    custom_init();
+#ifdef MODULE_BOARD_CONFIG
+    board_init();
 #endif
 
 #ifdef MODULE_UART_DEBUG

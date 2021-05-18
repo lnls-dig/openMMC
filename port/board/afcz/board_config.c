@@ -164,12 +164,6 @@ void board_init(void)
     Chip_IOCON_PinMuxSet(LPC_IOCON, 0, 1, (IOCON_FUNC3 | IOCON_MODE_PULLUP | IOCON_OPENDRAIN_EN));
     Chip_IOCON_PinMuxSet(LPC_IOCON, 0, 0, (IOCON_FUNC3 | IOCON_MODE_PULLUP | IOCON_OPENDRAIN_EN));
 
-    /* PM GPIO expander initialization */
-    tca9539_output_port_set(CHIP_ID_TCA9539_PM, 0, 0);
-    tca9539_output_port_set(CHIP_ID_TCA9539_PM, 1, 0);
-    tca9539_port_dir_set(CHIP_ID_TCA9539_PM, 0, 0);
-    tca9539_port_dir_set(CHIP_ID_TCA9539_PM, 1, 0);
-
     /* Configure JTAG chain */
     gpio_set_pin_state(PIN_PORT(GPIO_SOC_JTAG_OVERRIDE), PIN_NUMBER(GPIO_SOC_JTAG_OVERRIDE), GPIO_LEVEL_HIGH);
 }

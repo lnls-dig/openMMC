@@ -317,6 +317,12 @@ void payload_init(void)
         while ( gpio_read_pin( PIN_PORT(GPIO_MMC_ENABLE), PIN_NUMBER(GPIO_MMC_ENABLE) ) == 1) {};
     }
 
+    /* PM GPIO expander initialization */
+    tca9539_output_port_set(CHIP_ID_TCA9539_PM, 0, 0);
+    tca9539_output_port_set(CHIP_ID_TCA9539_PM, 1, 0);
+    tca9539_port_dir_set(CHIP_ID_TCA9539_PM, 0, 0);
+    tca9539_port_dir_set(CHIP_ID_TCA9539_PM, 1, 0);
+
     xTaskCreate(vTaskPayload, "Payload", 240, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle);
 
     amc_payload_evt = xEventGroupCreate();
