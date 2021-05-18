@@ -112,7 +112,7 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
   )
 
 #generate bootloader files only for afc cards
-if(${BOARD} MATCHES "^(afc)")
+if(${BOARD} MATCHES "^(afc-)")
   add_executable(bootloader ${BOOT_SRCS})
   set_target_properties(bootloader PROPERTIES
     SUFFIX ".axf"

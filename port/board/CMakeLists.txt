@@ -23,11 +23,14 @@ elseif(${BOARD} MATCHES "^(afc-timing)$" )
 elseif(${BOARD} MATCHES "^(sayma)$" )
   add_subdirectory(sayma)
 
+elseif(${BOARD} MATCHES "^(afcz)$" )
+  add_subdirectory(afcz)
+
 else()
   message(FATAL_ERROR "${BoldRed}Selected board \"${BOARD}\" is not implemented!${ColourReset}")
 endif()
 
-if(${BOARD} MATCHES "^(afc)")
+if(${BOARD} MATCHES "^(afc-)")
   add_subdirectory(afc-common)
 endif()
 

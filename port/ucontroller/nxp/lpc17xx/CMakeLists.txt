@@ -28,6 +28,7 @@ set(LIBLPCOPEN_SRCS
   ${LPCOPEN_SRCPATH}/spi_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/ssp_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/enet_17xx_40xx.c
+  ${LPCOPEN_SRCPATH}/stopwatch_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/sysctl_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/sysinit_17xx_40xx.c
   ${LPCOPEN_SRCPATH}/timer_17xx_40xx.c
