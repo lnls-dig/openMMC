@@ -85,7 +85,7 @@ static uint8_t mcp23016_write_reg (uint8_t reg, uint8_t data) {
     cmd_data[1] = data;
 
     if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-        tx_len = xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, 2);
+        tx_len = xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
         i2c_give(i2c_id);
     }
 
