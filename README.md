@@ -81,3 +81,18 @@ If you want to erase the whole Flash and copy both firmwares:
 	make program_all
 
 **NOTE 2**: We only have linker scripts to LPC1764 and LPC1769, so if you wish to compile to a different controller, you'll have to change the `linker/lpc1764_boot.ld` and `linker/lpc1764_app.ld` files, which defines the memory regions, otherwise you'll run into several HardFault errors.
+
+### FlashMagic
+
+With AFC v4 it is possible to program MMC using only a microUSB cable. As for now, the most reliable option is to use [FlashMagic](https://www.flashmagictool.com/) (**it may be possible to use [nxpprog](https://github.com/Technosystem-Labs/nxpprog), but for now it seems to be less reliable, we're working on it**).
+
+If you are on Windows the procedure is straightforward: 
+
+1. Install and run FlashMagic.
+2. Select **LPC1768 (LPC1700)** device.
+3. Identify COM port related to the MMC (it will be 4th port of the FTDI that appears in the system after connecting AFC) and select it in *Serial Port:*.
+4. In the firmware filed select **openMMC.bin** file that is placed in `<build dir>/out/openMMC.bin`. This scenario currently does not support flashing with bootloader. The only drawback is lack of possibility of firmware update via IPMI.
+5. Press big green button.
+6. Power cycle board.
+
+If you are on Linux you will need to use Wine. For detailed instruction please refer to [this](http://linuxkernel51.blogspot.com/2017/12/flashmagic-on-ubuntu.html) post.
