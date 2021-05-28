@@ -21,10 +21,62 @@
 
 /* Project Includes */
 #include "port.h"
+#include "idt_8v54816.h"
 
 
 uint8_t clock_switch_default_config() {
+    uint8_t i;
+    uint8_t clock_mux_config[] = {
+        // CH 0: AMC-CLK input
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
 
+        // CH 1: FMC2-CLK1-M2C input
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
+
+        // CH 2: FMC1-CLK1-M2C input
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
+
+        // CH 3: FMC1-CLK0-M2C input
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
+
+        // CH 4: FMC1-CLK2-BIDIR input
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
+
+        // CH 5: SI57X_PRI_CLK
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
+
+        // CH 6: FMC2-CLK0-M2C input
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
+
+        // CH 7: FMC2-CLK2-BIDIR input
+        IDT_DIR_OUT | IDT_TERM_ON | IDT_POL_P | IDT_SRC_CH5,
+
+        // CH 8: TCLKD input
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
+
+        // CH 9: TCLKC input
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
+
+        // CH 10: TCLKA input
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
+
+        // CH 11: TCLKB input
+        IDT_DIR_IN | IDT_TERM_ON | IDT_POL_P | 0,
+
+        // CH 12: FLEX_GTP113_CLK0 output from SI57X_PRI_CLK
+        IDT_DIR_OUT | IDT_TERM_ON | IDT_POL_P | IDT_SRC_CH5,
+
+        // CH 13: FLEX_CLK1 output from SI57X_PRI_CLK
+        IDT_DIR_OUT | IDT_TERM_ON | IDT_POL_P | IDT_SRC_CH5,
+
+        // CH 14: FLEX_CLK2 output from SI57X_PRI_CLK
+        IDT_DIR_OUT | IDT_TERM_ON | IDT_POL_P | IDT_SRC_CH5,
+
+        // CH 15: FLEX_CLK3 output from SI57X_PRI_CLK
+        IDT_DIR_OUT | IDT_TERM_ON | IDT_POL_P | IDT_SRC_CH5,
+    };
+    //FIXME: This can freeze MMC
+    while(clock_switch_write_reg(clock_mux_config) != 16) {}
 }
 
 void board_init() {
@@ -35,5 +87,5 @@ void board_init() {
 }
 
 void board_config() {
-	clock_switch_default_config();
+    
 }

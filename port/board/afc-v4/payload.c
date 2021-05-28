@@ -340,7 +340,7 @@ void vTaskPayload( void *pvParameters )
             break;
 
         case PAYLOAD_STATE_FPGA_SETUP:
-
+            clock_switch_default_config();
             new_state = PAYLOAD_FPGA_ON;
             break;
 
