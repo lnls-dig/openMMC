@@ -46,13 +46,13 @@ void rtm_enable_payload_power(void)
     vTaskDelay(100);
 
     // Enable RTM power
-    pca9554_write_pin(RTM_GPIO_DCDC_ENABLEn, 0);
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554, RTM_GPIO_DCDC_ENABLEn, 0);
 
     // Verify POWER GOOD
     uint8_t power_good_n = 0x1;
 
     vTaskDelay(50);
-    pca9554_read_pin(RTM_GPIO_POWER_GOOD, &power_good_n);
+    pca9554_read_pin(CHIP_ID_RTM_PCA9554, RTM_GPIO_POWER_GOOD, &power_good_n);
 
     if (power_good_n) {
         printf("[RTM] POWER GOOD error.\n");
@@ -63,7 +63,7 @@ void rtm_enable_payload_power(void)
 void rtm_disable_payload_power(void)
 {
     // Disable RTM power
-    pca9554_write_pin(RTM_GPIO_DCDC_ENABLEn, 1);
+    pca9554_write_pin(CHIP_ID_RTM_PCA9554, RTM_GPIO_DCDC_ENABLEn, 1);
 
     // Disable RTM P12V0
     tca9539_output_pin_set(CHIP_ID_TCA9539_PM, 1, 6, false);
@@ -75,7 +75,7 @@ uint8_t rtm_get_hotswap_handle_status(uint8_t *state)
     uint8_t pin_read;
 
     if (rtm_initialized) {
-        if (pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE, &pin_read) == 0) {
+        if (pca9554_read_pin(CHIP_ID_RTM_PCA9554, RTM_GPIO_HOTSWAP_HANDLE, &pin_read) == 0) {
             return false;
         }
 
@@ -110,7 +110,7 @@ void rtm_hardware_init(void)
     gpio_set_pin_state(PIN_PORT(GPIO_RTM_I2C_EN), PIN_NUMBER(GPIO_RTM_I2C_EN), true);
 
     // Set GPIO expander direction
-    pca9554_set_port_dir(0x11);
+    pca9554_set_port_dir(CHIP_ID_RTM_PCA9554, 0x11);
 
     rtm_initialized = true;
 }
@@ -172,7 +172,7 @@ bool rtm_compatibility_check(void)
 bool rtm_quiesce(void)
 {
     // Disable RTM power
-    return pca9554_write_pin(RTM_GPIO_DCDC_ENABLEn, 1);
+    return pca9554_write_pin(CHIP_ID_RTM_PCA9554, RTM_GPIO_DCDC_ENABLEn, 1);
 }
 
 void rtm_ctrl_led(uint8_t id, uint8_t state)
@@ -197,7 +197,7 @@ void rtm_ctrl_led(uint8_t id, uint8_t state)
     }
 
     if (rtm_initialized)
-        pca9554_write_pin(pca_pin, state);
+        pca9554_write_pin(CHIP_ID_RTM_PCA9554, pca_pin, state);
 }
 
 uint8_t rtm_read_led(uint8_t id)
@@ -222,7 +222,7 @@ uint8_t rtm_read_led(uint8_t id)
     }
 
     if (rtm_initialized)
-        pca9554_read_pin(pca_pin, &stat);
+        pca9554_read_pin(CHIP_ID_RTM_PCA9554, pca_pin, &stat);
 
     return stat;
 }
