@@ -12,7 +12,7 @@ if(${BOARD} MATCHES "^(afc-bpm)$")
 
   message(STATUS "Selected Board version: ${VERSION}")
   if(${VERSION} MATCHES "(3.0)")
-    add_subdirectory(afc-bpm/v3_0)
+    message(FATAL_ERROR "${BoldRed}AFCv3.0 is not supported anymore. Use -DVERSION=3.1 instead.${ColourReset}")
   elseif(${VERSION} MATCHES "(3.1)")
     add_subdirectory(afc-bpm/v3_1)
   endif()
