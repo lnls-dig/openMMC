@@ -134,4 +134,4 @@ if(${BOARD} MATCHES "^(afc)")
     )
 endif()
 
-include( ${CMAKE_SOURCE_DIR}/probe/lpclink.cmake )
+include( ${CMAKE_SOURCE_DIR}/probe/openocd.cmake )
