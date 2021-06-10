@@ -8,6 +8,7 @@ set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/i2c.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/led.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/ipmb.c ${MODULE_PATH}/ipmi.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/printf-stdarg.c)
+set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/error.c)
 
 message(STATUS "Selected modules to compile: ${TARGET_MODULES}")
 

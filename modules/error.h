@@ -1,8 +1,7 @@
 /*
  *   openMMC -- Open Source modular IPM Controller firmware
  *
- *   Copyright (C) 2016  Henrique Silva <henrique.silva@lnls.br>
- *   Copyright (C) 2015  Piotr Miedzik  <P.Miedzik@gsi.de>
+ *   Copyright (C) 2021  Augusto Fraga Giachero <augusto.fraga@cnpem.br>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -20,38 +19,44 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef IPMI_OEM_H_
-#define IPMI_OEM_H_
+#ifndef ERROR_H_
+#define ERROR_H_
+
+#include <stdio.h>
 
 /**
- * @file afc-bpm/v3_0/ipmi_oem.h
- * @brief Custom IPMI commands for AFC
+ * @file   error.h
+ * @author Augusto Fraga Giachero <augusto.fraga@cnpem.br>
  *
- * @ingroup AFC_V3_0_IPMI_OEM
+ * @brief  Error handling functions and codes
+ *
+ * @ingroup error
  */
+
+typedef enum {
+    MMC_OK,
+    MMC_OOM_ERR,
+    MMC_IO_ERR,
+    MMC_INVALID_ARG_ERR,
+    MMC_TIMEOUT_ERR,
+    MMC_RESOURCE_ERR,
+    MMC_UNKNOWN_ERR,
+} mmc_err;
 
 /**
- * @defgroup AFC_V3_0_IPMI_OEM AFCv3.0 IPMI OEM Commands
- * @ingroup AFC_V3_0
- * @{
+ * @brief Get the corresponding string for an error code
+ *
+ * @param[in] e  Error code
+ *
+ * @return a pointer to a null-terminated string
  */
-
-#include "ipmi.h"
+const char* get_error_str(mmc_err e);
 
 /**
- * @brief Custom NetFN (User defined, value greater than 0x2C)
+ * @brief Print the file name, line number and error description
+ *
+ * @param[in] e  Error code
  */
-#define NETFN_CUSTOM_OEM                    0x30
-
-#define IPMI_OEM_CMD_I2C_TRANSFER               0x00
-
-#define IPMI_OEM_CMD_ADN4604_SET_OUTPUT_CFG     0x01
-#define IPMI_OEM_CMD_ADN4604_GET_OUTPUT_CFG     0x02
-#define IPMI_OEM_CMD_ADN4604_RESET              0x03
-
-#define IPMI_OEM_CMD_GPIO_PIN                   0x04
-/**
- * @}
- */
+#define PRINT_ERR_LINE(e) printf("%s line %d: %s\n", __FILE__, __LINE__, get_error_str(e))
 
 #endif
