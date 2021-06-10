@@ -1,13 +1,13 @@
 MEMORY
 {
   /* Define each memory region */
-  /* Last 2 sectors (32kB each) are reserved for firmware upgrade */
-  MFlash128 (rx) : ORIGIN = 0, LENGTH = 440K /* 440K bytes */
+  /* Last 8 sectors (32kB each) are reserved for firmware upgrade */
+  MFlash128 (rx) : ORIGIN = 0x2000, LENGTH = 248K /* 248K bytes */
   RamLoc16 (rwx) : ORIGIN = 0x10000000, LENGTH = 32K /* 32K bytes */
   RamAHB16 (rwx) : ORIGIN = 0x2007c000, LENGTH = 32K /* 32K bytes */
 }
   /* Define a symbol for the top of each memory region */
-  __top_MFlash128 = 0 + 440K;
+  __top_MFlash128 = 0x2000 + 248K;
   __top_RamLoc16 = 0x10000000 + 32K;
   __top_RamAHB16 = 0x2007c000 + 32K;
 
