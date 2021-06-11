@@ -1,0 +1,5 @@
+<map id="Data Watchpoint and Trace (DWT)" name="Data Watchpoint and Trace (DWT)">
+<area shape="rect" id="Node000001" title="Type definitions for the Data Watchpoint and Trace (DWT)" alt="" coords="218,5,376,50"/>
+<area shape="rect" id="Node000003" href="$group__CMSIS__TPI.html" title="Type definitions for the Trace Port Interface (TPI)" alt="" coords="424,5,572,50"/>
+<area shape="rect" id="Node000002" href="$group__CMSIS__ITM.html" title="Type definitions for the Instrumentation Trace Macrocell (ITM)" alt="" coords="5,5,170,50"/>
+</map>

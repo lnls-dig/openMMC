@@ -1,0 +1,41 @@
+<map id="port/ucontroller/nxp/lpc17xx/lpc17_hpm.c" name="port/ucontroller/nxp/lpc17xx/lpc17_hpm.c">
+<area shape="rect" id="Node000001" title="Firmware update functions (HPM.1)" alt="" coords="356,5,518,50"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,98,147,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="356,50,149,97,148,91,355,45"/>
+<area shape="rect" id="Node000003" href="$lpc17__hpm_8h.html" title="Firmware update functions (HPM.1)" alt="" coords="170,98,275,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="381,53,272,95,270,90,379,48"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="299,98,352,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="409,53,357,91,354,86,406,48"/>
+<area shape="rect" id="Node000005" href="$ipmi_8h.html" title="IPMI module definitions." alt="" coords="376,98,498,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="440,50,440,82,435,82,435,50"/>
+<area shape="rect" id="Node000013" href="$sys__utils_8h.html" title=" " alt="" coords="522,98,672,126"/>
+<area shape="poly" id="edge13_Node000001_Node000013" title=" " alt="" coords="481,48,559,88,557,93,479,53"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="697,98,767,126"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="516,48,682,94,681,99,515,53"/>
+<area shape="rect" id="Node000015" href="$arm__cm3__reset_8h.html" title=" " alt="" coords="792,98,926,126"/>
+<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="520,42,777,92,776,97,519,47"/>
+<area shape="rect" id="Node000006" href="$ipmb_8h.html" title="Definitions used in IPMB Layer." alt="" coords="404,249,470,277"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="438,126,433,174,433,201,436,234,431,234,428,201,428,174,433,126"/>
+<area shape="rect" id="Node000012" href="$sdr_8h.html" title=" " alt="" coords="443,174,496,201"/>
+<area shape="poly" id="edge11_Node000005_Node000012" title=" " alt="" coords="445,125,460,158,455,161,441,127"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="194,325,291,353"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="405,280,293,322,291,317,403,275"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="315,325,376,353"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="423,280,375,317,372,313,419,275"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="401,325,474,353"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="440,278,440,309,435,309,435,278"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="498,325,580,353"/>
+<area shape="poly" id="edge9_Node000006_Node000010" title=" " alt="" coords="457,275,510,314,507,318,454,280"/>
+<area shape="rect" id="Node000011" href="$board__ipmb_8h.html" title="Board specific definitions used in IPMB Layer." alt="" coords="604,325,714,353"/>
+<area shape="poly" id="edge10_Node000006_Node000011" title=" " alt="" coords="472,273,606,317,604,322,470,278"/>
+<area shape="poly" id="edge12_Node000012_Node000006" title=" " alt="" coords="466,203,451,236,447,234,461,201"/>
+<area shape="rect" id="Node000016" href="$core__cm3_8h.html" title="CMSIS Cortex&#45;M3 Core Peripheral Access Layer Header File." alt="" coords="810,174,907,201"/>
+<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="861,126,861,158,856,158,856,126"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="852,325,922,353"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="835,204,813,218,794,236,783,256,783,266,786,276,809,301,839,319,836,323,806,305,782,278,777,266,778,254,790,233,810,214,832,200"/>
+<area shape="rect" id="Node000018" href="$cmsis__version_8h.html" title="CMSIS Core(M) Version definitions." alt="" coords="796,249,922,277"/>
+<area shape="poly" id="edge18_Node000016_Node000018" title=" " alt="" coords="861,202,861,234,856,234,856,202"/>
+<area shape="rect" id="Node000019" href="$cmsis__compiler_8h.html" title="CMSIS compiler generic header file." alt="" coords="946,249,1081,277"/>
+<area shape="poly" id="edge19_Node000016_Node000019" title=" " alt="" coords="887,199,973,240,971,245,885,204"/>
+<area shape="poly" id="edge20_Node000019_Node000017" title=" " alt="" coords="992,280,923,319,921,315,989,275"/>
+</map>

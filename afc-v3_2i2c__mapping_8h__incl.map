@@ -1,0 +1,13 @@
+<map id="port/board/afc&#45;v3/i2c_mapping.h" name="port/board/afc&#45;v3/i2c_mapping.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="138,5,294,50"/>
+<area shape="rect" id="Node000002" href="$i2c_8h.html" title=" " alt="" coords="190,98,242,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,50,219,82,214,82,214,50"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,174,102,201"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="191,127,98,169,95,164,189,123"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="126,174,208,201"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="210,128,186,162,182,159,205,125"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="232,174,302,201"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="227,125,251,159,247,162,223,128"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="326,174,408,201"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="244,124,328,164,325,169,242,128"/>
+</map>

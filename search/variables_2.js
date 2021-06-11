@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['b_0',['B',['../structSDR__type__01h__t.html#a1bd9f8363a706250f692234452c52bc1',1,'SDR_type_01h_t']]],
+  ['b_1',['b',['../group__CMSIS__core__DebugFunctions.html#ga37c92a6ccab1d24079e1e1ac92011183',1,'APSR_Type::b'],['../group__CMSIS__core__DebugFunctions.html#gadc200e389151f827f8cb044490ae671c',1,'IPSR_Type::b'],['../group__CMSIS__core__DebugFunctions.html#ga59524845cd5e7fede7fde407f41df8b0',1,'xPSR_Type::b'],['../group__CMSIS__core__DebugFunctions.html#gae2a377b142c1903e75601191fc97d3a6',1,'CONTROL_Type::b']]],
+  ['b_5faccuracy_2',['B_accuracy',['../structSDR__type__01h__t.html#ad22f3c1c1ab5651ab68f5d0395b1be57',1,'SDR_type_01h_t']]],
+  ['bfar_3',['BFAR',['../group__CMSIS__core__DebugFunctions.html#ga3f8e7e58be4e41c88dfa78f54589271c',1,'SCB_Type']]],
+  ['board_5fdiagnostic_5ft_4',['board_diagnostic_t',['../fpga__spi_8h.html#ae833ed8ed4e4c60a8ee23cf5f2158753',1,'fpga_spi.h']]],
+  ['board_5finfo_5foffset_5',['board_info_offset',['../structfru__common__header.html#a4c54e9061160526a130eae1932683238',1,'fru_common_header']]],
+  ['boot_5fend_5faddr_6',['boot_end_addr',['../port_2ucontroller_2nxp_2lpc17xx_2bootloader_2src_2main_8c.html#aafbdc45c34ab7a956ae807453d0f55be',1,'boot_end_addr:&#160;main.c'],['../lpc17__hpm_8c.html#aafbdc45c34ab7a956ae807453d0f55be',1,'boot_end_addr:&#160;lpc17_hpm.c']]],
+  ['boot_5fstart_5faddr_7',['boot_start_addr',['../port_2ucontroller_2nxp_2lpc17xx_2bootloader_2src_2main_8c.html#ad84cee110444b272a0ac372f68cbb496',1,'boot_start_addr:&#160;main.c'],['../lpc17__hpm_8c.html#ad84cee110444b272a0ac372f68cbb496',1,'boot_start_addr:&#160;lpc17_hpm.c']]],
+  ['btr_8',['BTR',['../structLPC__CAN1__Type.html#a73708db30f47de9b8e8959c9990a6fcf',1,'LPC_CAN1_Type::BTR'],['../structLPC__CAN2__Type.html#aa7c52a0186ec856e161d3a74ac81041c',1,'LPC_CAN2_Type::BTR']]],
+  ['buffer_9',['buffer',['../structfru__data.html#a62eb17a5914f49b64f89c344238ded19',1,'fru_data::buffer'],['../structipmi__msg__cfg.html#a87e003a735fb94cbba3f6fae2c818d73',1,'ipmi_msg_cfg::buffer']]],
+  ['build_5ff_10',['build_f',['../structfru__cfg.html#a006637ab4107f2e1c85c542c13115ff2',1,'fru_cfg']]],
+  ['bus_5fadc_5fresolution_11',['bus_adc_resolution',['../unionina220__config__reg__t.html#a34b5582b6b0f9b49b58dcb8c205578be',1,'ina220_config_reg_t']]],
+  ['bus_5fid_12',['bus_id',['../structi2c__chip__mapping.html#adc2f0f14f1e933d1ae6b3db17c387e0c',1,'i2c_chip_mapping']]],
+  ['bus_5fvoltage_5fconversion_5ftime_13',['bus_voltage_conversion_time',['../unionina3221__config__reg__t.html#aa751a3ae3edee3d0ff7c88faadee7a45',1,'ina3221_config_reg_t']]],
+  ['bus_5fvoltage_5flsb_14',['bus_voltage_lsb',['../structina220__config__t.html#a7876214dfca8c176b5d35032282dea1e',1,'ina220_config_t']]],
+  ['bus_5fvoltage_5frange_15',['bus_voltage_range',['../unionina220__config__reg__t.html#adbc6b1cc7e8f467de1a58c2f4d5bf80f',1,'ina220_config_reg_t']]],
+  ['bus_5fvoltage_5fshift_16',['bus_voltage_shift',['../structina220__config__t.html#a9b7ac597eedeb12c8585bab6e412af2c',1,'ina220_config_t']]],
+  ['byte_17',['byte',['../uniont__ipmc__capabilities.html#a235c019c9d960f72a9b21610333a13e8',1,'t_ipmc_capabilities']]]
+];

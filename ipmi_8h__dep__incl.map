@@ -1,0 +1,58 @@
+<map id="modules/ipmi.h" name="modules/ipmi.h">
+<area shape="rect" id="Node000001" title="IPMI module definitions." alt="" coords="1403,5,1525,33"/>
+<area shape="rect" id="Node000002" href="$clock__config_8h.html" title=" " alt="" coords="272,90,446,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1387,28,1035,50,572,84,447,95,446,90,572,78,1035,44,1387,22"/>
+<area shape="rect" id="Node000004" href="$afc-v3_2payload_8c.html" title=" " alt="" coords="5,182,206,210"/>
+<area shape="poly" id="edge25_Node000001_Node000004" title=" " alt="" coords="1387,24,1121,30,770,42,446,59,329,70,261,84,217,105,177,132,119,184,116,180,173,128,214,100,259,78,328,65,446,54,770,36,1121,25,1387,19"/>
+<area shape="rect" id="Node000005" href="$afc-v4_2payload_8c.html" title=" " alt="" coords="427,182,627,210"/>
+<area shape="poly" id="edge28_Node000001_Node000005" title=" " alt="" coords="1388,25,1233,31,1043,42,860,60,785,71,729,84,674,105,622,133,545,184,542,179,619,128,672,100,727,78,784,65,859,54,1042,37,1233,26,1387,20"/>
+<area shape="rect" id="Node000006" href="$fru_8c.html" title=" " alt="" coords="652,182,762,210"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1388,26,1036,45,867,62,808,72,775,83,751,105,733,132,713,183,708,181,728,130,747,102,772,79,807,67,867,57,1036,40,1387,21"/>
+<area shape="rect" id="Node000007" href="$fru__editor_8h.html" title=" " alt="" coords="786,90,942,117"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1388,30,1192,50,955,84,917,92,916,86,954,78,1191,45,1388,24"/>
+<area shape="rect" id="Node000014" href="$hpm_8c.html" title=" " alt="" coords="966,90,1088,117"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="1388,33,1253,54,1101,84,1070,91,1069,86,1100,78,1252,49,1387,28"/>
+<area shape="rect" id="Node000015" href="$ipmb_8c.html" title=" " alt="" coords="1112,90,1238,117"/>
+<area shape="poly" id="edge15_Node000001_Node000015" title=" " alt="" coords="1404,40,1222,92,1220,86,1402,35"/>
+<area shape="rect" id="Node000016" href="$ipmi_8c.html" title="IPMI module implementation." alt="" coords="1262,90,1384,117"/>
+<area shape="poly" id="edge16_Node000001_Node000016" title=" " alt="" coords="1430,43,1347,91,1344,87,1427,39"/>
+<area shape="rect" id="Node000017" href="$led_8c.html" title=" " alt="" coords="1408,90,1520,117"/>
+<area shape="poly" id="edge17_Node000001_Node000017" title=" " alt="" coords="1467,49,1467,89,1462,89,1462,49"/>
+<area shape="rect" id="Node000018" href="$modules_2main_8c.html" title=" " alt="" coords="1544,90,1670,117"/>
+<area shape="poly" id="edge18_Node000001_Node000018" title=" " alt="" coords="1502,39,1585,87,1583,91,1499,43"/>
+<area shape="rect" id="Node000019" href="$modules_2rtm_8c.html" title=" " alt="" coords="1693,90,1808,117"/>
+<area shape="poly" id="edge19_Node000001_Node000019" title=" " alt="" coords="1528,35,1682,78,1709,86,1707,91,1681,84,1527,40"/>
+<area shape="rect" id="Node000020" href="$sdr_8c.html" title=" " alt="" coords="1832,90,1944,117"/>
+<area shape="poly" id="edge20_Node000001_Node000020" title=" " alt="" coords="1541,28,1672,48,1821,78,1850,86,1848,91,1820,84,1671,54,1540,33"/>
+<area shape="rect" id="Node000021" href="$hotswap_8c.html" title="Hotswap sensors implementation." alt="" coords="1969,90,2170,117"/>
+<area shape="poly" id="edge21_Node000001_Node000021" title=" " alt="" coords="1541,26,1730,48,1957,78,2003,86,2002,92,1956,84,1729,53,1540,31"/>
+<area shape="rect" id="Node000022" href="$board__led_8c.html" title=" " alt="" coords="2194,81,2369,126"/>
+<area shape="poly" id="edge22_Node000001_Node000022" title=" " alt="" coords="1541,21,1824,39,2003,56,2183,78,2194,80,2193,85,2182,84,2003,61,1824,45,1541,26"/>
+<area shape="rect" id="Node000023" href="$afc-v3_2ipmi__oem_8h.html" title=" " alt="" coords="2393,81,2559,126"/>
+<area shape="poly" id="edge23_Node000001_Node000023" title=" " alt="" coords="1541,19,1695,24,1904,34,2141,51,2381,78,2393,80,2392,86,2380,84,2140,56,1903,39,1695,29,1541,24"/>
+<area shape="rect" id="Node000025" href="$afc-v4_2ipmi__oem_8h.html" title="Custom IPMI commands for AFC." alt="" coords="2584,81,2750,126"/>
+<area shape="poly" id="edge26_Node000001_Node000025" title=" " alt="" coords="1541,18,1724,20,1979,29,2273,47,2424,61,2571,78,2584,80,2583,86,2570,84,2423,66,2273,52,1979,34,1724,26,1541,23"/>
+<area shape="rect" id="Node000027" href="$lpc17__hpm_8c.html" title="Firmware update functions (HPM.1)" alt="" coords="2774,81,2936,126"/>
+<area shape="poly" id="edge29_Node000001_Node000027" title=" " alt="" coords="1541,20,2152,39,2504,56,2651,67,2762,78,2773,80,2773,85,2761,84,2650,72,2504,62,2152,45,1541,25"/>
+<area shape="rect" id="Node000003" href="$clock__config_8c.html" title=" " alt="" coords="230,182,403,210"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="349,133,325,183,320,181,344,130"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="309,125,143,184,141,179,307,120"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="398,123,504,179,501,184,395,127"/>
+<area shape="poly" id="edge7_Node000007_Node000006" title=" " alt="" coords="830,127,731,184,728,179,827,123"/>
+<area shape="rect" id="Node000008" href="$fru__editor_8c.html" title=" " alt="" coords="786,182,942,210"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="867,132,867,182,862,182,862,132"/>
+<area shape="rect" id="Node000009" href="$board__fru_8c.html" title=" " alt="" coords="966,174,1141,218"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="906,122,1009,171,1007,175,904,127"/>
+<area shape="rect" id="Node000010" href="$afc-v3_2user__amc__fru_8h.html" title=" " alt="" coords="1164,174,1330,218"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="935,119,1164,172,1163,178,934,124"/>
+<area shape="rect" id="Node000011" href="$afc-v4_2user__amc__fru_8h.html" title=" " alt="" coords="1354,174,1519,218"/>
+<area shape="poly" id="edge11_Node000007_Node000011" title=" " alt="" coords="932,118,955,123,1064,139,1148,147,1233,155,1342,171,1354,173,1353,178,1341,176,1233,161,1148,153,1063,144,954,128,931,124"/>
+<area shape="rect" id="Node000012" href="$rtm-8sfp_2rtm__user__fru_8h.html" title=" " alt="" coords="1543,174,1692,218"/>
+<area shape="poly" id="edge12_Node000007_Node000012" title=" " alt="" coords="930,118,955,123,1116,142,1243,147,1370,152,1444,159,1531,171,1543,173,1542,178,1530,176,1443,164,1369,157,1243,152,1116,147,954,128,929,124"/>
+<area shape="rect" id="Node000013" href="$rtm-lamp_2rtm__user__fru_8h.html" title=" " alt="" coords="1716,174,1869,218"/>
+<area shape="poly" id="edge13_Node000007_Node000013" title=" " alt="" coords="929,118,955,123,1069,137,1165,144,1330,147,1494,149,1591,157,1705,171,1715,173,1715,178,1704,176,1590,162,1494,155,1330,152,1165,149,1068,142,954,128,928,124"/>
+<area shape="rect" id="Node000024" href="$afc-v3_2ipmi__oem_8c.html" title=" " alt="" coords="2393,174,2559,218"/>
+<area shape="poly" id="edge24_Node000023_Node000024" title=" " alt="" coords="2479,141,2479,173,2474,173,2474,141"/>
+<area shape="rect" id="Node000026" href="$afc-v4_2ipmi__oem_8c.html" title=" " alt="" coords="2584,174,2750,218"/>
+<area shape="poly" id="edge27_Node000025_Node000026" title=" " alt="" coords="2670,141,2670,173,2664,173,2664,141"/>
+</map>

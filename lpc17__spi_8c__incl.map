@@ -1,0 +1,62 @@
+<map id="port/ucontroller/nxp/lpc17xx/lpc17_spi.c" name="port/ucontroller/nxp/lpc17xx/lpc17_spi.c">
+<area shape="rect" id="Node000001" title="Legacy SPI driver for LPC17xx." alt="" coords="1055,5,1207,50"/>
+<area shape="rect" id="Node000002" href="$port_8h.html" title="Port layer (includes all portable functions headers)" alt="" coords="1068,98,1127,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1125,51,1111,85,1106,82,1120,49"/>
+<area shape="rect" id="Node000024" title=" " alt="" coords="1786,174,1903,201"/>
+<area shape="poly" id="edge32_Node000001_Node000024" title=" " alt="" coords="1208,43,1771,167,1770,172,1207,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="531,249,672,277"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="1068,115,968,116,834,123,766,130,705,141,656,156,622,176,613,188,607,203,602,234,597,234,601,201,608,185,619,172,653,151,704,136,766,125,833,117,968,111,1068,110"/>
+<area shape="rect" id="Node000004" href="$lpc17__gpio_8h.html" title=" " alt="" coords="118,174,221,201"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="1068,118,754,140,295,176,237,182,236,177,295,171,754,135,1067,113"/>
+<area shape="rect" id="Node000006" href="$lpc17__i2c_8h.html" title="I2C driver for LPC17xx." alt="" coords="306,174,401,201"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="1068,117,804,134,615,152,417,176,416,171,614,146,804,129,1067,112"/>
+<area shape="rect" id="Node000007" href="$lpc17__ssp_8h.html" title=" " alt="" coords="425,174,522,201"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="1068,119,577,176,538,181,538,176,576,171,1067,114"/>
+<area shape="rect" id="Node000011" href="$lpc17__spi_8h.html" title="Legacy SPI driver definitions for LPC17xx." alt="" coords="632,174,726,201"/>
+<area shape="poly" id="edge11_Node000002_Node000011" title=" " alt="" coords="1068,120,742,176,741,170,1067,115"/>
+<area shape="rect" id="Node000013" href="$lpc17__watchdog_8h.html" title="Definitions of Watchdog driver implementation for LPC17xx." alt="" coords="750,174,888,201"/>
+<area shape="poly" id="edge13_Node000002_Node000013" title=" " alt="" coords="1069,124,884,172,883,167,1067,118"/>
+<area shape="rect" id="Node000015" href="$lpc17__interruptions_8h.html" title="Interruptions control." alt="" coords="1478,174,1637,201"/>
+<area shape="poly" id="edge15_Node000002_Node000015" title=" " alt="" coords="1128,115,1464,169,1463,174,1127,121"/>
+<area shape="rect" id="Node000020" href="$lpc17__hpm_8h.html" title="Firmware update functions (HPM.1)" alt="" coords="912,174,1016,201"/>
+<area shape="poly" id="edge21_Node000002_Node000020" title=" " alt="" coords="1075,129,1002,169,1000,164,1073,124"/>
+<area shape="rect" id="Node000021" href="$lpc17__power_8h.html" title="Definitions of power mode selection for LPC17xx." alt="" coords="1040,174,1155,201"/>
+<area shape="poly" id="edge22_Node000002_Node000021" title=" " alt="" coords="1100,126,1100,158,1095,158,1095,126"/>
+<area shape="rect" id="Node000023" href="$lpc17__pincfg_8h.html" title="Pin Config functions redirection for LPC17xx." alt="" coords="1180,174,1295,201"/>
+<area shape="poly" id="edge24_Node000002_Node000023" title=" " alt="" coords="1117,124,1194,164,1191,169,1114,129"/>
+<area shape="poly" id="edge26_Node000002_Node000024" title=" " alt="" coords="1128,112,1388,131,1575,148,1770,171,1770,176,1574,154,1388,136,1128,118"/>
+<area shape="rect" id="Node000025" href="$arm__cm3__reset_8h.html" title=" " alt="" coords="1320,174,1454,201"/>
+<area shape="poly" id="edge27_Node000002_Node000025" title=" " alt="" coords="1128,118,1321,167,1319,172,1127,123"/>
+<area shape="rect" id="Node000026" href="$lpc17__uart_8h.html" title="LPC17xx UART interface definitions." alt="" coords="1660,174,1762,201"/>
+<area shape="poly" id="edge29_Node000002_Node000026" title=" " alt="" coords="1128,113,1340,133,1489,149,1645,171,1645,176,1489,155,1339,138,1127,118"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="5,249,145,277"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="154,204,105,242,102,238,151,200"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="498,200,567,239,565,244,495,204"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="374,249,507,277"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="470,203,455,236,450,234,465,201"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="168,249,264,277"/>
+<area shape="poly" id="edge9_Node000007_Node000009" title=" " alt="" coords="428,204,277,247,276,242,427,199"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="288,249,350,277"/>
+<area shape="poly" id="edge10_Node000007_Node000010" title=" " alt="" coords="447,204,361,245,359,240,445,199"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="696,249,827,277"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="696,200,738,237,734,241,692,204"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="851,249,998,277"/>
+<area shape="poly" id="edge14_Node000013_Node000014" title=" " alt="" coords="839,200,895,238,892,243,836,204"/>
+<area shape="rect" id="Node000016" href="$core__cm3_8h.html" title="CMSIS Cortex&#45;M3 Core Peripheral Access Layer Header File." alt="" coords="1448,249,1544,277"/>
+<area shape="poly" id="edge16_Node000015_Node000016" title=" " alt="" coords="1549,204,1519,239,1515,236,1545,200"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="1433,401,1504,428"/>
+<area shape="poly" id="edge17_Node000016_Node000017" title=" " alt="" coords="1523,275,1545,290,1565,309,1577,330,1578,342,1573,354,1549,381,1519,399,1516,394,1546,377,1569,351,1572,341,1572,331,1561,312,1542,294,1520,280"/>
+<area shape="rect" id="Node000018" href="$cmsis__version_8h.html" title="CMSIS Core(M) Version definitions." alt="" coords="1433,325,1560,353"/>
+<area shape="poly" id="edge18_Node000016_Node000018" title=" " alt="" coords="1499,278,1499,309,1494,309,1494,278"/>
+<area shape="rect" id="Node000019" href="$cmsis__compiler_8h.html" title="CMSIS compiler generic header file." alt="" coords="1274,325,1409,353"/>
+<area shape="poly" id="edge19_Node000016_Node000019" title=" " alt="" coords="1470,280,1384,320,1382,316,1468,275"/>
+<area shape="poly" id="edge20_Node000019_Node000017" title=" " alt="" coords="1366,351,1434,391,1432,395,1363,356"/>
+<area shape="rect" id="Node000022" title=" " alt="" coords="1028,249,1168,277"/>
+<area shape="poly" id="edge23_Node000021_Node000022" title=" " alt="" coords="1100,202,1100,234,1095,234,1095,202"/>
+<area shape="poly" id="edge25_Node000023_Node000002" title=" " alt="" coords="1218,175,1140,134,1143,129,1221,171"/>
+<area shape="poly" id="edge28_Node000025_Node000016" title=" " alt="" coords="1408,200,1466,238,1463,243,1405,204"/>
+<area shape="rect" id="Node000027" title=" " alt="" coords="1721,249,1792,277"/>
+<area shape="poly" id="edge30_Node000026_Node000027" title=" " alt="" coords="1721,200,1743,235,1738,237,1717,203"/>
+<area shape="rect" id="Node000028" title=" " alt="" coords="1632,249,1697,277"/>
+<area shape="poly" id="edge31_Node000026_Node000028" title=" " alt="" coords="1705,203,1683,238,1678,235,1700,200"/>
+</map>

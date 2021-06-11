@@ -1,0 +1,9 @@
+<map id="port/ucontroller/nxp/lpc17xx/sysinit.c" name="port/ucontroller/nxp/lpc17xx/sysinit.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="24,5,174,50"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,98,76,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,52,61,87,57,83,82,49"/>
+<area shape="rect" id="Node000003" href="$lpc17__power_8h.html" title="Definitions of power mode selection for LPC17xx." alt="" coords="100,98,216,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="117,49,142,83,137,87,112,52"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="88,174,228,201"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="160,126,160,158,155,158,155,126"/>
+</map>

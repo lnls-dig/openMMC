@@ -1,0 +1,20 @@
+<map id="port/board/afc&#45;timing/ipmi_oem.h" name="port/board/afc&#45;timing/ipmi_oem.h">
+<area shape="rect" id="Node000001" title="Custom IPMI commands for AFC Timing." alt="" coords="169,5,328,50"/>
+<area shape="rect" id="Node000002" href="$ipmi_8h.html" title="IPMI module definitions." alt="" coords="217,98,279,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="251,50,251,82,246,82,246,50"/>
+<area shape="rect" id="Node000003" href="$ipmb_8h.html" title="Definitions used in IPMB Layer." alt="" coords="215,249,281,277"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="249,126,244,174,244,201,247,234,242,234,239,201,239,174,244,126"/>
+<area shape="rect" id="Node000009" href="$sdr_8h.html" title=" " alt="" coords="254,174,307,201"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="256,125,271,158,266,161,251,127"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="5,325,102,353"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="216,280,104,322,102,317,214,275"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="126,325,187,353"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="233,280,186,317,182,313,230,275"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="212,325,285,353"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="251,278,251,309,246,309,246,278"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="308,325,391,353"/>
+<area shape="poly" id="edge6_Node000003_Node000007" title=" " alt="" coords="268,275,321,314,318,318,265,280"/>
+<area shape="rect" id="Node000008" href="$board__ipmb_8h.html" title="Board specific definitions used in IPMB Layer." alt="" coords="414,325,525,353"/>
+<area shape="poly" id="edge7_Node000003_Node000008" title=" " alt="" coords="283,273,417,317,415,322,281,278"/>
+<area shape="poly" id="edge9_Node000009_Node000003" title=" " alt="" coords="277,203,262,236,257,234,272,201"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="amc_clock_config_record" name="amc_clock_config_record">
+<area shape="rect" id="Node000001" title=" " alt="" coords="19,208,205,235"/>
+<area shape="rect" id="Node000002" href="$structfru__multirecord__area__header.html" title=" " alt="" coords="5,98,163,143"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,157,111,207,106,208,92,158"/>
+<area shape="rect" id="Node000003" href="$structclock__config__descriptor.html" title=" " alt="" coords="186,106,360,134"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="241,145,134,210,132,205,238,140"/>
+<area shape="rect" id="Node000004" href="$structdirect__clock__descriptor.html" title=" " alt="" coords="188,5,359,33"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="276,48,276,106,271,106,271,48"/>
+</map>

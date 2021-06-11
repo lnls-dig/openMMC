@@ -1,0 +1,9 @@
+<map id="port/board/rtm&#45;lamp/rtm_i2c_mapping.h" name="port/board/rtm&#45;lamp/rtm_i2c_mapping.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="183,5,336,50"/>
+<area shape="rect" id="Node000002" href="$rtm-lamp_2rtm__i2c__mapping_8c.html" title=" " alt="" coords="5,98,159,143"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="205,60,125,100,123,95,202,55"/>
+<area shape="rect" id="Node000003" href="$rtm-lamp_2rtm__user_8c.html" title=" " alt="" coords="183,98,336,143"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="262,66,262,98,257,98,257,66"/>
+<area shape="rect" id="Node000004" href="$rtm-lamp_2sdr__list_8c.html" title=" " alt="" coords="360,98,513,143"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="316,55,396,95,393,100,314,60"/>
+</map>

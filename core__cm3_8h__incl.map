@@ -1,0 +1,10 @@
+<map id="port/ucontroller/nxp/lpc17xx/bootloader/inc/core_cm3.h" name="port/ucontroller/nxp/lpc17xx/bootloader/inc/core_cm3.h">
+<area shape="rect" id="Node000001" title="CMSIS Cortex&#45;M3 Core Peripheral Access Layer Header File." alt="" coords="5,5,179,67"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="84,191,154,218"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="51,69,34,86,21,104,15,123,20,141,42,166,71,184,68,189,39,171,15,144,10,122,16,101,30,82,47,65"/>
+<area shape="rect" id="Node000003" href="$cmsis__version_8h.html" title="CMSIS Core(M) Version definitions." alt="" coords="29,115,155,143"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="95,67,95,99,89,99,89,67"/>
+<area shape="rect" id="Node000004" href="$cmsis__compiler_8h.html" title="CMSIS compiler generic header file." alt="" coords="179,115,314,143"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="145,65,213,105,210,109,142,70"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="225,146,156,185,153,181,222,141"/>
+</map>

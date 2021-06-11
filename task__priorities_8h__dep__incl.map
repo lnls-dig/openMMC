@@ -1,0 +1,31 @@
+<map id="modules/task_priorities.h" name="modules/task_priorities.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1084,5,1271,33"/>
+<area shape="rect" id="Node000002" href="$fpga__spi_8c.html" title=" " alt="" coords="5,90,153,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1069,23,895,26,669,35,418,54,165,84,126,92,125,86,164,78,417,48,669,30,895,21,1069,18"/>
+<area shape="rect" id="Node000003" href="$ipmb_8c.html" title=" " alt="" coords="176,90,302,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1069,24,920,27,731,37,522,55,314,84,280,92,279,86,313,78,522,50,730,32,920,22,1069,18"/>
+<area shape="rect" id="Node000004" href="$ipmi_8c.html" title="IPMI module implementation." alt="" coords="326,90,448,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1069,26,945,31,792,42,626,59,461,84,428,92,427,86,460,78,625,53,792,37,944,26,1069,20"/>
+<area shape="rect" id="Node000005" href="$led_8c.html" title=" " alt="" coords="472,90,584,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1069,28,850,46,723,62,597,84,567,91,565,86,596,78,722,57,849,41,1069,23"/>
+<area shape="rect" id="Node000006" href="$modules_2rtm_8c.html" title=" " alt="" coords="608,90,723,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1069,33,911,53,736,84,706,91,704,86,734,78,910,47,1069,28"/>
+<area shape="rect" id="Node000007" href="$hotswap_8c.html" title="Hotswap sensors implementation." alt="" coords="748,90,949,117"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1111,40,902,92,900,86,1109,35"/>
+<area shape="rect" id="Node000008" href="$ina220_8c.html" title="INA220 interface implementation." alt="" coords="973,90,1164,117"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1150,45,1087,91,1084,87,1146,40"/>
+<area shape="rect" id="Node000009" href="$ina3221_8c.html" title="INA3221 interface implementation." alt="" coords="1188,90,1386,117"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1209,40,1271,87,1268,91,1206,45"/>
+<area shape="rect" id="Node000010" href="$lm75_8c.html" title="Interface functions for LM75 I2C Temperature Sensor." alt="" coords="1411,90,1590,117"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1245,35,1449,86,1448,92,1244,40"/>
+<area shape="rect" id="Node000011" href="$max6642_8c.html" title="MAX6642 I2C Temperature Sensor Interface implementation." alt="" coords="1614,90,1821,117"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1287,32,1602,78,1648,86,1647,92,1601,84,1286,38"/>
+<area shape="rect" id="Node000012" href="$watchdog_8c.html" title="Reset the uC if it fails to reload the watchdog timer." alt="" coords="1845,90,2001,117"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1286,23,1537,42,1686,58,1834,78,1873,86,1872,91,1833,84,1685,63,1537,47,1286,29"/>
+<area shape="rect" id="Node000013" href="$board__led_8c.html" title=" " alt="" coords="2025,81,2200,126"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1286,21,1612,38,1812,55,2013,78,2025,80,2024,86,2012,84,1812,60,1612,44,1286,26"/>
+<area shape="rect" id="Node000014" href="$afc-v3_2payload_8c.html" title=" " alt="" coords="2224,90,2424,117"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1286,20,1694,35,1952,53,2211,78,2262,86,2261,92,2211,84,1951,58,1693,41,1286,25"/>
+<area shape="rect" id="Node000015" href="$afc-v4_2payload_8c.html" title=" " alt="" coords="2448,90,2648,117"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1286,18,1499,21,1785,30,2109,48,2437,78,2487,86,2487,92,2436,84,2109,54,1784,35,1499,26,1286,23"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="modules/fru_editor.h" name="modules/fru_editor.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="522,5,679,33"/>
+<area shape="rect" id="Node000002" href="$fru_8c.html" title=" " alt="" coords="5,90,116,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="507,30,331,50,229,65,129,84,100,91,98,86,128,78,228,59,330,44,507,25"/>
+<area shape="rect" id="Node000003" href="$fru__editor_8c.html" title=" " alt="" coords="140,90,296,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="521,39,309,84,274,92,273,86,308,78,520,34"/>
+<area shape="rect" id="Node000004" href="$board__fru_8c.html" title=" " alt="" coords="320,81,494,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="557,42,460,83,457,78,555,37"/>
+<area shape="rect" id="Node000005" href="$afc-v3_2user__amc__fru_8h.html" title=" " alt="" coords="518,81,683,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="603,49,603,80,598,80,598,49"/>
+<area shape="rect" id="Node000006" href="$afc-v4_2user__amc__fru_8h.html" title=" " alt="" coords="707,81,872,126"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="646,37,741,78,738,83,644,42"/>
+<area shape="rect" id="Node000007" href="$rtm-8sfp_2rtm__user__fru_8h.html" title=" " alt="" coords="897,81,1045,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="680,34,885,78,897,81,896,86,884,84,679,39"/>
+<area shape="rect" id="Node000008" href="$rtm-lamp_2rtm__user__fru_8h.html" title=" " alt="" coords="1069,81,1222,126"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="694,27,864,48,1058,78,1069,80,1068,86,1057,84,863,53,694,33"/>
+</map>

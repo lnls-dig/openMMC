@@ -1,0 +1,17 @@
+<map id="modules/fpga_spi.h" name="modules/fpga_spi.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="484,5,632,33"/>
+<area shape="rect" id="Node000002" href="$fpga__spi_8c.html" title=" " alt="" coords="5,90,153,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="468,35,325,55,165,84,130,92,128,86,164,78,325,50,468,29"/>
+<area shape="rect" id="Node000003" href="$modules_2main_8c.html" title=" " alt="" coords="176,90,302,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="489,40,314,84,285,91,284,86,313,78,488,35"/>
+<area shape="rect" id="Node000004" href="$sdr_8c.html" title=" " alt="" coords="326,90,438,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="517,42,411,91,409,87,515,37"/>
+<area shape="rect" id="Node000005" href="$ina220_8c.html" title="INA220 interface implementation." alt="" coords="462,90,653,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="560,49,560,89,555,89,555,49"/>
+<area shape="rect" id="Node000006" href="$ina3221_8c.html" title="INA3221 interface implementation." alt="" coords="677,90,876,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="608,36,742,86,740,91,606,41"/>
+<area shape="rect" id="Node000007" href="$afc-v3_2sdr__list_8c.html" title=" " alt="" coords="899,81,1056,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="648,33,888,78,899,81,898,86,886,84,647,38"/>
+<area shape="rect" id="Node000008" href="$afc-v4_2sdr__list_8c.html" title=" " alt="" coords="1080,81,1238,126"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="648,25,842,46,1069,78,1080,81,1080,86,1068,84,841,51,647,31"/>
+</map>

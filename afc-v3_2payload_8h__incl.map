@@ -1,0 +1,9 @@
+<map id="port/board/afc&#45;v3/payload.h" name="port/board/afc&#45;v3/payload.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="33,5,235,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,127,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,35,90,71,86,68,120,32"/>
+<area shape="rect" id="Node000003" href="$mmc__error_8h.html" title="Error handling functions and codes." alt="" coords="151,81,256,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="148,32,182,68,179,71,144,35"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="171,157,236,184"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="206,109,206,141,201,141,201,109"/>
+</map>

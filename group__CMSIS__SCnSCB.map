@@ -1,0 +1,5 @@
+<map id="System Controls not in SCB (SCnSCB)" name="System Controls not in SCB (SCnSCB)">
+<area shape="rect" id="Node000002" href="$group__CMSIS__SCB.html" title="Type definitions for the System Control Block Registers." alt="" coords="5,5,167,50"/>
+<area shape="rect" id="Node000001" title="Type definitions for the System Control and ID Register not in the SCB." alt="" coords="215,5,368,50"/>
+<area shape="rect" id="Node000003" href="$group__CMSIS__SysTick.html" title="Type definitions for the System Timer Registers." alt="" coords="416,5,561,50"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Core Debug Registers (CoreDebug)" name="Core Debug Registers (CoreDebug)">
+<area shape="rect" id="Node000001" title="Type definitions for the Core Debug Registers." alt="" coords="202,5,364,50"/>
+<area shape="rect" id="Node000003" href="$group__CMSIS__core__bitfield.html" title="Macros for use with bit field definitions (xxx_Pos, xxx_Msk)." alt="" coords="412,5,571,50"/>
+<area shape="rect" id="Node000002" href="$group__CMSIS__TPI.html" title="Type definitions for the Trace Port Interface (TPI)" alt="" coords="5,5,154,50"/>
+</map>

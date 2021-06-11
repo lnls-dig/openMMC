@@ -1,0 +1,13 @@
+<map id="modules/sensors/sensors.h" name="modules/sensors/sensors.h">
+<area shape="rect" id="Node000001" title="Shortcut to include all sensors headers (not mandatory, user can include each sensor separately)" alt="" coords="303,5,500,33"/>
+<area shape="rect" id="Node000002" href="$sdr_8c.html" title=" " alt="" coords="5,90,118,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="322,39,130,84,103,91,101,86,129,78,320,34"/>
+<area shape="rect" id="Node000003" href="$afc-v3_2sdr__list_8c.html" title=" " alt="" coords="142,81,299,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="360,42,269,83,267,78,358,37"/>
+<area shape="rect" id="Node000004" href="$afc-v4_2sdr__list_8c.html" title=" " alt="" coords="323,81,480,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="404,49,404,80,399,80,399,49"/>
+<area shape="rect" id="Node000005" href="$rtm-8sfp_2sdr__list_8c.html" title=" " alt="" coords="505,81,653,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="445,38,533,78,531,83,443,42"/>
+<area shape="rect" id="Node000006" href="$rtm-lamp_2sdr__list_8c.html" title=" " alt="" coords="677,81,830,126"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="475,34,666,78,677,81,676,86,665,84,473,40"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="modules/at24mac.h" name="modules/at24mac.h">
+<area shape="rect" id="Node000001" title="AT24MACX02 EEPROM module interface declarations." alt="" coords="253,5,403,33"/>
+<area shape="rect" id="Node000002" href="$at24mac_8c.html" title="AT24MACX02 EEPROM module interface implementation." alt="" coords="5,90,155,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="275,41,121,91,119,86,273,36"/>
+<area shape="rect" id="Node000003" href="$fpga__spi_8c.html" title=" " alt="" coords="178,90,326,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="308,46,266,91,262,87,304,43"/>
+<area shape="rect" id="Node000004" href="$fru_8c.html" title=" " alt="" coords="350,90,460,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="353,43,395,87,391,91,349,46"/>
+<area shape="rect" id="Node000005" href="$board__fru_8c.html" title=" " alt="" coords="485,81,659,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="383,36,508,78,506,83,381,41"/>
+</map>

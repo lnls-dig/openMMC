@@ -1,0 +1,13 @@
+<map id="modules/ipmb.h" name="modules/ipmb.h">
+<area shape="rect" id="Node000001" title="Definitions used in IPMB Layer." alt="" coords="185,5,311,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,102,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="214,36,103,78,101,73,212,31"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="126,81,187,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="233,36,186,73,182,69,230,31"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="212,81,285,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="251,34,251,65,246,65,246,34"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="308,81,391,109"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="268,31,321,70,318,74,265,36"/>
+<area shape="rect" id="Node000006" href="$board__ipmb_8h.html" title="Board specific definitions used in IPMB Layer." alt="" coords="414,81,525,109"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="289,31,416,73,415,78,287,36"/>
+</map>

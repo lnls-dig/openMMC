@@ -1,0 +1,14 @@
+<map id="IPMI Commands" name="IPMI Commands">
+<area shape="rect" id="Node000002" href="$group__IPMI.html" title=" " alt="" coords="5,286,177,348"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="225,303,352,331"/>
+<area shape="rect" id="Node000007" href="$group__IPMI__APP__CMD.html" title=" " alt="" coords="400,5,613,50"/>
+<area shape="rect" id="Node000005" href="$group__IPMI__BRIGDE__CMD.html" title=" " alt="" coords="416,75,598,119"/>
+<area shape="rect" id="Node000012" href="$group__IPMI__CC.html" title=" " alt="" coords="420,143,593,171"/>
+<area shape="rect" id="Node000004" href="$group__IPMI__CHASSIS__CMD.html" title=" " alt="" coords="412,195,602,239"/>
+<area shape="rect" id="Node000011" href="$group__IPMI__CUSTOM__CMD.html" title=" " alt="" coords="412,264,602,309"/>
+<area shape="rect" id="Node000003" href="$group__IPMI__NETFN.html" title=" " alt="" coords="436,332,578,360"/>
+<area shape="rect" id="Node000010" href="$group__IPMI__PICMG__CMD.html" title=" " alt="" coords="415,384,598,429"/>
+<area shape="rect" id="Node000006" href="$group__IPMI__SENSOR__CMD.html" title=" " alt="" coords="414,453,599,498"/>
+<area shape="rect" id="Node000008" href="$group__IPMI__STORAGE__CMD.html" title=" " alt="" coords="412,523,602,567"/>
+<area shape="rect" id="Node000009" href="$group__IPMI__TRANSPORT__CMD.html" title=" " alt="" coords="412,592,602,637"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="port/ucontroller/nxp/lpc17xx/lpc17_ssp.h" name="port/ucontroller/nxp/lpc17xx/lpc17_ssp.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="228,5,385,50"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,98,147,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="246,53,128,95,126,90,245,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="171,98,304,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="290,52,260,87,256,84,286,49"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="328,98,424,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="327,49,357,84,353,87,323,52"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="448,98,509,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="353,48,438,89,436,93,351,53"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="modules/cdce906_reg.h" name="modules/cdce906_reg.h">
+<area shape="rect" id="Node000001" title="CDCE906 PLL register definitions." alt="" coords="5,5,181,33"/>
+<area shape="rect" id="Node000002" href="$cdce906_8c.html" title="CDCE906 PLL driver functions." alt="" coords="20,81,166,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,49,96,81,90,81,90,49"/>
+</map>

@@ -1,0 +1,27 @@
+var structLPC__CAN2__Type =
+[
+    [ "BTR", "structLPC__CAN2__Type.html#aa7c52a0186ec856e161d3a74ac81041c", null ],
+    [ "CMR", "structLPC__CAN2__Type.html#a057cc3ad448a7c70bd4330077d58a075", null ],
+    [ "EWL", "structLPC__CAN2__Type.html#afc6d0e1c7b7024919eb15e8eb3faa643", null ],
+    [ "GSR", "structLPC__CAN2__Type.html#abd404ea952c5be7c84adb61538dc6617", null ],
+    [ "ICR", "structLPC__CAN2__Type.html#af41209e8d21d1fad5121cbd0895de6a6", null ],
+    [ "IER", "structLPC__CAN2__Type.html#a3b01acd9a55967eb576d9e428d2e1fb5", null ],
+    [ "MOD", "structLPC__CAN2__Type.html#afaff162de700e1160c8c6b361157f319", null ],
+    [ "RDA", "structLPC__CAN2__Type.html#a090627fb05f4f735c66f8e5469c6aa4a", null ],
+    [ "RDB", "structLPC__CAN2__Type.html#a6b2a5b541ec58c68af0dcb4390620230", null ],
+    [ "RFS", "structLPC__CAN2__Type.html#a21854f110479059a21b4e886128e9636", null ],
+    [ "RID", "structLPC__CAN2__Type.html#a19a0c980321ec5dad0b56ac27262a7e5", null ],
+    [ "SR", "structLPC__CAN2__Type.html#a07e8fb21fed5a2d85b58a4242385df38", null ],
+    [ "TDA1", "structLPC__CAN2__Type.html#ab1b2930cf090fe6e5980d1ece624f456", null ],
+    [ "TDA2", "structLPC__CAN2__Type.html#ac45598c4bc5c49da27f98bb55c9e1daf", null ],
+    [ "TDA3", "structLPC__CAN2__Type.html#a6e34f3475150e699defeb829d80ba6d1", null ],
+    [ "TDB1", "structLPC__CAN2__Type.html#a0f3ebdd114c2608b3789c175d23e0471", null ],
+    [ "TDB2", "structLPC__CAN2__Type.html#aed14c4e90b7b41eb7b5db646b1b1d3e8", null ],
+    [ "TDB3", "structLPC__CAN2__Type.html#a1a1bf576c5acbcb2088fc0da79b871e3", null ],
+    [ "TFI1", "structLPC__CAN2__Type.html#a9ca1794e26d17618605e22ecb0677678", null ],
+    [ "TFI2", "structLPC__CAN2__Type.html#a657fec8fcdbdc0f68d86aa28b71ef09e", null ],
+    [ "TFI3", "structLPC__CAN2__Type.html#afd12016c8d454aba7aa5d87dc596bb04", null ],
+    [ "TID1", "structLPC__CAN2__Type.html#a0eac1d8701ea6bee606dc3ecbea93635", null ],
+    [ "TID2", "structLPC__CAN2__Type.html#a84e49ea26a93c255cede8147d27110d8", null ],
+    [ "TID3", "structLPC__CAN2__Type.html#a7f43a28c2d6bad0ff29b5be38f1eaf87", null ]
+];

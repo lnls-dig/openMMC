@@ -1,0 +1,35 @@
+<map id="modules/fru.h" name="modules/fru.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="990,5,1101,33"/>
+<area shape="rect" id="Node000002" href="$clock__config_8h.html" title=" " alt="" coords="229,90,403,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="974,28,729,48,576,64,422,84,377,91,376,86,421,78,575,58,729,42,974,22"/>
+<area shape="rect" id="Node000004" href="$afc-v3_2payload_8c.html" title=" " alt="" coords="5,174,206,201"/>
+<area shape="poly" id="edge14_Node000001_Node000004" title=" " alt="" coords="974,22,801,23,581,30,470,38,368,49,282,64,219,83,186,103,157,128,116,175,112,171,153,124,183,99,216,79,281,59,368,44,470,33,581,25,801,18,974,17"/>
+<area shape="rect" id="Node000005" href="$afc-v4_2payload_8c.html" title=" " alt="" coords="427,174,627,201"/>
+<area shape="poly" id="edge15_Node000001_Node000005" title=" " alt="" coords="974,25,837,31,677,43,539,60,492,71,467,83,461,93,460,104,470,129,490,152,511,171,507,175,486,156,465,131,455,105,456,92,464,79,490,66,538,54,677,37,837,26,974,20"/>
+<area shape="rect" id="Node000006" href="$fru_8c.html" title=" " alt="" coords="477,90,587,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="975,29,803,49,702,64,601,84,571,91,570,86,600,78,701,59,803,43,974,24"/>
+<area shape="rect" id="Node000007" href="$led_8c.html" title=" " alt="" coords="612,90,724,117"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="975,35,862,56,737,84,709,91,708,86,736,78,861,50,974,30"/>
+<area shape="rect" id="Node000008" href="$modules_2main_8c.html" title=" " alt="" coords="748,90,874,117"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="995,41,849,91,848,86,993,36"/>
+<area shape="rect" id="Node000009" href="$modules_2rtm_8c.html" title=" " alt="" coords="897,90,1012,117"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1022,46,971,91,967,87,1018,42"/>
+<area shape="rect" id="Node000010" href="$hotswap_8c.html" title="Hotswap sensors implementation." alt="" coords="1037,90,1238,117"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1073,42,1125,87,1121,91,1070,46"/>
+<area shape="rect" id="Node000011" href="$ina220_8c.html" title="INA220 interface implementation." alt="" coords="1262,90,1453,117"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1111,35,1308,86,1307,92,1110,40"/>
+<area shape="rect" id="Node000012" href="$ina3221_8c.html" title="INA3221 interface implementation." alt="" coords="1477,90,1675,117"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1117,27,1465,78,1509,86,1508,92,1464,84,1116,33"/>
+<area shape="rect" id="Node000013" href="$board__fru_8c.html" title=" " alt="" coords="1700,81,1874,126"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1117,22,1369,41,1528,57,1687,78,1700,80,1699,86,1686,84,1527,63,1369,47,1117,27"/>
+<area shape="rect" id="Node000014" href="$board__led_8c.html" title=" " alt="" coords="1898,81,2073,126"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1117,20,1450,36,1667,53,1886,78,1898,80,1897,86,1885,84,1666,58,1449,41,1117,25"/>
+<area shape="rect" id="Node000015" href="$rtm-8sfp_2rtm__user_8c.html" title=" " alt="" coords="2097,81,2245,126"/>
+<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="1117,18,1288,20,1529,28,1805,46,1946,60,2085,78,2097,80,2096,86,2084,84,1946,66,1804,52,1528,33,1288,25,1117,23"/>
+<area shape="rect" id="Node000016" href="$rtm-lamp_2rtm__user_8c.html" title=" " alt="" coords="2269,81,2422,126"/>
+<area shape="poly" id="edge17_Node000001_Node000016" title=" " alt="" coords="1117,20,1688,39,2017,57,2154,67,2258,78,2269,80,2268,85,2257,84,2154,72,2017,62,1688,45,1117,25"/>
+<area shape="rect" id="Node000003" href="$clock__config_8c.html" title=" " alt="" coords="230,174,403,201"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="319,133,319,173,314,173,314,133"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="269,126,140,176,138,171,267,121"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="365,121,494,171,492,176,363,126"/>
+</map>

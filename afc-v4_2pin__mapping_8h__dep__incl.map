@@ -1,0 +1,9 @@
+<map id="port/board/afc&#45;v4/pin_mapping.h" name="port/board/afc&#45;v4/pin_mapping.h">
+<area shape="rect" id="Node000001" title="Hardware pin definitions for AFCv4.0." alt="" coords="230,5,387,50"/>
+<area shape="rect" id="Node000002" href="$afc-v4_2payload_8c.html" title=" " alt="" coords="5,106,206,134"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="247,59,136,108,134,104,245,54"/>
+<area shape="rect" id="Node000003" href="$pin__mapping_8c.html" title=" " alt="" coords="230,98,387,143"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="311,66,311,98,306,98,306,66"/>
+<area shape="rect" id="Node000004" href="$port_2board_2afc-v4_2rtm_8c.html" title=" " alt="" coords="410,106,582,134"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="368,55,470,104,468,108,366,59"/>
+</map>

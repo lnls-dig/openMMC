@@ -1,0 +1,19 @@
+<map id="port/board/afc&#45;common/board_led.h" name="port/board/afc&#45;common/board_led.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="612,5,786,50"/>
+<area shape="rect" id="Node000002" href="$led_8c.html" title=" " alt="" coords="5,106,118,134"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="597,39,381,60,255,78,130,101,100,108,99,103,129,95,254,72,380,55,596,33"/>
+<area shape="rect" id="Node000003" href="$modules_2rtm_8c.html" title=" " alt="" coords="141,106,256,134"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="597,44,441,67,269,101,240,108,238,103,268,95,441,62,596,39"/>
+<area shape="rect" id="Node000004" href="$hotswap_8c.html" title="Hotswap sensors implementation." alt="" coords="281,106,482,134"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="609,57,429,108,427,103,607,52"/>
+<area shape="rect" id="Node000005" href="$board__led_8c.html" title=" " alt="" coords="506,98,681,143"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="664,62,620,100,617,95,661,58"/>
+<area shape="rect" id="Node000006" href="$afc-v3_2payload_8c.html" title=" " alt="" coords="705,106,906,134"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="737,58,792,104,788,108,734,62"/>
+<area shape="rect" id="Node000007" href="$afc-v4_2payload_8c.html" title=" " alt="" coords="929,106,1130,134"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="793,52,982,103,980,108,792,57"/>
+<area shape="rect" id="Node000008" href="$rtm-8sfp_2rtm__user_8c.html" title=" " alt="" coords="1154,98,1302,143"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="802,40,962,64,1142,95,1154,98,1153,103,1141,101,962,69,801,45"/>
+<area shape="rect" id="Node000009" href="$rtm-lamp_2rtm__user_8c.html" title=" " alt="" coords="1326,98,1480,143"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="802,34,1037,57,1177,74,1315,95,1326,97,1325,103,1314,101,1176,79,1037,62,802,39"/>
+</map>

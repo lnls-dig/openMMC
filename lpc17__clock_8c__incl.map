@@ -1,0 +1,17 @@
+<map id="port/ucontroller/nxp/lpc17xx/bootloader/src/lpc17_clock.c" name="port/ucontroller/nxp/lpc17xx/bootloader/src/lpc17_clock.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="36,5,209,67"/>
+<area shape="rect" id="Node000002" href="$lpc17__clock_8h.html" title=" " alt="" coords="5,191,115,218"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,68,73,177,68,175,109,67"/>
+<area shape="rect" id="Node000004" href="$LPC176x5x_8h.html" title=" " alt="" coords="125,115,230,143"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="143,66,164,100,159,103,139,69"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="64,342,134,370"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="65,218,83,293,92,326,87,328,77,295,60,219"/>
+<area shape="rect" id="Node000005" href="$core__cm3_8h.html" title="CMSIS Cortex&#45;M3 Core Peripheral Access Layer Header File." alt="" coords="144,191,240,218"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="183,143,189,175,184,176,177,144"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="174,221,149,241,126,268,113,297,105,327,100,326,108,296,122,265,145,238,170,217"/>
+<area shape="rect" id="Node000006" href="$cmsis__version_8h.html" title="CMSIS Core(M) Version definitions." alt="" coords="136,266,262,294"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="196,219,199,250,193,251,191,219"/>
+<area shape="rect" id="Node000007" href="$cmsis__compiler_8h.html" title="CMSIS compiler generic header file." alt="" coords="286,266,421,294"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="222,216,312,257,310,262,220,221"/>
+<area shape="poly" id="edge8_Node000007_Node000003" title=" " alt="" coords="309,297,149,343,148,338,307,292"/>
+</map>
