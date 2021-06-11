@@ -42,9 +42,9 @@
  * @param[in]  reg     Selected register
  * @param[out] readout Register value read
  *
- * @return Number of bytes read (0 if failure)
+ * @return MMC_OK if success, an error code otherwise
  */
-static uint8_t mcp23016_read_reg ( uint8_t reg, uint8_t *readout )
+static mmc_err mcp23016_read_reg ( uint8_t reg, uint8_t *readout )
 {
     uint8_t i2c_addr;
     uint8_t i2c_id;
@@ -52,29 +52,35 @@ static uint8_t mcp23016_read_reg ( uint8_t reg, uint8_t *readout )
     uint8_t data[2] = {0};
 
     if (readout == NULL) {
-        return 0;
+        return MMC_INVALID_ARG_ERR;
     }
 
     if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, data, 2);
+        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, data, sizeof(data));
         i2c_give(i2c_id);
+    } else {
+        return MMC_TIMEOUT_ERR;
+    }
+
+    if (rx_len != sizeof(data)) {
+        return MMC_IO_ERR;
     }
 
     *readout = data[0];
 
-    return rx_len;
+    return MMC_OK;
 }
 
 /**
  * @brief MCP23016 General register write
  *
- * @param reg   Selected register
- * @param data  Value to write to register
+ * @param[in] reg   Selected register
+ * @param[in] data  Value to write to register
  *
- * @return Number of bytes written
+ * @return MMC_OK if success, an error code otherwise
  */
 
-static uint8_t mcp23016_write_reg (uint8_t reg, uint8_t data) {
+static mmc_err mcp23016_write_reg (uint8_t reg, uint8_t data) {
 
     uint8_t i2c_addr;
     uint8_t i2c_id;
@@ -87,41 +93,54 @@ static uint8_t mcp23016_write_reg (uint8_t reg, uint8_t data) {
     if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
         tx_len = xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
         i2c_give(i2c_id);
+    } else {
+        return MMC_TIMEOUT_ERR;
     }
 
-    return tx_len;
+    if (tx_len != sizeof(cmd_data)) {
+        return MMC_IO_ERR;
+    }
+
+    return MMC_OK;
 }
 
 
 /* Pins Read/Write */
-uint8_t mcp23016_read_port( uint8_t port_num, uint8_t *readout )
+mmc_err mcp23016_read_port( uint8_t port_num, uint8_t *readout )
 {
     return mcp23016_read_reg( MCP23016_GP_REG + port_num, readout );
 }
 
-uint8_t mcp23016_read_pin( uint8_t port_num, uint8_t pin, uint8_t *status )
+mmc_err mcp23016_read_pin( uint8_t port_num, uint8_t pin, uint8_t *status )
 {
-    uint8_t rx_len = 0, pin_read = 0;
+    uint8_t pin_read = 0;
+    mmc_err err;
 
-    rx_len = mcp23016_read_port(port_num, &pin_read );
+    err = mcp23016_read_port(port_num, &pin_read );
 
     if (status) {
         *status = ((pin_read >> pin) & 0x1);
     }
 
-    return rx_len;
+    return err;
 }
 
-uint8_t mcp23016_write_port( uint8_t port_num, uint8_t data )
+mmc_err mcp23016_write_port( uint8_t port_num, uint8_t data )
 {
     return mcp23016_write_reg( MCP23016_GP_REG + port_num, data );
 }
 
-uint8_t mcp23016_write_pin( uint8_t port_num, uint8_t pin, bool data )
+mmc_err mcp23016_write_pin( uint8_t port_num, uint8_t pin, bool data )
 {
     uint8_t output = 0;
+    mmc_err err;
 
-    mcp23016_read_port( port_num, &output );
+    err = mcp23016_read_port( port_num, &output );
+
+    if (err != MMC_OK) {
+        return err;
+    }
+
     output &= ~( 1 << pin );
     output |= ( data << pin );
 
@@ -129,45 +148,51 @@ uint8_t mcp23016_write_pin( uint8_t port_num, uint8_t pin, bool data )
 }
 
 /* Polarity Control */
-uint8_t mcp23016_set_port_pol( uint8_t port_num, uint8_t pol )
+mmc_err mcp23016_set_port_pol( uint8_t port_num, uint8_t pol )
 {
     return mcp23016_write_reg( MCP23016_IPOL_REG + port_num, pol );
 }
 
-uint8_t mcp23016_get_port_pol( uint8_t port_num, uint8_t *pol )
+mmc_err mcp23016_get_port_pol( uint8_t port_num, uint8_t *pol )
 {
     return mcp23016_read_reg( MCP23016_IPOL_REG + port_num, pol );
 }
 
 /* Pins direction (output/input) */
-uint8_t mcp23016_set_port_dir( uint8_t port_num, uint8_t dir )
+mmc_err mcp23016_set_port_dir( uint8_t port_num, uint8_t dir )
 {
     return mcp23016_write_reg( MCP23016_IODIR_REG + port_num, dir );
 }
 
-uint8_t mcp23016_get_port_dir( uint8_t port_num, uint8_t *dir )
+mmc_err mcp23016_get_port_dir( uint8_t port_num, uint8_t *dir )
 {
     return mcp23016_read_reg( MCP23016_IODIR_REG + port_num, dir );
 }
 
 
-uint8_t mcp23016_read_reg_pair ( uint8_t reg, uint16_t *readout ) {
+mmc_err mcp23016_read_reg_pair ( uint8_t reg, uint16_t *readout ) {
     uint8_t i2c_addr;
     uint8_t i2c_id;
     uint8_t rx_len = 0;
-    uint8_t read[2] = {0};
+    uint8_t data[2] = {0};
 
     if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, read, 2);
+        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, data, sizeof(data));
         i2c_give(i2c_id);
+    } else {
+        return MMC_TIMEOUT_ERR;
     }
 
-    *readout = (read[0] << 8) | read[1];
+    if (rx_len != sizeof(data)) {
+        return MMC_IO_ERR;
+    }
 
-    return rx_len;
+    *readout = (data[0] << 8) | data[1];
+
+    return MMC_OK;
 }
 
-uint8_t mcp23016_write_reg_pair ( uint8_t reg, uint16_t data )
+mmc_err mcp23016_write_reg_pair ( uint8_t reg, uint16_t data )
 {
     uint8_t i2c_addr;
     uint8_t i2c_id;
@@ -181,7 +206,13 @@ uint8_t mcp23016_write_reg_pair ( uint8_t reg, uint16_t data )
     if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
         tx_len = xI2CMasterWrite(i2c_id, i2c_addr, cmd_data, sizeof(cmd_data));
         i2c_give(i2c_id);
+    } else {
+        return MMC_TIMEOUT_ERR;
     }
 
-    return tx_len;
+    if (tx_len != sizeof(cmd_data)) {
+        return MMC_IO_ERR;
+    }
+
+    return MMC_OK;
 }

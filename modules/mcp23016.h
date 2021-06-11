@@ -30,6 +30,7 @@
 #ifndef MCP23016_H_
 #define MCP23016_H_
 
+#include "error.h"
 #include "port.h"
 
 /**
@@ -88,71 +89,88 @@
 /**
  * @brief Read port pins status
  *
- * @return 8-bit value with the status of port pins
+ * @param[in]  port_num Port number (0, 1)
+ * @param[out] readout  8-bit value with the status of port pins
+ *
+ * @return MMC_OK if success, an error code otherwise
  */
-uint8_t mcp23016_read_port( uint8_t port_num, uint8_t *readout );
+mmc_err mcp23016_read_port( uint8_t port_num, uint8_t *readout );
 
 /**
  * @brief Read a pin status
  *
- * @param pin Selected pin to read
+ * @param[in]  port_num Port number (0, 1)
+ * @param[in]  pin      Selected pin to read
+ * @param[out] status   Pin logical status
  *
- * @return Pin logical status
+ * @return MMC_OK if success, an error code otherwise
  */
-uint8_t mcp23016_read_pin( uint8_t port_num, uint8_t pin, uint8_t *status );
+mmc_err mcp23016_read_pin( uint8_t port_num, uint8_t pin, uint8_t *status );
 
 /**
  * @brief Write port output pins
  *
- * @param data 8-bit value with the pins status
+ * @param[in] port_num Port number (0, 1)
+ * @param[in] data     8-bit value with the pins status
  *
- * @return None
+ * @return MMC_OK if success, an error code otherwise
  */
-uint8_t mcp23016_write_port( uint8_t port_num, uint8_t data );
+mmc_err mcp23016_write_port( uint8_t port_num, uint8_t data );
 
 /**
  * @brief Write a output pin
  *
- * @param pin Selected pin to write
- * @param data Logical status to be set
+ * @param[in] port_num Port number (0, 1)
+ * @param[in] pin      Selected pin to write
+ * @param[in] data     Logical status to be set
  *
- * @return None
+ * @return MMC_OK if success, an error code otherwise
  */
-uint8_t mcp23016_write_pin( uint8_t port_num, uint8_t pin, bool data );
+mmc_err mcp23016_write_pin( uint8_t port_num, uint8_t pin, bool data );
 
 /* Polarity Control */
 /**
  * @brief Set port pins polarity
  *
- * @param pol Polarity (active-high/low)
+ * @param[in] port_num Port number (0, 1)
+ * @param[in] pol      Polarity (active-high/low)
+ *
+ * @return MMC_OK if success, an error code otherwise
  */
-uint8_t mcp23016_set_port_pol( uint8_t port_num, uint8_t pol );
+mmc_err mcp23016_set_port_pol( uint8_t port_num, uint8_t pol );
 
 /**
  * @brief Read port pins polarity
  *
- * @return Pins polarity (active-high/low)
+ * @param[in]  port_num Port number (0, 1)
+ * @param[out] pol      Pins polarity (active-high/low)
+ *
+ * @return MMC_OK if success, an error code otherwise
  */
-uint8_t mcp23016_get_port_pol( uint8_t port_num, uint8_t *pol );
+mmc_err mcp23016_get_port_pol( uint8_t port_num, uint8_t *pol );
 
 /* Pins direction (output/input) */
 /**
  * @brief Set port pins direction
  *
- * @param dir Pin direction ( 0-Output 1-Input )
+ * @param[in] port_num Port number (0, 1)
+ * @param[in] dir      Pin direction ( 0-Output 1-Input )
  *
- * @return None
+ * @return MMC_OK if success, an error code otherwise
  */
-uint8_t mcp23016_set_port_dir( uint8_t port_num, uint8_t dir );
+mmc_err mcp23016_set_port_dir( uint8_t port_num, uint8_t dir );
 
 /**
  * @brief Read port pins direction
  *
- * @return 8-bit value with the pins direction setup
+ * @param[in]  port_num Port number (0, 1)
+ * @param[out] dir      Pin direction ( 0-Output 1-Input )
+ *
+ * @return MMC_OK if success, an error code otherwise
  */
-uint8_t mcp23016_get_port_dir( uint8_t port_num, uint8_t *dir );
+mmc_err mcp23016_get_port_dir( uint8_t port_num, uint8_t *dir );
 
-uint8_t mcp23016_read_reg_pair( uint8_t reg, uint16_t *readout);
-uint8_t mcp23016_write_reg_pair( uint8_t reg, uint16_t data);
+mmc_err mcp23016_read_reg_pair( uint8_t reg, uint16_t *readout);
+mmc_err mcp23016_write_reg_pair( uint8_t reg, uint16_t data);
 
 #endif
