@@ -221,6 +221,8 @@ TaskHandle_t vTaskPayload_Handle;
 void payload_init( void )
 {
     bool standalone_mode = false;
+    mmc_err err;
+
     if (get_ipmb_addr() == 0xA2) {
         standalone_mode = true;
     }
@@ -253,14 +255,35 @@ void payload_init( void )
         set_vadj_volt( 1, 2.5 );
 #endif
 
-        //set output on all pins
-        mcp23016_set_port_dir(0, 0);
-        mcp23016_set_port_dir(1, 0);
+        /*
+         * Configure all GPIOs as outputs
+         */
+        err = mcp23016_set_port_dir(0, 0);
+
+        if (err != MMC_OK) {
+            PRINT_ERR_LINE(err);
+        }
+
+        err = mcp23016_set_port_dir(1, 0);
+
+        if (err != MMC_OK) {
+            PRINT_ERR_LINE(err);
+        }
 
         gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_LOW);
         gpio_set_pin_state(PIN_PORT(GPIO_FPGA_INITB), PIN_NUMBER(GPIO_FPGA_INITB), GPIO_LEVEL_LOW);
-        mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
-        mcp23016_write_pin( ext_gpios[EXT_GPIO_FPGA_I2C_RESET].port_num, ext_gpios[EXT_GPIO_FPGA_I2C_RESET].pin_num, true );
+
+        err = mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+
+        if (err != MMC_OK) {
+            PRINT_ERR_LINE(err);
+        }
+
+        err = mcp23016_write_pin( ext_gpios[EXT_GPIO_FPGA_I2C_RESET].port_num, ext_gpios[EXT_GPIO_FPGA_I2C_RESET].pin_num, true );
+
+        if (err != MMC_OK) {
+            PRINT_ERR_LINE(err);
+        }
     }
 #endif
 }
@@ -283,6 +306,8 @@ void vTaskPayload( void *pvParameters )
     extern sensor_t * hotswap_amc_sensor;
 
     TickType_t xLastWakeTime;
+    mmc_err err;
+
     xLastWakeTime = xTaskGetTickCount();
 
     for ( ;; ) {
@@ -333,7 +358,12 @@ void vTaskPayload( void *pvParameters )
             } else if ( DCDC_good == 1 ) {
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
 
-                mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
+                err = mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
+
+                if (err != MMC_OK) {
+                    PRINT_ERR_LINE(err);
+                }
+
                 gpio_set_pin_state(PIN_PORT(GPIO_FPGA_INITB), PIN_NUMBER(GPIO_FPGA_INITB), GPIO_LEVEL_HIGH);
                 gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_HIGH);
             }
@@ -353,7 +383,11 @@ void vTaskPayload( void *pvParameters )
         case PAYLOAD_SWITCHING_OFF:
             gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_LOW);
             gpio_set_pin_state(PIN_PORT(GPIO_FPGA_INITB), PIN_NUMBER(GPIO_FPGA_INITB), GPIO_LEVEL_LOW);
-            mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+            err = mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+
+            if (err != MMC_OK) {
+                PRINT_ERR_LINE(err);
+            }
 
             setDC_DC_ConvertersON( false );
 
@@ -396,6 +430,8 @@ uint32_t hpm_page_addr;
 
 uint8_t payload_hpm_prepare_comp( void )
 {
+    mmc_err err;
+
     /* Initialize variables */
     if (hpm_page != NULL) {
         vPortFree(hpm_page);
@@ -417,10 +453,29 @@ uint8_t payload_hpm_prepare_comp( void )
     ssp_init( FLASH_SPI, FLASH_SPI_BITRATE, FLASH_SPI_FRAME_SIZE, SSP_MASTER, SSP_INTERRUPT );
 
     /* Prevent the FPGA from accessing the Flash to configure itself now */
-    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
-    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
-    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
-    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+    err = mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
+
+    if (err != MMC_OK) {
+        PRINT_ERR_LINE(err);
+    }
+
+    err = mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+
+    if (err != MMC_OK) {
+        PRINT_ERR_LINE(err);
+    }
+
+    err = mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
+
+    if (err != MMC_OK) {
+        PRINT_ERR_LINE(err);
+    }
+
+    err = mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+
+    if (err != MMC_OK) {
+        PRINT_ERR_LINE(err);
+    }
 
     /* Erase FLASH */
     flash_bulk_erase();
@@ -495,9 +550,20 @@ uint8_t payload_hpm_get_upgrade_status( void )
 
 uint8_t payload_hpm_activate_firmware( void )
 {
+    mmc_err err;
+
     /* Reset FPGA - Pulse PROGRAM_B pin */
-    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
-    mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
+    err = mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+
+    if (err != MMC_OK) {
+        PRINT_ERR_LINE(err);
+    }
+
+    err = mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, true );
+
+    if (err != MMC_OK) {
+        PRINT_ERR_LINE(err);
+    }
 
     return IPMI_CC_OK;
 }
