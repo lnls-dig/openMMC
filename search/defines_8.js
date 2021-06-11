@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['hotswap_5fbackend_5fpwr_5ffailure_5fmask_0',['HOTSWAP_BACKEND_PWR_FAILURE_MASK',['../hotswap_8h.html#af7451bf398d882f7810110325b66d787',1,'hotswap.h']]],
+  ['hotswap_5fbackend_5fpwr_5fshutdown_5fmask_1',['HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK',['../hotswap_8h.html#ab65461b66af3674ad7f1037f3f54a23c',1,'hotswap.h']]],
+  ['hotswap_5fmodule_5fhandle_5fclosed_5fmask_2',['HOTSWAP_MODULE_HANDLE_CLOSED_MASK',['../hotswap_8h.html#ac8fa528ccfbbe7e6a273e1e7a5139d51',1,'hotswap.h']]],
+  ['hotswap_5fmodule_5fhandle_5fopen_5fmask_3',['HOTSWAP_MODULE_HANDLE_OPEN_MASK',['../hotswap_8h.html#a2cff4d8b7802f1e38e1919206109982b',1,'hotswap.h']]],
+  ['hotswap_5fquiesced_5fmask_4',['HOTSWAP_QUIESCED_MASK',['../hotswap_8h.html#a267418ee48a0cc39b258a18ccac935ce',1,'hotswap.h']]],
+  ['hotswap_5fstate_5fbp_5ffail_5',['HOTSWAP_STATE_BP_FAIL',['../hotswap_8h.html#ab1e78c6ab9b70799a9bbd192a8335a97',1,'hotswap.h']]],
+  ['hotswap_5fstate_5fbp_5fsdown_6',['HOTSWAP_STATE_BP_SDOWN',['../hotswap_8h.html#a9b0148c15cff95e859d467e9546aa4b5',1,'hotswap.h']]],
+  ['hotswap_5fstate_5fhandle_5fclosed_7',['HOTSWAP_STATE_HANDLE_CLOSED',['../hotswap_8h.html#a2e4e1c21cad1f2a33564fcc648f391a6',1,'hotswap.h']]],
+  ['hotswap_5fstate_5fhandle_5fopened_8',['HOTSWAP_STATE_HANDLE_OPENED',['../hotswap_8h.html#a637b49fca6018a3eafec460e86ea732b',1,'hotswap.h']]],
+  ['hotswap_5fstate_5fquiesced_9',['HOTSWAP_STATE_QUIESCED',['../hotswap_8h.html#a5d9f6541543c5c94fd9a7afcfd370075',1,'hotswap.h']]],
+  ['hotswap_5fstate_5furtm_5fabsent_10',['HOTSWAP_STATE_URTM_ABSENT',['../hotswap_8h.html#ab51748743580927bbd6822b083e852f7',1,'hotswap.h']]],
+  ['hotswap_5fstate_5furtm_5fcompatible_11',['HOTSWAP_STATE_URTM_COMPATIBLE',['../hotswap_8h.html#a47de38994ace60db73d9486428e00d1d',1,'hotswap.h']]],
+  ['hotswap_5fstate_5furtm_5fincompatible_12',['HOTSWAP_STATE_URTM_INCOMPATIBLE',['../hotswap_8h.html#aeafc5aa93f5c7f00cbd5834285bbd24f',1,'hotswap.h']]],
+  ['hotswap_5fstate_5furtm_5fprsent_13',['HOTSWAP_STATE_URTM_PRSENT',['../hotswap_8h.html#a23e7f6494264f3ef66b767c123d6f51e',1,'hotswap.h']]],
+  ['hotswap_5furtm_5fabsent_5fmask_14',['HOTSWAP_URTM_ABSENT_MASK',['../hotswap_8h.html#a07fe91896d7ff050d3ef6e10b7c4ec5f',1,'hotswap.h']]],
+  ['hotswap_5furtm_5fcompatible_5fmask_15',['HOTSWAP_URTM_COMPATIBLE_MASK',['../hotswap_8h.html#a2207cd96f1f659596dc1b8565b72cfff',1,'hotswap.h']]],
+  ['hotswap_5furtm_5fpresent_5fmask_16',['HOTSWAP_URTM_PRESENT_MASK',['../hotswap_8h.html#a7b1e100bd282e94f9d6b4f8341ff4920',1,'hotswap.h']]],
+  ['hpm_5fblock_5fsize_17',['HPM_BLOCK_SIZE',['../hpm_8h.html#a9812b3bb98c110d28564335df95e0bfb',1,'hpm.h']]],
+  ['hpm_5finaccessibility_5ftimeout_18',['HPM_INACCESSIBILITY_TIMEOUT',['../hpm_8h.html#ab489cc0097885c622bf1a814092946f0',1,'hpm.h']]],
+  ['hpm_5frollback_5ftimeout_19',['HPM_ROLLBACK_TIMEOUT',['../hpm_8h.html#a670cbf397261b0a7c32f7edc16ea43b6',1,'hpm.h']]],
+  ['hpm_5fself_5ftest_5ftimeout_20',['HPM_SELF_TEST_TIMEOUT',['../hpm_8h.html#a9e0288f14911f613fee831500719612e',1,'hpm.h']]],
+  ['hpm_5fsupported_5fversion_21',['HPM_SUPPORTED_VERSION',['../hpm_8h.html#ac18a5ff895b50adb6bea307b5016221d',1,'hpm.h']]],
+  ['hpm_5fupgrade_5ftimeout_22',['HPM_UPGRADE_TIMEOUT',['../hpm_8h.html#a8ce7d36a149f9b471405574c0e30640a',1,'hpm.h']]]
+];

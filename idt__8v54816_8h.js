@@ -1,0 +1,36 @@
+var idt__8v54816_8h =
+[
+    [ "IDT_DIR_IN", "idt__8v54816_8h.html#a09b0995aadd0426ad1f0b34cbed3bce8", null ],
+    [ "IDT_DIR_OUT", "idt__8v54816_8h.html#a5264c923701604eba28793b6d4a8db7b", null ],
+    [ "IDT_MASK_DIR", "idt__8v54816_8h.html#ade30c35796ffd187942dd1e19ec9510d", null ],
+    [ "IDT_MASK_POL", "idt__8v54816_8h.html#a07e474d310333bb6a8ece27928dbd395", null ],
+    [ "IDT_MASK_SRC", "idt__8v54816_8h.html#a0bcc28c08dbd539866dce888297f05d1", null ],
+    [ "IDT_MASK_TERM", "idt__8v54816_8h.html#a46331854634043fe6bca5b340b51163d", null ],
+    [ "IDT_POL_N", "idt__8v54816_8h.html#a3e334412da0e0462200a3372e1cde16d", null ],
+    [ "IDT_POL_P", "idt__8v54816_8h.html#a3a0afda4ec3866d9b1c416ee305e11ee", null ],
+    [ "IDT_TERM_OFF", "idt__8v54816_8h.html#a1719d5c92e563a1c13c5b8ef93c2afbd", null ],
+    [ "IDT_TERM_ON", "idt__8v54816_8h.html#a9b5408298e59b6f240c204c48bed9202", null ],
+    [ "IDT_CLK_SRC", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9", [
+      [ "IDT_SRC_CH0", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9a85f5007ed12d60e338ee3c76c9d7ac0f", null ],
+      [ "IDT_SRC_CH1", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9a1ab147c753f58a95dc2e1061f40ea1b7", null ],
+      [ "IDT_SRC_CH2", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9a21e8a1750f23ff3c4f215b132d5b5655", null ],
+      [ "IDT_SRC_CH3", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9aa7ac4425a53e0ef0e69a3614899f9ce0", null ],
+      [ "IDT_SRC_CH4", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9a27d55981f8f690a5169f614db952f23c", null ],
+      [ "IDT_SRC_CH5", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9aaaf9f72c92db7c73867b013298e7b6fc", null ],
+      [ "IDT_SRC_CH6", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9a0e2251db9cb2cc4a5a1e6dfaa9404461", null ],
+      [ "IDT_SRC_CH7", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9adbcbba61553c8aff81f0b01b798a6ed4", null ],
+      [ "IDT_SRC_CH8", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9a9323b844bcc4338750d2778d93e4c87f", null ],
+      [ "IDT_SRC_CH9", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9aa12cbc6f9213734d113cc6c6f820c616", null ],
+      [ "IDT_SRC_CH10", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9ad032004d050358c8a23fe051d5ae5a00", null ],
+      [ "IDT_SRC_CH11", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9a679d0948dfeaa25796c2d86757f7cf28", null ],
+      [ "IDT_SRC_CH12", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9a83e29f63afc5b51ccf6466c10cf2bcb7", null ],
+      [ "IDT_SRC_CH13", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9a2df7e031449f88a13452ace6b29c4898", null ],
+      [ "IDT_SRC_CH14", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9a725ec70c436490ac3cc875c4eaee20c1", null ],
+      [ "IDT_SRC_CH15", "idt__8v54816_8h.html#a8eca5cdd970838866b8c5e4a17e78de9ac26445347f2d0382902629c138a33ccf", null ]
+    ] ],
+    [ "clock_switch_default_config", "idt__8v54816_8h.html#a547fae25bb6c497223bdc1f036e3c4fe", null ],
+    [ "clock_switch_read_reg", "idt__8v54816_8h.html#a8e9bf53108672421601228858b1aaf4c", null ],
+    [ "clock_switch_read_single_channel", "idt__8v54816_8h.html#ac3556928cddae282eaeaf9eb20ea761f", null ],
+    [ "clock_switch_set_single_channel", "idt__8v54816_8h.html#adf483940cd86c1f08ca2db72aac24980", null ],
+    [ "clock_switch_write_reg", "idt__8v54816_8h.html#a92da59707b6330ebbade8e0f93b6bd21", null ]
+];

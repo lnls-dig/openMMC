@@ -1,0 +1,5 @@
+<map id="LEDConfig" name="LEDConfig">
+<area shape="rect" id="Node000001" title=" " alt="" coords="7,98,96,126"/>
+<area shape="rect" id="Node000002" href="$structLEDState__t.html" title=" " alt="" coords="5,5,98,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="54,48,54,98,49,98,49,48"/>
+</map>

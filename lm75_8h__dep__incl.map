@@ -1,0 +1,5 @@
+<map id="modules/sensors/lm75.h" name="modules/sensors/lm75.h">
+<area shape="rect" id="Node000001" title="Definitions for LM75 I2C Temperature Sensor." alt="" coords="5,5,186,33"/>
+<area shape="rect" id="Node000002" href="$lm75_8c.html" title="Interface functions for LM75 I2C Temperature Sensor." alt="" coords="6,81,185,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,49,98,81,93,81,93,49"/>
+</map>

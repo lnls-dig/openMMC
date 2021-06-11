@@ -1,0 +1,5 @@
+<map id="Instrumentation Trace Macrocell (ITM)" name="Instrumentation Trace Macrocell (ITM)">
+<area shape="rect" id="Node000003" href="$group__CMSIS__DWT.html" title="Type definitions for the Data Watchpoint and Trace (DWT)" alt="" coords="411,5,569,50"/>
+<area shape="rect" id="Node000001" title="Type definitions for the Instrumentation Trace Macrocell (ITM)" alt="" coords="199,5,363,50"/>
+<area shape="rect" id="Node000002" href="$group__CMSIS__SysTick.html" title="Type definitions for the System Timer Registers." alt="" coords="5,5,151,50"/>
+</map>

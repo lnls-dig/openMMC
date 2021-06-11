@@ -1,0 +1,18 @@
+<map id="modules/ipmi.h" name="modules/ipmi.h">
+<area shape="rect" id="Node000001" title="IPMI module definitions." alt="" coords="187,5,309,33"/>
+<area shape="rect" id="Node000002" href="$ipmb_8h.html" title="Definitions used in IPMB Layer." alt="" coords="215,157,281,184"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="249,34,244,81,244,109,247,141,242,141,239,109,239,81,244,33"/>
+<area shape="rect" id="Node000008" href="$sdr_8h.html" title=" " alt="" coords="254,81,307,109"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="256,32,271,66,266,68,251,35"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,232,102,260"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="216,187,104,229,102,224,214,182"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="126,232,187,260"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="233,187,186,225,182,221,230,183"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="212,232,285,260"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="251,185,251,217,246,217,246,185"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="308,232,391,260"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="268,183,321,221,318,225,265,187"/>
+<area shape="rect" id="Node000007" href="$board__ipmb_8h.html" title="Board specific definitions used in IPMB Layer." alt="" coords="414,232,525,260"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="283,180,417,225,415,230,281,185"/>
+<area shape="poly" id="edge8_Node000008_Node000002" title=" " alt="" coords="277,110,262,144,257,141,272,108"/>
+</map>

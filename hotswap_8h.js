@@ -1,0 +1,27 @@
+var hotswap_8h =
+[
+    [ "DEBOUNCE_TIME", "hotswap_8h.html#a00aef9e8dd001a49f8717031d84b2c6c", null ],
+    [ "HOTSWAP_BACKEND_PWR_FAILURE_MASK", "hotswap_8h.html#af7451bf398d882f7810110325b66d787", null ],
+    [ "HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK", "hotswap_8h.html#ab65461b66af3674ad7f1037f3f54a23c", null ],
+    [ "HOTSWAP_MODULE_HANDLE_CLOSED_MASK", "hotswap_8h.html#ac8fa528ccfbbe7e6a273e1e7a5139d51", null ],
+    [ "HOTSWAP_MODULE_HANDLE_OPEN_MASK", "hotswap_8h.html#a2cff4d8b7802f1e38e1919206109982b", null ],
+    [ "HOTSWAP_QUIESCED_MASK", "hotswap_8h.html#a267418ee48a0cc39b258a18ccac935ce", null ],
+    [ "HOTSWAP_STATE_BP_FAIL", "hotswap_8h.html#ab1e78c6ab9b70799a9bbd192a8335a97", null ],
+    [ "HOTSWAP_STATE_BP_SDOWN", "hotswap_8h.html#a9b0148c15cff95e859d467e9546aa4b5", null ],
+    [ "HOTSWAP_STATE_HANDLE_CLOSED", "hotswap_8h.html#a2e4e1c21cad1f2a33564fcc648f391a6", null ],
+    [ "HOTSWAP_STATE_HANDLE_OPENED", "hotswap_8h.html#a637b49fca6018a3eafec460e86ea732b", null ],
+    [ "HOTSWAP_STATE_QUIESCED", "hotswap_8h.html#a5d9f6541543c5c94fd9a7afcfd370075", null ],
+    [ "HOTSWAP_STATE_URTM_ABSENT", "hotswap_8h.html#ab51748743580927bbd6822b083e852f7", null ],
+    [ "HOTSWAP_STATE_URTM_COMPATIBLE", "hotswap_8h.html#a47de38994ace60db73d9486428e00d1d", null ],
+    [ "HOTSWAP_STATE_URTM_INCOMPATIBLE", "hotswap_8h.html#aeafc5aa93f5c7f00cbd5834285bbd24f", null ],
+    [ "HOTSWAP_STATE_URTM_PRSENT", "hotswap_8h.html#a23e7f6494264f3ef66b767c123d6f51e", null ],
+    [ "HOTSWAP_URTM_ABSENT_MASK", "hotswap_8h.html#a07fe91896d7ff050d3ef6e10b7c4ec5f", null ],
+    [ "HOTSWAP_URTM_COMPATIBLE_MASK", "hotswap_8h.html#a2207cd96f1f659596dc1b8565b72cfff", null ],
+    [ "HOTSWAP_URTM_PRESENT_MASK", "hotswap_8h.html#a7b1e100bd282e94f9d6b4f8341ff4920", null ],
+    [ "hotswap_clear_mask_bit", "hotswap_8h.html#a09dafcd34cc16f4edce6c9432f944987", null ],
+    [ "hotswap_init", "hotswap_8h.html#aeeb214f7dd04a7bf518409c0365cbb08", null ],
+    [ "hotswap_send_event", "hotswap_8h.html#ae60c686233597f56f087e8a1feebf2de", null ],
+    [ "hotswap_set_mask_bit", "hotswap_8h.html#ae96351ecba4133c9c0b79e29ae8edad9", null ],
+    [ "vTaskHotSwap", "hotswap_8h.html#a6b1ff2cb75d950cec09b450e3694e9a6", null ],
+    [ "vTaskHotSwap_Handle", "hotswap_8h.html#a645c09cb29ccdbbeb025ac477d55f707", null ]
+];

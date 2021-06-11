@@ -1,0 +1,5 @@
+<map id="MCP23016 16&#45;bit I2C/SMBus I/O Expander Module" name="MCP23016 16&#45;bit I2C/SMBus I/O Expander Module">
+<area shape="rect" id="Node000001" title=" " alt="" coords="165,5,322,67"/>
+<area shape="rect" id="Node000003" href="$group__MCP23016__REGS.html" title=" " alt="" coords="370,22,525,50"/>
+<area shape="rect" id="Node000002" href="$group__PERIPH__IC.html" title=" " alt="" coords="5,22,117,50"/>
+</map>

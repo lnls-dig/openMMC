@@ -1,0 +1,17 @@
+<map id="modules/sensors/hotswap.h" name="modules/sensors/hotswap.h">
+<area shape="rect" id="Node000001" title="Hotswap sensors definitions." alt="" coords="519,5,722,33"/>
+<area shape="rect" id="Node000002" href="$rtm_8c.html" title=" " alt="" coords="5,90,121,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="504,32,328,51,230,66,133,84,103,92,101,86,132,78,229,60,327,46,503,27"/>
+<area shape="rect" id="Node000003" href="$hotswap_8c.html" title="Hotswap sensors implementation." alt="" coords="145,90,346,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="546,39,306,92,305,86,545,34"/>
+<area shape="rect" id="Node000004" href="$afc-bpm_2v3__1_2payload_8c.html" title=" " alt="" coords="370,81,516,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="579,42,491,83,489,78,577,38"/>
+<area shape="rect" id="Node000005" href="$afc-timing_2payload_8c.html" title=" " alt="" coords="541,81,700,126"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="623,49,623,80,618,80,618,49"/>
+<area shape="rect" id="Node000006" href="$afc-v4_2payload_8c.html" title=" " alt="" coords="724,90,925,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="668,37,793,86,791,91,666,42"/>
+<area shape="rect" id="Node000007" href="$rtm-8sfp_2rtm__user_8c.html" title=" " alt="" coords="949,81,1097,126"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="709,34,937,78,949,81,948,86,936,84,708,39"/>
+<area shape="rect" id="Node000008" href="$rtm-lamp_2rtm__user_8c.html" title=" " alt="" coords="1121,81,1274,126"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="737,29,914,49,1110,78,1121,80,1120,86,1109,84,913,54,737,34"/>
+</map>

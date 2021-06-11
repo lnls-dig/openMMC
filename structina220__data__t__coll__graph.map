@@ -1,0 +1,11 @@
+<map id="ina220_data_t" name="ina220_data_t">
+<area shape="rect" id="Node000001" title=" " alt="" coords="130,191,243,218"/>
+<area shape="rect" id="Node000002" href="$structsensor__t.html" title=" " alt="" coords="5,98,82,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,133,122,164,163,188,160,193,119,169,72,137"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="99,103,108,112,100,121,82,123,81,118,98,116,103,112,95,107"/>
+<area shape="rect" id="Node000003" href="$structina220__config__t.html" title=" " alt="" coords="315,98,439,126"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="337,135,215,192,213,188,334,130"/>
+<area shape="rect" id="Node000004" href="$unionina220__config__reg__t.html" title=" " alt="" coords="131,5,284,33"/>
+<area shape="poly" id="edge5_Node000001_Node000004" title=" " alt="" coords="207,49,201,98,190,191,185,190,196,98,201,48"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="247,38,353,95,351,100,244,43"/>
+</map>

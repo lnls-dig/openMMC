@@ -1,0 +1,31 @@
+<map id="modules/fru.h" name="modules/fru.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="1146,5,1258,33"/>
+<area shape="rect" id="Node000002" href="$fru_8c.html" title=" " alt="" coords="5,90,116,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="1131,25,625,43,338,61,219,71,129,84,98,91,97,86,128,78,218,66,337,55,624,38,1131,20"/>
+<area shape="rect" id="Node000003" href="$led_8c.html" title=" " alt="" coords="140,90,253,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="1131,22,974,23,759,30,513,49,387,64,265,84,234,91,233,86,264,78,387,59,512,44,758,25,974,18,1131,17"/>
+<area shape="rect" id="Node000004" href="$modules_2main_8c.html" title=" " alt="" coords="277,90,402,117"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="1131,24,997,28,818,37,617,55,414,84,381,91,380,86,413,78,616,50,818,32,997,22,1131,19"/>
+<area shape="rect" id="Node000005" href="$rtm_8c.html" title=" " alt="" coords="426,90,541,117"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="1131,25,1019,30,875,41,714,58,553,84,522,92,521,86,552,78,713,53,874,35,1019,25,1131,20"/>
+<area shape="rect" id="Node000006" href="$hotswap_8c.html" title="Hotswap sensors implementation." alt="" coords="565,90,767,117"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="1131,32,780,84,735,92,734,86,779,78,1130,27"/>
+<area shape="rect" id="Node000007" href="$ina220_8c.html" title="INA220 interface implementation." alt="" coords="791,90,981,117"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="1137,40,937,92,936,86,1136,35"/>
+<area shape="rect" id="Node000008" href="$ina3221_8c.html" title="INA3221 interface implementation." alt="" coords="1005,90,1204,117"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="1177,45,1121,91,1118,87,1173,41"/>
+<area shape="rect" id="Node000009" href="$afc-bpm_2v3__1_2payload_8c.html" title=" " alt="" coords="1227,81,1374,126"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="1231,41,1276,78,1273,82,1227,45"/>
+<area shape="rect" id="Node000010" href="$board__fru_8c.html" title=" " alt="" coords="1397,81,1572,126"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="1263,35,1410,78,1409,83,1261,40"/>
+<area shape="rect" id="Node000011" href="$board__led_8c.html" title=" " alt="" coords="1596,81,1770,126"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="1273,28,1584,78,1596,81,1595,86,1583,84,1272,33"/>
+<area shape="rect" id="Node000012" href="$afc-timing_2payload_8c.html" title=" " alt="" coords="1794,81,1954,126"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="1273,23,1501,42,1641,58,1782,78,1794,80,1793,86,1781,84,1641,63,1500,47,1273,28"/>
+<area shape="rect" id="Node000013" href="$afc-v4_2payload_8c.html" title=" " alt="" coords="1978,90,2178,117"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="1274,21,1576,39,1770,56,1966,78,2015,86,2014,92,1965,84,1770,61,1575,45,1273,26"/>
+<area shape="rect" id="Node000014" href="$rtm-8sfp_2rtm__user_8c.html" title=" " alt="" coords="2202,81,2351,126"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="1273,18,1437,21,1665,29,1926,47,2060,61,2190,78,2202,80,2202,86,2189,84,2059,66,1925,53,1665,35,1437,26,1273,23"/>
+<area shape="rect" id="Node000015" href="$rtm-lamp_2rtm__user_8c.html" title=" " alt="" coords="2375,81,2528,126"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="1273,17,1463,18,1733,25,2046,44,2206,59,2364,78,2374,80,2374,85,2363,84,2206,64,2045,49,1733,30,1462,23,1273,22"/>
+</map>

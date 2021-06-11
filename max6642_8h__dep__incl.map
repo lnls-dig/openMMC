@@ -1,0 +1,5 @@
+<map id="modules/sensors/max6642.h" name="modules/sensors/max6642.h">
+<area shape="rect" id="Node000001" title="Definitions for MAX6642 I2C Temperature Sensor." alt="" coords="5,5,214,33"/>
+<area shape="rect" id="Node000002" href="$max6642_8c.html" title="MAX6642 I2C Temperature Sensor Interface implementation." alt="" coords="6,81,213,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="112,49,112,81,107,81,107,49"/>
+</map>

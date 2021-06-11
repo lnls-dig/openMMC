@@ -1,0 +1,5 @@
+<map id="t_req_handler_record" name="t_req_handler_record">
+<area shape="rect" id="Node000001" title="IPMI Handler record structure used to index all handlers." alt="" coords="5,98,164,126"/>
+<area shape="rect" id="Node000002" href="$structipmi__msg.html" title="IPMI message struct." alt="" coords="42,5,127,33"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,48,87,98,82,98,82,48"/>
+</map>

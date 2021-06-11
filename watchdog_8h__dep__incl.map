@@ -1,0 +1,7 @@
+<map id="modules/watchdog.h" name="modules/watchdog.h">
+<area shape="rect" id="Node000001" title="Watchdog module definitions." alt="" coords="71,5,228,33"/>
+<area shape="rect" id="Node000002" href="$modules_2main_8c.html" title=" " alt="" coords="5,81,131,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,46,84,83,81,79,122,42"/>
+<area shape="rect" id="Node000003" href="$watchdog_8c.html" title="Reset the uC if it fails to reload the watchdog timer." alt="" coords="154,81,310,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="177,42,219,79,216,83,174,46"/>
+</map>

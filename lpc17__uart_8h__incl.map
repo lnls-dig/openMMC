@@ -1,0 +1,7 @@
+<map id="port/ucontroller/nxp/lpc17xx/lpc17_uart.h" name="port/ucontroller/nxp/lpc17xx/lpc17_uart.h">
+<area shape="rect" id="Node000001" title="LPC17xx UART interface definitions." alt="" coords="6,5,166,50"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,98,76,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="76,52,57,86,53,83,72,49"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="100,98,165,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="100,49,120,83,115,86,96,52"/>
+</map>

@@ -1,0 +1,21 @@
+<map id="port/board/afc&#45;common/board_led.h" name="port/board/afc&#45;common/board_led.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="676,5,850,50"/>
+<area shape="rect" id="Node000002" href="$led_8c.html" title=" " alt="" coords="5,107,118,134"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="660,37,417,57,273,76,130,101,100,109,99,103,129,95,272,70,417,52,660,31"/>
+<area shape="rect" id="Node000003" href="$rtm_8c.html" title=" " alt="" coords="141,107,257,134"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="661,41,477,64,372,80,269,101,239,109,237,103,268,95,371,75,476,59,660,36"/>
+<area shape="rect" id="Node000004" href="$hotswap_8c.html" title="Hotswap sensors implementation." alt="" coords="281,107,482,134"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="661,56,438,108,437,103,660,50"/>
+<area shape="rect" id="Node000005" href="$afc-bpm_2v3__1_2payload_8c.html" title=" " alt="" coords="506,98,652,143"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="706,60,624,100,621,95,704,55"/>
+<area shape="rect" id="Node000006" href="$board__led_8c.html" title=" " alt="" coords="676,98,850,143"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="766,66,766,98,760,98,760,66"/>
+<area shape="rect" id="Node000007" href="$afc-timing_2payload_8c.html" title=" " alt="" coords="874,98,1033,143"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="823,55,909,95,907,100,821,59"/>
+<area shape="rect" id="Node000008" href="$afc-v4_2payload_8c.html" title=" " alt="" coords="1057,107,1258,134"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="866,50,1101,103,1099,108,864,55"/>
+<area shape="rect" id="Node000009" href="$rtm-8sfp_2rtm__user_8c.html" title=" " alt="" coords="1282,98,1430,143"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="865,37,1054,61,1270,95,1282,98,1281,103,1269,101,1053,66,865,42"/>
+<area shape="rect" id="Node000010" href="$rtm-lamp_2rtm__user_8c.html" title=" " alt="" coords="1454,98,1608,143"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="865,32,1128,54,1286,72,1443,95,1454,97,1453,103,1442,101,1285,78,1128,60,865,38"/>
+</map>

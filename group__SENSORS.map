@@ -1,0 +1,9 @@
+<map id="Sensors" name="Sensors">
+<area shape="rect" id="Node000003" href="$group__HOTSWAP.html" title=" " alt="" coords="322,5,448,33"/>
+<area shape="rect" id="Node000004" href="$group__INA220.html" title=" " alt="" coords="285,58,484,119"/>
+<area shape="rect" id="Node000005" href="$group__INA3221.html" title=" " alt="" coords="285,143,484,205"/>
+<area shape="rect" id="Node000006" href="$group__LM75.html" title=" " alt="" coords="309,229,460,274"/>
+<area shape="rect" id="Node000007" href="$group__MAX6642.html" title=" " alt="" coords="291,298,478,359"/>
+<area shape="rect" id="Node000002" href="$group__PERIPH__IC.html" title=" " alt="" coords="5,160,117,188"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="165,160,237,188"/>
+</map>

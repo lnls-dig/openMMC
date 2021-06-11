@@ -1,0 +1,7 @@
+<map id="port/board/afc&#45;v4/i2c_mapping.h" name="port/board/afc&#45;v4/i2c_mapping.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="96,5,252,50"/>
+<area shape="rect" id="Node000002" href="$afc-v4_2i2c__mapping_8c.html" title=" " alt="" coords="5,98,162,143"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="144,63,107,100,103,96,140,59"/>
+<area shape="rect" id="Node000003" href="$afc-v4_2sdr__list_8c.html" title=" " alt="" coords="186,98,344,143"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="208,59,245,96,242,100,205,63"/>
+</map>

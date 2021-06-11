@@ -1,0 +1,5 @@
+<map id="modules/sensors/ina3221.h" name="modules/sensors/ina3221.h">
+<area shape="rect" id="Node000001" title="Definitions for INA3221 Current/Voltage Sensor." alt="" coords="5,5,205,33"/>
+<area shape="rect" id="Node000002" href="$ina3221_8c.html" title="INA3221 interface implementation." alt="" coords="6,81,204,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="108,49,108,81,102,81,102,49"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="modules/eeprom_24xx64.h" name="modules/eeprom_24xx64.h">
+<area shape="rect" id="Node000001" title="24xx64 EEPROM module interface declarations" alt="" coords="182,5,381,33"/>
+<area shape="rect" id="Node000002" href="$eeprom__24xx64_8c.html" title="24xx64 EEPROM module interface implementation" alt="" coords="5,90,203,117"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="240,42,134,91,131,87,238,37"/>
+<area shape="rect" id="Node000003" href="$fru_8c.html" title=" " alt="" coords="226,90,337,117"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="284,49,284,89,279,89,279,49"/>
+<area shape="rect" id="Node000004" href="$board__fru_8c.html" title=" " alt="" coords="361,81,535,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="323,38,405,78,403,83,321,43"/>
+</map>

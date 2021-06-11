@@ -1,0 +1,9 @@
+<map id="port/ucontroller/nxp/lpc17xx/lpc17_uartrb.h" name="port/ucontroller/nxp/lpc17xx/lpc17_uartrb.h">
+<area shape="rect" id="Node000001" title="LPC17xx UART interface with Ring Buffer definitions." alt="" coords="60,5,233,50"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,98,88,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,52,76,90,73,86,119,48"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="111,98,182,126"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="149,50,149,82,144,82,144,50"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="206,98,271,126"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="172,48,214,86,211,90,169,52"/>
+</map>

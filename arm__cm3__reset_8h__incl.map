@@ -1,0 +1,12 @@
+<map id="port/ucontroller/nxp/lpc17xx/arm_cm3_reset.h" name="port/ucontroller/nxp/lpc17xx/arm_cm3_reset.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,199,50"/>
+<area shape="rect" id="Node000002" href="$core__cm3_8h.html" title="CMSIS Cortex&#45;M3 Core Peripheral Access Layer Header File." alt="" coords="54,98,150,126"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,50,105,82,99,82,99,50"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="94,249,164,277"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="78,129,57,143,37,160,27,180,26,190,30,200,52,225,81,243,78,247,49,229,25,203,21,191,21,179,33,157,53,139,75,124"/>
+<area shape="rect" id="Node000004" href="$cmsis__version_8h.html" title="CMSIS Core(M) Version definitions." alt="" coords="39,174,165,201"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="105,126,105,158,99,158,99,126"/>
+<area shape="rect" id="Node000005" href="$cmsis__compiler_8h.html" title="CMSIS compiler generic header file." alt="" coords="189,174,324,201"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="131,124,217,164,214,169,129,129"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="235,204,166,244,163,239,232,200"/>
+</map>

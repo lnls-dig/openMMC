@@ -1,0 +1,5 @@
+<map id="modules/sensors/ina220.h" name="modules/sensors/ina220.h">
+<area shape="rect" id="Node000001" title="Definitions for INA220 Current/Voltage/Power Sensor." alt="" coords="5,5,197,33"/>
+<area shape="rect" id="Node000002" href="$ina220_8c.html" title="INA220 interface implementation." alt="" coords="6,81,196,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,49,104,81,98,81,98,49"/>
+</map>
