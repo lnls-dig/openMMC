@@ -98,6 +98,11 @@ if (";${TARGET_MODULES};" MATCHES ";IDT_8V54816;")
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_IDT_8V54816")
 endif()
 
+if (";${TARGET_MODULES};" MATCHES ";MAX116XX;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/max116xx.c )
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_MAX116XX")
+endif()
+
 if (";${TARGET_MODULES};" MATCHES ";RTM;")
   if (NOT BOARD_RTM)
     message( FATAL_ERROR "${BoldRed}RTM Module included but no RTM Board specified${ColourReset}")
