@@ -65,7 +65,7 @@ enum max116xx_scan_mode {
 
 enum max116xx_diff_mode {
     MAX116XX_DIFFERENTIAL = 0,
-    MAX116XX_SIGLE_ENDED = 1,
+    MAX116XX_SINGLE_ENDED = 1,
 };
 
 /**
