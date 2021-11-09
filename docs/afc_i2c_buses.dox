@@ -1,0 +1,13 @@
+/**
+ * @page AFC_I2C AFC I2C Buses
+ *
+ * @tableofcontents
+ *
+ * @section AFCv3
+ * \dotfile afcv3_i2c_hierarchy.dot "AFCv3.1 I2C Bus hierarchy"
+ *
+ * @section AFCv4
+ * \dotfile afcv4_cpu_i2c_hierarchy.dot "AFCv4 LPC1768 I2C Bus hierarchy"
+ *
+ * \dotfile afcv4_fpga_i2c_hierarchy.dot "AFCv4 FPGA I2C Bus hierarchy"
+ */
