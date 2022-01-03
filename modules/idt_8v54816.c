@@ -33,10 +33,6 @@ uint8_t clock_switch_read_reg(uint8_t *rx_data)
     uint8_t i2c_addr, i2c_interface;
     uint8_t rx_len = 0;
 
-    uint8_t bus = 0;
-    uint8_t pca_channel;
-    uint8_t dbg = 1;
-
     if ( i2c_take_by_chipid( CHIP_ID_8V54816, &i2c_addr, &i2c_interface, portMAX_DELAY ) && ( rx_data != NULL ) ) {
 
         rx_len = xI2CMasterRead( i2c_interface, i2c_addr, rx_data, 16 );
