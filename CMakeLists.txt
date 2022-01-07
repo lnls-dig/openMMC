@@ -106,7 +106,7 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
 # Headers path
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
 # Link libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS c gcc m ${PROJ_LIBS})
+target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS gcc c ${PROJ_LIBS})
 
 
 
@@ -127,7 +127,7 @@ if(${BOARD} MATCHES "^(afc)")
   # Headers path
   target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
   # Link libraries
-  target_link_libraries(bootloader gcc c m lpcopen)
+  target_link_libraries(bootloader gcc c lpcopen)
 
   add_custom_command(TARGET bootloader POST_BUILD
     COMMAND ${CMAKE_OBJCOPY} -O binary bootloader.axf bootloader.bin
