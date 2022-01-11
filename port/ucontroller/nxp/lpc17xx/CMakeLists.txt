@@ -69,6 +69,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}" PARENT_SCOPE)
 
 set(UCONTROLLER_SRCS ${UCONTROLLER_SRCS} PARENT_SCOPE)
 set(UCONTROLLER_HDRS ${UCONTROLLER_HDRS} PARENT_SCOPE)
+set(UCONTROLLER_APP_LD_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.ld" PARENT_SCOPE)
 
 add_library(lpcopen STATIC ${LIBLPCOPEN_SRCS})
 
@@ -76,3 +77,5 @@ target_link_libraries(lpcopen PUBLIC FreeRTOS)
 target_include_directories(lpcopen PUBLIC ${LPCOPEN_INCPATH})
 target_include_directories(lpcopen PUBLIC ${LPC17XX_PATH})
 target_include_directories(lpcopen PUBLIC ${PROJ_HDRS})
+
+add_subdirectory(bootloader)

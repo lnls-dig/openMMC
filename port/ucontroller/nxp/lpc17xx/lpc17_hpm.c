@@ -33,11 +33,56 @@
 #include "modules/sys_utils.h"
 #include "boot/boot.h"
 #include "string.h"
+#include "arm_cm3_reset.h"
+
+typedef struct
+{
+    uint8_t version[3];
+    uint8_t fw_type;
+    uint32_t magic;
+    uint8_t RESERVED[248];
+} fw_info;
+
+/*
+ * Flash symbols defined in the linker script
+ */
+extern const uint32_t __AppFlash_start;
+extern const uint32_t __AppFlash_end;
+extern const uint32_t __BootFlash_start;
+extern const uint32_t __BootFlash_end;
+extern const uint32_t __FWUpdateFlash_start;
+extern const uint32_t __FWUpdateFlash_end;
+extern const fw_info __FWInfo_addr;
+
+const uint32_t* app_start_addr = &__AppFlash_start;
+const uint32_t* app_end_addr = &__AppFlash_end;
+const uint32_t* boot_start_addr = &__BootFlash_start;
+const uint32_t* boot_end_addr = &__BootFlash_end;
+const uint32_t* update_start_addr = &__FWUpdateFlash_start;
+const uint32_t* update_end_addr = &__FWUpdateFlash_end;
+
+const fw_info* fw_header = &__FWInfo_addr;
 
 uint32_t ipmc_page_addr = 0;
 uint32_t ipmc_image_size = 0;
 uint32_t ipmc_pg_index = 0;
 uint32_t ipmc_page[64];
+
+static uint8_t get_sector_number(const void* flash_addr)
+{
+    uint8_t ret = 0;
+    const uint32_t flash = (const uint32_t)flash_addr;
+
+    if (flash < 0x10000)
+    {
+        ret = (flash / 0x1000);
+    }
+    else
+    {
+        ret = ((flash - 0x10000) / 0x8000) + 16;
+    }
+    return ret;
+}
 
 uint8_t ipmc_hpm_prepare_comp( void )
 {
@@ -49,9 +94,17 @@ uint8_t ipmc_hpm_prepare_comp( void )
         ipmc_page[i] = 0xFFFFFFFF;
     }
 
-    if (ipmc_erase_sector(IPMC_UPDATE_SECTOR_START, IPMC_UPDATE_SECTOR_END) != IAP_CMD_SUCCESS) {
-        return IPMI_CC_UNSPECIFIED_ERROR;
-    }
+    /*
+     * Assumes that the bootloader has erased the flash update
+     * area. Erasing it here will lock the flash, preventing code
+     * execution until it finishes. This can take tens of ms for
+     * multiple sector erases, and for all this time no interrupt
+     * exceptions can be served.
+     *
+     * For LPC1768 devices it would cause the HPM update to fail as it
+     * wouldn't answer the ipmi request in time.
+     */
+
     return IPMI_CC_OK;
 }
 
@@ -113,13 +166,6 @@ uint8_t ipmc_hpm_finish_upload( uint32_t image_size )
         /* HPM CC: Number of bytes received does not match the size provided in the "Finish firmware upload" request */
         return 0x81;
     }
-    /* Copy the last page (we'll change only the last word) */
-    memcpy(ipmc_page, (uint32_t *) (UPGRADE_FLASH_END_ADDR-256), sizeof(ipmc_page));
-
-    /* TODO: Write actual firmware ID */
-    /* Write bootloader magic word */
-    ipmc_page[63] = 0x55555555;
-    ipmc_program_page( UPGRADE_FLASH_END_ADDR-IPMC_UPDATE_ADDRESS_OFFSET-256, ipmc_page, sizeof(ipmc_page));
 
     return IPMI_CC_OK;
 }
@@ -132,13 +178,38 @@ uint8_t ipmc_hpm_get_upgrade_status( void )
 
 uint8_t ipmc_hpm_activate_firmware( void )
 {
+    fw_info fw_update_header;
+    memset(&fw_update_header, 0xFF, sizeof(fw_update_header));
+
+    /*
+     * Write firmware update record to inform the bootloader that a
+     * new firmware is available.
+     *
+     * TODO: Write actual firmware ID
+     */
+    fw_update_header.magic = 0xAAAAAAAA;
+    fw_update_header.fw_type = 1; // Update application
+    fw_update_header.version[0] = 1;
+    fw_update_header.version[1] = 4;
+    fw_update_header.version[2] = 1;
+    ipmc_program_page((uint32_t)fw_header - (uint32_t)update_start_addr, (uint32_t*)&fw_update_header, sizeof(fw_update_header));
+
+    /*
+     * Imediately reset the mcu, for some motive scheduling a reset
+     * using FreeRTOS timers isn't working (xTimerStart hangs for ever)
+     */
+    mcu_reset();
+
     /* Schedule a reset to 500ms from now */
-    sys_schedule_reset(500);
+    /* sys_schedule_reset(500); */
     return IPMI_CC_OK;
 }
 
 uint8_t ipmc_program_page( uint32_t address, uint32_t * data, uint32_t size )
 {
+    const uint32_t update_start_sec = get_sector_number(update_start_addr);
+    const uint32_t update_end_sec = get_sector_number(update_end_addr);
+
     if (size % 256) {
         /* Data should be a 256 byte boundary */
         return IPMI_CC_PARAM_OUT_OF_RANGE;
@@ -146,12 +217,12 @@ uint8_t ipmc_program_page( uint32_t address, uint32_t * data, uint32_t size )
 
     portDISABLE_INTERRUPTS();
 
-    if (Chip_IAP_PreSectorForReadWrite( IPMC_UPDATE_SECTOR_START, IPMC_UPDATE_SECTOR_END ) != IAP_CMD_SUCCESS) {
+    if (Chip_IAP_PreSectorForReadWrite(update_start_sec, update_end_sec) != IAP_CMD_SUCCESS) {
         portENABLE_INTERRUPTS();
         return IPMI_CC_UNSPECIFIED_ERROR;
     }
 
-    if (Chip_IAP_CopyRamToFlash( IPMC_UPDATE_ADDRESS_OFFSET + address, data, size )) {
+    if (Chip_IAP_CopyRamToFlash((uint32_t)update_start_addr + address, data, size)) {
         portENABLE_INTERRUPTS();
         return IPMI_CC_UNSPECIFIED_ERROR;
     }
@@ -163,11 +234,11 @@ uint8_t ipmc_program_page( uint32_t address, uint32_t * data, uint32_t size )
 uint8_t ipmc_erase_sector( uint32_t sector_start, uint32_t sector_end)
 {
     portDISABLE_INTERRUPTS();
-    if (Chip_IAP_PreSectorForReadWrite( sector_start, sector_end ) != IAP_CMD_SUCCESS) {
+    if (Chip_IAP_PreSectorForReadWrite(sector_start, sector_end) != IAP_CMD_SUCCESS) {
         portENABLE_INTERRUPTS();
         return IPMI_CC_UNSPECIFIED_ERROR;
     }
-    if (Chip_IAP_EraseSector( sector_start, sector_end ) != IAP_CMD_SUCCESS) {
+    if (Chip_IAP_EraseSector(sector_start, sector_end) != IAP_CMD_SUCCESS) {
         portENABLE_INTERRUPTS();
         return IPMI_CC_UNSPECIFIED_ERROR;
     }
