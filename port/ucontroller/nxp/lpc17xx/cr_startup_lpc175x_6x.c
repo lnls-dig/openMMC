@@ -285,6 +285,11 @@ ResetISR(void) {
         bss_init(ExeAddr, SectionLen);
     }
 
+    /*
+     * Enable global interrupts
+     */
+    __asm__("cpsie i \n");
+
 #if defined (__USE_CMSIS) || defined (__USE_LPCOPEN)
     SystemInit();
 #endif
