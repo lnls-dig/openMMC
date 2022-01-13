@@ -195,13 +195,10 @@ uint8_t ipmc_hpm_activate_firmware( void )
     ipmc_program_page((uint32_t)fw_header - (uint32_t)update_start_addr, (uint32_t*)&fw_update_header, sizeof(fw_update_header));
 
     /*
-     * Imediately reset the mcu, for some motive scheduling a reset
-     * using FreeRTOS timers isn't working (xTimerStart hangs for ever)
+     * Schedule a reset to 500ms from now
      */
-    mcu_reset();
+    sys_schedule_reset(500);
 
-    /* Schedule a reset to 500ms from now */
-    /* sys_schedule_reset(500); */
     return IPMI_CC_OK;
 }
 
