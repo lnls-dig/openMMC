@@ -295,6 +295,8 @@ IPMI_HANDLER(ipmi_picmg_upload_firmware_block, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_
     uint8_t block_data[HPM_BLOCK_SIZE];
     uint8_t block_sz = req->data_len-2;
 
+    static uint8_t expected_block_n = 0x00;
+
     if (active_id > 7) {
         /* Component ID out of range */
         rsp->data[len++] = IPMI_PICMG_GRP_EXT;
@@ -310,7 +312,13 @@ IPMI_HANDLER(ipmi_picmg_upload_firmware_block, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_
 
     if (hpm_components[active_id].hpm_upload_block_f) {
         /* WARNING: This function can't block! */
-        rsp->completion_code = hpm_components[active_id].hpm_upload_block_f(&block_data[0], block_sz);
+        /* req->data[1] holds the block number */
+        if(req->data[1] == expected_block_n) {
+               rsp->completion_code = hpm_components[active_id].hpm_upload_block_f(&block_data[0], block_sz);
+               expected_block_n++;
+        } else {	/* Repeated block, ignore it */
+               rsp->completion_code = IPMI_CC_OK;
+        }
     } else {
         rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
     }
