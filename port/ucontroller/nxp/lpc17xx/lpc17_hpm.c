@@ -32,7 +32,7 @@
 #include "modules/ipmi.h"
 #include "modules/sys_utils.h"
 #include "boot/boot.h"
-#include "string.h"
+#include <string.h>
 #include "arm_cm3_reset.h"
 
 typedef struct
@@ -65,7 +65,7 @@ const fw_info* fw_header = &__FWInfo_addr;
 
 uint32_t ipmc_page_addr = 0;
 uint32_t ipmc_image_size = 0;
-uint32_t ipmc_pg_index = 0;
+uint32_t ipmc_page_byte_index = 0;
 uint32_t ipmc_page[64];
 
 static uint8_t get_sector_number(const void* flash_addr)
@@ -87,7 +87,7 @@ static uint8_t get_sector_number(const void* flash_addr)
 uint8_t ipmc_hpm_prepare_comp( void )
 {
     ipmc_image_size = 0;
-    ipmc_pg_index = 0;
+    ipmc_page_byte_index = 0;
     ipmc_page_addr = 0;
 
     for(uint32_t i=0; i<(sizeof(ipmc_page)/sizeof(uint32_t)); i++) {
@@ -110,23 +110,19 @@ uint8_t ipmc_hpm_prepare_comp( void )
 
 uint8_t ipmc_hpm_upload_block( uint8_t * block, uint16_t size )
 {
-    uint8_t remaining_bytes_start;
+    const uint32_t ipmc_page_available_bytes_n = sizeof(ipmc_page) - ipmc_page_byte_index;
 
-    if ( sizeof(ipmc_page)/4 - ipmc_pg_index > size/4) {
+    if(ipmc_page_available_bytes_n >= size) {
         /* Our page is not full yet, just append the new data */
-        for (uint16_t i =0; i < size; i+=4, ipmc_pg_index++) {
-            ipmc_page[ipmc_pg_index] = (block[i+3] << 24)|(block[i+2] << 16)|(block[i+1] << 8)|(block[i]);
-        }
+        memcpy(&((uint8_t *)ipmc_page)[ipmc_page_byte_index], block, size);
+        ipmc_page_byte_index += size;
 
         return IPMI_CC_OK;
 
     } else {
         /* Complete the remaining bytes on the buffer */
-        remaining_bytes_start = (sizeof(ipmc_page)/4 - ipmc_pg_index)*4;
-
-        for (uint16_t i =0; ipmc_pg_index < sizeof(ipmc_page)/4 ; i+=4, ipmc_pg_index++) {
-            ipmc_page[ipmc_pg_index] = (block[i+3] << 24)|(block[i+2] << 16)|(block[i+1] << 8)|(block[i]);
-        }
+        memcpy(&((uint8_t *)ipmc_page)[ipmc_page_byte_index], block, ipmc_page_available_bytes_n);
+        ipmc_page_byte_index = 0;
 
         /* Program the complete page in the Flash */
         ipmc_program_page( ipmc_page_addr, ipmc_page, sizeof(ipmc_page));
@@ -136,16 +132,12 @@ uint8_t ipmc_hpm_upload_block( uint8_t * block, uint16_t size )
 
         ipmc_image_size += sizeof(ipmc_page);
 
-        /* Empty our buffer and reset the index */
-        for(uint32_t i=0; i<(sizeof(ipmc_page)/sizeof(uint32_t)); i++) {
-            ipmc_page[i] = 0xFFFFFFFF;
-        }
-        ipmc_pg_index = 0;
+        /* Empty our buffer */
+        memset((uint8_t *)ipmc_page, 0xFF, sizeof(ipmc_page));
 
         /* Save the trailing bytes */
-        for (uint8_t i =0; i <(size-remaining_bytes_start); i+=4) {
-            ipmc_page[ipmc_pg_index++] = (block[i+3+remaining_bytes_start] << 24)|(block[i+2+remaining_bytes_start] << 16)|(block[i+1+remaining_bytes_start] << 8)|(block[i+remaining_bytes_start]);
-        }
+	memcpy((uint8_t *)ipmc_page, &block[ipmc_page_available_bytes_n], size - ipmc_page_available_bytes_n);
+	ipmc_page_byte_index += size - ipmc_page_available_bytes_n;
 
         return IPMI_CC_COMMAND_IN_PROGRESS;
     }
@@ -154,11 +146,11 @@ uint8_t ipmc_hpm_upload_block( uint8_t * block, uint16_t size )
 uint8_t ipmc_hpm_finish_upload( uint32_t image_size )
 {
     /* Check if the last page was already programmed */
-    if (ipmc_pg_index != 0) {
+    if(ipmc_page_byte_index != 0) {
         /* Program the complete page in the Flash */
         ipmc_program_page( ipmc_page_addr, ipmc_page, sizeof(ipmc_page));
-        ipmc_image_size += ipmc_pg_index*4;
-        ipmc_pg_index = 0;
+        ipmc_image_size += ipmc_page_byte_index;
+        ipmc_page_byte_index = 0;
         ipmc_page_addr = 0;
     }
 
