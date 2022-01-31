@@ -105,12 +105,12 @@ uint8_t ipmc_hpm_prepare_comp( void )
             /* Erases flash update region sectors */
             /*
              * This procedure locks the flash, preventing code execution
-	     * until it finishes. This can take tens of ms for multiple
-	     * sector erases, and for all this time no interrupt
+             * until it finishes. This can take tens of ms for multiple
+             * sector erases, and for all this time no interrupt
              * exceptions can be served.
              *
              * For LPC1768 devices it would cause the HPM update to fail
-	     * as it wouldn't answer the ipmi request in time.
+             * as it wouldn't answer the ipmi request in time.
              */
             ret = ipmc_erase_sector(update_start_sec, update_end_sec);
             break;
