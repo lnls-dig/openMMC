@@ -97,12 +97,11 @@ uint8_t ipmc_hpm_prepare_comp( void )
     }
 
     /* Checks flash update region integrity */
-    for(uint32_t *ptr = (uint32_t *)update_start_addr; ptr <= update_end_addr; ptr++) {
+    for(const uint32_t *ptr = update_start_addr; ptr <= update_end_addr; ptr++) {
 	if(*ptr != 0xFFFFFFFF) {
-            const uint32_t update_start_sec = get_sector_number(update_start_addr);
-            const uint32_t update_end_sec = get_sector_number(update_end_addr);
+            const uint32_t sec = get_sector_number(ptr);
 
-            /* Erases flash update region sectors */
+            /* Erases flash update region sector */
             /*
              * This procedure locks the flash, preventing code execution
              * until it finishes. This can take tens of ms for multiple
@@ -112,8 +111,9 @@ uint8_t ipmc_hpm_prepare_comp( void )
              * For LPC1768 devices it would cause the HPM update to fail
              * as it wouldn't answer the ipmi request in time.
              */
-            ret = ipmc_erase_sector(update_start_sec, update_end_sec);
-            break;
+            ret = ipmc_erase_sector(sec, sec);
+
+            if(ret != IPMI_CC_OK)	break;
 	}
     }
 
