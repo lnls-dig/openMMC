@@ -39,6 +39,9 @@ static uint8_t last_cmd_cc;
 /*Current component under upgrade */
 static uint8_t active_id;
 
+/* Variable used to monitor HPM upload fw block command's block number */
+static uint8_t expected_block_n;
+
 /* IPMC Capabilities */
 t_ipmc_capabilities ipmc_cap = {
     .flags = { .upgrade_undesirable = 0,
@@ -210,6 +213,8 @@ IPMI_HANDLER(ipmi_picmg_initiate_upgrade_action, NETFN_GRPEXT, IPMI_PICMG_CMD_HP
     uint8_t comp_id = req->data[1];
     uint8_t upgrade_action = req->data[2];
 
+    expected_block_n = 0x00;
+
     rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
 
     if (comp_id > 7) {
@@ -294,8 +299,6 @@ IPMI_HANDLER(ipmi_picmg_upload_firmware_block, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_
     uint8_t len = rsp->data_len = 0;
     uint8_t block_data[HPM_BLOCK_SIZE];
     uint8_t block_sz = req->data_len-2;
-
-    static uint8_t expected_block_n = 0x00;
 
     if (active_id > 7) {
         /* Component ID out of range */

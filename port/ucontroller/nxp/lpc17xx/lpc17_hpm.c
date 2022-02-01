@@ -90,22 +90,34 @@ uint8_t ipmc_hpm_prepare_comp( void )
     ipmc_page_byte_index = 0;
     ipmc_page_addr = 0;
 
+    uint8_t ret = IPMI_CC_OK;
+
     for(uint32_t i=0; i<(sizeof(ipmc_page)/sizeof(uint32_t)); i++) {
         ipmc_page[i] = 0xFFFFFFFF;
     }
 
-    /*
-     * Assumes that the bootloader has erased the flash update
-     * area. Erasing it here will lock the flash, preventing code
-     * execution until it finishes. This can take tens of ms for
-     * multiple sector erases, and for all this time no interrupt
-     * exceptions can be served.
-     *
-     * For LPC1768 devices it would cause the HPM update to fail as it
-     * wouldn't answer the ipmi request in time.
-     */
+    /* Checks flash update region integrity */
+    for(const uint32_t *ptr = update_start_addr; ptr <= update_end_addr; ptr++) {
+	if(*ptr != 0xFFFFFFFF) {
+            const uint32_t sec = get_sector_number(ptr);
 
-    return IPMI_CC_OK;
+            /* Erases flash update region sector */
+            /*
+             * This procedure locks the flash, preventing code execution
+             * until it finishes. This can take tens of ms for multiple
+             * sector erases, and for all this time no interrupt
+             * exceptions can be served.
+             *
+             * For LPC1768 devices it would cause the HPM update to fail
+             * as it wouldn't answer the ipmi request in time.
+             */
+            ret = ipmc_erase_sector(sec, sec);
+
+            if(ret != IPMI_CC_OK)	break;
+	}
+    }
+
+    return ret;
 }
 
 uint8_t ipmc_hpm_upload_block( uint8_t * block, uint16_t size )
