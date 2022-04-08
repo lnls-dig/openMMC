@@ -54,7 +54,7 @@ static void write_fpga_buffer( board_diagnostic_t *diag )
     uint32_t *buffer = (uint32_t *)diag;
 
     /* Send all bytes sequentially, except the last record (FMC slot status), whose address is 0xFF */
-    for( i = 0; i < sizeof(board_diagnostic_t)- 1; i++) {
+    for( i = 0; i < (sizeof(board_diagnostic_t) / sizeof(uint32_t))- 1; i++) {
         write_fpga_dword( i, buffer[i] );
     }
     write_fpga_dword( 0xFF, buffer[i] );
