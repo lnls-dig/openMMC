@@ -22,6 +22,8 @@
 #ifndef FPGA_SPI_H_
 #define FPGA_SPI_H_
 
+#include <assert.h>
+
 #include "sdr.h"
 #include "utils.h"
 
@@ -84,7 +86,7 @@ typedef struct __attribute__ ((__packed__)) {
 /**
  * @brief AFC diagnostic struct sent to FPGA via SPI
  */
-typedef struct __attribute__ ((__packed__)) {
+typedef struct __attribute__ ((__packed__,aligned(4))) {
     uint32_t cardID[4];
     uint32_t slot_id:16,
         ipmi_addr:16;
@@ -92,6 +94,10 @@ typedef struct __attribute__ ((__packed__)) {
     sensor_diag_t sensor[NUM_SENSOR];
     fmc_diag_t fmc_slot;
 } board_diagnostic_t;
+
+/* Guarantee buffer can be read as an uint32_t array
+ * FIXME: use static_assert when moving build to C11 */
+_Static_assert(sizeof(board_diagnostic_t) % sizeof(uint32_t) == 0);
 
 /**
  * @brief FPGA Diagnostics Task
