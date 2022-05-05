@@ -127,7 +127,7 @@ const SDR_type_01h_t SDR_AMC_12V = {
     .sensor_units_2 = 0x04, /* sensor units 2 :*/
     .sensor_units_3 = 0x00, /* sensor units 3 :*/
     .linearization = 0x00, /* Linearization */
-    .M = 128, /* M */
+    .M = 64, /* M */
     .M_tol = 0x00, /* M - Tolerance */
     .B = 0x00, /* B */
     .B_accuracy = 0x00, /* B - Accuracy */
@@ -1282,8 +1282,8 @@ void amc_sdr_init( void )
 #ifdef MODULE_INA3221_CURRENT
 
     /* AMC RTM Current */
-    sdr_insert_entry( TYPE_01, (void *) &SDR_AMC_12V, &vTaskINA3221_Handle, 0, CHIP_ID_INA_0 );
-    sdr_insert_entry( TYPE_01, (void *) &SDR_RTM_12V, &vTaskINA3221_Handle, 0, CHIP_ID_INA_0 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_AMC_12V_CURR, &vTaskINA3221_Handle, 0, CHIP_ID_INA_0 );
+    sdr_insert_entry( TYPE_01, (void *) &SDR_RTM_12V_CURR, &vTaskINA3221_Handle, 0, CHIP_ID_INA_0 );
     sdr_add_settings(CHIP_ID_INA_0, (void *) &INA3221_SETTINGS);
 
     /* FMC1 Current */
