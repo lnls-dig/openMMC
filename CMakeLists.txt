@@ -64,7 +64,6 @@ set(UCONTROLLER_APP_LD_SCRIPT "")
 add_subdirectory(port/board)
 add_subdirectory(port/ucontroller)
 add_subdirectory(FreeRTOS)
-add_subdirectory(boot)
 add_subdirectory(modules)
 
 include_directories( ${UCONTROLLER_HDRS} ${PROJ_HDRS} )
@@ -95,8 +94,6 @@ else()
   message(FATAL_ERROR "${BOARD} not supported!")
 endif()
 
-
-
 # Linker flags
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
@@ -109,32 +106,11 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
 # Link libraries
 target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS gcc c ${PROJ_LIBS})
 
-
-
 ##Generate binary file
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
   COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_PROJECT_NAME}.axf ${CMAKE_PROJECT_NAME}.bin
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
   COMMENT "Converting the AXF output to a binary file"
   )
-
-#generate bootloader files only for afc cards
-if(${BOARD} MATCHES "^(afc)")
-  add_executable(bootloader ${BOOT_SRCS})
-  set_target_properties(bootloader PROPERTIES
-    SUFFIX ".axf"
-    LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.ld -Wl,-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_CONTROLLER}_boot.map"
-    )
-  # Headers path
-  target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
-  # Link libraries
-  target_link_libraries(bootloader gcc c lpcopen)
-
-  add_custom_command(TARGET bootloader POST_BUILD
-    COMMAND ${CMAKE_OBJCOPY} -O binary bootloader.axf bootloader.bin
-    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    COMMENT "Converting the AXF output to a binary file"
-    )
-endif()
 
 include( ${CMAKE_SOURCE_DIR}/probe/openocd.cmake )

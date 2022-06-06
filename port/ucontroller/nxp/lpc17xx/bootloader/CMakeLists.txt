@@ -37,3 +37,8 @@ set_target_properties(newboot PROPERTIES
   SUFFIX ".elf"
   LINK_FLAGS ${LPC17_BOOT_LINK_FLAGS}
   )
+add_custom_command(TARGET newboot POST_BUILD
+  COMMAND ${CMAKE_OBJCOPY} -O binary newboot.elf newboot.bin
+  WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  COMMENT "Generate a raw binary image of the bootloader"
+  )

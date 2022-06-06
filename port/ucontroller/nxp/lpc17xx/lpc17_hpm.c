@@ -31,7 +31,6 @@
 #include "iap.h"
 #include "modules/ipmi.h"
 #include "modules/sys_utils.h"
-#include "boot/boot.h"
 #include <string.h>
 #include "arm_cm3_reset.h"
 
