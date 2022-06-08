@@ -95,7 +95,6 @@ char* u8_to_str(uint8_t n, char* str)
     return str;
 }
 
-__attribute__ ((long_call, noinline, section (".ramtext")))
 uint8_t get_sector_number(const void* flash_addr)
 {
     uint8_t ret = 0;
@@ -112,7 +111,6 @@ uint8_t get_sector_number(const void* flash_addr)
     return ret;
 }
 
-__attribute__ ((long_call, noinline, section (".ramtext")))
 void copy_flash_region(const uint32_t* src, const uint32_t* dest, size_t len, uint32_t cpu_clk_khz)
 {
     uint32_t buffer[64];
@@ -133,7 +131,6 @@ void copy_flash_region(const uint32_t* src, const uint32_t* dest, size_t len, ui
     }
 }
 
-__attribute__ ((long_call, noinline, section (".ramtext")))
 void update(uint32_t cpu_clk_khz, enum fw_update_type ftype)
 {
     uint32_t target_start_sec;

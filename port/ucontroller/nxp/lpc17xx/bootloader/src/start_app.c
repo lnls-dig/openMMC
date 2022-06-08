@@ -23,7 +23,6 @@
 
 #include "LPC176x5x.h"
 
-__attribute__ ((long_call, noinline, section (".ramtext")))
 void start_app(const uint32_t* vtor)
 {
 	__disable_irq();

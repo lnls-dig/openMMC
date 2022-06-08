@@ -27,9 +27,7 @@ ENTRY(ResetISR)
 
 SECTIONS
 {
-
-    /* MAIN TEXT SECTION */
-    .text : ALIGN(4)
+    .boot : ALIGN(4)
     {
         FILL(0xff)
         __vectors_start__ = ABSOLUTE(.) ;
@@ -45,6 +43,9 @@ SECTIONS
         LONG(LOADADDR(.data_RAM2));
         LONG(    ADDR(.data_RAM2));
         LONG(  SIZEOF(.data_RAM2));
+        LONG(LOADADDR(.text));
+        LONG(    ADDR(.text));
+        LONG(  SIZEOF(.text));
         __data_section_table_end = .;
         __bss_section_table = .;
         LONG(    ADDR(.bss));
@@ -56,16 +57,17 @@ SECTIONS
         /* End of Global Section Table */
 
         *(.after_vectors*)
-
+        *(.boot*)
     } > BootFlash
 
+    /* MAIN TEXT SECTION */
     .text : ALIGN(4)
     {
-         *(.text*)
+        FILL(0xff)
+        *(.text*)
         *(.rodata .rodata.* .constdata .constdata.*)
         . = ALIGN(4);
-
-    } > BootFlash
+    } > RamLoc AT> BootFlash
 
     /*
      * for exception handling/unwind - some Newlib functions (in common
@@ -90,7 +92,6 @@ SECTIONS
     {
         FILL(0xff)
         PROVIDE(__start_data_RAM2 = .) ;
-        *(.ramtext)
         *(.ramfunc.$RAM2)
         *(.ramfunc.$RamAHB)
         *(.data.$RAM2*)

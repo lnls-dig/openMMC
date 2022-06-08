@@ -92,7 +92,7 @@ __Vectors_End:
 
 
                 .thumb
-                .section .text
+                .section .boot
                 .align   2
 
                 .thumb_func
@@ -106,9 +106,9 @@ ResetISR:
 .L_loop0:
                 cmp      r4, r5
                 bge      .L_loop0_done
-                ldr      r1, [r4]
-                ldr      r2, [r4, #4]
-                ldr      r3, [r4, #8]
+                ldr      r1, [r4]     // Flash address
+                ldr      r2, [r4, #4] // RAM address
+                ldr      r3, [r4, #8] // Size
 
 .L_loop0_0:
                 subs     r3, #4
@@ -140,8 +140,8 @@ ResetISR:
                 adds     r3, #8
                 b        .L_loop2
 .L_loop2_done:
-
-                bl       main
+                ldr      r0,=main
+                blx      r0
 
                 .fnend
                 .size    ResetISR, . - ResetISR

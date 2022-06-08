@@ -39,7 +39,6 @@ enum iap_cmds
 
 static const void (*iap_entry) (uint32_t*, uint32_t*) = (void*) 0x1FFF1FF1;
 
-__attribute__ ((long_call, noinline, section (".ramtext")))
 enum iap_err lpc17_iap_prepare_sectors(uint8_t start_sector, uint8_t end_sector)
 {
 	uint32_t inout[5] = {
@@ -53,7 +52,6 @@ enum iap_err lpc17_iap_prepare_sectors(uint8_t start_sector, uint8_t end_sector)
 	return (enum iap_err)inout[0];
 }
 
-__attribute__ ((long_call, noinline, section (".ramtext")))
 enum iap_err lpc17_iap_copy_ram_flash(const uint32_t* src_ram, const uint32_t* dest_flash, size_t len, uint32_t cpu_clk_khz)
 {
 	uint32_t inout[5] = {
@@ -69,7 +67,6 @@ enum iap_err lpc17_iap_copy_ram_flash(const uint32_t* src_ram, const uint32_t* d
 	return (enum iap_err)inout[0];
 }
 
-__attribute__ ((long_call, noinline, section (".ramtext")))
 enum iap_err lpc17_iap_erase_sectors(uint8_t start_sector, uint8_t end_sector, uint32_t cpu_clk_khz)
 {
 	uint32_t inout[5] = {
@@ -84,7 +81,6 @@ enum iap_err lpc17_iap_erase_sectors(uint8_t start_sector, uint8_t end_sector, u
 	return (enum iap_err)inout[0];
 }
 
-__attribute__ ((long_call, noinline, section (".ramtext")))
 enum iap_err lpc17_iap_blank_check(uint8_t start_sector, uint8_t end_sector)
 {
 	uint32_t inout[5] = {
