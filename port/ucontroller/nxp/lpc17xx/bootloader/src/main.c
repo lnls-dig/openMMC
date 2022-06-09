@@ -246,4 +246,5 @@ int main(void)
      * Jump to application code
      */
     start_app(app_start_addr);
+    return 0;
 }

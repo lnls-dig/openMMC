@@ -98,7 +98,6 @@ __Vectors_End:
                 .thumb_func
                 .type    ResetISR, %function
                 .globl   ResetISR
-                .fnstart
 ResetISR:
                 ldr      r4, =__data_section_table
                 ldr      r5, =__data_section_table_end
@@ -143,7 +142,6 @@ ResetISR:
                 ldr      r0,=main
                 blx      r0
 
-                .fnend
                 .size    ResetISR, . - ResetISR
 
 /* The default macro is not used for HardFault_Handler
@@ -152,19 +150,15 @@ ResetISR:
                 .thumb_func
                 .type    HardFault_Handler, %function
                 .weak    HardFault_Handler
-                .fnstart
 HardFault_Handler:
                 b        .
-                .fnend
                 .size    HardFault_Handler, . - HardFault_Handler
 
                 .thumb_func
                 .type    Default_Handler, %function
                 .weak    Default_Handler
-                .fnstart
 Default_Handler:
                 b        .
-                .fnend
                 .size    Default_Handler, . - Default_Handler
 
 /* Macro to define default exception/interrupt handlers.
