@@ -32,6 +32,7 @@
 
 /* Project Includes */
 #include "sdr.h"
+#include "port.h"
 #include "sensors.h"
 #include "ipmi.h"
 #include "fpga_spi.h"
@@ -109,6 +110,10 @@ void sensor_init( void )
 #if defined(MODULE_INA220_CURRENT) || defined(MODULE_INA220_VOLTAGE)
     ina220_init();
 #endif
+#ifdef MODULE_STM32F3_ADC
+    STM32F3_ADC_init();
+#endif
+
 }
 
 void sdr_init( void )
