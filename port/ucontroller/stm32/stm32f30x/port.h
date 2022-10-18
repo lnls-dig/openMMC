@@ -45,5 +45,11 @@
 #include "stm32_timer.h"
 
 #include "pin_mapping.h"
+#include "i2c_mapping.h"
+#include "stm32_i2c.h"
+
+#define IPMB_TXTASK_STACK_SIZE 512
+#define IPMB_RXTASK_STACK_SIZE 512
+#define IPMITASK_STACK_SIZE 2048
 
 #endif
