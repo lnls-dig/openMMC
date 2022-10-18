@@ -7,6 +7,9 @@ endif()
 if(${TARGET_CONTROLLER} MATCHES "^(lpc|LPC)17")
   add_subdirectory(nxp/lpc17xx)
 
+elseif(${TARGET_CONTROLLER} MATCHES "^(stm|STM)32(f|F)30")
+  add_subdirectory(stm32/stm32f30x)
+
 else ()
   message(FATAL_ERROR "${BoldRed}Selected Controller \"${TARGET_CONTROLLER}\" is not implemented!${ColourReset}")
 endif()
