@@ -132,4 +132,11 @@ if(${BOARD} MATCHES "^(afc)")
     )
 endif()
 
-include( ${CMAKE_SOURCE_DIR}/probe/lpclink.cmake )
+if(${TARGET_CONTROLLER} MATCHES "^(LPC)")
+  include( ${CMAKE_SOURCE_DIR}/probe/lpclink.cmake )
+elseif(${TARGET_CONTROLLER} MATCHES "^(STM32)")
+  include( ${CMAKE_SOURCE_DIR}/probe/openocd.cmake )
+else()
+  message(WARNING "No probe support for ${TARGET_CONTROLLER}!")
+endif()
+
