@@ -286,7 +286,8 @@ IPMI_HANDLER(ipmi_storage_read_fru_data_cmd, NETFN_STORAGE, IPMI_READ_FRU_DATA_C
     /* Count byte on the request is "1" based */
     uint8_t count = req->data[3];
 
-    if ( (count-1) > IPMI_MSG_MAX_LENGTH ) {
+    /* Consider header, count, data and checksum */
+    if ( (count + IPMB_RESP_HEADER_LENGTH + 2) > IPMI_MSG_MAX_LENGTH ) {
         rsp->completion_code = IPMI_CC_CANT_RET_NUM_REQ_BYTES;
         return;
     }
