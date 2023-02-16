@@ -3,6 +3,20 @@
 
 #include "i2c.h"
 
+enum i2c_bus_id {
+	I2C_LPC17_BUS0,
+	I2C_LPC17_BUS1,
+	I2C_LPC17_BUS2,
+	I2C_MUX_BUS0,
+	I2C_MUX_BUS1,
+	I2C_MUX_BUS2,
+	I2C_MUX_BUS3,
+	I2C_MUX_BUS4,
+	I2C_MUX_BUS5,
+	I2C_MUX_BUS6,
+	I2C_MUX_BUS7,
+};
+
 #define I2CMODE_POOLING         1
 #define I2CMODE_INTERRUPT       0
 #define SPEED_100KHZ            100000

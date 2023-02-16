@@ -24,8 +24,46 @@
 
 #include "FreeRTOS.h"
 #include "semphr.h"
+#include "error.h"
 #include <stdint.h>
 #include <stdbool.h>
+
+#define I2C_M_READ           0x0001 /* Read data, from slave to master */
+#define I2C_M_TEN            0x0002 /* Ten bit address */
+#define I2C_M_NOSTOP         0x0040 /* Message should not end with a STOP */
+#define I2C_M_NOSTART        0x0080 /* Message should not begin with a START */
+
+/**
+ * @brief I2C message struct (copied from Nuttx)
+ */
+struct i2c_msg {
+    uint16_t addr;              /* Slave address (7- or 10-bit) */
+    uint16_t flags;             /* See I2C_M_* definitions */
+    uint8_t* buffer;            /* Buffer to be transferred */
+    ssize_t length;             /* Length of the buffer in bytes */
+    struct i2c_msg* next;       /* Next message to be sent or NULL */
+};
+
+struct i2c_dev {
+    mmc_err (*master_transfer) (struct i2c_dev* dev, struct i2c_msg* msgs);
+};
+
+/**
+ * @brief Register an I2C bus
+ *
+ * This should be called only during hardware initialization. Currently
+ * there is no way of unregistering I2C buses.
+ *
+ * @param[in] bus_id Bus id enum
+ * @param[in] dev    A pointer to an I2C dev struct. This should remain
+ *                   valid for the entire program life time.
+ *
+ * @return MMC_OK if success, an error code otherwise
+ */
+mmc_err i2c_register_bus(enum i2c_bus_id bus_id, struct i2c_dev* dev);
+
+
+mmc_err i2c_master_trans(enum i2c_bus_id bus_id, struct i2c_msg* msgs, int count);
 
 /**
  * @brief I2C Chips information regarding the bus and slave address

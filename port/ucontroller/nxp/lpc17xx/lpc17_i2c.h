@@ -25,6 +25,8 @@
  * @brief I2C driver for LPC17xx
  */
 
+#include "error.h"
+
 /*! @brief Max message length (in bits) used in I2C */
 #define i2cMAX_MSG_LENGTH               32
 
@@ -36,3 +38,13 @@ uint8_t xI2CSlaveReceive( I2C_ID_T id, uint8_t * rx_buff, uint8_t buff_len, uint
 void vI2CSlaveSetup ( I2C_ID_T id, uint8_t slave_addr );
 void vI2CConfig( I2C_ID_T id, uint32_t speed );
 
+struct i2c_lpc17_dev {
+	struct i2c_dev dev;
+	void* lpc17_i2c_base;
+	SemaphoreHandle_t wait;
+	SemaphoreHandle_t mutex;
+	TickType_t timeout;
+	struct i2c_msg* msgs;
+};
+
+mmc_err i2c_mcu_init(struct i2c_lpc17_dev* dev, uint8_t id, uint32_t speed);

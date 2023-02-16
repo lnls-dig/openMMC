@@ -25,6 +25,42 @@
 #include "i2c.h"
 #include "i2c_mapping.h"
 
+#define I2C_MAX_BUSES 16
+static struct i2c_dev* buses[I2C_MAX_BUSES] = {NULL};
+
+mmc_err i2c_register_bus(enum i2c_bus_id bus_id, struct i2c_dev* dev) {
+    int bus_id_index = (int) bus_id;
+
+    if (bus_id_index < 0 || bus_id_index >= I2C_MAX_BUSES) {
+        return MMC_INVALID_ARG_ERR;
+    }
+
+    if (buses[bus_id_index] != NULL) {
+        return MMC_RESOURCE_ERR;
+    }
+
+    buses[bus_id_index] = dev;
+
+    return MMC_OK;
+}
+
+mmc_err i2c_master_trans(enum i2c_bus_id bus_id, struct i2c_msg* msgs, int count) {
+    int bus_id_index = (int) bus_id;
+    struct i2c_dev* dev = NULL;
+
+    if (bus_id_index < 0 || bus_id_index >= I2C_MAX_BUSES) {
+        return MMC_INVALID_ARG_ERR;
+    }
+
+    dev = buses[bus_id_index];
+
+    if (dev == NULL) {
+        return MMC_RESOURCE_ERR;
+    }
+
+    return dev->master_transfer(dev, msgs, count);
+}
+
 void i2c_init( void )
 {
     for ( uint8_t i = 0; i < I2C_MUX_CNT; i++ ) {
