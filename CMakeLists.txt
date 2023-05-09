@@ -42,7 +42,7 @@ message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat -Wno-unused-parameter -Wno-missing-field-initializers")
 
 # Build specific flags
-set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_ERROR_FLAGS}")
+set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_ERROR_FLAGS} -fcommon")
 set(CMAKE_C_FLAGS_DEBUG     "-Og -g3 -DDEBUG")
 set(CMAKE_C_FLAGS_RELEASE   "-Os")
 
@@ -86,10 +86,10 @@ link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 add_executable(${CMAKE_PROJECT_NAME} ${UCONTROLLER_SRCS} ${PROJ_SRCS})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES COMPILE_FLAGS ${MODULES_FLAGS})
 
-if(${BOARD} MATCHES "^(afc)")
+if(${TARGET_CONTROLLER} MATCHES "^(LPC)")
   set(PROJ_LIBS lpcopen)
-else()
-  message(FATAL_ERROR "${BOARD} not supported!")
+elseif(${TARGET_CONTROLLER} MATCHES "^(STM32)")
+  set(PROJ_LIBS libstm)
 endif()
 
 
@@ -132,4 +132,11 @@ if(${BOARD} MATCHES "^(afc)")
     )
 endif()
 
-include( ${CMAKE_SOURCE_DIR}/probe/lpclink.cmake )
+if(${TARGET_CONTROLLER} MATCHES "^(LPC)")
+  include( ${CMAKE_SOURCE_DIR}/probe/lpclink.cmake )
+elseif(${TARGET_CONTROLLER} MATCHES "^(STM32)")
+  include( ${CMAKE_SOURCE_DIR}/probe/openocd.cmake )
+else()
+  message(WARNING "No probe support for ${TARGET_CONTROLLER}!")
+endif()
+

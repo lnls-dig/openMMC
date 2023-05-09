@@ -52,4 +52,8 @@
 #include "max6642.h"
 #endif
 
+#ifdef MODULE_STM32F3_ADC
+#include "stm32f3_adc.h"
+#endif
+
 #endif

@@ -39,6 +39,10 @@
 #include "payload.h"
 #include "uart_debug.h"
 
+#ifndef IPMITASK_STACK_SIZE
+#define IPMITASK_STACK_SIZE 100
+#endif
+
 /* Local variables */
 /**
  * @brief Queue that holds the incoming IPMI messages
@@ -116,7 +120,9 @@ void ipmi_init ( void )
 {
     ipmb_init();
     ipmb_register_rxqueue( &ipmi_rxqueue );
-    xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", 100, ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle );
+    xTaskCreate(
+        IPMITask, (const char*)"IPMI Dispatcher", IPMITASK_STACK_SIZE,
+        ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle);
 }
 
 /**
