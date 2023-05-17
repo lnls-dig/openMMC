@@ -80,7 +80,7 @@ IPMI_HANDLER(ipmi_oem_cmd_i2c_transfer, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_I2C_TRANS
 
     if ( read_len > 0 ) {
         read_data = pvPortMalloc( read_len );
-        memset( read_data, read_len, 0 );
+        memset( read_data, 0, read_len );
 
         if ( xI2CMasterRead( i2c_interf, i2c_addr, read_data, read_len ) == read_len ) {
             rsp->data[0] = read_len;
