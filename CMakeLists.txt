@@ -70,11 +70,6 @@ include_directories( ${UCONTROLLER_HDRS} ${PROJ_HDRS} )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DTARGET_BOARD_NAME=\"${TARGET_BOARD_NAME}\" ")
 
-if(BENCH_TEST)
-  set(MODULES_FLAGS "${MODULES_FLAGS} -DBENCH_TEST")
-  message( STATUS "${Magenta}Bench mode activated! ${ColourReset}")
-endif()
-
 # Get Git information
 git_describe(GIT_TAG "--tags")
 get_git_head_revision(GIT_REFSPEC GIT_SHA1)

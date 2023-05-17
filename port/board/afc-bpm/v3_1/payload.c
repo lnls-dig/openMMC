@@ -178,11 +178,17 @@ TaskHandle_t vTaskPayload_Handle;
 
 void payload_init( void )
 {
+    /* Set standalone mode if the module is disconnected from a create*/
+    bool standalone_mode = false;
 
-#ifndef BENCH_TEST
-    /* Wait until ENABLE# signal is asserted ( ENABLE == 0) */
-    while ( gpio_read_pin( PIN_PORT(GPIO_MMC_ENABLE), PIN_NUMBER(GPIO_MMC_ENABLE) ) == 1 ) {};
-#endif
+    if (get_ipmb_addr() == IPMB_ADDR_DISCONNECTED) {
+        standalone_mode = true;
+    }
+
+    if (!standalone_mode) {
+        /* Wait until ENABLE# signal is asserted ( ENABLE == 0) */
+        while ( gpio_read_pin( PIN_PORT(GPIO_MMC_ENABLE), PIN_NUMBER(GPIO_MMC_ENABLE) ) == 1 ) {};
+    }
 
     xTaskCreate( vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
 

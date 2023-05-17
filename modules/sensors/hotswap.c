@@ -137,6 +137,11 @@ void vTaskHotSwap( void *Parameters )
             continue;
         }
 
+        bool standalone_mode = false;
+        if (get_ipmb_addr() == IPMB_ADDR_DISCONNECTED) {
+            standalone_mode = true;
+        }
+
         if ( new_state_amc ^ old_state_amc ) {
             if ( new_state_amc == 0 ) {
                 printf("AMC Hotswap handle pressed!\n");
@@ -148,9 +153,9 @@ void vTaskHotSwap( void *Parameters )
                 hotswap_clear_mask_bit( HOTSWAP_AMC, 1 << (!new_state_amc) );
                 old_state_amc = new_state_amc;
             }
-#ifdef BENCH_TEST
-            old_state_amc = new_state_amc;
-#endif
+            if (!standalone_mode) {
+                old_state_amc = new_state_amc;
+            }
         }
 
 #ifdef MODULE_RTM
@@ -167,23 +172,28 @@ void vTaskHotSwap( void *Parameters )
         if ( new_state_rtm ^ old_state_rtm ) {
             if ( new_state_rtm == 0 ) {
                 printf("RTM Hotswap handle pressed!\n");
-#ifdef BENCH_TEST
-                payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_RTM_ENABLE);
-#endif
+
+                if (!standalone_mode) {
+                    payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_RTM_ENABLE);
+                }
             } else {
-            	printf("RTM Hotswap handle released!\n");
-#ifdef BENCH_TEST
-                payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_QUIESCE);
-#endif
+                printf("RTM Hotswap handle released!\n");
+
+                if (!standalone_mode) {
+                     payload_send_message(FRU_RTM, PAYLOAD_MESSAGE_QUIESCE);
+                }
+
             }
             if ( hotswap_send_event( hotswap_rtm_sensor, new_state_rtm ) == ipmb_error_success ) {
                 hotswap_set_mask_bit( HOTSWAP_RTM, 1 << new_state_rtm );
                 hotswap_clear_mask_bit( HOTSWAP_RTM, 1 << (!new_state_rtm) );
                 old_state_rtm = new_state_rtm;
             }
-#ifdef BENCH_TEST
-            old_state_rtm = new_state_rtm;
-#endif
+
+            if (!standalone_mode) {
+                old_state_rtm = new_state_rtm;
+            }
+
         }
 #endif
     }
