@@ -245,7 +245,7 @@ void vTaskPayload( void *pvParameters )
 
         if ( (current_evt & PAYLOAD_MESSAGE_REBOOT) || (current_evt & PAYLOAD_MESSAGE_WARM_RST) ) {
             fpga_soft_reset();
-            xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_REBOOT );
+            xEventGroupClearBits(amc_payload_evt, PAYLOAD_MESSAGE_REBOOT | PAYLOAD_MESSAGE_WARM_RST);
         }
 
         payload_check_pgood(&PP_good);
