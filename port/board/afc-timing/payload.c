@@ -243,17 +243,17 @@ void vTaskPayload( void *pvParameters )
         current_evt = xEventGroupGetBits( amc_payload_evt );
 
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
-	    
+
             /*
-             * If you issue a shutdown fru command in the MCH shell, the payload power 
-             * task will receive a PAYLOAD_MESSAGE_QUIESCE message and set the 
-             * QUIESCED_req flag to '1' and the MCH will shutdown the 12VP0 power, 
-             * making the payload power task go to PAYLOAD_NO_POWER state. 
+             * If you issue a shutdown fru command in the MCH shell, the payload power
+             * task will receive a PAYLOAD_MESSAGE_QUIESCE message and set the
+             * QUIESCED_req flag to '1' and the MCH will shutdown the 12VP0 power,
+             * making the payload power task go to PAYLOAD_NO_POWER state.
              * So, if we are in the PAYLOAD_QUIESCED state and receive a
-             * PAYLOAD_MESSAGE_QUIESCE message, the QUIESCED_req flag 
+             * PAYLOAD_MESSAGE_QUIESCE message, the QUIESCED_req flag
              * should be '0'
              */
-    
+
             if (state == PAYLOAD_QUIESCED) {
 	        QUIESCED_req = 0;
 	    } else {
@@ -371,7 +371,7 @@ uint8_t payload_hpm_prepare_comp( void )
         return IPMI_CC_OUT_OF_SPACE;
     }
 
-    memset(hpm_page, 0xFF, sizeof(hpm_page));
+    memset(hpm_page, 0xFF, PAYLOAD_HPM_PAGE_SIZE);
 
     hpm_pg_index = 0;
     hpm_page_addr = 0;
@@ -396,7 +396,7 @@ uint8_t payload_hpm_upload_block( uint8_t * block, uint16_t size )
     /* TODO: Check DONE pin before accessing the SPI bus, since the FPGA may be reading it in order to boot */
     uint8_t remaining_bytes_start;
 
-    if ( sizeof(hpm_page) - hpm_pg_index > size ) {
+    if ( PAYLOAD_HPM_PAGE_SIZE - hpm_pg_index > size ) {
         /* Our page is not full yet, just append the new data */
         memcpy(&hpm_page[hpm_pg_index], block, size);
         hpm_pg_index += size;
@@ -405,16 +405,16 @@ uint8_t payload_hpm_upload_block( uint8_t * block, uint16_t size )
 
     } else {
         /* Complete the remaining bytes on the buffer */
-        memcpy(&hpm_page[hpm_pg_index], block, (sizeof(hpm_page) - hpm_pg_index));
-        remaining_bytes_start = (sizeof(hpm_page) - hpm_pg_index);
+        memcpy(&hpm_page[hpm_pg_index], block, (PAYLOAD_HPM_PAGE_SIZE - hpm_pg_index));
+        remaining_bytes_start = (PAYLOAD_HPM_PAGE_SIZE - hpm_pg_index);
 
         /* Program the complete page in the Flash */
-        flash_program_page( hpm_page_addr, &hpm_page[0], sizeof(hpm_page));
+        flash_program_page( hpm_page_addr, &hpm_page[0], PAYLOAD_HPM_PAGE_SIZE);
 
-        hpm_page_addr += sizeof(hpm_page);
+        hpm_page_addr += PAYLOAD_HPM_PAGE_SIZE;
 
         /* Empty our buffer and reset the index */
-        memset(hpm_page, 0xFF, sizeof(hpm_page));
+        memset(hpm_page, 0xFF, PAYLOAD_HPM_PAGE_SIZE);
         hpm_pg_index = 0;
 
         /* Save the trailing bytes */
@@ -433,7 +433,7 @@ uint8_t payload_hpm_finish_upload( uint32_t image_size )
     /* Check if the last page was already programmed */
     if (!hpm_pg_index) {
         /* Program the complete page in the Flash */
-        flash_program_page( hpm_page_addr, &hpm_page[0], (sizeof(hpm_page)-hpm_pg_index));
+        flash_program_page( hpm_page_addr, &hpm_page[0], (PAYLOAD_HPM_PAGE_SIZE-hpm_pg_index));
         hpm_pg_index = 0;
         hpm_page_addr = 0;
 
