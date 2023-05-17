@@ -224,7 +224,7 @@ void payload_init( void )
     bool standalone_mode = false;
     mmc_err err;
 
-    if (get_ipmb_addr() == 0xA2) {
+    if (get_ipmb_addr() == IPMB_ADDR_DISCONNECTED) {
         standalone_mode = true;
     }
 
