@@ -48,6 +48,7 @@ extern enum {
     PAYLOAD_FPGA_ON,
     PAYLOAD_SWITCHING_OFF,
     PAYLOAD_QUIESCED,
+    PAYLOAD_RESET,
     PAYLOAD_MAX_STATES
 } payload_state;
 

@@ -243,12 +243,27 @@ void vTaskPayload( void *pvParameters )
         current_evt = xEventGroupGetBits( amc_payload_evt );
 
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
-            QUIESCED_req = 1;
+	    
+            /*
+             * If you issue a shutdown fru command in the MCH shell, the payload power 
+             * task will receive a PAYLOAD_MESSAGE_QUIESCE message and set the 
+             * QUIESCED_req flag to '1' and the MCH will shutdown the 12VP0 power, 
+             * making the payload power task go to PAYLOAD_NO_POWER state. 
+             * So, if we are in the PAYLOAD_QUIESCED state and receive a
+             * PAYLOAD_MESSAGE_QUIESCE message, the QUIESCED_req flag 
+             * should be '0'
+             */
+    
+            if (state == PAYLOAD_QUIESCED) {
+	        QUIESCED_req = 0;
+	    } else {
+	        QUIESCED_req = 1;
+	    }
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCE );
         }
 
         if ( current_evt & PAYLOAD_MESSAGE_COLD_RST ) {
-            state = PAYLOAD_SWITCHING_OFF;
+            state = PAYLOAD_RESET;
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_COLD_RST );
         }
 
@@ -315,6 +330,11 @@ void vTaskPayload( void *pvParameters )
             if (PP_good == 0 && DCDC_good == 0) {
                 new_state = PAYLOAD_NO_POWER;
             }
+            break;
+        case PAYLOAD_RESET:
+            /*Reset DCDC converters*/
+            setDC_DC_ConvertersON( false );
+            new_state = PAYLOAD_NO_POWER;
             break;
 
         default:
