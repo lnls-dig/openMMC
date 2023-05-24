@@ -68,6 +68,11 @@ t_component hpm_components[HPM_MAX_COMPONENTS] = {
                 .rollback_backup_support = 0x01
             }
         },
+        .hpm_prepare_comp_f = bootloader_hpm_prepare_comp,
+        .hpm_upload_block_f = bootloader_hpm_upload_block,
+        .hpm_finish_upload_f = bootloader_hpm_finish_upload,
+        .hpm_get_upgrade_status_f = bootloader_hpm_get_upgrade_status,
+        .hpm_activate_firmware_f = bootloader_hpm_activate_firmware
     },
     [HPM_IPMC_COMPONENT_ID] = {
         .properties = {

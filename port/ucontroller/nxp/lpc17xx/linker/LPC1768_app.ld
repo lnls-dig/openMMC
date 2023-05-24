@@ -8,8 +8,8 @@ MEMORY
   RamLoc (rwx)       : ORIGIN = 0x10000000, LENGTH = 32K /* 32K bytes */
   RamAHB (rwx)       : ORIGIN = 0x2007c000, LENGTH = 32K /* 32K bytes */
 }
-  __Bootloader_start    = 0x0000; /* Bootloader start address (vector table) */
-  __Bootloader_end      = 0x1FFF; /* Bootloader end address (last byte) */
+  __BootFlash_start    = 0x0000; /* Bootloader start address (vector table) */
+  __BootFlash_end      = 0x1FFF; /* Bootloader end address (last byte) */
   __AppFlash_start      = 0x2000; /* Application start address (vector table) */
   __AppFlash_end        = 0x1FFF + 248K;  /* Application end address (last byte) */
   __FWUpdateFlash_start = 0x40000; /* Firmware update region start address */
