@@ -183,7 +183,7 @@ void payload_init( void )
     /* Set standalone mode if the module is disconnected from a create*/
     bool standalone_mode = false;
 
-    if (get_ipmp_addr() == IPMB_ADDR_DISCONNECTED) {
+    if (get_ipmb_addr() == IPMB_ADDR_DISCONNECTED) {
         standalone_mode = true;
     }
 
