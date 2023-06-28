@@ -108,4 +108,18 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
   COMMENT "Converting the AXF output to a binary file"
   )
 
+##Generate hpm files if bin2hpm is installed
+
+find_program(BIN2HPM NAMES "bin2hpm")
+if(BIN2HPM)
+  add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND bin2hpm -c 1 -n -m 0x315A -p 0x00 ${CMAKE_PROJECT_NAME}.bin -o ${CMAKE_PROJECT_NAME}.hpm
+    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    COMMENT "Creating HPM file from binary"
+  )
+  message(STATUS "bin2hpm found in the $PATH, .hpm files will be generated automatically.")
+else()
+  message(NOTICE "bin2hpm not found in the $PATH, .hpm files will not be generated.")
+endif()
+
 include( ${CMAKE_SOURCE_DIR}/probe/openocd.cmake )
