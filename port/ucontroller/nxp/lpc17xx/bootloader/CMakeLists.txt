@@ -42,3 +42,14 @@ add_custom_command(TARGET newboot POST_BUILD
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
   COMMENT "Generate a raw binary image of the bootloader"
   )
+
+##Generate hpm files if bin2hpm is installed
+
+find_program(BIN2HPM NAMES "bin2hpm")
+if(BIN2HPM)
+  add_custom_command(TARGET newboot POST_BUILD
+    COMMAND bin2hpm -c 0 -n -m 0x315A -p 0x00 newboot.bin -o newboot.hpm
+    WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    COMMENT "Creating HPM file from binary"
+  )
+endif()
