@@ -52,16 +52,21 @@ typedef uint8_t (* t_hpm_prepare_comp)(void);
 typedef uint8_t (* t_hpm_get_upgrade_status)(void);
 typedef uint8_t (* t_hpm_activate_firmware)(void);
 
+
+/*
+ * Define the "Get target upgrade capabilities" message struct as define in the 
+ * Hardware Platform Management IPM Controller Firmware Upgrade Specification, Table 3-3
+ */
 typedef union {
     struct {
-        uint8_t upgrade_undesirable:1;
-        uint8_t automatic_rollback_overridden:1;
-        uint8_t ipmc_degraded_in_update:1;
-        uint8_t deferred_activation:1;
-        uint8_t services_affected:1;
-        uint8_t manual_rollback:1;
-        uint8_t automatic_rollback:1;
         uint8_t self_test:1;
+        uint8_t automatic_rollback:1;
+        uint8_t manual_rollback:1;
+        uint8_t services_affected:1;
+        uint8_t deferred_activation:1;
+        uint8_t ipmc_degraded_in_update:1;
+        uint8_t automatic_rollback_overridden:1;
+        uint8_t upgrade_undesirable:1;
     } flags;
     uint8_t byte;
 } t_ipmc_capabilities;
