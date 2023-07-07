@@ -225,6 +225,10 @@ size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len )
         return 0;
     }
 
+    /*
+     * Read runtime FRU info that is auto-generated
+     * when there is no valid FRU info in the EEPROM
+     */
     if ( fru[id].runtime ) {
         for ( i = 0; i < len; i++, j++ ) {
             if ( j < fru[id].fru_size ) {
@@ -234,8 +238,12 @@ size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len )
             }
         }
         ret_val = i;
+
+    /*
+     *  Read EEPROM FRU info
+     */
     } else {
-        ret_val = fru[id].cfg.read_f( fru[id].cfg.eeprom_id, offset, rx_buff, len, 0 );
+        ret_val = fru[id].cfg.read_f( fru[id].cfg.eeprom_id, offset, rx_buff, len, 10 );
     }
     return ret_val;
 }
@@ -295,6 +303,17 @@ IPMI_HANDLER(ipmi_storage_read_fru_data_cmd, NETFN_STORAGE, IPMI_READ_FRU_DATA_C
     offset = (req->data[2] << 8) | (req->data[1]);
 
     count = fru_read( fru_id, &(rsp->data[len+1]), offset, count );
+
+    /*
+     *  If count == 0, it may indicate that the fru_read function
+     *  failed somehow.
+     */
+
+    if (count == 0) {
+        rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+        return ;
+    }
+
     rsp->data[len++] = count;
 
     rsp->data_len = len + count;
