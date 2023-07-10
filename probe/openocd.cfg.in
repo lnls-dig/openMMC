@@ -1,4 +1,4 @@
-source [find interface/${DEBUG_PROBE}.cfg]
+source [find ${OPENOCD_DEBUG_PROBE_FILE}]
 
 transport select ${OPENOCD_TRANSPORT}
 
