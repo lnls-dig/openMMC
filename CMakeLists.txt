@@ -20,7 +20,7 @@ project(openMMC C CXX ASM)
 
 #Find a toolchain file
 if(NOT CMAKE_TOOLCHAIN_FILE)
-  message(WARNING "${Yellow}No toolchain configuration file specified. Using default option!${ColourReset}")
+  message(NOTICE "No toolchain configuration file specified. Using default option!")
 
   include(${CMAKE_SOURCE_DIR}/toolchain/toolchain-arm-none-eabi.cmake)
 endif()
