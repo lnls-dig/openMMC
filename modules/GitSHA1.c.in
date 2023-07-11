@@ -2,3 +2,46 @@
 #define GIT_TAG "@GIT_TAG@"
 const char g_GIT_SHA1[] = GIT_SHA1;
 const char g_GIT_TAG[] = GIT_TAG;
+
+#include <string.h>
+#include <stddef.h>
+#include <stdint.h>
+#include "ipmi.h"
+
+static void hex_str_to_bin(const char* src, uint8_t* dest, size_t len)
+{
+    for (size_t i = 0; src[i] && ((i / 2) < len); i++)
+    {
+        char c = src[i];
+        uint8_t nibble = 0;
+        if (c >= '0' && c <= '9')
+        {
+            nibble = c & 0x0F;
+        }
+        else if (c >= 'A' && c <= 'F')
+        {
+            nibble = c - 'A' + 0x0A;
+        }
+        else if (c >= 'a' && c <= 'f')
+		{
+            nibble = c - 'a' + 0x0A;
+		}
+        if ((i % 2) == 0)
+        {
+            dest[i / 2] &= 0x0F;
+            dest[i / 2] |= nibble << 4;
+        }
+        else
+        {
+            dest[i / 2] &= 0xF0;
+            dest[i / 2] |= nibble;
+        }
+    }
+}
+
+IPMI_HANDLER(ipmi_custom_cmd_get_git_hash, NETFN_CUSTOM, IPMI_CUSTOM_CMD_GET_GIT_HASH, ipmi_msg *req, ipmi_msg *rsp)
+{
+    hex_str_to_bin(GIT_SHA1, rsp->data, 20);
+    rsp->data_len = 20;
+    rsp->completion_code = IPMI_CC_OK;
+}
