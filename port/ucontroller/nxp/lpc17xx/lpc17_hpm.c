@@ -34,6 +34,8 @@
 #include <string.h>
 #include "arm_cm3_reset.h"
 
+bool finish_upload_success = false;
+
 typedef struct
 {
     uint8_t version[3];
@@ -82,6 +84,7 @@ static uint8_t get_sector_number(const void* flash_addr)
 
 uint8_t hpm_prepare_comp(enum memory_area area)
 {
+    finish_upload_success = false;
     ipmc_image_size = 0;
     ipmc_page_byte_index = 0;
     ipmc_page_addr = 0;
@@ -193,11 +196,15 @@ uint8_t hpm_finish_upload(uint32_t image_size, enum memory_area area)
         ipmc_page_addr = 0;
     }
 
-    if (ipmc_image_size != image_size) {
-        /* HPM CC: Number of bytes received does not match the size provided in the "Finish firmware upload" request */
+    if (ipmc_image_size != image_size ||
+        ipmc_image_size == 0) {
+        /*
+         * HPM CC: Number of bytes received does not match the size provided in the "Finish firmware upload" request
+         * or no bytes where received.
+         */
         return 0x81;
     }
-
+    finish_upload_success = true;
     return IPMI_CC_OK;
 }
 
@@ -225,6 +232,13 @@ uint8_t bootloader_hpm_get_upgrade_status(void)
 
 uint8_t ipmc_hpm_activate_firmware(void)
 {
+    /*
+     * Doesn't write the magic word if the function hpm_finish_upload fails
+     */
+
+    if (!finish_upload_success) {
+        return IPMI_CC_UNSPECIFIED_ERROR;
+    }
     fw_info fw_update_header;
     memset(&fw_update_header, 0xFF, sizeof(fw_update_header));
 
@@ -252,6 +266,14 @@ uint8_t ipmc_hpm_activate_firmware(void)
 
 uint8_t bootloader_hpm_activate_firmware(void)
 {
+    /*
+     * Doesn't activate the firmware if the function hpm_finish_upload fails
+     */
+
+    if (!finish_upload_success) {
+        return IPMI_CC_UNSPECIFIED_ERROR;
+    }
+
     sys_schedule_reset(500);
     return IPMI_CC_OK;
 }
@@ -259,9 +281,9 @@ uint8_t bootloader_hpm_activate_firmware(void)
 uint8_t program_page(uint32_t address, uint32_t *data, uint32_t size, enum memory_area area)
 {
     uint32_t update_start_sec, update_end_sec;
-    
+
     portDISABLE_INTERRUPTS();
-    
+
     if (size % 256) {
         /* Data should be a 256 byte boundary */
         return IPMI_CC_PARAM_OUT_OF_RANGE;
@@ -270,7 +292,7 @@ uint8_t program_page(uint32_t address, uint32_t *data, uint32_t size, enum memor
     if (area == BOOT_FLASH) {
         update_start_sec = get_sector_number(boot_start_addr);
         update_end_sec = get_sector_number(boot_end_addr);
-        
+
         if (Chip_IAP_PreSectorForReadWrite(update_start_sec, update_end_sec) != IAP_CMD_SUCCESS) {
             portENABLE_INTERRUPTS();
             return IPMI_CC_UNSPECIFIED_ERROR;
@@ -278,13 +300,13 @@ uint8_t program_page(uint32_t address, uint32_t *data, uint32_t size, enum memor
 
         if (Chip_IAP_CopyRamToFlash((uint32_t)boot_start_addr + address, data, size)) {
             portENABLE_INTERRUPTS();
-            return IPMI_CC_UNSPECIFIED_ERROR;        
+            return IPMI_CC_UNSPECIFIED_ERROR;
         }
 
     } else if (area == FW_UPDATE_FLASH) {
         update_start_sec = get_sector_number(update_start_addr);
         update_end_sec = get_sector_number(update_end_addr);
-    
+
         if (Chip_IAP_PreSectorForReadWrite(update_start_sec, update_end_sec) != IAP_CMD_SUCCESS) {
             portENABLE_INTERRUPTS();
             return IPMI_CC_UNSPECIFIED_ERROR;
@@ -292,14 +314,14 @@ uint8_t program_page(uint32_t address, uint32_t *data, uint32_t size, enum memor
 
         if (Chip_IAP_CopyRamToFlash((uint32_t)update_start_addr + address, data, size)) {
             portENABLE_INTERRUPTS();
-            return IPMI_CC_UNSPECIFIED_ERROR;        
+            return IPMI_CC_UNSPECIFIED_ERROR;
         }
 
-    
+
     } else {
         return IPMI_CC_PARAM_OUT_OF_RANGE;
     }
-    
+
     portENABLE_INTERRUPTS();
     return IPMI_CC_OK;
 }
