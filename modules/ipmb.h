@@ -38,6 +38,11 @@
 
 
 /**
+ * @brief Address out of range of the MicroTCA Carrier's AMC Slot ID
+ */
+#define IPMB_ADDR_DISCONNECTED	0xA2
+
+/**
  * @brief Maximum count of messages to be sent
  */
 #define IPMB_TXQUEUE_LEN        10

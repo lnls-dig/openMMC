@@ -1,0 +1,11 @@
+source [find ${OPENOCD_DEBUG_PROBE_FILE}]
+
+transport select ${OPENOCD_TRANSPORT}
+
+source [find target/${OPENOCD_TARGET}.cfg]
+
+adapter speed 3000
+
+$_TARGETNAME configure -event gdb-attach {
+    halt
+}

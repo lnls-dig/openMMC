@@ -1,0 +1,34 @@
+name: Build for all targets
+on:
+  push:
+    branches:
+      - master
+      - devel
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/lnls-dig/openmmc-builder:latest
+    strategy:
+      matrix:
+        build-flags:
+          - { flags: -DBOARD=afc-bpm -DVERSION=3.1 } 
+          - { flags: -DBOARD=afc-timing -DBOARD_RTM=8sfp }
+          - { flags: -DBOARD=afc-v4 }
+          - { flags: -DBOARD=afc-v4 -DDEBUG_PROBE=jlink -DOPENOCD_TRANSPORT=swd }
+          - { flags: -DBOARD=afc-v4 -DDEBUG_PROBE=cmsis-dap -DOPENOCD_TRANSPORT=swd }
+          - { flags: -DBOARD=afc-v4 -DDEBUG_PROBE=digilent_jtag_hs3 -DOPENOCD_TRANSPORT=jtag }
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Create build environment
+        run: mkdir build
+      - name: Configure CMake
+        working-directory: build
+        run: cmake .. -DCMAKE_BUILD_TYPE=RELWITHDEBINFO ${{matrix.build-flags.flags}}
+      - name: Build for all targets
+        working-directory: build
+        run: make

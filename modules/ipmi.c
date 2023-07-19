@@ -116,7 +116,7 @@ void ipmi_init ( void )
 {
     ipmb_init();
     ipmb_register_rxqueue( &ipmi_rxqueue );
-    xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", 100, ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle );
+    xTaskCreate( IPMITask, (const char*)"IPMI Dispatcher", 256, ( void * ) NULL, tskIPMI_PRIORITY, &TaskIPMI_Handle );
 }
 
 /**

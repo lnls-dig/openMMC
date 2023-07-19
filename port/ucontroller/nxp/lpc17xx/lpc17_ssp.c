@@ -35,11 +35,13 @@ static ssp_config_t ssp_cfg[MAX_SSP_INTERFACES] = {
         .irq = SSP0_IRQn,
         .ssel_pin = SSP0_SSEL,
     },
+#ifdef MODULE_FLASH_SPI
     [FLASH_SPI] = {
         .lpc_id = LPC_SSP1,
         .irq = SSP1_IRQn,
         .ssel_pin = SSP1_SSEL,
     }
+#endif
 };
 
 static void ssp_irq_handler( LPC_SSP_T * ssp_id )

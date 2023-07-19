@@ -1,5 +1,7 @@
 # Define minimal required version of CMake.
-cmake_minimum_required(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.0.0)
+
+option(DISABLE_WATCHDOG "Disable watchdog module to aid debugging" OFF)
 
 #Include text color definitions
 include( ${CMAKE_SOURCE_DIR}/toolchain/colors.cmake )
@@ -18,7 +20,7 @@ project(openMMC C CXX ASM)
 
 #Find a toolchain file
 if(NOT CMAKE_TOOLCHAIN_FILE)
-  message(WARNING "${Yellow}No toolchain configuration file specified. Using default option!${ColourReset}")
+  message(NOTICE "No toolchain configuration file specified. Using default option!")
 
   include(${CMAKE_SOURCE_DIR}/toolchain/toolchain-arm-none-eabi.cmake)
 endif()
@@ -57,21 +59,16 @@ set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}" CACHE STRING "")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}" CACHE STRING "")
 
 set(PROJ_HDRS ${CMAKE_SOURCE_DIR} )
+set(UCONTROLLER_APP_LD_SCRIPT "")
 
 add_subdirectory(port/board)
 add_subdirectory(port/ucontroller)
 add_subdirectory(FreeRTOS)
-add_subdirectory(boot)
 add_subdirectory(modules)
 
 include_directories( ${UCONTROLLER_HDRS} ${PROJ_HDRS} )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DTARGET_CONTROLLER=${TARGET_CONTROLLER} -DTARGET_BOARD_NAME=\"${TARGET_BOARD_NAME}\" ")
-
-if(BENCH_TEST)
-  set(MODULES_FLAGS "${MODULES_FLAGS} -DBENCH_TEST")
-  message( STATUS "${Magenta}Bench mode activated! ${ColourReset}")
-endif()
 
 # Get Git information
 git_describe(GIT_TAG "--tags")
@@ -92,44 +89,37 @@ else()
   message(FATAL_ERROR "${BOARD} not supported!")
 endif()
 
-
-
 # Linker flags
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-  SUFFIX ".axf"
-  LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_app.map" )
+  SUFFIX ".elf"
+  LINK_FLAGS "-T ${UCONTROLLER_APP_LD_SCRIPT} -Wl,-Map=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TARGET_CONTROLLER}_app.map"
+  )
 
 # Headers path
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${PROJ_HDRS})
 # Link libraries
-target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS c gcc m ${PROJ_LIBS})
-
-
+target_link_libraries(${CMAKE_PROJECT_NAME} FreeRTOS gcc c ${PROJ_LIBS})
 
 ##Generate binary file
 add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-  COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_PROJECT_NAME}.axf ${CMAKE_PROJECT_NAME}.bin
+  COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_PROJECT_NAME}.elf ${CMAKE_PROJECT_NAME}.bin
   WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  COMMENT "Converting the AXF output to a binary file"
+  COMMENT "Converting the ELF output to a binary file"
   )
 
-#generate bootloader files only for afc cards
-if(${BOARD} MATCHES "^(afc)")
-  add_executable(bootloader ${BOOT_SRCS})
-  set_target_properties(bootloader PROPERTIES
-    SUFFIX ".axf"
-    LINK_FLAGS "-T ${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.ld -Wl,-Map=${CMAKE_SOURCE_DIR}/linker/${TARGET_CONTROLLER}_boot.map")
-  # Headers path
-  target_include_directories(bootloader PUBLIC ${PROJ_HDRS})
-  # Link libraries
-  target_link_libraries(bootloader gcc c m lpcopen)
+##Generate hpm files if bin2hpm is installed
 
-  add_custom_command(TARGET bootloader POST_BUILD
-    COMMAND ${CMAKE_OBJCOPY} -O binary bootloader.axf bootloader.bin
+find_program(BIN2HPM NAMES "bin2hpm")
+if(BIN2HPM)
+  add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+    COMMAND bin2hpm -c 1 -n -m 0x315A -p 0x00 ${CMAKE_PROJECT_NAME}.bin -o ${CMAKE_PROJECT_NAME}.hpm
     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    COMMENT "Converting the AXF output to a binary file"
-    )
+    COMMENT "Creating HPM file from binary"
+  )
+  message(STATUS "bin2hpm found in the $PATH, .hpm files will be generated automatically.")
+else()
+  message(NOTICE "bin2hpm not found in the $PATH, .hpm files will not be generated.")
 endif()
 
-include( ${CMAKE_SOURCE_DIR}/probe/lpclink.cmake )
+include( ${CMAKE_SOURCE_DIR}/probe/openocd.cmake )

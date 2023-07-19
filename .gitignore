@@ -56,6 +56,7 @@ CMakeFiles/
 Makefile
 *cmake_install.cmake
 CMakeCache.txt
+build/
 
 #Output files
 out/*

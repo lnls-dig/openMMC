@@ -50,7 +50,7 @@ uint8_t rtm_get_hotswap_handle_status( uint8_t *state )
 
     rtm_enable_i2c();
 
-    if (pca9554_read_pin( RTM_GPIO_HOTSWAP_HANDLE, &pin_read ) == 0 ) {
+    if (pca9554_read_pin( CHIP_ID_RTM_PCA9554, RTM_GPIO_HOTSWAP_HANDLE, &pin_read ) == 0 ) {
         return false;
     }
 
@@ -88,7 +88,7 @@ void rtm_check_presence( uint8_t *status )
 void rtm_hardware_init( void )
 {
     rtm_enable_i2c();
-    pca9554_set_port_dir( 0x1F );
+    pca9554_set_port_dir( CHIP_ID_RTM_PCA9554, 0x1F );
 }
 
 void rtm_enable_i2c( void )
@@ -179,7 +179,7 @@ void rtm_ctrl_led( uint8_t id, uint8_t state )
         return;
     }
 
-    pca9554_write_pin( pca_pin, state );
+    pca9554_write_pin( CHIP_ID_RTM_PCA9554, pca_pin, state );
 }
 
 uint8_t rtm_read_led( uint8_t id )
@@ -203,7 +203,7 @@ uint8_t rtm_read_led( uint8_t id )
         return 1;
     }
 
-    pca9554_read_pin( pca_pin, &stat );
+    pca9554_read_pin( CHIP_ID_RTM_PCA9554, pca_pin, &stat );
 
     return stat;
 }

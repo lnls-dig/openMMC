@@ -35,7 +35,14 @@ static void printchar(char **str, int c)
         **str = c;
         ++(*str);
     }
-    else (void)putchar(c);
+    else {
+        if (c == '\n') {
+            int cr = '\r';
+            (void) putchar(cr);
+        }
+        (void) putchar(c);
+    }
+
 }
 
 #define PAD_RIGHT 1

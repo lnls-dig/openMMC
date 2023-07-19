@@ -1,0 +1,108 @@
+graph afcv4_i2c_hieranchy {
+    rankdir=LR
+    LPC1768_I2C0 [label="LPC1768 I2C0\n(P0.27, P0.28)", shape=rectangle]
+    LPC1768_I2C1 [label="LPC1768 I2C1\n(P0.0, P0.1)", shape=rectangle]
+    LPC1768_I2C2 [label="LPC1768 I2C2\n(P0.10, P0.11)", shape=rectangle]
+    I2CMUX0 [label="I2CMUX0", shape=rectangle]
+    I2CMUX1 [label="I2CMUX1", shape=rectangle]
+    I2CMUX2 [label="I2CMUX2", shape=rectangle]
+    I2CMUX3 [label="I2CMUX3", shape=rectangle]
+    I2CMUX4 [label="I2CMUX4", shape=rectangle]
+    I2CMUX5 [label="I2CMUX5", shape=rectangle]
+    I2CMUX6 [label="I2CMUX6", shape=rectangle]
+    I2CMUX7 [label="I2CMUX7", shape=rectangle]
+    IPMB [label="IPMB", shape=rectangle]
+
+    subgraph cluster_i2c_mux {
+        label = "I2C Mux"
+        style = dashed
+        IC63 [label="TCA9548 (IC63) 0x71", shape=rectangle]
+    }
+
+    subgraph cluster_io {
+        label = "I/O Expander"
+        style = dashed
+        IC66 [label="MCP23016 (IC66) 0x20", shape=rectangle]
+    }
+
+    subgraph cluster_temp_sensors {
+        label = "Temperature sensors"
+        style = dashed
+        IC30 [label="LM75 (IC30) 0x4C", shape=rectangle]
+        IC31 [label="LM75 (IC31) 0x4D", shape=rectangle]
+        IC32 [label="LM75 (IC32) 0x4E", shape=rectangle]
+        IC33 [label="LM75 (IC33) 0x4F", shape=rectangle]
+        IC18 [label="MAX6642 (IC18) 0x48", shape=rectangle]
+    }
+
+    subgraph cluster_rtc {
+        label = "RTC"
+        style = dashed
+        IC9 [label="MCP79410 (IC9)\nEEPROM: 0x57, RTC: 0x6F", shape=rectangle]
+    }
+
+    subgraph cluster_eeprom {
+        label = "EEPROM"
+        style = dashed
+        IC27 [label="AT24MAC602 (IC27)\nEEPROM: 0x50, SN: 0x58", shape=rectangle]
+        IC71 [label="AT24C64D (IC71) 0x51", shape=rectangle]
+    }
+
+    subgraph cluster_vol_cur_monitor {
+        label = "Voltage and current monitoring"
+        style = dashed
+        IC6 [label="INA3221 AMC_P12V RTM_P12V\n(IC6) 0x40", shape=rectangle]
+        IC7 [label="INA3221 FMC1_P3V3 FMC1_P12V\nFMC1_PVADJ (IC7) 0x41", shape=rectangle]
+        IC8 [label="INA3221 FMC2_P3V3 FMC2_P12V\nFMC2_PVADJ (IC8) 0x42", shape=rectangle]
+    }
+
+    subgraph cluster_clk_sw {
+        label = "Clock switch"
+        style = dashed
+        IC73 [label="8V54816 (IC73) 0x5B", shape=rectangle]
+    }
+
+    RTM [label="RTM", shape=rectangle]
+
+    subgraph cluster_fmc {
+        label = "FMC"
+        style = dashed
+        FMC2 [label="FMC2", shape=rectangle]
+        FMC1 [label="FMC1", shape=rectangle]
+    }
+    LPC1768_I2C0 -- IPMB
+
+    LPC1768_I2C1 -- IC63
+    IC63 -- I2CMUX0
+    IC63 -- I2CMUX1
+    IC63 -- I2CMUX2
+    IC63 -- I2CMUX3
+    IC63 -- I2CMUX4
+    IC63 -- I2CMUX5
+    IC63 -- I2CMUX6
+    IC63 -- I2CMUX7
+
+    I2CMUX0 -- IC30
+    I2CMUX0 -- IC31
+    I2CMUX0 -- IC32
+    I2CMUX0 -- IC33
+    I2CMUX0 -- IC18
+
+    I2CMUX1 -- IC9
+    I2CMUX1 -- IC27
+    I2CMUX1 -- IC71
+
+    I2CMUX3 -- IC6
+    I2CMUX3 -- IC7
+    I2CMUX3 -- IC8
+
+    I2CMUX4 -- IC73
+
+    I2CMUX5 -- RTM
+
+    I2CMUX6 -- FMC2
+
+    I2CMUX7 -- FMC1
+
+    LPC1768_I2C2 -- IC66
+}

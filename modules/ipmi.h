@@ -467,6 +467,7 @@
  * @{
  */
 #define IPMI_CUSTOM_CMD_MMC_GET_FREE_HEAP                       0x01
+#define IPMI_CUSTOM_CMD_GET_GIT_HASH                            0x02
 /**
  * @}
  */
