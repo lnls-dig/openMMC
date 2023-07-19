@@ -39,13 +39,13 @@ After creating the build files with CMake, you can compile the firmware using `m
 
 	make [VERBOSE=1]
 
-Both a `.axf` file and a `.bin` file will be generated in the `out` folder. You can use any one you prefer to program your processor.
+Both a `.elf` file and a `.bin` file will be generated in the `out` folder. You can use any one you prefer to program your processor.
 
 To clean the compilation files (binaries, objects and dependence files), just run
 
     make clean
 
-To make a debug build (to include symbols into axf file, turn off optimizations, etc.) add `-DCMAKE_BUILD_TYPE=Debug` option to `cmake` command. Example:
+To make a debug build (to include symbols into elf file, turn off optimizations, etc.) add `-DCMAKE_BUILD_TYPE=Debug` option to `cmake` command. Example:
 
 	cmake ~/openmmc/ -DBOARD=afc -DVERSION=3.1 -DCMAKE_BUILD_TYPE=Debug
 
@@ -110,7 +110,7 @@ It is possible to debug the MMC firmware using OpenOCD and GDB. First, connect O
 
 Then open GDB:
 
-	$ arm-none-eabi-gdb out/openMMC.axf
+	$ arm-none-eabi-gdb out/openMMC.elf
 	(gdb) target remote localhost:3333
 
 Now you can use the typical GDB commands to inspect the program flow and variables. Some useful commands when interacting with a microcontroller trough OpenOCD are listed below:
