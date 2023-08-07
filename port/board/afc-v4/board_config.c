@@ -22,11 +22,6 @@
 /* Project Includes */
 #include "port.h"
 
-
-uint8_t clock_switch_default_config() {
-
-}
-
 void board_init() {
     /* I2C MUX Init */
     gpio_set_pin_state(PIN_PORT(GPIO_I2C_MUX_ADDR1), PIN_NUMBER(GPIO_I2C_MUX_ADDR1), GPIO_LEVEL_LOW);
@@ -35,5 +30,4 @@ void board_init() {
 }
 
 void board_config() {
-	clock_switch_default_config();
 }

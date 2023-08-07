@@ -35,12 +35,16 @@
 #include "task_priorities.h"
 #include "mcp23016.h"
 #include "ad84xx.h"
+#include "idt_8v54816.h"
 #include "hotswap.h"
 #include "utils.h"
 #include "fru.h"
 #include "led.h"
 #include "board_led.h"
-
+#include "board_config.h"
+#include "clock_config.h"
+#include "eeprom_24xx02.h"
+#include "i2c_mapping.h"
 
 /* payload states
  *   0 - No power
@@ -233,7 +237,7 @@ void payload_init( void )
         while ( gpio_read_pin( PIN_PORT(GPIO_MMC_ENABLE), PIN_NUMBER(GPIO_MMC_ENABLE) ) == 1 ) {};
     }
 
-    xTaskCreate( vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
+    xTaskCreate( vTaskPayload, "Payload", 256, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
 
     amc_payload_evt = xEventGroupCreate();
 #ifdef MODULE_RTM
@@ -328,19 +332,18 @@ void vTaskPayload( void *pvParameters )
         new_state = state;
 
         current_evt = xEventGroupGetBits( amc_payload_evt );
-
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
-            
+
             /*
-             * If you issue a shutdown fru command in the MCH shell, the payload power 
-             * task will receive a PAYLOAD_MESSAGE_QUIESCE message and set the 
-             * QUIESCED_req flag to '1' and the MCH will shutdown the 12VP0 power, 
-             * making the payload power task go to PAYLOAD_NO_POWER state. 
+             * If you issue a shutdown fru command in the MCH shell, the payload power
+             * task will receive a PAYLOAD_MESSAGE_QUIESCE message and set the
+             * QUIESCED_req flag to '1' and the MCH will shutdown the 12VP0 power,
+             * making the payload power task go to PAYLOAD_NO_POWER state.
              * So, if we are in the PAYLOAD_QUIESCED state and receive a
-             * PAYLOAD_MESSAGE_QUIESCE message, the QUIESCED_req flag 
+             * PAYLOAD_MESSAGE_QUIESCE message, the QUIESCED_req flag
              * should be '0'
              */
-    
+
             if (state == PAYLOAD_QUIESCED) {
 	        QUIESCED_req = 0;
 	    } else {
@@ -349,6 +352,17 @@ void vTaskPayload( void *pvParameters )
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCE );
         }
 
+        /*
+         * When receive a PAYLOAD_MESSAGE_CLOCK_CONFIG message, configure the clock switch
+         * and write the new configuration in EEPROM
+         */
+        if( current_evt & PAYLOAD_MESSAGE_CLOCK_CONFIG ){
+            clock_switch_write_reg(clock_config);
+            if (PAYLOAD_FPGA_ON) {
+            eeprom_24xx02_write(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
+            }
+            xEventGroupClearBits(amc_payload_evt, PAYLOAD_MESSAGE_CLOCK_CONFIG);
+        }
         if ( current_evt & PAYLOAD_MESSAGE_COLD_RST ) {
             state = PAYLOAD_RESET;
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_COLD_RST );
@@ -397,7 +411,9 @@ void vTaskPayload( void *pvParameters )
             break;
 
         case PAYLOAD_STATE_FPGA_SETUP:
-
+            /* Configure the clock switch according to the configuration saved in EEPROM*/
+            eeprom_24xx02_read(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
+            clock_switch_write_reg(clock_config);
             new_state = PAYLOAD_FPGA_ON;
             break;
 
