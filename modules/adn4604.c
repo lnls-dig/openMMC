@@ -34,72 +34,10 @@
 /* Project Includes */
 #include "port.h"
 #include "adn4604.h"
-#include "adn4604_usercfg.h"
 #include "i2c.h"
 #include "i2c_mapping.h"
 
 adn_connect_map_t con;
-
-void adn4604_init( void )
-{
-    uint16_t out_enable_flag = {
-        ADN4604_EN_OUT_0 << 0 |
-        ADN4604_EN_OUT_1 << 1 |
-        ADN4604_EN_OUT_2 << 2 |
-        ADN4604_EN_OUT_3 << 3 |
-        ADN4604_EN_OUT_4 << 4 |
-        ADN4604_EN_OUT_5 << 5 |
-        ADN4604_EN_OUT_6 << 6 |
-        ADN4604_EN_OUT_7 << 7 |
-        ADN4604_EN_OUT_8 << 8 |
-        ADN4604_EN_OUT_9 << 9 |
-        ADN4604_EN_OUT_10 << 10 |
-        ADN4604_EN_OUT_11 << 11 |
-        ADN4604_EN_OUT_12 << 12 |
-        ADN4604_EN_OUT_13 << 13 |
-        ADN4604_EN_OUT_14 << 14 |
-        ADN4604_EN_OUT_15 << 15
-    };
-
-    /* Disable UPDATE' pin by pulling it GPIO_LEVEL_HIGH */
-    gpio_set_pin_state( PIN_PORT(GPIO_ADN_UPDATE), PIN_NUMBER(GPIO_ADN_UPDATE), GPIO_LEVEL_HIGH );
-
-    /* There's a delay circuit in the Reset pin of the clock switch, we must wait until it clears out */
-    while( gpio_read_pin( PIN_PORT(GPIO_ADN_RESETN), PIN_NUMBER(GPIO_ADN_RESETN) ) == 0 ) {
-        vTaskDelay( 50 );
-    }
-
-    /* Configure the interconnects */
-    con.out0 = ADN4604_CFG_OUT_0;
-    con.out1 = ADN4604_CFG_OUT_1;
-    con.out2 = ADN4604_CFG_OUT_2;
-    con.out3 = ADN4604_CFG_OUT_3;
-    con.out4 = ADN4604_CFG_OUT_4;
-    con.out5 = ADN4604_CFG_OUT_5;
-    con.out6 = ADN4604_CFG_OUT_6;
-    con.out7 = ADN4604_CFG_OUT_7;
-    con.out8 = ADN4604_CFG_OUT_8;
-    con.out9 = ADN4604_CFG_OUT_9;
-    con.out10 = ADN4604_CFG_OUT_10;
-    con.out11 = ADN4604_CFG_OUT_11;
-    con.out12 = ADN4604_CFG_OUT_12;
-    con.out13 = ADN4604_CFG_OUT_13;
-    con.out14 = ADN4604_CFG_OUT_14;
-    con.out15 = ADN4604_CFG_OUT_15;
-
-    adn4604_xpt_config( ADN_XPT_MAP0_CON_REG, con );
-
-    /* Enable desired outputs */
-    for ( uint8_t i = 0; i < 16; i++ ) {
-        if ( ( out_enable_flag >> i ) & 0x1 ) {
-            adn4604_tx_control( i, TX_ENABLED );
-        }
-    }
-
-    adn4604_active_map( ADN_XPT_MAP0 );
-
-    adn4604_update();
-}
 
 void adn4604_tx_control( uint8_t output, uint8_t tx_mode )
 {

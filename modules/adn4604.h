@@ -113,14 +113,6 @@ enum adn4604_tx_ctl {
 };
 
 /**
- * @brief Initializes the ADN4604 Clock switch hardware
- *
- * This IC starts with a pre-defined configuration provided by the board port in the adn4604_usercfg.h file.
- * The current port status may be changed with OEM IPMI commands.
- */
-void adn4604_init( void );
-
-/**
  * @brief Sets the output status
  *
  * @param output Output number (0 to 15)

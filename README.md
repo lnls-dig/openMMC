@@ -130,3 +130,27 @@ Now you can use the typical GDB commands to inspect the program flow and variabl
 	(gdb) monitor reset halt # Resets the microcontroller and immediately halts
 	(gdb) monitor reset run  # Resets the microcontroller and starts executing
 	(gdb) load               # Reload the firmware into flash
+
+
+## IPMI Custom Commands
+The IPMI allow us to create custom commands according to the project needs. [ipmitool](https://codeberg.org/IPMITool/ipmitool) can be used to send the commands
+
+### Clock switch configuration
+It's possible to configure the clock switch. For the AFC v3.1 (ADN4604ASVZ) you can use the following scheme:
+- **Port I/O (bit 7)**: Use it to configure the port as an input ('0') or output ('1'). Unused ports should be left configured as inputs;
+- **Output Port Signal Source (bits 0 to 3)**: Select the input port for the respective output port.
+
+For the AFC v4 (IDT 8V54816) you can use the following scheme:
+- **Port I/O (bit 7)**: Use it to configure the port as an input ('0') or output ('1'). Unused ports should be left configured as inputs;
+- **Termination On/Off (bit 6)**: Use to set the internal termination. '0' is off (high-impedance), '1' is on (100 $\Omega$)
+- **Polarity (bit 5)**: Set the channel polarity. '0' for inverted, '1' for non-inverted
+- **Output Port Signal Source (bits 0 to 3)**: Select the input port for the respective output port.
+
+
+The command to write the configuration is the above:
+
+    ipmitool -I lan -H mch_host_name -A none -T 0x82 -m 0x20 -t (112 + num_slot*2) raw 0x32 0x03 <configuration_array_in_hex>
+
+To read the actual configuration, use:
+
+    ipmitool -I lan -H mch_host_name -A none -T 0x82 -m 0x20 -t (112 + num_slot*2) raw 0x32 0x04

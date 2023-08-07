@@ -10,6 +10,7 @@ endif()
 #List all modules used by this board
 set(TARGET_MODULES
   "FRU"
+  "CLOCK_CONFIG"
   "PAYLOAD"
   "SDR"
   "SCANSTA1101"
@@ -18,6 +19,7 @@ set(TARGET_MODULES
   "DAC_AD84XX"
   "EEPROM_AT24MAC"
   "EEPROM_24XX64"
+  "EEPROM_24XX02"
   "HOTSWAP_SENSOR"
   "LM75"
   "MAX6642"
