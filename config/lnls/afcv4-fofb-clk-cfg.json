@@ -1,0 +1,101 @@
+{
+ "afc_ver": "4.0",
+ "cfg": {
+  "AMC_CLK_RTM_CLK": {
+   "SRC": "TCLKA",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "OUT"
+  },
+  "FMC2_CLK1_M2C_FMC2_CLK3_BIDIR": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "IN"
+  },
+  "FMC1_CLK1_M2C_FMC1_CLK3_BIDIR": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "IN"
+  },
+  "FMC1_CLK0_M2C": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "IN"
+  },
+  "FMC1_CLK2_BIDIR": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "IN"
+  },
+  "SI57X_PRI": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "ON",
+   "DIR": "IN"
+  },
+  "FMC2_CLK0_M2C": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "IN"
+  },
+  "FMC2_CLK2_BIDIR": {
+   "SRC": "TCLKA",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "OUT"
+  },
+  "TCLKD_FLEX_FPGA_CLK3": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "IN"
+  },
+  "TCLKC_FLEX_FPGA_CLK2": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "IN"
+  },
+  "TCLKA": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "ON",
+   "DIR": "IN"
+  },
+  "TCLKB": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "IN"
+  },
+  "FLEX_GTP113_CLK0": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "IN"
+  },
+  "FLEX_GTP113_GTP216_CLK1": {
+   "SRC": "SI57X_PRI",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "OUT"
+  },
+  "FLEX_GTP116_CLK1_RTM_GTP03": {
+   "SRC": "AMC_CLK_RTM_CLK",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "IN"
+  },
+  "FLEX_GTP213_CLK1_RTM_GTP47": {
+   "SRC": "TCLKA",
+   "POL": "POS",
+   "TERM": "OFF",
+   "DIR": "OUT"
+  }
+ }
+}
