@@ -1,0 +1,119 @@
+{
+ "afc_ver": "3.1",
+ "in_cfg": {
+  "FMC2_CLK3_BIDIR": {
+   "POL": "POS"
+  },
+  "FMC2_CLK1_M2": {
+   "POL": "POS"
+  },
+  "FMC2_CLK0_M2C": {
+   "POL": "POS"
+  },
+  "FMC2_CLK2_BIDIR": {
+   "POL": "POS"
+  },
+  "TCLKB": {
+   "POL": "POS"
+  },
+  "TCLKA": {
+   "POL": "POS"
+  },
+  "TCLKC": {
+   "POL": "POS"
+  },
+  "TCLKD": {
+   "POL": "POS"
+  },
+  "FCLKA": {
+   "POL": "POS"
+  },
+  "FMC1_CLK3_BIDIR": {
+   "POL": "POS"
+  },
+  "FMC1_CLK1_M2C": {
+   "POL": "POS"
+  },
+  "FMC1_CLK0_M2C": {
+   "POL": "POS"
+  },
+  "FMC1_CLK2_BIDIR": {
+   "POL": "POS"
+  },
+  "WR_PLL_CLK1": {
+   "POL": "POS"
+  },
+  "CLK20_VCXO": {
+   "POL": "POS"
+  },
+  "SI57X_CLK": {
+   "POL": "POS"
+  }
+ },
+ "out_cfg": {
+  "TCLKD": {
+   "SRC": "FMC2_CLK3_BIDIR",
+   "EN": false
+  },
+  "TCLKC": {
+   "SRC": "FMC2_CLK3_BIDIR",
+   "EN": false
+  },
+  "TCLKA": {
+   "SRC": "FMC2_CLK3_BIDIR",
+   "EN": false
+  },
+  "TCLKB": {
+   "SRC": "FMC2_CLK3_BIDIR",
+   "EN": false
+  },
+  "FPGA_CLK1": {
+   "SRC": "WR_PLL_CLK1",
+   "EN": true
+  },
+  "FP2_CLK2": {
+   "SRC": "FCLKA",
+   "EN": false
+  },
+  "LINK01_CLK": {
+   "SRC": "TCLKA",
+   "EN": true
+  },
+  "FP2_CLK1": {
+   "SRC": "SI57X_CLK",
+   "EN": true
+  },
+  "PCIE_CLK1": {
+   "SRC": "FCLKA",
+   "EN": true
+  },
+  "LINK23_CLK": {
+   "SRC": "TCLKA",
+   "EN": false
+  },
+  "FIN1_CLK3": {
+   "SRC": "TCLKA",
+   "EN": true
+  },
+  "FIN1_CLK2": {
+   "SRC": "TCLKA",
+   "EN": true
+  },
+  "RTM_SYNC_CLK": {
+   "SRC": "CLK20_VCXO",
+   "EN": false
+  },
+  "OP15C": {
+   "SRC": "TCLKA",
+   "EN": true
+  },
+  "FIN2_CLK2": {
+   "SRC": "TCLKA",
+   "EN": true
+  },
+  "FIN2_CLK3": {
+   "SRC": "TCLKA",
+   "EN": true
+  }
+ }
+}
