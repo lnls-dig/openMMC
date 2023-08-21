@@ -260,7 +260,7 @@ size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len )
         memcpy( &fru[id].buffer[offset], tx_buff, len );
         ret_val = len;
     } else {
-        ret_val = fru[id].cfg.write_f( fru[id].cfg.eeprom_id, offset, tx_buff, len, 0 );
+        ret_val = fru[id].cfg.write_f( fru[id].cfg.eeprom_id, offset, tx_buff, len, 10 );
     }
     return ret_val;
 }
@@ -340,6 +340,16 @@ IPMI_HANDLER(ipmi_storage_write_fru_data_cmd, NETFN_STORAGE, IPMI_WRITE_FRU_DATA
         /* Count written (1 based) */
         rsp->data[len++] = 0;
         rsp->completion_code = IPMI_CC_PARAM_OUT_OF_RANGE;
+    }
+
+    /*
+     *  If count == 0, it may indicate that the fru_write function
+     *  failed somehow.
+     */
+
+    if (count == 0) {
+        rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+        return ;
     }
     rsp->data_len = len;
 }
