@@ -106,6 +106,7 @@ size_t at24mac_write( uint8_t id, uint16_t address, uint8_t *tx_data, size_t buf
 
             /* Write the data */
             tx_len += xI2CMasterWrite( i2c_interface, i2c_addr, &page_buf[0] , bytes_to_write+1 );
+            tx_len -= 1; /* Remove byte address from data written size */
             curr_addr += bytes_to_write;
         }
         i2c_give( i2c_interface );
