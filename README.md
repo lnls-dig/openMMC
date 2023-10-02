@@ -27,13 +27,13 @@ Create a new folder wherever is suitable
 
 	cd <build_folder>
 
-Run CMake using the path to the repository folder as an direct argument and the flag `-DBOARD=<board_name>` and `-DVERSION=<board_version>` to configure the compilation scripts to your specific board hardware
+Run CMake using the path to the repository folder as an direct argument and the flag `-DBOARD=<board_name>`(at this moment, only `afc` can be selected) ,`-DVERSION=<board_version>` (`3.1` or `4.0`) and `-DBOARD_RTM=<rtm_name>` (for now, only RTM `8sfp` for AFCv3.1 is supported) to configure the compilation scripts to your specific board hardware.
 
-	cmake <path_to_source> -DBOARD=<board_name> -DVERSION=<board_version>
+	cmake <path_to_source> -DBOARD=<board_name> -DVERSION=<board_version> -DBOARD_RTM=<rtm_name>
 
 Example:
 
-	cmake ~/openmmc/ -DBOARD=afc -DVERSION=3.1
+	cmake ~/openmmc/ -DBOARD=afc -DVERSION=3.1 -DBOARD_RTM=8sfp
 
 After creating the build files with CMake, you can compile the firmware using `make`, optionally setting the VERBOSE flag to 1 if you wish to see all the compilation commands
 
