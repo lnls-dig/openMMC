@@ -52,7 +52,7 @@ To make a debug build (to include symbols into elf file, turn off optimizations,
 ## Programming
 
 ### OpenOCD
-Flashing the MMC microcontroller via SWD/JTAG is supported for CMSIS-DAP and Jlink compatible probes through OpenOCD. You can specify the debug probe with the flag `-DDEBUG_PROBE=<probe_name>`, valid options are `cmsis-dap` (default) and `jlink`.
+Flashing the MMC microcontroller via SWD/JTAG is supported for CMSIS-DAP and Jlink compatible probes through OpenOCD. You can specify the debug probe with the flag `-DDEBUG_PROBE=<probe_name>`, valid options are `cmsis-dap` (default), `jlink`, `digilent_jtag_hs3` and `xvc` (support is not merged to the official OpenOCD source yet, so you build our patched version: https://github.com/lnls-dig/openocd/tree/fix-afcv3-flashing).
 
 	cmake ~/openmmc/ -DBOARD=afc -DVERSION=3.1 -DDEBUG_PROBE=cmsis-dap
 
