@@ -19,6 +19,7 @@ jobs:
           - { flags: -DBOARD=afc -DVERSION=4.0 -DDEBUG_PROBE=jlink -DOPENOCD_TRANSPORT=swd }
           - { flags: -DBOARD=afc -DVERSION=4.0 -DDEBUG_PROBE=cmsis-dap -DOPENOCD_TRANSPORT=swd }
           - { flags: -DBOARD=afc -DVERSION=4.0 -DDEBUG_PROBE=digilent_jtag_hs3 -DOPENOCD_TRANSPORT=jtag }
+          - { flags: -DBOARD=afc -DVERSION=4.0 -DDEBUG_PROBE=xvc -DOPENOCD_TRANSPORT=jtag -DXVC_HOST=host -DXVC_PORT=0000}
     steps:
       - uses: actions/checkout@v3
         with:
