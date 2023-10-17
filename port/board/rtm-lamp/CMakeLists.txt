@@ -13,13 +13,21 @@ set(RTM_LAMP_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 set( PROJ_SRCS ${PROJ_SRCS}
   ${RTM_LAMP_PATH}/rtm_user.c
   ${RTM_LAMP_PATH}/sdr_list.c
+  ${RTM_LAMP_PATH}/rtm_i2c_mapping.c
   )
 
 #Include headers path
 set(PROJ_HDRS ${PROJ_HDRS} ${RTM_LAMP_PATH})
 
+if(${TARGET_BOARD_NAME} MATCHES "afc-v3")
+  list(APPEND PROJ_HDRS ${RTM_8SFP_PATH}/../afc-v3/i2c_mapping.h)
+elseif(${TARGET_BOARD_NAME} MATCHES "afc-v4")
+  list(APPEND PROJ_HDRS ${RTM_8SFP_PATH}/../afc-v4/i2c_mapping.h)
+endif()
+
 #Set the variables in the main scope
 set(TARGET_MODULES ${TARGET_MODULES} ${RTM_LAMP_MODULES} PARENT_SCOPE)
 
+#Set the variables in the main scope
 set(PROJ_SRCS ${PROJ_SRCS} PARENT_SCOPE)
 set(PROJ_HDRS ${PROJ_HDRS} PARENT_SCOPE)
