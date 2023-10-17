@@ -26,6 +26,7 @@
 #include "pin_mapping.h"
 #include "hotswap.h"
 #include "i2c_mapping.h"
+#include "rtm_i2c_mapping.h"
 #include "fru.h"
 #include "utils.h"
 #include "led.h"

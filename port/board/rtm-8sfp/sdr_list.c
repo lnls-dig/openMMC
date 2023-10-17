@@ -23,7 +23,7 @@
 #include "sdr.h"
 #include "utils.h"
 #include "sensors.h"
-#include "i2c_mapping.h"
+#include "rtm_i2c_mapping.h"
 
 /* Rename file to sdr_list.c */
 #ifdef MODULE_HOTSWAP
