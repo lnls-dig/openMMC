@@ -46,6 +46,11 @@ if (";${TARGET_MODULES};" MATCHES ";PAYLOAD;")
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_PAYLOAD")
 endif()
 
+if (";${TARGET_MODULES};" MATCHES ";RTM;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/rtm.c)
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_RTM")
+endif()
+
 #Extra definitions
 if (FRU_WRITE_EEPROM)
   message(STATUS "FRU EEPROM will be written if no valid data is found!")
