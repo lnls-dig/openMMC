@@ -1,0 +1,18 @@
+#include "port.h"
+#include "rtm_i2c_mapping.h"
+#include "eeprom_24xx64.h"
+#include "hotswap.h"
+
+void rtm_check_presence( uint8_t *status )
+ {
+     /* Due to a hardware limitation in the AFC board, we can't rely on reading the PS signal
+       since this pin doesn't have a pull-up resistor, it's always read as 0.
+       A very dirty workaround is to 'ping' the RTM EEPROM, if it responds, then the board is connected */
+
+    uint8_t dumb;
+    *status = HOTSWAP_STATE_URTM_ABSENT;
+
+    if(eeprom_24xx64_read(CHIP_ID_RTM_EEPROM, 0, &dumb, 1, 100)) {
+        *status = HOTSWAP_STATE_URTM_PRSENT;
+    }
+ }

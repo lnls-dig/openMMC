@@ -65,27 +65,6 @@ uint8_t rtm_get_hotswap_handle_status( uint8_t *state )
     return false;
 }
 
-void rtm_check_presence( uint8_t *status )
-{
-    /* Due to a hardware limitation in the AFC board, we can't rely on reading the PS signal
-       since this pin doesn't have a pull-up resistor, it's always read as 0.
-       A very dirty workaround is to 'ping' the RTM IO Expander(PCA9554), if it responds, then the board is connected */
-    rtm_enable_i2c();
-
-    uint8_t i2c_addr, i2c_interface;
-    uint8_t dumb;
-
-    /* Defaults to absent - in case of I2C failure */
-    *status = HOTSWAP_STATE_URTM_ABSENT;
-
-    if (i2c_take_by_chipid( CHIP_ID_RTM_PCA9554, &i2c_addr, &i2c_interface, 100)) {
-        if (xI2CMasterRead( i2c_interface, i2c_addr, &dumb, 1)) {
-            *status = HOTSWAP_STATE_URTM_PRSENT;
-        }
-        i2c_give(i2c_interface);
-    }
-}
-
 void rtm_hardware_init( void )
 {
     rtm_enable_i2c();

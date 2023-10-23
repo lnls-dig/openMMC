@@ -44,4 +44,14 @@ extern volatile bool rtm_present;
  */
 void rtm_manage_init( void );
 
+/**
+ * @brief Check RTM Presence
+ *
+ * This function is used to detect the RTM Board presence
+ *
+ * @return None
+ */
+void rtm_check_presence(uint8_t *status);
+
+
 #endif
