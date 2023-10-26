@@ -41,7 +41,7 @@
  * Product information area
  *********************************************/
 #define AMC_PRODUCT_MANUFACTURER    "LNLS"
-#define AMC_PRODUCT_NAME            "AFC Timing"
+#define AMC_PRODUCT_NAME            "AFC v3.1"
 #define AMC_PRODUCT_PN              ""
 #define AMC_PRODUCT_VERSION         "v3.1"
 #define AMC_PRODUCT_SN              ""
