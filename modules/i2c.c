@@ -110,7 +110,7 @@ bool i2c_take_by_chipid( uint8_t chip_id, uint8_t *i2c_address, uint8_t *i2c_int
         }
         bus_id = i2c_chip_rtm_map[chip_id-64].bus_id;
         if ( i2c_address != NULL ) {
-            *i2c_address = i2c_chip_map[chip_id-64].i2c_address;
+            *i2c_address = i2c_chip_rtm_map[chip_id-64].i2c_address;
         }
 #endif
 
