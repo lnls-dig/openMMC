@@ -249,8 +249,8 @@ void vTaskPayload( void *pvParameters )
         if( current_evt & PAYLOAD_MESSAGE_CLOCK_CONFIG ){
             eeprom_24xx02_write(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
             if (PAYLOAD_FPGA_ON){
-            adn4604_reset();
-            clock_configuration();
+                adn4604_reset();
+                clock_configuration();
             }
             xEventGroupClearBits(amc_payload_evt, PAYLOAD_MESSAGE_CLOCK_CONFIG);
         }
