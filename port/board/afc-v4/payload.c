@@ -357,9 +357,9 @@ void vTaskPayload( void *pvParameters )
          * and write the new configuration in EEPROM
          */
         if( current_evt & PAYLOAD_MESSAGE_CLOCK_CONFIG ){
-            clock_switch_write_reg(clock_config);
-            if (PAYLOAD_FPGA_ON) {
             eeprom_24xx02_write(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
+            if (PAYLOAD_FPGA_ON) {
+                clock_switch_write_reg(clock_config);
             }
             xEventGroupClearBits(amc_payload_evt, PAYLOAD_MESSAGE_CLOCK_CONFIG);
         }
