@@ -345,10 +345,10 @@ void vTaskPayload( void *pvParameters )
              */
 
             if (state == PAYLOAD_QUIESCED) {
-	        QUIESCED_req = 0;
-	    } else {
-	        QUIESCED_req = 1;
-	    }
+                QUIESCED_req = 0;
+            } else {
+                QUIESCED_req = 1;
+            }
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCE );
         }
 
@@ -413,8 +413,10 @@ void vTaskPayload( void *pvParameters )
         case PAYLOAD_STATE_FPGA_SETUP:
             /* Configure the clock switch according to the configuration saved in EEPROM*/
             eeprom_24xx02_read(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
-            clock_switch_write_reg(clock_config);
-            new_state = PAYLOAD_FPGA_ON;
+            /* Only change the state if the clock config is efective*/
+            if (clock_switch_write_reg(clock_config)) {
+                new_state = PAYLOAD_FPGA_ON;
+            }
             break;
 
         case PAYLOAD_FPGA_ON:
