@@ -334,6 +334,15 @@ IPMI_HANDLER(ipmi_storage_write_fru_data_cmd, NETFN_STORAGE, IPMI_WRITE_FRU_DATA
         /* Write data to the FRU */
         count = fru_write( id, &req->data[3], offset, req->data_len - 3);
 
+        /*
+         * If count == 0, it may indicate that the fru_write function
+         *  failed somehow.
+         */
+
+        if (count == 0) {
+            rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+            return ;
+        }
         /* Count written (1 based) */
         rsp->data[len++] = count +1;
     } else {
@@ -342,14 +351,5 @@ IPMI_HANDLER(ipmi_storage_write_fru_data_cmd, NETFN_STORAGE, IPMI_WRITE_FRU_DATA
         rsp->completion_code = IPMI_CC_PARAM_OUT_OF_RANGE;
     }
 
-    /*
-     *  If count == 0, it may indicate that the fru_write function
-     *  failed somehow.
-     */
-
-    if (count == 0) {
-        rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
-        return ;
-    }
     rsp->data_len = len;
 }
