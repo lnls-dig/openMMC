@@ -37,6 +37,7 @@
 #define PAYLOAD_H_
 
 #include "event_groups.h"
+#include "mmc_error.h"
 
 /**
  * @brief Payload state machine state numbers
@@ -114,7 +115,7 @@ uint8_t payload_hpm_activate_firmware( void );
  * @brief Configure the clock switch interconects according to the configuration
  * saved in EEPROM
  */
-void clock_configuration();
+mmc_err clock_configuration( void );
 
 
 #endif /* IPMI_PAYLOAD_H_ */
