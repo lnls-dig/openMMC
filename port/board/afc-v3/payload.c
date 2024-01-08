@@ -267,10 +267,10 @@ void vTaskPayload( void *pvParameters )
              */
 
             if (state == PAYLOAD_QUIESCED) {
-	        QUIESCED_req = 0;
-	    } else {
-	        QUIESCED_req = 1;
-	    }
+                QUIESCED_req = 0;
+            } else {
+                QUIESCED_req = 1;
+            }
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCE );
         }
 
@@ -313,9 +313,12 @@ void vTaskPayload( void *pvParameters )
         case PAYLOAD_STATE_FPGA_SETUP:
 #ifdef MODULE_ADN4604
             /* Configure clock switch */
-            clock_configuration();
-#endif
+            if (clock_configuration() == MMC_OK) {
+                new_state = PAYLOAD_FPGA_ON;
+            }
+#else
             new_state = PAYLOAD_FPGA_ON;
+#endif
             break;
 
         case PAYLOAD_FPGA_ON:
@@ -477,9 +480,10 @@ uint8_t payload_hpm_activate_firmware( void )
     return IPMI_CC_OK;
 }
 
-void clock_configuration()
+mmc_err clock_configuration( void )
 {
     adn_connect_map_t con;
+    mmc_err error;
 
     /* Read the clock configuration from the eeprom */
     eeprom_24xx02_read(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
@@ -530,7 +534,10 @@ void clock_configuration()
     con.out14 = clock_config[14] & 0x0F;
     con.out15 = clock_config[15] & 0x0F;
 
-    adn4604_xpt_config( ADN_XPT_MAP0_CON_REG, con );
+    error = adn4604_xpt_config( ADN_XPT_MAP0_CON_REG, con );
+    if (error != MMC_OK) {
+        return error;
+    }
 
     /* Enable desired outputs */
     for ( uint8_t i = 0; i < 16; i++ ) {
@@ -541,8 +548,11 @@ void clock_configuration()
         }
     }
 
-    adn4604_active_map( ADN_XPT_MAP0 );
+    error = adn4604_active_map( ADN_XPT_MAP0 );
+    if (error != MMC_OK) {
+        return error;
+    }
 
-    adn4604_update();
+    return adn4604_update();
 }
 #endif

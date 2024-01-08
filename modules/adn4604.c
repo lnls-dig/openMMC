@@ -39,10 +39,11 @@
 
 adn_connect_map_t con;
 
-void adn4604_tx_control( uint8_t output, uint8_t tx_mode )
+mmc_err adn4604_tx_control( uint8_t output, uint8_t tx_mode )
 {
     uint8_t i2c_addr, i2c_interf;
     uint8_t enable[2];
+    uint8_t tx_len = 0;
 
     /* TX Enable registers have an 0x20 offset from their value */
     enable[0] = 0x20 + output;
@@ -69,56 +70,72 @@ void adn4604_tx_control( uint8_t output, uint8_t tx_mode )
     enable[1] = tx_mode << 4;
 
     if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) ) {
-        xI2CMasterWrite( i2c_interf, i2c_addr, enable, sizeof(enable) );
+        tx_len = xI2CMasterWrite( i2c_interf, i2c_addr, enable, sizeof(enable) );
         i2c_give(i2c_interf);
     }
+
+    if (!tx_len) return MMC_TIMEOUT_ERR;
+    return MMC_OK;
 }
 
-void adn4604_update( void )
+mmc_err adn4604_update( void )
 {
     uint8_t i2c_addr, i2c_interf;
     uint8_t update[2] = { ADN_XPT_UPDATE_REG, 0x01 };
+    uint8_t tx_len = 0;
 
     if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) ) {
-        xI2CMasterWrite( i2c_interf, i2c_addr, update, sizeof(update) );
+        tx_len = xI2CMasterWrite( i2c_interf, i2c_addr, update, sizeof(update) );
         i2c_give(i2c_interf);
     }
+
+    if (!tx_len) return MMC_TIMEOUT_ERR;
+    return MMC_OK;
 }
 
-void adn4604_reset( void )
+mmc_err adn4604_reset( void )
 {
     uint8_t i2c_addr, i2c_interf;
     uint8_t update[2] = { ADN_RESET_REG, 0x01 };
+    uint8_t tx_len = 0;
 
     if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) ) {
-        xI2CMasterWrite( i2c_interf, i2c_addr, update, sizeof(update) );
+        tx_len = xI2CMasterWrite( i2c_interf, i2c_addr, update, sizeof(update) );
         i2c_give(i2c_interf);
     }
+    if (!tx_len) return MMC_TIMEOUT_ERR;
+    return MMC_OK;
 }
 
-void adn4604_xpt_config( uint8_t map, adn_connect_map_t xpt_con )
+mmc_err adn4604_xpt_config( uint8_t map, adn_connect_map_t xpt_con )
 {
     uint8_t i2c_addr, i2c_interf;
+    uint8_t tx_len = 0;
 
     adn_connect_cfg_t cfg = { map, xpt_con };
 
     if (i2c_take_by_chipid(CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10) ) {
-        xI2CMasterWrite( i2c_interf, i2c_addr, (uint8_t *)&cfg, sizeof(cfg) );
+        tx_len = xI2CMasterWrite( i2c_interf, i2c_addr, (uint8_t *)&cfg, sizeof(cfg) );
         i2c_give(i2c_interf);
     }
+    if (!tx_len) return MMC_TIMEOUT_ERR;
+    return MMC_OK;
 }
 
-void adn4604_active_map( uint8_t map )
+mmc_err adn4604_active_map( uint8_t map )
 {
     uint8_t i2c_addr, i2c_interf;
+    uint8_t tx_len = 0;
 
     /* Select the active map */
     uint8_t map_sel[2] = { ADN_XPT_MAP_TABLE_SEL_REG, map };
 
     if ( i2c_take_by_chipid( CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10 ) ) {
-        xI2CMasterWrite( i2c_interf, i2c_addr, map_sel, sizeof(map_sel) );
+        tx_len = xI2CMasterWrite( i2c_interf, i2c_addr, map_sel, sizeof(map_sel) );
         i2c_give( i2c_interf );
     }
+    if (!tx_len) return MMC_TIMEOUT_ERR;
+    return MMC_OK;
 }
 
 adn_connect_map_t adn4604_out_status( void )
@@ -139,13 +156,17 @@ adn_connect_map_t adn4604_out_status( void )
     return stat_map;
 }
 
-void adn4604_termination_ctl( uint8_t cfg )
+mmc_err adn4604_termination_ctl( uint8_t cfg )
 {
     uint8_t i2c_addr, i2c_interf;
     uint8_t msg[2] = { ADN_TERMINATION_CTL_REG, (cfg & 0xF0) };
+    uint8_t tx_len = 0;
 
     if ( i2c_take_by_chipid( CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10 ) ) {
-        xI2CMasterWrite( i2c_interf, i2c_addr, msg, sizeof(msg) );
+        tx_len = xI2CMasterWrite( i2c_interf, i2c_addr, msg, sizeof(msg) );
         i2c_give( i2c_interf );
     }
+    if (!tx_len) return MMC_TIMEOUT_ERR;
+    return MMC_OK;
+
 }
