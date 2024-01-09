@@ -20,7 +20,7 @@
  */
 
 /**
- * @file   error.c
+ * @file   mmc_error.c
  * @author Augusto Fraga Giachero <augusto.fraga@cnpem.br>
  *
  * @brief  Error handling functions
@@ -28,7 +28,7 @@
  * @ingroup error
  */
 #include <stddef.h>
-#include "error.h"
+#include "mmc_error.h"
 
 static const char* mmc_error_strings[] = {
     [MMC_OK] = "No error",

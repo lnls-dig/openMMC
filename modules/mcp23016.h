@@ -30,7 +30,7 @@
 #ifndef MCP23016_H_
 #define MCP23016_H_
 
-#include "error.h"
+#include "mmc_error.h"
 #include "port.h"
 
 /**

@@ -19,13 +19,13 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef ERROR_H_
-#define ERROR_H_
+#ifndef MMC_ERROR_H_
+#define MMC_ERROR_H_
 
 #include <stdio.h>
 
 /**
- * @file   error.h
+ * @file   mmc_error.h
  * @author Augusto Fraga Giachero <augusto.fraga@cnpem.br>
  *
  * @brief  Error handling functions and codes

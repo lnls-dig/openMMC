@@ -8,7 +8,7 @@ set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/i2c.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/led.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/ipmb.c ${MODULE_PATH}/ipmi.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/printf-stdarg.c)
-set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/error.c)
+set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/mmc_error.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/eeprom_24xx02.c)
 
 message(STATUS "Selected modules to compile: ${TARGET_MODULES}")
