@@ -255,13 +255,7 @@ size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len )
     if ( id >= FRU_COUNT ) {
         return 0;
     }
-
-    if ( fru[id].runtime ) {
-        memcpy( &fru[id].buffer[offset], tx_buff, len );
-        ret_val = len;
-    } else {
-        ret_val = fru[id].cfg.write_f( fru[id].cfg.eeprom_id, offset, tx_buff, len, 10 );
-    }
+    ret_val = fru[id].cfg.write_f( fru[id].cfg.eeprom_id, offset, tx_buff, len, 10 );
     return ret_val;
 }
 
