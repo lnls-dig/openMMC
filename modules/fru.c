@@ -70,7 +70,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
     if (fru[id].runtime) {
         memcpy( &common_header[0], &fru[id].buffer[0], 8);
     } else {
-        fru[id].cfg.read_f( fru[id].cfg.eeprom_id, 0x00, &common_header[0], 8, 0 );
+        fru[id].cfg.read_f( fru[id].cfg.eeprom_id, 0x00, &common_header[0], 8, 10 );
     }
 
     printf("[FRU][%s] Asserting FRU information integrity\n", id == FRU_AMC ? "AMC" : "RTM");
@@ -91,14 +91,14 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
         if (fru[id].runtime) {
             rec_len = fru[id].buffer[chassis_off+1];
         } else {
-            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, chassis_off+1, &rec_len, 1, 0 );
+            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, chassis_off+1, &rec_len, 1, 10 );
         }
         rec_len *= 8;
         if (rec_len > 0) {
             if (fru[id].runtime) {
                 memcpy( &rec_buff[0], &fru[id].buffer[chassis_off], rec_len);
             } else {
-                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, chassis_off, &rec_buff[0], rec_len, 0 );
+                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, chassis_off, &rec_buff[0], rec_len, 10 );
             }
             if ( !((calculate_chksum( &rec_buff[0], rec_len ) == 0) && rec_buff[0] == 1) ) {
                 /* Wrong checksum */
@@ -116,7 +116,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
         if (fru[id].runtime) {
             rec_len = fru[id].buffer[board_off+1];
         } else {
-            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, board_off+1, &rec_len, 1, 0 );
+            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, board_off+1, &rec_len, 1, 10 );
         }
         rec_len *= 8;
 
@@ -124,7 +124,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
             if (fru[id].runtime) {
                 memcpy( &rec_buff[0], &fru[id].buffer[board_off], rec_len);
             } else {
-                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, board_off, &rec_buff[0], rec_len, 0 );
+                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, board_off, &rec_buff[0], rec_len, 10 );
             }
             if ( !((calculate_chksum( &rec_buff[0], rec_len ) == 0) && rec_buff[0] == 1) ) {
                 /* Wrong checksum */
@@ -142,7 +142,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
         if (fru[id].runtime) {
             rec_len = fru[id].buffer[product_off+1];
         } else {
-            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, product_off+1, &rec_len, 1, 0 );
+            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, product_off+1, &rec_len, 1, 10 );
         }
         rec_len *= 8;
 
@@ -150,7 +150,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
             if (fru[id].runtime) {
                 memcpy( &rec_buff[0], &fru[id].buffer[product_off], rec_len);
             } else {
-                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, product_off, &rec_buff[0], rec_len, 0 );
+                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, product_off, &rec_buff[0], rec_len, 10 );
             }
             if ( !((calculate_chksum( &rec_buff[0], rec_len ) == 0 ) && rec_buff[0] == 1) ) {
                 /* Wrong checksum */
@@ -172,7 +172,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
             if (fru[id].runtime) {
                 memcpy( &rec_buff[0], &fru[id].buffer[multirec_off], 5);
             } else {
-                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, multirec_off, &rec_buff[0], 5, 0 );
+                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, multirec_off, &rec_buff[0], 5, 10 );
             }
             /* Calculate Multirecord header checksum */
             if ( !(calculate_chksum( &rec_buff[0], 5 ) == 0) ) {
@@ -190,7 +190,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
                 if (fru[id].runtime) {
                     memcpy( &rec_buff[0], &fru[id].buffer[multirec_off], rec_len );
                 } else {
-                    fru[id].cfg.read_f( fru[id].cfg.eeprom_id, multirec_off, &rec_buff[0], rec_len, 0 );
+                    fru[id].cfg.read_f( fru[id].cfg.eeprom_id, multirec_off, &rec_buff[0], rec_len, 10 );
                 }
                 if ( !((calculate_chksum( &rec_buff[0], rec_len ) == rec_chksum)) ) {
                     /* Wrong checksum */
