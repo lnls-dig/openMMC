@@ -48,7 +48,7 @@ size_t eeprom_24xx02_read( uint8_t id, uint16_t address, uint8_t *rx_data, size_
     }
 
     if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout ) ) {
-        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, address, rx_data, buf_len );
+        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, (uint8_t *)&address, 1, rx_data, buf_len );
         i2c_give( i2c_interface );
     }
 

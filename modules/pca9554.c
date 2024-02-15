@@ -57,7 +57,7 @@ static uint8_t pca9554_read_reg ( uint8_t chip_id, uint8_t reg, uint8_t *readout
     }
 
     if( i2c_take_by_chipid( chip_id, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, readout, 1);
+        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, &reg, 1, readout, 1);
         i2c_give(i2c_id);
     }
     return rx_len;

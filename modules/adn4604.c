@@ -142,13 +142,15 @@ adn_connect_map_t adn4604_out_status( void )
 {
     uint8_t i2c_addr, i2c_interf;
     uint8_t i;
+    uint8_t cmd;
     adn_connect_map_t stat_map = {0};
 
     if ( i2c_take_by_chipid( CHIP_ID_ADN, &i2c_addr, &i2c_interf, (TickType_t)10 ) ) {
 
         /* Read all outputs status */
         for ( i = 0; i < 8; i++ ) {
-            xI2CMasterWriteRead( i2c_interf, i2c_addr, ADN_XPT_STATUS_REG+i, (uint8_t *)(&stat_map)+i, 1 );
+            cmd = ADN_XPT_STATUS_REG+i;
+            xI2CMasterWriteRead( i2c_interf, i2c_addr, &cmd, 1, (uint8_t *)(&stat_map)+i, 1 );
         }
         i2c_give( i2c_interf );
     }

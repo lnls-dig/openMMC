@@ -43,12 +43,8 @@ size_t at24mac_read( uint8_t id, uint16_t address, uint8_t *rx_data, size_t buf_
     uint8_t i2c_interface;
     uint8_t rx_len = 0;
 
-    if (rx_data == NULL) {
-        return 0;
-    }
-
     if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout ) && ( rx_data != NULL ) ) {
-        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, address, rx_data, buf_len );
+        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr, (uint8_t *)&address, 1, rx_data, buf_len );
         i2c_give( i2c_interface );
     }
 
@@ -60,9 +56,10 @@ size_t at24mac_read_serial_num( uint8_t id, uint8_t *rx_data, size_t buf_len, ui
     uint8_t i2c_addr;
     uint8_t i2c_interface;
     uint8_t rx_len = 0;
+    const uint8_t cmd = AT24MAC_ID_ADDR;
 
     if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout ) && ( rx_data != NULL ) ) {
-        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr+8, AT24MAC_ID_ADDR, rx_data, buf_len);
+        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr+8, &cmd, 1, rx_data, buf_len);
 
         i2c_give( i2c_interface );
     }
@@ -75,10 +72,11 @@ size_t at24mac_read_eui( uint8_t id, uint8_t *rx_data, size_t buf_len, uint32_t 
     uint8_t i2c_addr;
     uint8_t i2c_interface;
     uint8_t rx_len = 0;
+    const uint8_t cmd = AT24MAC_EUI_ADDR;
 
     if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout ) && ( rx_data != NULL ) ) {
 
-        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr+8, AT24MAC_EUI_ADDR, rx_data, buf_len);
+        rx_len = xI2CMasterWriteRead( i2c_interface, i2c_addr+8, &cmd, 1, rx_data, buf_len);
 
         i2c_give( i2c_interface );
     }

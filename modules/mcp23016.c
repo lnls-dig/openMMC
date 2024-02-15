@@ -56,7 +56,7 @@ static mmc_err mcp23016_read_reg ( uint8_t reg, uint8_t *readout )
     }
 
     if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, data, sizeof(data));
+        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, &reg, 1, data, sizeof(data));
         i2c_give(i2c_id);
     } else {
         return MMC_TIMEOUT_ERR;
@@ -177,7 +177,7 @@ mmc_err mcp23016_read_reg_pair ( uint8_t reg, uint16_t *readout ) {
     uint8_t data[2] = {0};
 
     if( i2c_take_by_chipid( CHIP_ID_MCP23016, &i2c_addr, &i2c_id, (TickType_t) 10) ) {
-        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, reg, data, sizeof(data));
+        rx_len = xI2CMasterWriteRead(i2c_id, i2c_addr, &reg, 1, data, sizeof(data));
         i2c_give(i2c_id);
     } else {
         return MMC_TIMEOUT_ERR;
