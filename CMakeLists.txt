@@ -41,7 +41,7 @@ endif()
 message( STATUS "Build type: ${CMAKE_BUILD_TYPE}" )
 
 # Include board specific code
-set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat -Wno-unused-parameter -Wno-missing-field-initializers")
+set(CMAKE_ERROR_FLAGS "-Wall -Wextra -Wpointer-arith -Wno-packed-bitfield-compat -Wno-unused-parameter -Wno-missing-field-initializers -Werror=int-conversion -Werror=stringop-overflow -Werror=maybe-uninitialized -Werror=incompatible-pointer-types")
 
 # Build specific flags
 set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} ${CMAKE_ERROR_FLAGS}")
