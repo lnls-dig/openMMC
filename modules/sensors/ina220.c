@@ -140,7 +140,7 @@ Bool ina220_readvalue( ina220_data_t * data, uint8_t reg, uint16_t *read )
 
     if( i2c_take_by_chipid( data->sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY) == pdTRUE ) {
 
-        xI2CMasterWriteRead( i2c_interf, i2c_addr, reg, &val[0], sizeof(val)/sizeof(val[0]) );
+        xI2CMasterWriteRead( i2c_interf, i2c_addr, &reg, 1, &val[0], sizeof(val)/sizeof(val[0]) );
 
         i2c_give( i2c_interf );
 

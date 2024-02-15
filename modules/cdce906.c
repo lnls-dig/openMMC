@@ -568,9 +568,10 @@ int cdce906_read_cfg(uint8_t chip_id, cdce906_cfg* cfg)
     uint8_t i2c_id;
     int i2c_trans = 0;
     int ret = 0;
+    const uint8_t cmd = 0x00;
 
     if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, (TickType_t)10)) {
-        i2c_trans = xI2CMasterWriteRead(i2c_id, i2c_addr, 0x00, data, sizeof(data));
+        i2c_trans = xI2CMasterWriteRead(i2c_id, i2c_addr, &cmd, 1, data, sizeof(data));
         i2c_give(i2c_id);
     }
 

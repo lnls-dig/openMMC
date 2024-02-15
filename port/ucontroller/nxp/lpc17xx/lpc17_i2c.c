@@ -150,3 +150,15 @@ void vI2CSlaveSetup ( I2C_ID_T id, uint8_t slave_addr )
     slave_cfg.rxSz = (sizeof(recv_msg)/sizeof(recv_msg[0]));
     Chip_I2C_SlaveSetup( id, I2C_SLAVE_0, &slave_cfg, I2C_Slave_Event, SLAVE_MASK);
 }
+
+int xI2CMasterWriteRead(I2C_ID_T id, uint8_t addr, const uint8_t *tx_buff, int tx_len, uint8_t *rx_buff, int rx_len)
+{
+    I2C_XFER_T xfer = {0};
+    xfer.slaveAddr = addr;
+    xfer.txBuff = tx_buff;
+    xfer.txSz = tx_len;
+    xfer.rxBuff = rx_buff;
+    xfer.rxSz = rx_len;
+    while (Chip_I2C_MasterTransfer(id, &xfer) == I2C_STATUS_ARBLOST) {}
+    return rx_len - xfer.rxSz;
+}
