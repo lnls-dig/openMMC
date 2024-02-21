@@ -239,8 +239,36 @@
          GPIO_FMC1_PRSNT_M2C,                   \
          GPIO_FMC2_PRSNT_M2C,                   \
          GPIO_RTM_PS
-#endif
 
 /**
  * @}
  */
+#include <stdint.h>
+
+typedef struct external_gpio {
+    uint8_t port_num;
+    uint8_t pin_num;
+} external_gpio_t;
+
+extern const external_gpio_t ext_gpios[16];
+
+enum {
+	EXT_GPIO_EN_P1V0,
+	EXT_GPIO_EN_P1V8,
+	EXT_GPIO_EN_P3V3,
+	EXT_GPIO_EN_FMC1_PVADJ,
+	EXT_GPIO_EN_FMC2_PVADJ,
+	EXT_GPIO_P1V5_VTT_EN,
+	EXT_GPIO_EN_P1V2,
+	EXT_GPIO_EN_FMC1_P12V,
+	EXT_GPIO_EN_FMC1_P3V3,
+	EXT_GPIO_EN_FMC2_P12V,
+	EXT_GPIO_EN_FMC2_P3V3,
+	EXT_GPIO_EN_RTM_PWR,
+	EXT_GPIO_EN_RTM_MP,
+	EXT_GPIO_FPGA_I2C_RESET,
+	EXT_GPIO_DAC_VADJ_RSTn,
+	EXT_GPIO_PROGRAM_B,
+};
+
+#endif

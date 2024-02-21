@@ -16,3 +16,16 @@ void rtm_check_presence( uint8_t *status )
         *status = HOTSWAP_STATE_URTM_PRSENT;
     }
  }
+
+mmc_err rtm_enable_payload_power( void )
+{
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 1 );
+    return rtm_enable_payload_power_post();
+}
+
+ mmc_err rtm_disable_payload_power( void )
+{
+    mmc_err error = rtm_disable_payload_power_pre();
+    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 0 );
+    return error;
+}

@@ -70,7 +70,6 @@
  * @}
  */
 
-
 /* Pins Read/Write */
 /**
  * @brief Read all pins status
