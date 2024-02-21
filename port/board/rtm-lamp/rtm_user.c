@@ -35,10 +35,8 @@
 #include "cdce906_config.h"
 /* RTM Management functions */
 
-void rtm_enable_payload_power( void )
+mmc_err rtm_enable_payload_power_post( void )
 {
-    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 1 );
-
     /*
      * RTM-LAMP power up sequence
      */
@@ -49,12 +47,12 @@ void rtm_enable_payload_power( void )
     vTaskDelay(pdMS_TO_TICKS(10));
     pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_VS1_EN, 1);
     pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_VS2_EN, 1);
+
+    return MMC_OK;
 }
 
-void rtm_disable_payload_power( void )
+mmc_err rtm_disable_payload_power_pre( void )
 {
-    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 0 );
-
     /*
      * RTM-LAMP power down sequence
      */
@@ -65,14 +63,14 @@ void rtm_disable_payload_power( void )
     pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_7V_EN, 1);
     vTaskDelay(pdMS_TO_TICKS(10));
     pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_5V_EN, 0);
+
+    return MMC_OK;
 }
 
 uint8_t rtm_get_hotswap_handle_status( uint8_t *state )
 {
     static uint8_t falling, rising;
     uint8_t pin_read;
-
-    rtm_enable_i2c();
 
     if (pca9554_read_pin( CHIP_ID_RTM_PCA9554_LEDS, RTM_GPIO_HOTSWAP_HANDLE, &pin_read ) == 0 ) {
         return false;
@@ -90,7 +88,6 @@ uint8_t rtm_get_hotswap_handle_status( uint8_t *state )
 
 void rtm_hardware_init( void )
 {
-    rtm_enable_i2c();
     pca9554_set_port_dir( CHIP_ID_RTM_PCA9554_LEDS, 0x1F );
 
     /*
@@ -105,20 +102,6 @@ void rtm_hardware_init( void )
     pca9554_write_port(CHIP_ID_RTM_PCA9554_PWR, (0 << RTM_GPIO_NEG_7V_EN) |
                        (1 << RTM_GPIO_7V_EN) | (0 << RTM_GPIO_VS1_EN) |
                        (0 << RTM_GPIO_VS2_EN) | (0 << RTM_GPIO_5V_EN));
-}
-
-void rtm_enable_i2c( void )
-{
-    /* Enable I2C communication with RTM */
-    gpio_set_pin_dir( PIN_PORT(GPIO_RTM_PS), PIN_NUMBER(GPIO_RTM_PS), GPIO_DIR_OUTPUT );
-    gpio_set_pin_dir( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_DIR_OUTPUT );
-    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_LEVEL_HIGH );
-}
-
-void rtm_disable_i2c( void )
-{
-    gpio_set_pin_dir( PIN_PORT(GPIO_RTM_PS), PIN_NUMBER(GPIO_RTM_PS), GPIO_DIR_INPUT );
-    gpio_set_pin_dir( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_DIR_INPUT );
 }
 
 bool rtm_compatibility_check( void )
@@ -166,12 +149,6 @@ bool rtm_compatibility_check( void )
     vPortFree(z3_compat_recs[1]);
 
     return false;
-}
-
-bool rtm_quiesce( void )
-{
-    /* In this board, no action is needed to quiesce */
-    return true;
 }
 
 void rtm_ctrl_led( uint8_t id, uint8_t state )

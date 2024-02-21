@@ -53,5 +53,21 @@ void rtm_manage_init( void );
  */
 void rtm_check_presence(uint8_t *status);
 
+/**
+ * @brief Enable payload power
+ *
+ * This function turn on the 12V payload power rail and initialise the RTM powered by it.
+ *
+ */
+mmc_err rtm_enable_payload_power( void );
+
+/**
+ * @brief Disable payload power
+ *
+ * This function turn off the 12V payload power rail and de-initialise the RTM powered by it.
+ *
+ */
+mmc_err rtm_disable_payload_power( void );
+
 
 #endif
