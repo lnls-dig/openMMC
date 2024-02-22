@@ -47,7 +47,7 @@ void rtm_manage_init( void );
 /**
  * @brief Check RTM Presence
  *
- * This function is used to detect the RTM Board presence
+ * This task use some GPIO pins to detect the RTM Board presence
  *
  * @return None
  */
