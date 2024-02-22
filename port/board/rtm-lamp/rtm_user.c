@@ -123,9 +123,18 @@ bool rtm_compatibility_check( void )
             /* Read Multirecord header */
             fru_read( i, multirec_hdr, multirec_off, 10 );
 
+
             if (multirec_hdr[8] == 0x30) {
                 z3rec_found = true;
-                break;
+
+                /* According to Plataform Management FRU Information Storage Definition v1.0, pg 19
+                 * multirec_hdr[1] >> 7 == 1 indicates the end of list, and for this reason, the loop
+                 * should only break if this condition is satisfied to ensure that we have passed
+                 * through all multirecord area.
+                 */
+                if ((multirec_hdr[1] >> 7) == 1) {
+                    break;
+                }
             }
             /* Advance the offset pointer, adding the record length field to it */
             multirec_off += multirec_hdr[2]+5;
