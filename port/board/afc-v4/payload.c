@@ -98,7 +98,7 @@ uint8_t setDC_DC_ConvertersON(bool on)
         for (uint8_t i = 0; i < (sizeof(power_pins) / sizeof(power_pins[0])); i++) {
             pin = power_pins[i];
             mcp23016_write_pin( ext_gpios[pin].port_num, ext_gpios[pin].pin_num, true );
-            vTaskDelay(10);
+            vTaskDelay(pdMS_TO_TICKS(10));
         }
     } else {
         printf("Disable Power\n");
@@ -106,7 +106,7 @@ uint8_t setDC_DC_ConvertersON(bool on)
         for (uint8_t i = (sizeof(power_pins) / sizeof(power_pins[0])); i > 0; i--) {
             pin = power_pins[i];
             mcp23016_write_pin( ext_gpios[pin].port_num, ext_gpios[pin].pin_num, false );
-            vTaskDelay(10);
+            vTaskDelay(pdMS_TO_TICKS(10));
         }
     }
     return 1;

@@ -51,7 +51,7 @@ void vTaskINA3221( void *Parameters )
     uint8_t channel;
     TickType_t xLastWakeTime;
     /* Task will run every 100ms */
-    const TickType_t xFrequency = INA3221_UPDATE_RATE / portTICK_PERIOD_MS;
+    const TickType_t xFrequency = pdMS_TO_TICKS(INA3221_UPDATE_RATE);
 
     sensor_t * ina3221_sensor;
     ina3221_data_t * data_ptr;

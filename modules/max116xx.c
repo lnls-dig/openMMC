@@ -45,7 +45,7 @@ mmc_err max116xx_set_config(uint8_t chip_id, const max116xx_cfg* cfg)
     setup_cfg[0] = 0x80 | cfg->ref_sel | cfg->clk_sel | cfg->pol_sel | 0b10;
     setup_cfg[1] = cfg->scan_mode | (cfg->channel_sel << 1) | cfg->diff_mode;
 
-    if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, (TickType_t) 10)) {
+    if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, pdMS_TO_TICKS(10))) {
         tx_len = xI2CMasterWrite(i2c_id, i2c_addr, setup_cfg, sizeof(setup_cfg));
         i2c_give(i2c_id);
     } else {
@@ -69,7 +69,7 @@ mmc_err max116xx_read_uni(uint8_t chip_id, int16_t data[], uint8_t samples)
         return MMC_INVALID_ARG_ERR;
     }
 
-    if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, (TickType_t) 10)) {
+    if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, pdMS_TO_TICKS(10))) {
         rx_len = xI2CMasterRead(i2c_id, i2c_addr, (uint8_t*)data, (samples * 2));
         i2c_give(i2c_id);
     } else {
@@ -101,7 +101,7 @@ mmc_err max116xx_read_bip(uint8_t chip_id, int16_t data[], uint8_t samples)
         return MMC_INVALID_ARG_ERR;
     }
 
-    if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, (TickType_t) 10)) {
+    if (i2c_take_by_chipid(chip_id, &i2c_addr, &i2c_id, pdMS_TO_TICKS(10))) {
         rx_len = xI2CMasterRead(i2c_id, i2c_addr, (uint8_t*)data, (samples * 2));
         i2c_give(i2c_id);
     } else {

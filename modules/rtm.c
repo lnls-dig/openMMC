@@ -57,7 +57,7 @@ void RTM_Manage( void * Parameters )
     rtm_disable_payload_power();
 
     for ( ;; ) {
-        vTaskDelay(500);
+        vTaskDelay(pdMS_TO_TICKS(500));
 
         rtm_check_presence( &ps_new_state );
 

@@ -45,7 +45,7 @@ TaskHandle_t vTaskMAX6642_Handle;
 
 void vTaskMAX6642( void* Parameters )
 {
-    const TickType_t xFrequency = MAX6642_UPDATE_RATE;
+    const TickType_t xFrequency = pdMS_TO_TICKS(MAX6642_UPDATE_RATE);
 
     sensor_t * temp_sensor;
 
