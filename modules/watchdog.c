@@ -61,7 +61,7 @@ void WatchdogTask (void * Parameters)
         }
         wdt_feed();
         //printf(" Watchdog fed (again) \n ");
-        vTaskDelay(WATCHDOG_FEED_DELAY);
+        vTaskDelay(pdMS_TO_TICKS(WATCHDOG_FEED_DELAY));
     }
 }
 

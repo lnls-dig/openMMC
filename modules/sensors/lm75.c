@@ -46,7 +46,7 @@ TaskHandle_t vTaskLM75_Handle;
 
 void vTaskLM75( void* Parameters )
 {
-    const TickType_t xFrequency = LM75_UPDATE_RATE;
+    const TickType_t xFrequency = pdMS_TO_TICKS(LM75_UPDATE_RATE);
 
     uint8_t i2c_addr, i2c_interf;
     sensor_t * temp_sensor;

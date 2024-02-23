@@ -72,7 +72,7 @@ void vTaskFPGA_COMM( void * Parameters )
 
     /* Check if the FPGA has finished programming itself from the FLASH */
     while (!gpio_read_pin( PIN_PORT(GPIO_FPGA_DONE_B), PIN_NUMBER(GPIO_FPGA_DONE_B))) {
-        vTaskDelay(FPGA_UPDATE_RATE);
+        vTaskDelay(pdMS_TO_TICKS(FPGA_UPDATE_RATE));
     }
 
     ssp_init( FPGA_SPI, FPGA_SPI_BITRATE, FPGA_SPI_FRAME_SIZE, SSP_MASTER, SSP_POLLING );
@@ -119,7 +119,7 @@ void vTaskFPGA_COMM( void * Parameters )
         /* Data Valid byte - indicates that the bus is idle */
         write_fpga_dword( 0x05, 0xAAAAAAAA );
 
-        vTaskDelay(FPGA_UPDATE_RATE);
+        vTaskDelay(pdMS_TO_TICKS(FPGA_UPDATE_RATE));
     }
 }
 
