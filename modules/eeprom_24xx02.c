@@ -60,16 +60,13 @@ size_t eeprom_24xx02_write( uint8_t id, uint16_t address, uint8_t *tx_data, size
     uint8_t i2c_addr;
     uint8_t i2c_interface;
     uint8_t bytes_to_write;
+    uint8_t i2c_written = 0;
     uint8_t page_buf[9];
     uint16_t curr_addr;
 
     size_t tx_len = 0;
 
-    if ( tx_data == NULL ) {
-        return 0;
-    }
-
-    if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout)) {
+    if ( tx_data != NULL ) {
         curr_addr = address;
 
         while (tx_len < buf_len) {
@@ -82,13 +79,22 @@ size_t eeprom_24xx02_write( uint8_t id, uint16_t address, uint8_t *tx_data, size
 
             memcpy(&page_buf[1], tx_data+tx_len, bytes_to_write);
 
-            /* Write the data */
-            tx_len += xI2CMasterWrite( i2c_interface, i2c_addr, &page_buf[0] , bytes_to_write+1 );
-            vTaskDelay(10);
-            tx_len -= 1; /* Remove the page byte from the count */
-            curr_addr += bytes_to_write;
+            if (i2c_take_by_chipid( id, &i2c_addr, &i2c_interface, timeout)) {
+                /* Write the data */
+                i2c_written = xI2CMasterWrite( i2c_interface, i2c_addr, &page_buf[0] , bytes_to_write+1 );
+                /* When trying to write, the EEPROM will reply with NACKs if it's busy.
+                 * If the i2c receives a NACK when trying to write, the function returns only
+                 * the number of bytes successfully written, and we should increment only this value
+                 * in tx_len and in curr_addr */
+
+                if (i2c_written) {
+                    tx_len += i2c_written - 1; /* Remove byte address from data written size */
+                    curr_addr += i2c_written - 1;
+                }
+                i2c_give( i2c_interface );
+            }
+            vTaskDelay(pdMS_TO_TICKS(1)); /* Avoid too much unnecessary I2C trafic*/
         }
-        i2c_give( i2c_interface );
     }
 
     return tx_len;
