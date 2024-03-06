@@ -216,7 +216,7 @@ IPMI_HANDLER(ipmi_picmg_initiate_upgrade_action, NETFN_GRPEXT, IPMI_PICMG_CMD_HP
     uint8_t len = rsp->data_len = 0;
 
     uint8_t comp_id;
-    
+
     /* Set the component that'll be upgraded */
     /*
      * As specified in the Hardware Platform Management IPM Controller Firmware Upgrade Specification, Table 3-4,
@@ -309,6 +309,12 @@ IPMI_HANDLER(ipmi_picmg_upload_firmware_block, NETFN_GRPEXT, IPMI_PICMG_CMD_HPM_
     uint8_t len = rsp->data_len = 0;
     uint8_t block_data[HPM_BLOCK_SIZE];
     uint8_t block_sz = req->data_len-2;
+
+    if(block_sz > HPM_BLOCK_SIZE){
+       rsp->data_len = len;
+       rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+       return;
+    }
 
     if (active_component == NULL) {
         /* Component ID out of range */
