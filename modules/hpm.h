@@ -36,7 +36,7 @@
 #define HPM_ROLLBACK_TIMEOUT 10 /* in 5 seconds counts */
 #define HPM_INACCESSIBILITY_TIMEOUT 10 /* in 5 seconds counts */
 
-#define HPM_BLOCK_SIZE 20
+#define HPM_BLOCK_SIZE 64
 
 /* Components ID */
 enum {
@@ -54,7 +54,7 @@ typedef uint8_t (* t_hpm_activate_firmware)(void);
 
 
 /*
- * Define the "Get target upgrade capabilities" message struct as define in the 
+ * Define the "Get target upgrade capabilities" message struct as define in the
  * Hardware Platform Management IPM Controller Firmware Upgrade Specification, Table 3-3
  */
 typedef union {
