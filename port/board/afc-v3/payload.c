@@ -311,6 +311,8 @@ void vTaskPayload( void *pvParameters )
             break;
 
         case PAYLOAD_STATE_FPGA_SETUP:
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M), GPIO_LEVEL_HIGH);
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M), GPIO_LEVEL_HIGH);
 #ifdef MODULE_ADN4604
             /* Configure clock switch */
             if (clock_configuration() == MMC_OK) {
@@ -329,6 +331,9 @@ void vTaskPayload( void *pvParameters )
 
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON( false );
+
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M), GPIO_LEVEL_LOW);
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M), GPIO_LEVEL_LOW);
 
             /* Respond to quiesce event if any */
             if ( QUIESCED_req ) {
