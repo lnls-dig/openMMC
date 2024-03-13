@@ -111,7 +111,7 @@
    "SRC": "CLK20_VCXO",
    "EN": false
   },
-  "FMC2_CLK2_BIDIR": {
+  "FIN2_CLK3": {
    "SRC": "FMC2_CLK2_BIDIR",
    "EN": false
   }
