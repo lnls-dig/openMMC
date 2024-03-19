@@ -96,7 +96,9 @@ void vI2CConfig( I2C_ID_T id, uint32_t speed )
 
 static TaskHandle_t slave_task_id;
 I2C_XFER_T slave_cfg;
+I2C_XFER_T slave_dummy;
 uint8_t recv_msg[i2cMAX_MSG_LENGTH];
+uint8_t recv_msg_dummy[i2cMAX_MSG_LENGTH];
 uint8_t recv_bytes;
 
 uint8_t xI2CSlaveReceive( I2C_ID_T id, uint8_t * rx_buff, uint8_t buff_len, uint32_t timeout )
@@ -138,6 +140,13 @@ static void I2C_Slave_Event(I2C_ID_T id, I2C_EVENT_T event)
     }
 }
 
+/*
+ * This stub functions is called when the received I2C Slave Address doesn't match the
+ * expected IPMB address. This seems to be necessary because the lpcopen library tries
+ * to handle the I2C Slave configuration for I2C_SLAVE_GENERAL even if it's not configured,
+ * thus dereferencing an invalid unitialized pointer generating a HardFault.
+ */
+static void I2C_Dummy_Event(I2C_ID_T id, I2C_EVENT_T event){}
 
 void vI2CSlaveSetup ( I2C_ID_T id, uint8_t slave_addr )
 {
@@ -149,6 +158,13 @@ void vI2CSlaveSetup ( I2C_ID_T id, uint8_t slave_addr )
     slave_cfg.rxBuff = &recv_msg[0];
     slave_cfg.rxSz = (sizeof(recv_msg)/sizeof(recv_msg[0]));
     Chip_I2C_SlaveSetup( id, I2C_SLAVE_0, &slave_cfg, I2C_Slave_Event, SLAVE_MASK);
+
+    slave_dummy.slaveAddr = 0;
+    slave_dummy.txBuff = NULL;
+    slave_dummy.txSz = 0;
+    slave_dummy.rxBuff = recv_msg_dummy;
+    slave_dummy.rxSz =(sizeof(recv_msg_dummy)/sizeof(recv_msg_dummy[0]));
+    Chip_I2C_SlaveSetup( id, I2C_SLAVE_GENERAL, &slave_dummy, I2C_Dummy_Event, SLAVE_MASK);
 }
 
 int xI2CMasterWriteRead(I2C_ID_T id, uint8_t addr, const uint8_t *tx_buff, int tx_len, uint8_t *rx_buff, int rx_len)
