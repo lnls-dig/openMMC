@@ -236,6 +236,7 @@ int handleMasterXferState(LPC_I2C_T *pI2C, I2C_XFER_T  *xfer)
 	case 0x00:
 		xfer->status = I2C_STATUS_BUSERR;
 		cclr &= ~I2C_CON_STO;
+		break;
 	}
 
 	/* Set clear control flags */

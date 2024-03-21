@@ -50,7 +50,7 @@
 /* Prepare sector for write operation */
 uint8_t Chip_IAP_PreSectorForReadWrite(uint32_t strSector, uint32_t endSector)
 {
-	uint32_t command[5], result[4];
+	uint32_t command[5], result[5];
 
 	command[0] = IAP_PREWRRITE_CMD;
 	command[1] = strSector;
