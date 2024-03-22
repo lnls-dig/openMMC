@@ -4,7 +4,7 @@ if (NOT TARGET_CONTROLLER)
 endif()
 
 if (NOT TARGET_BOARD_NAME)
-  set(TARGET_BOARD_NAME "AFC Timing" CACHE STRING "Board Name")
+  set(TARGET_BOARD_NAME "AFC v3.1" CACHE STRING "Board Name")
 endif()
 
 #List all modules used by this board
