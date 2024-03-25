@@ -27,7 +27,7 @@ Create a new folder wherever is suitable
 
 	cd <build_folder>
 
-Run CMake using the path to the repository folder as an direct argument and the flag `-DBOARD=<board_name>`(at this moment, only `afc` can be selected) ,`-DVERSION=<board_version>` (`3.1` or `4.0`) and `-DBOARD_RTM=<rtm_name>` (for now, only RTM `8sfp` for AFCv3.1 is supported) to configure the compilation scripts to your specific board hardware.
+Run CMake using the path to the repository folder as an direct argument and the flag `-DBOARD=<board_name>`(at this moment, only `afc` can be selected) ,`-DVERSION=<board_version>` (`3.1` or `4.0`) and `-DBOARD_RTM=<rtm_name>` (`8sfp` or `lamp`) to configure the compilation scripts to your specific board hardware.
 
 	cmake <path_to_source> -DBOARD=<board_name> -DVERSION=<board_version> -DBOARD_RTM=<rtm_name>
 
@@ -93,6 +93,8 @@ It's also important to mention that you can use the `--help` command in case of 
 	./bin/hpm-downloader --help
 
 ### ipmitool
+> :warning: **Disclaimer:** Due to [e88b30b](https://github.com/lnls-dig/openMMC/tree/e88b30b26c9dc05662d84e35b51fc81d7ecf7561), the ipmitool fails when trying to upgrade the firmware from v1.5.0. For succeed in upgrade, you can use a modified ipmitool version, setting the variable [`max_rq_size`](https://codeberg.org/IPMITool/ipmitool/src/commit/137aeb64cbb493d61d6945cac156aba5f0510780/lib/ipmi_hpmfwupg.c#L1143) to 20. After this version, you can use the ipmitool normally.
+
 After [5631857](https://github.com/lnls-dig/openMMC/commit/563185791c8b51ea026680c98ec0ea9587ea645b), it's possible to program the firmware and the bootloader through [ipmitool](https://codeberg.org/IPMITool/ipmitool), for previous releases, you still need to use [hpm-downloader](https://github.com/lnls-dig/hpm-downloader). In order to use it, you have to install the ipmitool, and then generate .hpm files from `OpenMMC.bin` and `newboot.bin`. To generate `.hpm` files, you will need to use [bin2hpm](https://github.com/MicroTCA-Tech-Lab/bin2hpm). If you have bin2hpm in your `$PATH`, the `.hpm` files will be automatically generated for you, provided you build from [0095b14](https://github.com/lnls-dig/openMMC/commit/0095b14667afe844113725228671d8810b45d9e0) or more recent versions.
 After generate the files, you can use the following commands to program the MMC microcontroller.
 To upgrade the firmware, use
@@ -135,12 +137,27 @@ Now you can use the typical GDB commands to inspect the program flow and variabl
 ## IPMI Custom Commands
 The IPMI allow us to create custom commands according to the project needs. [ipmitool](https://codeberg.org/IPMITool/ipmitool) can be used to send the commands
 
+### Get free heap memory
+It is possible to monitor the MMC's memory usage via IPMI. To obtain the total free heap use command 0x01, netfn_id 0x32. The returned data will be the number of free heap bytes, encoded as a 32 bits unsigned integer, little-endian.
+
+    ipmitool -I lan -H mch_host_name -A none -T 0x82 -m 0x20 -t (112 + num_slot*2) raw 0x32 0x01
+
+### Commit Hash read
+After loading a new firmware, you can use an ipmi command to read its commit hash to ensure that the running version is the one you want.
+The command is the above:
+
+
+    ipmitool -I lan -H mch_host_name -A none -T 0x82 -m 0x20 -t (112 + num_slot*2) raw 0x32 0x02
+
 ### Clock switch configuration
-It's possible to configure the clock switch. For the AFC v3.1 (ADN4604ASVZ) you can use the following scheme:
+After [7a919489](https://github.com/lnls-dig/openMMC/tree/7a91948975f87f6613b28fc1ea562a2a7bb3c475) the clock switch configuration is no longer hardcoded for each board. Instead, it must be configured through an IPMI command.
+
+For the AFC v3.1 (ADN4604ASVZ) you can use the [script](/scripts/afcv3.1-clksw-config.py) for generate the configuration, and use the json configuration for [AFCv3.1-BPM](/config/lnls/afcv3.1-bpm-clk-cfg.json) or [AFCv3.1-Timing](/config/lnls/afcv3.1-timing-clk-cfg.json). If you want to generate a new configuration, use the following scheme:
 - **Port I/O (bit 7)**: Use it to configure the port as an input ('0') or output ('1'). Unused ports should be left configured as inputs;
 - **Output Port Signal Source (bits 0 to 3)**: Select the input port for the respective output port.
 
 For the AFC v4 (IDT 8V54816) you can use the following scheme:
+For the AFC v4.0 (IDT 8V54816) you can use the [script](/scripts/afcv4-clksw-config.py) for generate the configuration, and use the json configuration for [AFCv4.0-FOFB](/config/lnls/afcv4-fofb-clk-cfg.json). If you want to generate a new configuration, use the following scheme:
 - **Port I/O (bit 7)**: Use it to configure the port as an input ('0') or output ('1'). Unused ports should be left configured as inputs;
 - **Termination On/Off (bit 6)**: Use to set the internal termination. '0' is off (high-impedance), '1' is on (100 $\Omega$)
 - **Polarity (bit 5)**: Set the channel polarity. '0' for inverted, '1' for non-inverted
