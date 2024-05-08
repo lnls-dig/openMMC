@@ -218,6 +218,9 @@ void payload_init( void )
         while ( gpio_read_pin( PIN_PORT(GPIO_MMC_ENABLE), PIN_NUMBER(GPIO_MMC_ENABLE) ) == 1 ) {};
     }
 
+    /* Recover clock switch configuration saved in EEPROM */
+    eeprom_24xx02_read(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
+
     xTaskCreate( vTaskPayload, "Payload", 256, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
 
     amc_payload_evt = xEventGroupCreate();
@@ -396,9 +399,11 @@ void vTaskPayload( void *pvParameters )
             gpio_set_pin_state(PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M), GPIO_LEVEL_HIGH);
             gpio_set_pin_state(PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M), GPIO_LEVEL_HIGH);
 
-            /* Configure the clock switch according to the configuration saved in EEPROM*/
-            eeprom_24xx02_read(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
-            /* Only change the state if the clock config is efective*/
+
+            /*
+             * Only change the state if the clock switch configuration
+             * succeeds
+             */
             if (clock_switch_write_reg(clock_config)) {
                 new_state = PAYLOAD_FPGA_ON;
             }

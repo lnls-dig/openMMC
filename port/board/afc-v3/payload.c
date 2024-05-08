@@ -193,6 +193,9 @@ void payload_init( void )
         while ( gpio_read_pin( PIN_PORT(GPIO_MMC_ENABLE), PIN_NUMBER(GPIO_MMC_ENABLE) ) == 1 ) {};
     }
 
+    /* Recover clock switch configuration saved in EEPROM */
+    eeprom_24xx02_read(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
+
     xTaskCreate( vTaskPayload, "Payload", 256, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
 
     amc_payload_evt = xEventGroupCreate();
@@ -250,7 +253,7 @@ void vTaskPayload( void *pvParameters )
             eeprom_24xx02_write(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
             if (PAYLOAD_FPGA_ON){
                 adn4604_reset();
-                clock_configuration();
+                clock_configuration(clock_config);
             }
             xEventGroupClearBits(amc_payload_evt, PAYLOAD_MESSAGE_CLOCK_CONFIG);
         }
@@ -315,7 +318,7 @@ void vTaskPayload( void *pvParameters )
             gpio_set_pin_state(PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M), GPIO_LEVEL_HIGH);
 #ifdef MODULE_ADN4604
             /* Configure clock switch */
-            if (clock_configuration() == MMC_OK) {
+            if (clock_configuration(clock_config) == MMC_OK) {
                 new_state = PAYLOAD_FPGA_ON;
             }
 #else
@@ -485,32 +488,29 @@ uint8_t payload_hpm_activate_firmware( void )
     return IPMI_CC_OK;
 }
 
-mmc_err clock_configuration( void )
+mmc_err clock_configuration(const uint8_t clk_cfg[16])
 {
     adn_connect_map_t con;
     mmc_err error;
 
-    /* Read the clock configuration from the eeprom */
-    eeprom_24xx02_read(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
-
     /* Translate the configuration to enable or disable the outputs */
     uint16_t out_enable_flag = {
-        ((clock_config[0] & 0x80) >> 7) << 0 |
-        ((clock_config[1] & 0x80) >> 7) << 1 |
-        ((clock_config[2] & 0x80) >> 7) << 2 |
-        ((clock_config[3] & 0x80) >> 7) << 3 |
-        ((clock_config[4] & 0x80) >> 7) << 4 |
-        ((clock_config[5] & 0x80) >> 7) << 5 |
-        ((clock_config[6] & 0x80) >> 7) << 6 |
-        ((clock_config[7] & 0x80) >> 7) << 7 |
-        ((clock_config[8] & 0x80) >> 7) << 8 |
-        ((clock_config[9] & 0x80) >> 7) << 9 |
-        ((clock_config[10] & 0x80) >> 7) << 10 |
-        ((clock_config[11] & 0x80) >> 7) << 11 |
-        ((clock_config[12] & 0x80) >> 7) << 12 |
-        ((clock_config[13] & 0x80) >> 7) << 13 |
-        ((clock_config[14] & 0x80) >> 7) << 14 |
-        ((clock_config[15] & 0x80) >> 7) << 15
+        ((clk_cfg[0] & 0x80) >> 7) << 0 |
+        ((clk_cfg[1] & 0x80) >> 7) << 1 |
+        ((clk_cfg[2] & 0x80) >> 7) << 2 |
+        ((clk_cfg[3] & 0x80) >> 7) << 3 |
+        ((clk_cfg[4] & 0x80) >> 7) << 4 |
+        ((clk_cfg[5] & 0x80) >> 7) << 5 |
+        ((clk_cfg[6] & 0x80) >> 7) << 6 |
+        ((clk_cfg[7] & 0x80) >> 7) << 7 |
+        ((clk_cfg[8] & 0x80) >> 7) << 8 |
+        ((clk_cfg[9] & 0x80) >> 7) << 9 |
+        ((clk_cfg[10] & 0x80) >> 7) << 10 |
+        ((clk_cfg[11] & 0x80) >> 7) << 11 |
+        ((clk_cfg[12] & 0x80) >> 7) << 12 |
+        ((clk_cfg[13] & 0x80) >> 7) << 13 |
+        ((clk_cfg[14] & 0x80) >> 7) << 14 |
+        ((clk_cfg[15] & 0x80) >> 7) << 15
     };
 
     /* Disable UPDATE' pin by pulling it GPIO_LEVEL_HIGH */
@@ -522,22 +522,22 @@ mmc_err clock_configuration( void )
     }
 
     /* Configure the interconnects*/
-    con.out0 = clock_config[0] & 0x0F;
-    con.out1 = clock_config[1] & 0x0F;
-    con.out2 = clock_config[2] & 0x0F;
-    con.out3 = clock_config[3] & 0x0F;
-    con.out4 = clock_config[4] & 0x0F;
-    con.out5 = clock_config[5] & 0x0F;
-    con.out6 = clock_config[6] & 0x0F;
-    con.out7 = clock_config[7] & 0x0F;
-    con.out8 = clock_config[8] & 0x0F;
-    con.out9 = clock_config[9] & 0x0F;
-    con.out10 = clock_config[10] & 0x0F;
-    con.out11 = clock_config[11] & 0x0F;
-    con.out12 = clock_config[12] & 0x0F;
-    con.out13 = clock_config[13] & 0x0F;
-    con.out14 = clock_config[14] & 0x0F;
-    con.out15 = clock_config[15] & 0x0F;
+    con.out0 = clk_cfg[0] & 0x0F;
+    con.out1 = clk_cfg[1] & 0x0F;
+    con.out2 = clk_cfg[2] & 0x0F;
+    con.out3 = clk_cfg[3] & 0x0F;
+    con.out4 = clk_cfg[4] & 0x0F;
+    con.out5 = clk_cfg[5] & 0x0F;
+    con.out6 = clk_cfg[6] & 0x0F;
+    con.out7 = clk_cfg[7] & 0x0F;
+    con.out8 = clk_cfg[8] & 0x0F;
+    con.out9 = clk_cfg[9] & 0x0F;
+    con.out10 = clk_cfg[10] & 0x0F;
+    con.out11 = clk_cfg[11] & 0x0F;
+    con.out12 = clk_cfg[12] & 0x0F;
+    con.out13 = clk_cfg[13] & 0x0F;
+    con.out14 = clk_cfg[14] & 0x0F;
+    con.out15 = clk_cfg[15] & 0x0F;
 
     error = adn4604_xpt_config( ADN_XPT_MAP0_CON_REG, con );
     if (error != MMC_OK) {
