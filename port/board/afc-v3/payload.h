@@ -115,8 +115,7 @@ uint8_t payload_hpm_activate_firmware( void );
  * @brief Configure the clock switch interconects according to the configuration
  * saved in EEPROM
  */
-mmc_err clock_configuration( void );
-
+mmc_err clock_configuration(const uint8_t clk_cfg[16]);
 
 #endif /* IPMI_PAYLOAD_H_ */
 
