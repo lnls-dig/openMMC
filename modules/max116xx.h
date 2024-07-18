@@ -31,7 +31,7 @@
 #ifndef MAX116XX_H_
 #define MAX116XX_H_
 
-#include "error.h"
+#include "mmc_error.h"
 #include "port.h"
 
 /**

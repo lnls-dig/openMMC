@@ -36,6 +36,8 @@
 #ifndef ADN4604_H_
 #define ADN4604_H_
 
+#include "mmc_error.h"
+
 typedef struct __attribute__((__packed__)) {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     uint8_t out1:4,
@@ -113,20 +115,12 @@ enum adn4604_tx_ctl {
 };
 
 /**
- * @brief Initializes the ADN4604 Clock switch hardware
- *
- * This IC starts with a pre-defined configuration provided by the board port in the adn4604_usercfg.h file.
- * The current port status may be changed with OEM IPMI commands.
- */
-void adn4604_init( void );
-
-/**
  * @brief Sets the output status
  *
  * @param output Output number (0 to 15)
  * @param tx_mode Selected mode: (TX_DISABLED, TX_STANDBY, TX_SQUELCHED or TX_ENABLED)
  */
-void adn4604_tx_control( uint8_t output, uint8_t tx_mode );
+mmc_err adn4604_tx_control( uint8_t output, uint8_t tx_mode );
 
 /**
  * @brief Activates the current stored configuration
@@ -134,12 +128,12 @@ void adn4604_tx_control( uint8_t output, uint8_t tx_mode );
  * @note The Update pin has precedence over the software register, so if the Update pin is asserted, but the low-to-high step doesn't occur, you won't be able to update the IC configuration
  *
  */
-void adn4604_update( void );
+mmc_err adn4604_update( void );
 
 /**
  * @brief ADN4604 Software Reset
  */
-void adn4604_reset( void );
+mmc_err adn4604_reset( void );
 
 /**
  * @brief Configures the cross-connection map
@@ -147,14 +141,14 @@ void adn4604_reset( void );
  * @param map Selected map to configure (0 or 1)
  * @param xpt_con Outputs assignment
  */
-void adn4604_xpt_config( uint8_t map, adn_connect_map_t xpt_con );
+mmc_err adn4604_xpt_config( uint8_t map, adn_connect_map_t xpt_con );
 
 /**
  * @brief Sets the active map on the IC
  *
  * @param map Selected map (0 or 1)
  */
-void adn4604_active_map( uint8_t map );
+mmc_err adn4604_active_map( uint8_t map );
 
 /**
  * @brief Reads the outputs current connections
@@ -168,6 +162,6 @@ adn_connect_map_t adn4604_out_status( void );
  *
  * @param cfg Selected in/outputs (separated in quadrants defined in #adn4604_term_ctl)
  */
-void adn4604_termination_ctl( uint8_t cfg );
+mmc_err adn4604_termination_ctl( uint8_t cfg );
 
 #endif

@@ -4,12 +4,14 @@ if (NOT TARGET_CONTROLLER)
 endif()
 
 if (NOT TARGET_BOARD_NAME)
-  set(TARGET_BOARD_NAME "AFC v4" CACHE STRING "Board Name")
+  set(TARGET_BOARD_NAME "AFC v4.0" CACHE STRING "Board Name")
 endif()
 
 #List all modules used by this board
 set(TARGET_MODULES
   "FRU"
+  "CLOCK_CONFIG"
+  "EEPROM_24XX02"
   "PAYLOAD"
   "SDR"
   "DAC_AD84XX"
@@ -17,8 +19,8 @@ set(TARGET_MODULES
   "EEPROM_AT24MAC"
   "LM75"
   "MAX6642"
-#  "INA3221_VOLTAGE"
-#  "INA3221_CURRENT"
+  "INA3221_VOLTAGE"
+  "INA3221_CURRENT"
   "UART_DEBUG"
   "MCP23016"
   "ADC"
@@ -26,6 +28,7 @@ set(TARGET_MODULES
   "IDT_8V54816"
   "HPM"
   "SYSUTILS"
+  "RTM"
   )
 
 if (NOT DISABLE_WATCHDOG)
@@ -38,10 +41,16 @@ set(BOARD_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 ##Sensors SDR list
 set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/sdr_list.c )
 set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/i2c_mapping.c )
+set( PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/pin_mapping.c )
 
 if (";${TARGET_MODULES};" MATCHES ";PAYLOAD;")
   set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/payload.c)
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_PAYLOAD")
+endif()
+
+if (";${TARGET_MODULES};" MATCHES ";RTM;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${BOARD_PATH}/rtm.c)
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_RTM")
 endif()
 
 if (";${TARGET_MODULES};" MATCHES ";ADC;")

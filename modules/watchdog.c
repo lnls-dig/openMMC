@@ -37,18 +37,11 @@
 #include "task_priorities.h"
 #include "uart_debug.h"
 
-#define WATCHDOG_CLK_FREQ 8000000
-#define WATCHDOG_TIMEOUT 1000 /* in milisseconds */
-#define WATCHDOG_FEED_DELAY (WATCHDOG_TIMEOUT/3)*2
-
-SemaphoreHandle_t watchdog_smphr;
-
 void watchdog_init( void )
 {
     wdt_init();
     wdt_config();
     wdt_set_timeout(((WATCHDOG_TIMEOUT/1000)*WATCHDOG_CLK_FREQ));
-    watchdog_smphr = xSemaphoreCreateBinary();
     xTaskCreate( WatchdogTask, (const char *) "Watchdog Task", 60, (void * ) NULL, tskWATCHDOG_PRIORITY, ( TaskHandle_t * ) NULL);
 }
 
@@ -56,16 +49,7 @@ void WatchdogTask (void * Parameters)
 {
     wdt_start();
     for ( ;; ) {
-        if (xSemaphoreTake(watchdog_smphr, 0)) {
-            NVIC_SystemReset();
-        }
         wdt_feed();
-        //printf(" Watchdog fed (again) \n ");
-        vTaskDelay(WATCHDOG_FEED_DELAY);
+        vTaskDelay(pdMS_TO_TICKS(WATCHDOG_FEED_DELAY));
     }
-}
-
-void watchdog_reset_mcu( void )
-{
-    xSemaphoreGive(watchdog_smphr);
 }

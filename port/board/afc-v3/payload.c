@@ -38,6 +38,9 @@
 #include "fru.h"
 #include "led.h"
 #include "board_led.h"
+#include "clock_config.h"
+#include "i2c_mapping.h"
+#include "eeprom_24xx02.h"
 
 /* payload states
  *   0 - No power
@@ -178,8 +181,6 @@ TaskHandle_t vTaskPayload_Handle;
 
 void payload_init( void )
 {
-
-
     /* Set standalone mode if the module is disconnected from a create*/
     bool standalone_mode = false;
 
@@ -192,8 +193,10 @@ void payload_init( void )
         while ( gpio_read_pin( PIN_PORT(GPIO_MMC_ENABLE), PIN_NUMBER(GPIO_MMC_ENABLE) ) == 1 ) {};
     }
 
+    /* Recover clock switch configuration saved in EEPROM */
+    eeprom_24xx02_read(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
 
-    xTaskCreate( vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
+    xTaskCreate( vTaskPayload, "Payload", 256, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
 
     amc_payload_evt = xEventGroupCreate();
 #ifdef MODULE_RTM
@@ -242,6 +245,18 @@ void vTaskPayload( void *pvParameters )
 
         current_evt = xEventGroupGetBits( amc_payload_evt );
 
+        /*
+         * When receive a PAYLOAD_MESSAGE_CLOCK_CONFIG command, write the new configuration
+         * in EEPROM memory, reset the clock configuration and perform the new configuration.
+        */
+        if( current_evt & PAYLOAD_MESSAGE_CLOCK_CONFIG ){
+            eeprom_24xx02_write(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
+            if (PAYLOAD_FPGA_ON){
+                adn4604_reset();
+                clock_configuration(clock_config);
+            }
+            xEventGroupClearBits(amc_payload_evt, PAYLOAD_MESSAGE_CLOCK_CONFIG);
+        }
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
 
             /*
@@ -255,10 +270,10 @@ void vTaskPayload( void *pvParameters )
              */
 
             if (state == PAYLOAD_QUIESCED) {
-	        QUIESCED_req = 0;
-	    } else {
-	        QUIESCED_req = 1;
-	    }
+                QUIESCED_req = 0;
+            } else {
+                QUIESCED_req = 1;
+            }
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCE );
         }
 
@@ -299,11 +314,16 @@ void vTaskPayload( void *pvParameters )
             break;
 
         case PAYLOAD_STATE_FPGA_SETUP:
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M), GPIO_LEVEL_HIGH);
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M), GPIO_LEVEL_HIGH);
 #ifdef MODULE_ADN4604
             /* Configure clock switch */
-            adn4604_init();
-#endif
+            if (clock_configuration(clock_config) == MMC_OK) {
+                new_state = PAYLOAD_FPGA_ON;
+            }
+#else
             new_state = PAYLOAD_FPGA_ON;
+#endif
             break;
 
         case PAYLOAD_FPGA_ON:
@@ -314,6 +334,9 @@ void vTaskPayload( void *pvParameters )
 
         case PAYLOAD_SWITCHING_OFF:
             setDC_DC_ConvertersON( false );
+
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M), GPIO_LEVEL_LOW);
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M), GPIO_LEVEL_LOW);
 
             /* Respond to quiesce event if any */
             if ( QUIESCED_req ) {
@@ -463,5 +486,78 @@ uint8_t payload_hpm_activate_firmware( void )
     gpio_set_pin_state( PIN_PORT(GPIO_FPGA_PROGRAM_B), PIN_NUMBER(GPIO_FPGA_PROGRAM_B), GPIO_LEVEL_HIGH);
 
     return IPMI_CC_OK;
+}
+
+mmc_err clock_configuration(const uint8_t clk_cfg[16])
+{
+    adn_connect_map_t con;
+    mmc_err error;
+
+    /* Translate the configuration to enable or disable the outputs */
+    uint16_t out_enable_flag = {
+        ((clk_cfg[0] & 0x80) >> 7) << 0 |
+        ((clk_cfg[1] & 0x80) >> 7) << 1 |
+        ((clk_cfg[2] & 0x80) >> 7) << 2 |
+        ((clk_cfg[3] & 0x80) >> 7) << 3 |
+        ((clk_cfg[4] & 0x80) >> 7) << 4 |
+        ((clk_cfg[5] & 0x80) >> 7) << 5 |
+        ((clk_cfg[6] & 0x80) >> 7) << 6 |
+        ((clk_cfg[7] & 0x80) >> 7) << 7 |
+        ((clk_cfg[8] & 0x80) >> 7) << 8 |
+        ((clk_cfg[9] & 0x80) >> 7) << 9 |
+        ((clk_cfg[10] & 0x80) >> 7) << 10 |
+        ((clk_cfg[11] & 0x80) >> 7) << 11 |
+        ((clk_cfg[12] & 0x80) >> 7) << 12 |
+        ((clk_cfg[13] & 0x80) >> 7) << 13 |
+        ((clk_cfg[14] & 0x80) >> 7) << 14 |
+        ((clk_cfg[15] & 0x80) >> 7) << 15
+    };
+
+    /* Disable UPDATE' pin by pulling it GPIO_LEVEL_HIGH */
+    gpio_set_pin_state( PIN_PORT(GPIO_ADN_UPDATE), PIN_NUMBER(GPIO_ADN_UPDATE), GPIO_LEVEL_HIGH );
+
+    /* There's a delay circuit in the Reset pin of the clock switch, we must wait until it clears out */
+    while( gpio_read_pin( PIN_PORT(GPIO_ADN_RESETN), PIN_NUMBER(GPIO_ADN_RESETN) ) == 0 ) {
+        vTaskDelay( 50 );
+    }
+
+    /* Configure the interconnects*/
+    con.out0 = clk_cfg[0] & 0x0F;
+    con.out1 = clk_cfg[1] & 0x0F;
+    con.out2 = clk_cfg[2] & 0x0F;
+    con.out3 = clk_cfg[3] & 0x0F;
+    con.out4 = clk_cfg[4] & 0x0F;
+    con.out5 = clk_cfg[5] & 0x0F;
+    con.out6 = clk_cfg[6] & 0x0F;
+    con.out7 = clk_cfg[7] & 0x0F;
+    con.out8 = clk_cfg[8] & 0x0F;
+    con.out9 = clk_cfg[9] & 0x0F;
+    con.out10 = clk_cfg[10] & 0x0F;
+    con.out11 = clk_cfg[11] & 0x0F;
+    con.out12 = clk_cfg[12] & 0x0F;
+    con.out13 = clk_cfg[13] & 0x0F;
+    con.out14 = clk_cfg[14] & 0x0F;
+    con.out15 = clk_cfg[15] & 0x0F;
+
+    error = adn4604_xpt_config( ADN_XPT_MAP0_CON_REG, con );
+    if (error != MMC_OK) {
+        return error;
+    }
+
+    /* Enable desired outputs */
+    for ( uint8_t i = 0; i < 16; i++ ) {
+        if ( ( out_enable_flag >> i ) & 0x1 ) {
+            adn4604_tx_control( i, TX_ENABLED );
+        } else {
+            adn4604_tx_control( i, TX_DISABLED );
+        }
+    }
+
+    error = adn4604_active_map( ADN_XPT_MAP0 );
+    if (error != MMC_OK) {
+        return error;
+    }
+
+    return adn4604_update();
 }
 #endif

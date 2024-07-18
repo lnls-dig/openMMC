@@ -47,7 +47,7 @@ void fru_init( uint8_t id )
     fru[id].fru_size = fru[id].cfg.build_f( &fru[id].buffer );
 
     printf(" Writing FRU info to EEPROM... \n");
-    fru[id].cfg.write_f( fru[id].cfg.eeprom_id, 0x00, fru[id].buffer, fru[id].fru_size, 10 );
+    fru[id].cfg.write_f( fru[id].cfg.eeprom_id, 0x00, fru[id].buffer, fru[id].fru_size, pdMS_TO_TICKS(10) );
 #endif
 
     /* Read FRU info Common Header */
@@ -70,7 +70,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
     if (fru[id].runtime) {
         memcpy( &common_header[0], &fru[id].buffer[0], 8);
     } else {
-        fru[id].cfg.read_f( fru[id].cfg.eeprom_id, 0x00, &common_header[0], 8, 0 );
+        fru[id].cfg.read_f( fru[id].cfg.eeprom_id, 0x00, &common_header[0], 8, 10 );
     }
 
     printf("[FRU][%s] Asserting FRU information integrity\n", id == FRU_AMC ? "AMC" : "RTM");
@@ -91,14 +91,14 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
         if (fru[id].runtime) {
             rec_len = fru[id].buffer[chassis_off+1];
         } else {
-            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, chassis_off+1, &rec_len, 1, 0 );
+            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, chassis_off+1, &rec_len, 1, pdMS_TO_TICKS(10) );
         }
         rec_len *= 8;
         if (rec_len > 0) {
             if (fru[id].runtime) {
                 memcpy( &rec_buff[0], &fru[id].buffer[chassis_off], rec_len);
             } else {
-                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, chassis_off, &rec_buff[0], rec_len, 0 );
+                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, chassis_off, &rec_buff[0], rec_len, pdMS_TO_TICKS(10) );
             }
             if ( !((calculate_chksum( &rec_buff[0], rec_len ) == 0) && rec_buff[0] == 1) ) {
                 /* Wrong checksum */
@@ -116,7 +116,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
         if (fru[id].runtime) {
             rec_len = fru[id].buffer[board_off+1];
         } else {
-            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, board_off+1, &rec_len, 1, 0 );
+            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, board_off+1, &rec_len, 1, pdMS_TO_TICKS(10) );
         }
         rec_len *= 8;
 
@@ -124,7 +124,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
             if (fru[id].runtime) {
                 memcpy( &rec_buff[0], &fru[id].buffer[board_off], rec_len);
             } else {
-                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, board_off, &rec_buff[0], rec_len, 0 );
+                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, board_off, &rec_buff[0], rec_len, pdMS_TO_TICKS(10) );
             }
             if ( !((calculate_chksum( &rec_buff[0], rec_len ) == 0) && rec_buff[0] == 1) ) {
                 /* Wrong checksum */
@@ -142,7 +142,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
         if (fru[id].runtime) {
             rec_len = fru[id].buffer[product_off+1];
         } else {
-            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, product_off+1, &rec_len, 1, 0 );
+            fru[id].cfg.read_f( fru[id].cfg.eeprom_id, product_off+1, &rec_len, 1, pdMS_TO_TICKS(10) );
         }
         rec_len *= 8;
 
@@ -150,7 +150,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
             if (fru[id].runtime) {
                 memcpy( &rec_buff[0], &fru[id].buffer[product_off], rec_len);
             } else {
-                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, product_off, &rec_buff[0], rec_len, 0 );
+                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, product_off, &rec_buff[0], rec_len, pdMS_TO_TICKS(10) );
             }
             if ( !((calculate_chksum( &rec_buff[0], rec_len ) == 0 ) && rec_buff[0] == 1) ) {
                 /* Wrong checksum */
@@ -172,7 +172,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
             if (fru[id].runtime) {
                 memcpy( &rec_buff[0], &fru[id].buffer[multirec_off], 5);
             } else {
-                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, multirec_off, &rec_buff[0], 5, 0 );
+                fru[id].cfg.read_f( fru[id].cfg.eeprom_id, multirec_off, &rec_buff[0], 5, pdMS_TO_TICKS(10) );
             }
             /* Calculate Multirecord header checksum */
             if ( !(calculate_chksum( &rec_buff[0], 5 ) == 0) ) {
@@ -190,7 +190,7 @@ uint8_t fru_check_integrity( uint8_t id, size_t *fru_size )
                 if (fru[id].runtime) {
                     memcpy( &rec_buff[0], &fru[id].buffer[multirec_off], rec_len );
                 } else {
-                    fru[id].cfg.read_f( fru[id].cfg.eeprom_id, multirec_off, &rec_buff[0], rec_len, 0 );
+                    fru[id].cfg.read_f( fru[id].cfg.eeprom_id, multirec_off, &rec_buff[0], rec_len, pdMS_TO_TICKS(10) );
                 }
                 if ( !((calculate_chksum( &rec_buff[0], rec_len ) == rec_chksum)) ) {
                     /* Wrong checksum */
@@ -243,7 +243,7 @@ size_t fru_read( uint8_t id, uint8_t *rx_buff, uint16_t offset, size_t len )
      *  Read EEPROM FRU info
      */
     } else {
-        ret_val = fru[id].cfg.read_f( fru[id].cfg.eeprom_id, offset, rx_buff, len, 10 );
+        ret_val = fru[id].cfg.read_f( fru[id].cfg.eeprom_id, offset, rx_buff, len, pdMS_TO_TICKS(10) );
     }
     return ret_val;
 }
@@ -255,13 +255,7 @@ size_t fru_write( uint8_t id, uint8_t *tx_buff, uint16_t offset, size_t len )
     if ( id >= FRU_COUNT ) {
         return 0;
     }
-
-    if ( fru[id].runtime ) {
-        memcpy( &fru[id].buffer[offset], tx_buff, len );
-        ret_val = len;
-    } else {
-        ret_val = fru[id].cfg.write_f( fru[id].cfg.eeprom_id, offset, tx_buff, len, 0 );
-    }
+    ret_val = fru[id].cfg.write_f( fru[id].cfg.eeprom_id, offset, tx_buff, len, pdMS_TO_TICKS(10) );
     return ret_val;
 }
 
@@ -334,6 +328,15 @@ IPMI_HANDLER(ipmi_storage_write_fru_data_cmd, NETFN_STORAGE, IPMI_WRITE_FRU_DATA
         /* Write data to the FRU */
         count = fru_write( id, &req->data[3], offset, req->data_len - 3);
 
+        /*
+         * If count == 0, it may indicate that the fru_write function
+         *  failed somehow.
+         */
+
+        if (count == 0) {
+            rsp->completion_code = IPMI_CC_UNSPECIFIED_ERROR;
+            return ;
+        }
         /* Count written (1 based) */
         rsp->data[len++] = count +1;
     } else {
@@ -341,5 +344,6 @@ IPMI_HANDLER(ipmi_storage_write_fru_data_cmd, NETFN_STORAGE, IPMI_WRITE_FRU_DATA
         rsp->data[len++] = 0;
         rsp->completion_code = IPMI_CC_PARAM_OUT_OF_RANGE;
     }
+
     rsp->data_len = len;
 }

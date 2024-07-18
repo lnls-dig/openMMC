@@ -14,12 +14,12 @@ jobs:
     strategy:
       matrix:
         build-flags:
-          - { flags: -DBOARD=afc-bpm -DVERSION=3.1 } 
-          - { flags: -DBOARD=afc-timing -DBOARD_RTM=8sfp }
-          - { flags: -DBOARD=afc-v4 }
-          - { flags: -DBOARD=afc-v4 -DDEBUG_PROBE=jlink -DOPENOCD_TRANSPORT=swd }
-          - { flags: -DBOARD=afc-v4 -DDEBUG_PROBE=cmsis-dap -DOPENOCD_TRANSPORT=swd }
-          - { flags: -DBOARD=afc-v4 -DDEBUG_PROBE=digilent_jtag_hs3 -DOPENOCD_TRANSPORT=jtag }
+          - { flags: -DBOARD=afc -DVERSION=3.1 -DBOARD_RTM=8sfp }
+          - { flags: -DBOARD=afc -DVERSION=4.0 -DBOARD_RTM=lamp}
+          - { flags: -DBOARD=afc -DVERSION=4.0 -DBOARD_RTM=lamp -DDEBUG_PROBE=jlink -DOPENOCD_TRANSPORT=swd }
+          - { flags: -DBOARD=afc -DVERSION=4.0 -DBOARD_RTM=lamp -DDEBUG_PROBE=cmsis-dap -DOPENOCD_TRANSPORT=swd }
+          - { flags: -DBOARD=afc -DVERSION=4.0 -DBOARD_RTM=lamp -DDEBUG_PROBE=digilent_jtag_hs3 -DOPENOCD_TRANSPORT=jtag }
+          - { flags: -DBOARD=afc -DVERSION=4.0 -DBOARD_RTM=lamp -DDEBUG_PROBE=xvc -DOPENOCD_TRANSPORT=jtag -DXVC_HOST=host -DXVC_PORT=0000}
     steps:
       - uses: actions/checkout@v3
         with:

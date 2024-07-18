@@ -142,12 +142,12 @@ IPMI_HANDLER(ipmi_oem_cmd_gpio_pin, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_GPIO_PIN, ipm
 
     case 1:
         /* Set pin as input */
-        gpio_set_pin_dir( port, pin, GPIO_DIR_INPUT );
+        gpio_set_pin_dir( port, pin, INPUT );
         break;
 
     case 2:
         /* Set pin as output */
-        gpio_set_pin_dir( port, pin, GPIO_DIR_OUTPUT );
+        gpio_set_pin_dir( port, pin, OUTPUT );
 
         /* If given, set the pin output value */
         if (req->data_len > 3) {
@@ -163,54 +163,3 @@ IPMI_HANDLER(ipmi_oem_cmd_gpio_pin, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_GPIO_PIN, ipm
 
     rsp->data_len = len;
 }
-
-/* ADN4604 IPMI Control commands */
-#ifdef MODULE_ADN4604
-
-#include "adn4604.h"
-
-/* This command may take a while to execute and hold the IPMI transaction */
-IPMI_HANDLER(ipmi_oem_adn4604_cfg_output, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_ADN4604_SET_OUTPUT_CFG, ipmi_msg *req, ipmi_msg* rsp)
-{
-    int len = rsp->data_len = 0;
-
-    /* @todo  Read port status before setting the new configuration */
-    extern adn_connect_map_t con;
-    uint8_t map;
-    uint8_t output = req->data[1];
-    uint8_t input = req->data[2];
-    uint8_t enable = req->data[3];
-
-    if (output % 2) {
-        *((uint8_t *)&con+(output/2)) &= 0x0F;
-        *((uint8_t *)&con+(output/2)) |= (input << 4) & 0xF0;
-    } else {
-        *((uint8_t *)&con+(output/2)) &= 0xF0;
-        *((uint8_t *)&con+(output/2)) |= input & 0x0F;
-    }
-
-    map = ( req->data[0] == 0 ) ? ADN_XPT_MAP0_CON_REG : ADN_XPT_MAP1_CON_REG;
-
-    adn4604_xpt_config( map , con );
-
-    if ( enable ) {
-        adn4604_tx_control( output, TX_ENABLED );
-    } else {
-        adn4604_tx_control( output, TX_DISABLED );
-    }
-
-    adn4604_update();
-
-    rsp->data_len = len;
-    rsp->completion_code = IPMI_CC_OK;
-}
-
-IPMI_HANDLER(ipmi_oem_adn4604_reset, NETFN_CUSTOM_OEM, IPMI_OEM_CMD_ADN4604_RESET, ipmi_msg *req, ipmi_msg* rsp)
-{
-    adn4604_reset();
-
-    rsp->data_len = 0;
-    rsp->completion_code = IPMI_CC_OK;
-}
-
-#endif

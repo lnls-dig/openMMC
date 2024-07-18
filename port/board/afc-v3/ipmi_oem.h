@@ -24,15 +24,15 @@
 #define IPMI_OEM_H_
 
 /**
- * @file afc-bpm/v3_1/ipmi_oem.h
- * @brief Custom IPMI commands for AFC
+ * @file afc-timing/ipmi_oem.h
+ * @brief Custom IPMI commands for AFC Timing
  *
- * @ingroup AFC_V3_1_IPMI_OEM
+ * @ingroup AFC_TIMING_IPMI_OEM
  */
 
 /**
- * @defgroup AFC_V3_1_IPMI_OEM AFCv3.1 IPMI OEM Commands
- * @ingroup AFC_V3_1
+ * @defgroup AFC_TIMING_IPMI_OEM AFC-Timing IPMI OEM Commands
+ * @ingroup AFC_TIMING
  * @{
  */
 
@@ -44,11 +44,6 @@
 #define NETFN_CUSTOM_OEM                    0x30
 
 #define IPMI_OEM_CMD_I2C_TRANSFER               0x00
-
-#define IPMI_OEM_CMD_ADN4604_SET_OUTPUT_CFG     0x01
-#define IPMI_OEM_CMD_ADN4604_GET_OUTPUT_CFG     0x02
-#define IPMI_OEM_CMD_ADN4604_RESET              0x03
-
 #define IPMI_OEM_CMD_GPIO_PIN                   0x04
 /**
  * @}

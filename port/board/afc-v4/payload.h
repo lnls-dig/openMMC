@@ -62,34 +62,13 @@ extern enum {
 #define PAYLOAD_MESSAGE_WARM_RST        (1 << 1)
 #define PAYLOAD_MESSAGE_REBOOT          (1 << 2)
 #define PAYLOAD_MESSAGE_QUIESCE         (1 << 3)
-#define PAYLOAD_MESSAGE_DCDC_PGOOD      (1 << 4)
-#define PAYLOAD_MESSAGE_DCDC_PGOODn     (1 << 5)
+#define PAYLOAD_MESSAGE_RTM_ENABLE      (1 << 4)
+#define PAYLOAD_MESSAGE_DCDC_PGOOD      (1 << 5)
+#define PAYLOAD_MESSAGE_DCDC_PGOODn     (1 << 6)
+#define PAYLOAD_MESSAGE_CLOCK_CONFIG	(1 << 7)
 /**
  * @}
  */
-typedef struct external_gpio {
-    uint8_t port_num;
-    uint8_t pin_num;
-} external_gpio_t;
-
-enum {
-	EXT_GPIO_EN_P1V0,
-	EXT_GPIO_EN_P1V8,
-	EXT_GPIO_EN_P3V3,
-	EXT_GPIO_EN_FMC1_PVADJ,
-	EXT_GPIO_EN_FMC2_PVADJ,
-	EXT_GPIO_P1V5_VTT_EN,
-	EXT_GPIO_EN_P1V2,
-	EXT_GPIO_EN_FMC1_P12V,
-	EXT_GPIO_EN_FMC1_P3V3,
-	EXT_GPIO_EN_FMC2_P12V,
-	EXT_GPIO_EN_FMC2_P3V3,
-	EXT_GPIO_EN_RTM_PWR,
-	EXT_GPIO_EN_RTM_MP,
-	EXT_GPIO_FPGA_I2C_RESET,
-	EXT_GPIO_DAC_VADJ_RSTn,
-	EXT_GPIO_PROGRAM_B,
-};
 
 /**
  * @brief Payload task unblock delay

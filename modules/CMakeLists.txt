@@ -8,7 +8,8 @@ set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/i2c.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/led.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/ipmb.c ${MODULE_PATH}/ipmi.c)
 set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/printf-stdarg.c)
-set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/error.c)
+set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/mmc_error.c)
+set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/eeprom_24xx02.c)
 
 message(STATUS "Selected modules to compile: ${TARGET_MODULES}")
 
@@ -23,6 +24,16 @@ if (";${TARGET_MODULES};" MATCHES ";FRU;")
   set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/fru_editor.c )
   set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_FRU")
  endif()
+
+if (";${TARGET_MODULES};" MATCHES ";CLOCK_CONFIG;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/clock_config.c )
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_CLOCK_CONFIG")
+endif()
+
+if (";${TARGET_MODULES};" MATCHES ";EEPROM_24XX02;")
+  set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/eeprom_24xx02.c )
+  set(MODULES_FLAGS "${MODULES_FLAGS} -DMODULE_EEPROM_24XX02")
+endif()
 
 if (";${TARGET_MODULES};" MATCHES ";SDR;")
   set(PROJ_SRCS ${PROJ_SRCS} ${MODULE_PATH}/sdr.c )

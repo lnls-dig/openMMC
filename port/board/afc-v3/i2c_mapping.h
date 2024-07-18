@@ -55,18 +55,14 @@ enum {
     CHIP_ID_FMC2_EEPROM,
     CHIP_ID_FMC2_LM75_1,
     CHIP_ID_FMC2_LM75_0,
-    CHIP_ID_RTM_PCA9554,
-    CHIP_ID_RTM_EEPROM,
-    CHIP_ID_RTM_LM75_0,
-    CHIP_ID_RTM_LM75_1
 };
 
 #define I2C_MUX_CNT    2
 #define I2C_BUS_CNT    7
-#define I2C_CHIP_CNT   28
+#define I2C_CHIP_CNT   24
 
-extern i2c_mux_state_t i2c_mux[];
-extern i2c_bus_mapping_t i2c_bus_map[];
-extern i2c_chip_mapping_t i2c_chip_map[];
+extern i2c_mux_state_t i2c_mux[I2C_MUX_CNT];
+extern i2c_bus_mapping_t i2c_bus_map[I2C_BUS_CNT];
+extern i2c_chip_mapping_t i2c_chip_map[I2C_CHIP_CNT];
 
 #endif

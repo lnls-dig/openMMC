@@ -19,44 +19,37 @@
  *   @license GPL-3.0+ <http://spdx.org/licenses/GPL-3.0+>
  */
 
-#ifndef ERROR_H_
-#define ERROR_H_
-
-#include <stdio.h>
-
 /**
- * @file   error.h
+ * @file   mmc_error.c
  * @author Augusto Fraga Giachero <augusto.fraga@cnpem.br>
  *
- * @brief  Error handling functions and codes
+ * @brief  Error handling functions
  *
  * @ingroup error
  */
+#include <stddef.h>
+#include "mmc_error.h"
 
-typedef enum {
-    MMC_OK,
-    MMC_OOM_ERR,
-    MMC_IO_ERR,
-    MMC_INVALID_ARG_ERR,
-    MMC_TIMEOUT_ERR,
-    MMC_RESOURCE_ERR,
-    MMC_UNKNOWN_ERR,
-} mmc_err;
+static const char* mmc_error_strings[] = {
+    [MMC_OK] = "No error",
+    [MMC_OOM_ERR] = "Out of memory",
+    [MMC_IO_ERR] = "Input output error",
+    [MMC_INVALID_ARG_ERR] = "Invalid arguments",
+    [MMC_RESOURCE_ERR] = "Resource unavailable",
+    [MMC_TIMEOUT_ERR] = "Timeout",
+    [MMC_UNKNOWN_ERR] = "Unknown error",
+};
 
-/**
- * @brief Get the corresponding string for an error code
- *
- * @param[in] e  Error code
- *
- * @return a pointer to a null-terminated string
- */
-const char* get_error_str(mmc_err e);
+const char* get_error_str(mmc_err e)
+{
+    const size_t eindex = (size_t) e;
+    const char* err_str;
 
-/**
- * @brief Print the file name, line number and error description
- *
- * @param[in] e  Error code
- */
-#define PRINT_ERR_LINE(e) printf("%s line %d: %s\n", __FILE__, __LINE__, get_error_str(e))
+    if (eindex < (sizeof(mmc_error_strings) / sizeof(char*))) {
+        err_str = mmc_error_strings[eindex];
+    } else {
+        err_str = mmc_error_strings[MMC_UNKNOWN_ERR];
+    }
 
-#endif
+    return err_str;
+}

@@ -26,6 +26,7 @@
 #include "pin_mapping.h"
 #include "hotswap.h"
 #include "i2c_mapping.h"
+#include "rtm_i2c_mapping.h"
 #include "fru.h"
 #include "utils.h"
 #include "led.h"
@@ -34,10 +35,8 @@
 #include "cdce906_config.h"
 /* RTM Management functions */
 
-void rtm_enable_payload_power( void )
+mmc_err rtm_enable_payload_power_post( void )
 {
-    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 1 );
-
     /*
      * RTM-LAMP power up sequence
      */
@@ -48,12 +47,12 @@ void rtm_enable_payload_power( void )
     vTaskDelay(pdMS_TO_TICKS(10));
     pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_VS1_EN, 1);
     pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_VS2_EN, 1);
+
+    return MMC_OK;
 }
 
-void rtm_disable_payload_power( void )
+mmc_err rtm_disable_payload_power_pre( void )
 {
-    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_PWR), PIN_NUMBER(GPIO_EN_RTM_PWR), 0 );
-
     /*
      * RTM-LAMP power down sequence
      */
@@ -64,14 +63,14 @@ void rtm_disable_payload_power( void )
     pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_7V_EN, 1);
     vTaskDelay(pdMS_TO_TICKS(10));
     pca9554_write_pin(CHIP_ID_RTM_PCA9554_PWR, RTM_GPIO_5V_EN, 0);
+
+    return MMC_OK;
 }
 
 uint8_t rtm_get_hotswap_handle_status( uint8_t *state )
 {
     static uint8_t falling, rising;
     uint8_t pin_read;
-
-    rtm_enable_i2c();
 
     if (pca9554_read_pin( CHIP_ID_RTM_PCA9554_LEDS, RTM_GPIO_HOTSWAP_HANDLE, &pin_read ) == 0 ) {
         return false;
@@ -87,30 +86,8 @@ uint8_t rtm_get_hotswap_handle_status( uint8_t *state )
     return false;
 }
 
-void rtm_check_presence( uint8_t *status )
-{
-    /* Due to a hardware limitation in the AFC board, we can't rely on reading the PS signal
-       since this pin doesn't have a pull-up resistor, it's always read as 0.
-       A very dirty workaround is to 'ping' the RTM IO Expander(PCA9554), if it responds, then the board is connected */
-    rtm_enable_i2c();
-
-    uint8_t i2c_addr, i2c_interface;
-    uint8_t dumb;
-
-    /* Defaults to absent - in case of I2C failure */
-    *status = HOTSWAP_STATE_URTM_ABSENT;
-
-    if (i2c_take_by_chipid( CHIP_ID_RTM_PCA9554_LEDS, &i2c_addr, &i2c_interface, 100)) {
-        if (xI2CMasterRead( i2c_interface, i2c_addr, &dumb, 1)) {
-            *status = HOTSWAP_STATE_URTM_PRSENT;
-        }
-        i2c_give(i2c_interface);
-    }
-}
-
 void rtm_hardware_init( void )
 {
-    rtm_enable_i2c();
     pca9554_set_port_dir( CHIP_ID_RTM_PCA9554_LEDS, 0x1F );
 
     /*
@@ -125,20 +102,6 @@ void rtm_hardware_init( void )
     pca9554_write_port(CHIP_ID_RTM_PCA9554_PWR, (0 << RTM_GPIO_NEG_7V_EN) |
                        (1 << RTM_GPIO_7V_EN) | (0 << RTM_GPIO_VS1_EN) |
                        (0 << RTM_GPIO_VS2_EN) | (0 << RTM_GPIO_5V_EN));
-}
-
-void rtm_enable_i2c( void )
-{
-    /* Enable I2C communication with RTM */
-    gpio_set_pin_dir( PIN_PORT(GPIO_RTM_PS), PIN_NUMBER(GPIO_RTM_PS), GPIO_DIR_OUTPUT );
-    gpio_set_pin_dir( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_DIR_OUTPUT );
-    gpio_set_pin_state( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_LEVEL_HIGH );
-}
-
-void rtm_disable_i2c( void )
-{
-    gpio_set_pin_dir( PIN_PORT(GPIO_RTM_PS), PIN_NUMBER(GPIO_RTM_PS), GPIO_DIR_INPUT );
-    gpio_set_pin_dir( PIN_PORT(GPIO_EN_RTM_I2C), PIN_NUMBER(GPIO_EN_RTM_I2C), GPIO_DIR_INPUT );
 }
 
 bool rtm_compatibility_check( void )
@@ -160,9 +123,18 @@ bool rtm_compatibility_check( void )
             /* Read Multirecord header */
             fru_read( i, multirec_hdr, multirec_off, 10 );
 
+
             if (multirec_hdr[8] == 0x30) {
                 z3rec_found = true;
-                break;
+
+                /* According to Plataform Management FRU Information Storage Definition v1.0, pg 19
+                 * multirec_hdr[1] >> 7 == 1 indicates the end of list, and for this reason, the loop
+                 * should only break if this condition is satisfied to ensure that we have passed
+                 * through all multirecord area.
+                 */
+                if ((multirec_hdr[1] >> 7) == 1) {
+                    break;
+                }
             }
             /* Advance the offset pointer, adding the record length field to it */
             multirec_off += multirec_hdr[2]+5;
@@ -186,12 +158,6 @@ bool rtm_compatibility_check( void )
     vPortFree(z3_compat_recs[1]);
 
     return false;
-}
-
-bool rtm_quiesce( void )
-{
-    /* In this board, no action is needed to quiesce */
-    return true;
 }
 
 void rtm_ctrl_led( uint8_t id, uint8_t state )

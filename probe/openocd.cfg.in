@@ -1,4 +1,4 @@
-source [find ${OPENOCD_DEBUG_PROBE_FILE}]
+${OPENOCD_DEBUG_PROBE_CMD}
 
 transport select ${OPENOCD_TRANSPORT}
 

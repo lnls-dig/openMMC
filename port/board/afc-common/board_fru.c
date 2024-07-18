@@ -28,7 +28,9 @@
 #include "at24mac.h"
 #include "eeprom_24xx64.h"
 #include "i2c_mapping.h"
-
+#ifdef MODULE_RTM
+#include "rtm_i2c_mapping.h"
+#endif
 fru_data_t fru[FRU_COUNT] = {
     [FRU_AMC] = {
         .cfg = {
@@ -40,6 +42,7 @@ fru_data_t fru[FRU_COUNT] = {
         .runtime = false
     },
 #ifdef MODULE_RTM
+
     [FRU_RTM] = {
         .cfg = {
             .eeprom_id = CHIP_ID_RTM_EEPROM,

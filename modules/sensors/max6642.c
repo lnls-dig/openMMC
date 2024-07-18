@@ -45,7 +45,7 @@ TaskHandle_t vTaskMAX6642_Handle;
 
 void vTaskMAX6642( void* Parameters )
 {
-    const TickType_t xFrequency = MAX6642_UPDATE_RATE;
+    const TickType_t xFrequency = pdMS_TO_TICKS(MAX6642_UPDATE_RATE);
 
     sensor_t * temp_sensor;
 
@@ -83,10 +83,10 @@ Bool max6642_read_local( sensor_t *sensor, uint8_t *temp )
 {
     uint8_t i2c_interf, i2c_addr;
     uint8_t read = 0;
-
+    const uint8_t cmd = MAX6642_CMD_READ_LOCAL;
     if ( i2c_take_by_chipid( sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY ) == pdTRUE ) {
 
-        xI2CMasterWriteRead( i2c_interf, i2c_addr, MAX6642_CMD_READ_LOCAL, &read, 1 );
+        xI2CMasterWriteRead( i2c_interf, i2c_addr, &cmd, 1, &read, 1 );
         i2c_give( i2c_interf );
 
         *temp = read;
@@ -100,10 +100,11 @@ Bool max6642_read_remote( sensor_t *sensor, uint8_t *temp )
 {
     uint8_t i2c_interf, i2c_addr;
     uint8_t read = 0;
+    const uint8_t cmd = MAX6642_CMD_READ_REMOTE;
 
     if ( i2c_take_by_chipid( sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY ) == pdTRUE ) {
 
-        xI2CMasterWriteRead( i2c_interf, i2c_addr, MAX6642_CMD_READ_REMOTE, &read, 1 );
+        xI2CMasterWriteRead( i2c_interf, i2c_addr, &cmd, 1, &read, 1 );
         i2c_give( i2c_interf );
 
         *temp = read;
@@ -117,10 +118,11 @@ Bool max6642_read_local_extd( sensor_t *sensor, uint8_t *temp )
 {
     uint8_t i2c_interf, i2c_addr;
     uint8_t read = 0;
+    const uint8_t cmd = MAX6642_CMD_READ_LOCAL_EXTD;
 
     if ( i2c_take_by_chipid( sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY ) == pdTRUE ) {
 
-        xI2CMasterWriteRead( i2c_interf, i2c_addr, MAX6642_CMD_READ_LOCAL_EXTD, &read, 1 );
+        xI2CMasterWriteRead( i2c_interf, i2c_addr, &cmd, 1, &read, 1 );
         i2c_give( i2c_interf );
 
         *temp = read;
@@ -134,10 +136,11 @@ Bool max6642_read_remote_extd( sensor_t *sensor, uint8_t *temp )
 {
     uint8_t i2c_interf, i2c_addr;
     uint8_t read = 0;
+    const uint8_t cmd = MAX6642_CMD_READ_REMOTE_EXTD;
 
     if ( i2c_take_by_chipid( sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY ) == pdTRUE ) {
 
-        xI2CMasterWriteRead( i2c_interf, i2c_addr, MAX6642_CMD_READ_REMOTE_EXTD, &read, 1 );
+        xI2CMasterWriteRead( i2c_interf, i2c_addr, &cmd, 1, &read, 1 );
         i2c_give( i2c_interf );
 
         *temp = read;
@@ -151,10 +154,11 @@ uint8_t max6642_read_status( sensor_t *sensor )
 {
     uint8_t i2c_interf, i2c_addr;
     uint8_t stat = 0;
+    const uint8_t cmd = MAX6642_CMD_READ_STATUS;
 
     if ( i2c_take_by_chipid( sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY ) == pdTRUE ) {
 
-        xI2CMasterWriteRead( i2c_interf, i2c_addr, MAX6642_CMD_READ_STATUS, &stat, 1 );
+        xI2CMasterWriteRead( i2c_interf, i2c_addr, &cmd, 1, &stat, 1 );
         i2c_give( i2c_interf );
     }
 
@@ -165,10 +169,11 @@ uint8_t max6642_read_cfg( sensor_t *sensor )
 {
     uint8_t i2c_interf, i2c_addr;
     uint8_t cfg = 0;
+    const uint8_t cmd = MAX6642_CMD_READ_CONFIG;
 
     if ( i2c_take_by_chipid( sensor->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY) == pdTRUE ) {
 
-        xI2CMasterWriteRead( i2c_interf, i2c_addr, MAX6642_CMD_READ_CONFIG, &cfg, 1 );
+        xI2CMasterWriteRead( i2c_interf, i2c_addr, &cmd, 1, &cfg, 1 );
         i2c_give( i2c_interf );
     }
 

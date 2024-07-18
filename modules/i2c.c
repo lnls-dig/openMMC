@@ -25,6 +25,10 @@
 #include "i2c.h"
 #include "i2c_mapping.h"
 
+#ifdef MODULE_RTM
+#include "rtm_i2c_mapping.h"
+#endif
+
 void i2c_init( void )
 {
     for ( uint8_t i = 0; i < I2C_MUX_CNT; i++ ) {
@@ -85,13 +89,33 @@ bool i2c_take_by_busid( uint8_t bus_id, uint8_t *i2c_interface, TickType_t timeo
 
 bool i2c_take_by_chipid( uint8_t chip_id, uint8_t *i2c_address, uint8_t *i2c_interface,  uint32_t timeout )
 {
-    if ( chip_id > I2C_CHIP_CNT ) {
-        return false;
-    }
 
-    uint8_t bus_id = i2c_chip_map[chip_id].bus_id;
-    if ( i2c_address != NULL ) {
-        *i2c_address = i2c_chip_map[chip_id].i2c_address;
+    uint8_t bus_id;
+
+    /*AFC devices*/
+    if (chip_id <= 63) {
+        if ( chip_id > I2C_CHIP_CNT ) {
+            return false;
+        }
+        bus_id = i2c_chip_map[chip_id].bus_id;
+        if ( i2c_address != NULL ) {
+            *i2c_address = i2c_chip_map[chip_id].i2c_address;
+        }
+
+#ifdef MODULE_RTM
+    /*RTM devices*/
+    } else if ((64 <= chip_id) && (chip_id <= 127)) {
+        if ( chip_id > 64+I2C_CHIP_RTM_CNT ) {
+            return false;
+        }
+        bus_id = i2c_chip_rtm_map[chip_id-64].bus_id;
+        if ( i2c_address != NULL ) {
+            *i2c_address = i2c_chip_rtm_map[chip_id-64].i2c_address;
+        }
+#endif
+
+    } else {
+        return false;
     }
 
     return i2c_take_by_busid( bus_id, i2c_interface, timeout );

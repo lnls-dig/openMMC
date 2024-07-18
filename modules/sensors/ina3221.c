@@ -51,7 +51,7 @@ void vTaskINA3221( void *Parameters )
     uint8_t channel;
     TickType_t xLastWakeTime;
     /* Task will run every 100ms */
-    const TickType_t xFrequency = INA3221_UPDATE_RATE / portTICK_PERIOD_MS;
+    const TickType_t xFrequency = pdMS_TO_TICKS(INA3221_UPDATE_RATE);
 
     sensor_t * ina3221_sensor;
     ina3221_data_t * data_ptr;
@@ -113,7 +113,7 @@ uint8_t ina3221_read_reg( ina3221_data_t * data, uint8_t reg, uint16_t *read )
 
     if( i2c_take_by_chipid( data->chipid, &i2c_addr, &i2c_interf, portMAX_DELAY) == pdTRUE ) {
 
-        rx_len = xI2CMasterWriteRead( i2c_interf, i2c_addr, reg, &val[0], sizeof(val)/sizeof(val[0]) );
+        rx_len = xI2CMasterWriteRead( i2c_interf, i2c_addr, &reg, 1, &val[0], sizeof(val)/sizeof(val[0]) );
 
         i2c_give( i2c_interf );
 

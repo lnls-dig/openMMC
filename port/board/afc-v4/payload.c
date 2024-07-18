@@ -35,12 +35,17 @@
 #include "task_priorities.h"
 #include "mcp23016.h"
 #include "ad84xx.h"
+#include "idt_8v54816.h"
 #include "hotswap.h"
 #include "utils.h"
 #include "fru.h"
 #include "led.h"
 #include "board_led.h"
-
+#include "board_config.h"
+#include "clock_config.h"
+#include "eeprom_24xx02.h"
+#include "i2c_mapping.h"
+#include "pin_mapping.h"
 
 /* payload states
  *   0 - No power
@@ -62,26 +67,6 @@
  *       Payload was safely turned off
  *       Wait until payload power goes down to restart the cycle
  */
-
-const external_gpio_t ext_gpios[16] = {
-        [EXT_GPIO_P1V5_VTT_EN] =     { 1, 7 },
-        [EXT_GPIO_EN_P1V8] =         { 1, 6 },
-        [EXT_GPIO_EN_P1V2] =         { 1, 5 },
-        [EXT_GPIO_EN_FMC1_P12V] =    { 1, 4 },
-        [EXT_GPIO_EN_FMC2_P12V] =    { 1, 3 },
-        [EXT_GPIO_EN_FMC1_PVADJ] =   { 1, 2 },
-        [EXT_GPIO_EN_FMC2_PVADJ] =   { 1, 1 },
-        [EXT_GPIO_EN_FMC1_P3V3] =    { 1, 0 },
-        [EXT_GPIO_EN_FMC2_P3V3] =    { 0, 7 },
-        [EXT_GPIO_EN_P1V0] =         { 0, 6 },
-        [EXT_GPIO_EN_P3V3] =         { 0, 5 },
-        [EXT_GPIO_EN_RTM_PWR] =      { 0, 4 },
-        [EXT_GPIO_EN_RTM_MP] =       { 0, 3 },
-        [EXT_GPIO_FPGA_I2C_RESET] =  { 0, 2 },
-        [EXT_GPIO_DAC_VADJ_RSTn] =   { 0, 1 },
-        [EXT_GPIO_PROGRAM_B] =       { 0, 0 }
-};
-
 
 /**
  * @brief Set AFC's DCDC Converters state
@@ -113,7 +98,7 @@ uint8_t setDC_DC_ConvertersON(bool on)
         for (uint8_t i = 0; i < (sizeof(power_pins) / sizeof(power_pins[0])); i++) {
             pin = power_pins[i];
             mcp23016_write_pin( ext_gpios[pin].port_num, ext_gpios[pin].pin_num, true );
-            vTaskDelay(10);
+            vTaskDelay(pdMS_TO_TICKS(10));
         }
     } else {
         printf("Disable Power\n");
@@ -121,7 +106,7 @@ uint8_t setDC_DC_ConvertersON(bool on)
         for (uint8_t i = (sizeof(power_pins) / sizeof(power_pins[0])); i > 0; i--) {
             pin = power_pins[i];
             mcp23016_write_pin( ext_gpios[pin].port_num, ext_gpios[pin].pin_num, false );
-            vTaskDelay(10);
+            vTaskDelay(pdMS_TO_TICKS(10));
         }
     }
     return 1;
@@ -233,11 +218,15 @@ void payload_init( void )
         while ( gpio_read_pin( PIN_PORT(GPIO_MMC_ENABLE), PIN_NUMBER(GPIO_MMC_ENABLE) ) == 1 ) {};
     }
 
-    xTaskCreate( vTaskPayload, "Payload", 120, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
+    /* Recover clock switch configuration saved in EEPROM */
+    eeprom_24xx02_read(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
+
+    xTaskCreate( vTaskPayload, "Payload", 256, NULL, tskPAYLOAD_PRIORITY, &vTaskPayload_Handle );
 
     amc_payload_evt = xEventGroupCreate();
 #ifdef MODULE_RTM
     rtm_payload_evt = xEventGroupCreate();
+    mcp23016_write_pin(ext_gpios[EXT_GPIO_EN_RTM_MP].port_num, ext_gpios[EXT_GPIO_EN_RTM_MP].pin_num, true);
 #endif
 
 #ifdef MODULE_ADC
@@ -328,27 +317,37 @@ void vTaskPayload( void *pvParameters )
         new_state = state;
 
         current_evt = xEventGroupGetBits( amc_payload_evt );
-
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
-            
+
             /*
-             * If you issue a shutdown fru command in the MCH shell, the payload power 
-             * task will receive a PAYLOAD_MESSAGE_QUIESCE message and set the 
-             * QUIESCED_req flag to '1' and the MCH will shutdown the 12VP0 power, 
-             * making the payload power task go to PAYLOAD_NO_POWER state. 
+             * If you issue a shutdown fru command in the MCH shell, the payload power
+             * task will receive a PAYLOAD_MESSAGE_QUIESCE message and set the
+             * QUIESCED_req flag to '1' and the MCH will shutdown the 12VP0 power,
+             * making the payload power task go to PAYLOAD_NO_POWER state.
              * So, if we are in the PAYLOAD_QUIESCED state and receive a
-             * PAYLOAD_MESSAGE_QUIESCE message, the QUIESCED_req flag 
+             * PAYLOAD_MESSAGE_QUIESCE message, the QUIESCED_req flag
              * should be '0'
              */
-    
+
             if (state == PAYLOAD_QUIESCED) {
-	        QUIESCED_req = 0;
-	    } else {
-	        QUIESCED_req = 1;
-	    }
+                QUIESCED_req = 0;
+            } else {
+                QUIESCED_req = 1;
+            }
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_QUIESCE );
         }
 
+        /*
+         * When receive a PAYLOAD_MESSAGE_CLOCK_CONFIG message, configure the clock switch
+         * and write the new configuration in EEPROM
+         */
+        if( current_evt & PAYLOAD_MESSAGE_CLOCK_CONFIG ){
+            eeprom_24xx02_write(CHIP_ID_RTC_EEPROM, 0x0, clock_config, 16, 10);
+            if (PAYLOAD_FPGA_ON) {
+                clock_switch_write_reg(clock_config);
+            }
+            xEventGroupClearBits(amc_payload_evt, PAYLOAD_MESSAGE_CLOCK_CONFIG);
+        }
         if ( current_evt & PAYLOAD_MESSAGE_COLD_RST ) {
             state = PAYLOAD_RESET;
             xEventGroupClearBits( amc_payload_evt, PAYLOAD_MESSAGE_COLD_RST );
@@ -397,8 +396,17 @@ void vTaskPayload( void *pvParameters )
             break;
 
         case PAYLOAD_STATE_FPGA_SETUP:
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M), GPIO_LEVEL_HIGH);
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M), GPIO_LEVEL_HIGH);
 
-            new_state = PAYLOAD_FPGA_ON;
+
+            /*
+             * Only change the state if the clock switch configuration
+             * succeeds
+             */
+            if (clock_switch_write_reg(clock_config)) {
+                new_state = PAYLOAD_FPGA_ON;
+            }
             break;
 
         case PAYLOAD_FPGA_ON:
@@ -411,6 +419,9 @@ void vTaskPayload( void *pvParameters )
             gpio_set_pin_state(PIN_PORT(GPIO_FPGA_RESET), PIN_NUMBER(GPIO_FPGA_RESET), GPIO_LEVEL_LOW);
             gpio_set_pin_state(PIN_PORT(GPIO_FPGA_INITB), PIN_NUMBER(GPIO_FPGA_INITB), GPIO_LEVEL_LOW);
             err = mcp23016_write_pin( ext_gpios[EXT_GPIO_PROGRAM_B].port_num, ext_gpios[EXT_GPIO_PROGRAM_B].pin_num, false );
+
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC1_PG_C2M), PIN_NUMBER(GPIO_FMC1_PG_C2M), GPIO_LEVEL_LOW);
+            gpio_set_pin_state(PIN_PORT(GPIO_FMC2_PG_C2M), PIN_NUMBER(GPIO_FMC2_PG_C2M), GPIO_LEVEL_LOW);
 
             if (err != MMC_OK) {
                 PRINT_ERR_LINE(err);

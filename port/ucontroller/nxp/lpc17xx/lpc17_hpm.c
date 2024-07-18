@@ -82,7 +82,7 @@ static uint8_t get_sector_number(const void* flash_addr)
     return ret;
 }
 
-uint8_t hpm_prepare_comp(enum memory_area area)
+uint8_t hpm_prepare_comp( void )
 {
     finish_upload_success = false;
     ipmc_image_size = 0;
@@ -94,20 +94,9 @@ uint8_t hpm_prepare_comp(enum memory_area area)
     for (uint32_t i=0; i<(sizeof(ipmc_page)/sizeof(uint32_t)); i++) {
         ipmc_page[i] = 0xFFFFFFFF;
     }
-    const uint32_t *start, *end;
-
-    if (area == BOOT_FLASH) {
-        start = boot_start_addr;
-        end = boot_end_addr;
-    } else if (area == FW_UPDATE_FLASH) {
-        start = update_start_addr;
-        end = update_end_addr;
-    } else {
-        return IPMI_CC_PARAM_OUT_OF_RANGE;
-    }
 
     /* Checks flash update region integrity */
-    for (const uint32_t *ptr = start; ptr <= end; ptr++) {
+    for (const uint32_t *ptr = update_start_addr; ptr <= update_end_addr; ptr++){
 	if (*ptr != 0xFFFFFFFF) {
             const uint32_t sec = get_sector_number(ptr);
 
@@ -132,15 +121,15 @@ uint8_t hpm_prepare_comp(enum memory_area area)
 
 uint8_t ipmc_hpm_prepare_comp(void)
 {
-    return hpm_prepare_comp(FW_UPDATE_FLASH);
+    return hpm_prepare_comp();
 }
 
 uint8_t bootloader_hpm_prepare_comp(void)
 {
-    return hpm_prepare_comp(BOOT_FLASH);
+    return hpm_prepare_comp();
 }
 
-uint8_t hpm_upload_block(uint8_t *block, uint16_t size, enum memory_area area)
+uint8_t hpm_upload_block(uint8_t *block, uint16_t size)
 {
     const uint32_t ipmc_page_available_bytes_n = sizeof(ipmc_page) - ipmc_page_byte_index;
 
@@ -157,7 +146,7 @@ uint8_t hpm_upload_block(uint8_t *block, uint16_t size, enum memory_area area)
         ipmc_page_byte_index = 0;
 
         /* Program the complete page in the Flash */
-        program_page(ipmc_page_addr, ipmc_page, sizeof(ipmc_page), area);
+        program_page(ipmc_page_addr, ipmc_page, sizeof(ipmc_page));
 
         /* Advance the address counter */
         ipmc_page_addr += sizeof(ipmc_page);
@@ -177,20 +166,20 @@ uint8_t hpm_upload_block(uint8_t *block, uint16_t size, enum memory_area area)
 
 uint8_t ipmc_hpm_upload_block(uint8_t *block, uint16_t size)
 {
-    return hpm_upload_block(block, size, FW_UPDATE_FLASH);
+    return hpm_upload_block(block, size);
 }
 
 uint8_t bootloader_hpm_upload_block(uint8_t *block, uint16_t size)
 {
-    return hpm_upload_block(block, size, BOOT_FLASH);
+    return hpm_upload_block(block, size);
 }
 
-uint8_t hpm_finish_upload(uint32_t image_size, enum memory_area area)
+uint8_t hpm_finish_upload(uint32_t image_size)
 {
     /* Check if the last page was already programmed */
     if(ipmc_page_byte_index != 0) {
         /* Program the complete page in the Flash */
-        program_page( ipmc_page_addr, ipmc_page, sizeof(ipmc_page), area);
+        program_page(ipmc_page_addr, ipmc_page, sizeof(ipmc_page));
         ipmc_image_size += ipmc_page_byte_index;
         ipmc_page_byte_index = 0;
         ipmc_page_addr = 0;
@@ -210,12 +199,12 @@ uint8_t hpm_finish_upload(uint32_t image_size, enum memory_area area)
 
 uint8_t ipmc_hpm_finish_upload(uint32_t image_size)
 {
-    return hpm_finish_upload(image_size, FW_UPDATE_FLASH);
+    return hpm_finish_upload(image_size);
 }
 
 uint8_t bootloader_hpm_finish_upload(uint32_t image_size)
 {
-    return hpm_finish_upload(image_size, BOOT_FLASH);
+    return hpm_finish_upload(image_size);
 }
 
 uint8_t ipmc_hpm_get_upgrade_status(void)
@@ -230,7 +219,7 @@ uint8_t bootloader_hpm_get_upgrade_status(void)
     return IPMI_CC_OK;
 }
 
-uint8_t ipmc_hpm_activate_firmware(void)
+uint8_t hpm_activate_firmware( enum fw_type type )
 {
     /*
      * Doesn't write the magic word if the function hpm_finish_upload fails
@@ -249,12 +238,12 @@ uint8_t ipmc_hpm_activate_firmware(void)
      * TODO: Write actual firmware ID
      */
     fw_update_header.magic = 0xAAAAAAAA;
-    fw_update_header.fw_type = 1; // Update application
+    fw_update_header.fw_type = type; // 2 -> bootloader | 1 -> application
     fw_update_header.version[0] = 1;
     fw_update_header.version[1] = 4;
     fw_update_header.version[2] = 1;
 
-    program_page((uint32_t)fw_header - (uint32_t)update_start_addr, (uint32_t*)&fw_update_header, sizeof(fw_update_header), FW_UPDATE_FLASH);
+    program_page((uint32_t)fw_header - (uint32_t)update_start_addr, (uint32_t*)&fw_update_header, sizeof(fw_update_header));
 
     /*
      * Schedule a reset to 500ms from now
@@ -264,21 +253,17 @@ uint8_t ipmc_hpm_activate_firmware(void)
     return IPMI_CC_OK;
 }
 
-uint8_t bootloader_hpm_activate_firmware(void)
+uint8_t ipmc_hpm_activate_firmware(void)
 {
-    /*
-     * Doesn't activate the firmware if the function hpm_finish_upload fails
-     */
-
-    if (!finish_upload_success) {
-        return IPMI_CC_UNSPECIFIED_ERROR;
-    }
-
-    sys_schedule_reset(500);
-    return IPMI_CC_OK;
+   hpm_activate_firmware( APPLICATION );
 }
 
-uint8_t program_page(uint32_t address, uint32_t *data, uint32_t size, enum memory_area area)
+uint8_t bootloader_hpm_activate_firmware(void)
+{
+  hpm_activate_firmware( BOOTLOADER );
+}
+
+uint8_t program_page(uint32_t address, uint32_t *data, uint32_t size)
 {
     uint32_t update_start_sec, update_end_sec;
 
@@ -289,37 +274,17 @@ uint8_t program_page(uint32_t address, uint32_t *data, uint32_t size, enum memor
         return IPMI_CC_PARAM_OUT_OF_RANGE;
     }
 
-    if (area == BOOT_FLASH) {
-        update_start_sec = get_sector_number(boot_start_addr);
-        update_end_sec = get_sector_number(boot_end_addr);
+    update_start_sec = get_sector_number(update_start_addr);
+    update_end_sec = get_sector_number(update_end_addr);
 
-        if (Chip_IAP_PreSectorForReadWrite(update_start_sec, update_end_sec) != IAP_CMD_SUCCESS) {
-            portENABLE_INTERRUPTS();
-            return IPMI_CC_UNSPECIFIED_ERROR;
-        }
+    if (Chip_IAP_PreSectorForReadWrite(update_start_sec, update_end_sec) != IAP_CMD_SUCCESS) {
+        portENABLE_INTERRUPTS();
+        return IPMI_CC_UNSPECIFIED_ERROR;
+    }
 
-        if (Chip_IAP_CopyRamToFlash((uint32_t)boot_start_addr + address, data, size)) {
-            portENABLE_INTERRUPTS();
-            return IPMI_CC_UNSPECIFIED_ERROR;
-        }
-
-    } else if (area == FW_UPDATE_FLASH) {
-        update_start_sec = get_sector_number(update_start_addr);
-        update_end_sec = get_sector_number(update_end_addr);
-
-        if (Chip_IAP_PreSectorForReadWrite(update_start_sec, update_end_sec) != IAP_CMD_SUCCESS) {
-            portENABLE_INTERRUPTS();
-            return IPMI_CC_UNSPECIFIED_ERROR;
-        }
-
-        if (Chip_IAP_CopyRamToFlash((uint32_t)update_start_addr + address, data, size)) {
-            portENABLE_INTERRUPTS();
-            return IPMI_CC_UNSPECIFIED_ERROR;
-        }
-
-
-    } else {
-        return IPMI_CC_PARAM_OUT_OF_RANGE;
+    if (Chip_IAP_CopyRamToFlash((uint32_t)update_start_addr + address, data, size)) {
+        portENABLE_INTERRUPTS();
+        return IPMI_CC_UNSPECIFIED_ERROR;
     }
 
     portENABLE_INTERRUPTS();

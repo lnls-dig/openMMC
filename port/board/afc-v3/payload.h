@@ -37,6 +37,7 @@
 #define PAYLOAD_H_
 
 #include "event_groups.h"
+#include "mmc_error.h"
 
 /**
  * @brief Payload state machine state numbers
@@ -62,6 +63,7 @@ extern enum {
 #define PAYLOAD_MESSAGE_REBOOT          (1 << 2)
 #define PAYLOAD_MESSAGE_QUIESCE         (1 << 3)
 #define PAYLOAD_MESSAGE_RTM_ENABLE      (1 << 4)
+#define PAYLOAD_MESSAGE_CLOCK_CONFIG    (1 << 5)
 /**
  * @}
  */
@@ -108,6 +110,12 @@ uint8_t payload_hpm_finish_upload( uint32_t image_size );
 uint8_t payload_hpm_get_upgrade_status( void );
 uint8_t payload_hpm_activate_firmware( void );
 #endif
+
+/**
+ * @brief Configure the clock switch interconects according to the configuration
+ * saved in EEPROM
+ */
+mmc_err clock_configuration(const uint8_t clk_cfg[16]);
 
 #endif /* IPMI_PAYLOAD_H_ */
 
