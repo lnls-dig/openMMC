@@ -23,19 +23,19 @@ make
 
 cp "${afc_v3_1_build_dir}/out/openMMC.elf" "${bin_dir}/openMMC-afcv3.1-8sfp-${tag}.elf"
 cp "${afc_v3_1_build_dir}/out/openMMC.bin" "${bin_dir}/openMMC-afcv3.1-8sfp-${tag}.bin"
-[[ -e "${afc_v3_1_build_dir}/out/openMMC.hpm" ]] && cp "${afc_v3_1_build_dir}/out/openMMC.hpm" "${bin_dir}/openMMC-afcv3.1-8sfp-${tag}.hpm"
+[ -e "${afc_v3_1_build_dir}/out/openMMC.hpm" ] && cp "${afc_v3_1_build_dir}/out/openMMC.hpm" "${bin_dir}/openMMC-afcv3.1-8sfp-${tag}.hpm"
 
 cp "${afc_v3_1_build_dir}/out/newboot.elf" "${bin_dir}/newboot-afcv3.1-${tag}.elf"
 cp "${afc_v3_1_build_dir}/out/newboot.bin" "${bin_dir}/newboot-afcv3.1-${tag}.bin"
-[[ -e "${afc_v3_1_build_dir}/out/newboot.hpm" ]] && cp "${afc_v3_1_build_dir}/out/newboot.hpm" "${bin_dir}/newboot-afcv3.1-${tag}.hpm"
+[ -e "${afc_v3_1_build_dir}/out/newboot.hpm" ] && cp "${afc_v3_1_build_dir}/out/newboot.hpm" "${bin_dir}/newboot-afcv3.1-${tag}.hpm"
 
 cp "${afc_v4_build_dir}/out/openMMC.elf" "${bin_dir}/openMMC-afcv4.0-lamp-${tag}.elf"
 cp "${afc_v4_build_dir}/out/openMMC.bin" "${bin_dir}/openMMC-afcv4.0-lamp-${tag}.bin"
-[[ -e "${afc_v4_build_dir}/out/openMMC.hpm" ]] && cp "${afc_v4_build_dir}/out/openMMC.hpm" "${bin_dir}/openMMC-afcv4.0-lamp-${tag}.hpm"
+[ -e "${afc_v4_build_dir}/out/openMMC.hpm" ] && cp "${afc_v4_build_dir}/out/openMMC.hpm" "${bin_dir}/openMMC-afcv4.0-lamp-${tag}.hpm"
 
 cp "${afc_v4_build_dir}/out/newboot.elf" "${bin_dir}/newboot-afcv4.0-${tag}.elf"
 cp "${afc_v4_build_dir}/out/newboot.bin" "${bin_dir}/newboot-afcv4.0-${tag}.bin"
-[[ -e "${afc_v4_build_dir}/out/newboot.hpm" ]] && cp "${afc_v4_build_dir}/out/newboot.hpm" "${bin_dir}/newboot-afcv4.0-${tag}.hpm"
+[ -e "${afc_v4_build_dir}/out/newboot.hpm" ] && cp "${afc_v4_build_dir}/out/newboot.hpm" "${bin_dir}/newboot-afcv4.0-${tag}.hpm"
 
 cd "${bin_dir}"
 sha256sum * > SHA256SUMS
