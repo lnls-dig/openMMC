@@ -32,3 +32,17 @@ jobs:
       - name: Build for all targets
         working-directory: build
         run: make
+
+  test_make_release:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/lnls-dig/openmmc-builder:latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Create build environment
+        run: mkdir build
+      - name: Run make-release.sh
+        working-directory: scripts
+        run: ./make-release.sh
