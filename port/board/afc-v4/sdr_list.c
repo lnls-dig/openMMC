@@ -150,7 +150,7 @@ const SDR_type_01h_t SDR_AMC_12V = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = INA3221_CHANNEL_1, /* OEM reserved */
-    .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_12V_ID) , /* 8 bit ASCII, number of bytes */
+    .IDtypelen = 0xc0 | STR_SIZE(SDR_AMC_12V_ID) , /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_AMC_12V_ID /* sensor string */
 };
 
@@ -589,7 +589,7 @@ const SDR_type_01h_t SDR_AMC_12V_CURR = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = INA3221_CHANNEL_1, /* OEM reserved */
-    .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_12V_CURR_ID) , /* 8 bit ASCII, number of bytes */
+    .IDtypelen = 0xc0 | STR_SIZE(SDR_AMC_12V_CURR_ID) , /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_AMC_12V_CURR_ID /* sensor string */
 };
 
@@ -644,7 +644,7 @@ const SDR_type_01h_t SDR_RTM_12V_CURR = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = INA3221_CHANNEL_2, /* OEM reserved */
-    .IDtypelen = 0xc0 | STR_SIZE(SDR_FMC1_12V_CURR_ID) , /* 8 bit ASCII, number of bytes */
+    .IDtypelen = 0xc0 | STR_SIZE(SDR_RTM_12V_CURR_ID) , /* 8 bit ASCII, number of bytes */
     .IDstring = SDR_RTM_12V_CURR_ID /* sensor string */
 };
 
