@@ -92,7 +92,8 @@ It is possible to flash the MMC microcontroller with the LPC-Link1 adapter by us
 	./probe/lpclink1-flash.sh firmware.bin LPC1764 0x0000
 
 ### HPM-Downloader
-> :warning: **Disclaimer:** Due to [f06f69f](https://github.com/lnls-dig/openMMC/commit/f06f69f978c11bb8e1a2b12e4846e4bd51f757e4), this alternative is deprecated and ipmitool should be used instead, except when updating the OpenMMC application from older versions.
+> [!WARNING]
+> **Disclaimer:** Due to [f06f69f](https://github.com/lnls-dig/openMMC/commit/f06f69f978c11bb8e1a2b12e4846e4bd51f757e4), this alternative is deprecated and ipmitool should be used instead, except when updating the OpenMMC application from older versions.
 
 Another option to program the MMC microcontroler is through [HPM-Downloader](https://github.com/lnls-dig/hpm-downloader).
 First, download and compile the HPM. In it's root directory, in order to load the firmware, run
@@ -109,7 +110,8 @@ It's also important to mention that you can use the `--help` command in case of 
 	./bin/hpm-downloader --help
 
 ### ipmitool
-> :warning: **Disclaimer:** Due to [e88b30b](https://github.com/lnls-dig/openMMC/tree/e88b30b26c9dc05662d84e35b51fc81d7ecf7561), the ipmitool may fail when trying to upgrade the firmware from v1.5.0. You can use a modified ipmitool utility as a workaround, setting the variable [`max_rq_size`](https://codeberg.org/IPMITool/ipmitool/src/commit/137aeb64cbb493d61d6945cac156aba5f0510780/lib/ipmi_hpmfwupg.c#L1143) to 20.
+> [!WARNING]
+> **Disclaimer:** Due to [e88b30b](https://github.com/lnls-dig/openMMC/tree/e88b30b26c9dc05662d84e35b51fc81d7ecf7561), the ipmitool may fail when trying to upgrade the firmware from v1.5.0. You can use a modified ipmitool utility as a workaround, setting the variable [`max_rq_size`](https://codeberg.org/IPMITool/ipmitool/src/commit/137aeb64cbb493d61d6945cac156aba5f0510780/lib/ipmi_hpmfwupg.c#L1143) to 20.
 
 After [5631857](https://github.com/lnls-dig/openMMC/commit/563185791c8b51ea026680c98ec0ea9587ea645b), it's possible to program the firmware and the bootloader through [ipmitool](https://codeberg.org/IPMITool/ipmitool), for previous releases, you still need to use [hpm-downloader](https://github.com/lnls-dig/hpm-downloader). In order to use it, you have to install the ipmitool, and then generate .hpm files from `OpenMMC.bin` and `newboot.bin`. To generate `.hpm` files, you will need to use [bin2hpm](https://github.com/MicroTCA-Tech-Lab/bin2hpm). If you have bin2hpm in your `$PATH`, the `.hpm` files will be automatically generated for you, provided you build from [0095b14](https://github.com/lnls-dig/openMMC/commit/0095b14667afe844113725228671d8810b45d9e0) or more recent versions.
 After generate the files, you can use the following commands to program the MMC microcontroller.
@@ -122,7 +124,8 @@ To upgrade the bootloader, use
     ipmitool -I lan -H host_name_mch -A none -T 0x82 -m 0x20 -t (112 + num_slot*2 in hexadecimal) hpm upgrade newboot.hpm activate
 
 ### nxpprog
-> :warning: **Disclaimer:** Only supported in AFCv4.0.2
+> [!WARNING]
+> **Disclaimer:** Only supported in AFCv4.0.2
 
 In AFCv4, it's possible to program the firmware and bootloader via serial port using [nxpprog](https://github.com/lnls-dig/nxpprog). In order to use it, install nxpprog and then execute the following commands:
 To upgrade the application, use
@@ -166,7 +169,8 @@ The command is the above:
     ipmitool -I lan -H mch_host_name -A none -T 0x82 -m 0x20 -t (112 + num_slot*2) raw 0x32 0x02
 
 ### Clock switch configuration
-After [7a919489](https://github.com/lnls-dig/openMMC/tree/7a91948975f87f6613b28fc1ea562a2a7bb3c475) the clock switch configuration is no longer hardcoded for each board. Instead, it must be configured through an IPMI command.
+> [!IMPORTANT]
+> After [7a919489](https://github.com/lnls-dig/openMMC/tree/7a91948975f87f6613b28fc1ea562a2a7bb3c475) the clock switch configuration is no longer hardcoded for each board. Instead, it must be configured through an IPMI command.
 
 For the AFC v3.1 (ADN4604ASVZ) you can use the [script](/scripts/afcv3.1-clksw-config.py) for generate the configuration, and use the json configuration for [AFCv3.1-BPM](/config/lnls/afcv3.1-bpm-clk-cfg.json) or [AFCv3.1-Timing](/config/lnls/afcv3.1-timing-clk-cfg.json). If you want to generate a new configuration, use the following scheme:
 - **Port I/O (bit 7)**: Use it to configure the port as an input ('0') or output ('1'). Unused ports should be left configured as inputs;
