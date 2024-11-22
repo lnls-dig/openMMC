@@ -6,6 +6,22 @@ Open Source modular IPM Controller firmware
 
 Documentation: https://lnls-dig.github.io/openMMC
 
+## Table of Contents
+- [openMMC](#openmmc)
+   * [Installation:](#installation)
+   * [Compilation](#compilation)
+   * [Programming](#programming)
+      + [OpenOCD](#openocd)
+      + [LPC-Link1](#lpc-link1)
+      + [HPM-Downloader](#hpm-downloader)
+      + [ipmitool](#ipmitool)
+      + [nxpprog](#nxpprog)
+   * [Debugging](#debugging)
+   * [IPMI Custom Commands](#ipmi-custom-commands)
+      + [Get free heap memory](#get-free-heap-memory)
+      + [Commit Hash read](#commit-hash-read)
+      + [Clock switch configuration](#clock-switch-configuration)
+
 ## Installation:
 The following packages are needed in your system in order to compile the firmware:
 - **gcc-arm-none-eabi**
