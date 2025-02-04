@@ -24,6 +24,7 @@
 #include "event_groups.h"
 
 /* Project includes */
+#include "mmc_error.h"
 #include "port.h"
 #include "rtm.h"
 #include "rtm_user.h"
@@ -127,7 +128,7 @@ void RTM_Manage( void * Parameters )
         current_evt = xEventGroupGetBits( rtm_payload_evt );
 
         if ( current_evt & PAYLOAD_MESSAGE_QUIESCE ) {
-            if ( rtm_disable_payload_power() ) {
+            if (rtm_disable_payload_power() == MMC_OK) {
                 /* Quiesced event */
                 printf("[RTM] Quiesced RTM successfuly!\n");
                 hotswap_set_mask_bit( HOTSWAP_RTM, HOTSWAP_QUIESCED_MASK );
