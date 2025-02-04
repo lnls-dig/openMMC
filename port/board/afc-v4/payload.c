@@ -411,6 +411,7 @@ void vTaskPayload( void *pvParameters )
 
         case PAYLOAD_FPGA_ON:
             if ( QUIESCED_req == 1 || PP_good == 0 || DCDC_good == 0 ) {
+                printf("QUIESCED_req = %d, PP_good = %d, DCDC_good = %d\n", QUIESCED_req, PP_good, DCDC_good);
                 new_state = PAYLOAD_SWITCHING_OFF;
             }
             break;
