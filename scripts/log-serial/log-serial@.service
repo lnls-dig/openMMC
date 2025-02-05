@@ -1,0 +1,10 @@
+[Unit]
+Description=Serial Logger Service
+
+[Service]
+ExecStart=/usr/local/bin/log-serial.py /var/log/openmmc-serial-%i.log /dev/serial/by-id/%i
+StandardOutput=journal
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
