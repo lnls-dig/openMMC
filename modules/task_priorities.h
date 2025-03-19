@@ -30,8 +30,8 @@
 #define tskFPGA_COMM_PRIORITY           (tskIDLE_PRIORITY+1)
 #define tskWATCHDOG_PRIORITY            (tskIDLE_PRIORITY+1)
 
-#define tskPAYLOAD_PRIORITY             (tskIDLE_PRIORITY+2)
-#define tskRTM_MANAGE_PRIORITY          (tskIDLE_PRIORITY+2)
+#define tskPAYLOAD_PRIORITY             (tskIDLE_PRIORITY+3)
+#define tskRTM_MANAGE_PRIORITY          (tskIDLE_PRIORITY+3)
 
 #define tskSENSOR_PRIORITY              (tskIDLE_PRIORITY+3)
 #define tskHOTSWAP_PRIORITY             (tskIDLE_PRIORITY+3)
