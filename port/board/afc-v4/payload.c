@@ -298,7 +298,8 @@ void vTaskPayload( void *pvParameters )
     uint8_t new_state = -1;
 
     /* Payload power good flag */
-    uint8_t PP_good = 0;
+    uint8_t pp_good = 0;
+    uint8_t last_pp_goods[2] = {0, 0};
 
     /* Payload DCDCs good flag */
     uint8_t DCDC_good = 0;
@@ -362,13 +363,19 @@ void vTaskPayload( void *pvParameters )
             xEventGroupClearBits(amc_payload_evt, PAYLOAD_MESSAGE_REBOOT | PAYLOAD_MESSAGE_WARM_RST);
         }
 
-        PP_good = payload_check_pgood(&pp_adc_val);
+        last_pp_goods[1] = last_pp_goods[0];
+        last_pp_goods[0] = payload_check_pgood(&pp_adc_val);
+
+        if (last_pp_goods[0] == last_pp_goods[1]) {
+            pp_good = last_pp_goods[0];
+        }
+
         DCDC_good = gpio_read_pin(PIN_PORT(GPIO_PGOOD_P1V0), PIN_NUMBER(GPIO_PGOOD_P1V0));
 
         switch(state) {
 
         case PAYLOAD_NO_POWER:
-            if (PP_good) {
+            if (pp_good) {
                 new_state = PAYLOAD_POWER_GOOD_WAIT;
             }
             break;
@@ -383,7 +390,7 @@ void vTaskPayload( void *pvParameters )
             hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_SHUTDOWN_MASK );
             hotswap_clear_mask_bit( HOTSWAP_AMC, HOTSWAP_BACKEND_PWR_FAILURE_MASK );
 
-            if ( QUIESCED_req || ( PP_good == 0 ) ) {
+            if ( QUIESCED_req || ( pp_good == 0 ) ) {
                 new_state = PAYLOAD_SWITCHING_OFF;
             } else if ( DCDC_good == 1 ) {
                 new_state = PAYLOAD_STATE_FPGA_SETUP;
@@ -414,9 +421,12 @@ void vTaskPayload( void *pvParameters )
             break;
 
         case PAYLOAD_FPGA_ON:
-            if ( QUIESCED_req == 1 || PP_good == 0 || DCDC_good == 0 ) {
-                printf("QUIESCED_req = %d, PP_good = %d, DCDC_good = %d\n", QUIESCED_req, PP_good, DCDC_good);
+            if (last_pp_goods[0] == 0) {
                 printf("Payload power ADC value %u\n", pp_adc_val);
+            }
+
+            if ( QUIESCED_req == 1 || pp_good == 0 || DCDC_good == 0 ) {
+                printf("QUIESCED_req = %d, pp_good = %d, DCDC_good = %d\n", QUIESCED_req, pp_good, DCDC_good);
                 new_state = PAYLOAD_SWITCHING_OFF;
             }
             break;
@@ -447,7 +457,7 @@ void vTaskPayload( void *pvParameters )
 
         case PAYLOAD_QUIESCED:
             /* Wait until power goes down to restart the cycle */
-            if (PP_good == 0 && DCDC_good == 0) {
+            if (pp_good == 0 && DCDC_good == 0) {
                 new_state = PAYLOAD_NO_POWER;
             }
             break;
