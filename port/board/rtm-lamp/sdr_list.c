@@ -117,8 +117,8 @@ const SDR_type_01h_t SDR_LM75_RTM_1 = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | STR_SIZE("TEMP RTM1"), /* 8 bit ASCII, number of bytes */
-    .IDstring = "TEMP RTM1" /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("Air in"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "Air in" /* sensor string */
 };
 
 const SDR_type_01h_t SDR_LM75_RTM_2 = {
@@ -171,8 +171,8 @@ const SDR_type_01h_t SDR_LM75_RTM_2 = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | STR_SIZE("TEMP RTM2"), /* 8 bit ASCII, number of bytes */
-    .IDstring = "TEMP RTM2" /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("Air out"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "Air out" /* sensor string */
 };
 
 const SDR_type_01h_t SDR_LM75_RTM_3 = {
@@ -225,8 +225,8 @@ const SDR_type_01h_t SDR_LM75_RTM_3 = {
     .reserved1 = 0x00, /* reserved */
     .reserved2 = 0x00, /* reserved */
     .OEM = 0x00, /* OEM reserved */
-    .IDtypelen = 0xc0 | STR_SIZE("TEMP RTM3"), /* 8 bit ASCII, number of bytes */
-    .IDstring = "TEMP RTM3" /* sensor string */
+    .IDtypelen = 0xc0 | STR_SIZE("PS Block"), /* 8 bit ASCII, number of bytes */
+    .IDstring = "PS Block" /* sensor string */
 };
 #endif
 
