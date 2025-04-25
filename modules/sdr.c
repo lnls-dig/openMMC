@@ -44,6 +44,8 @@ sensor_t *sdr_tail = NULL;
 static uint16_t reservationID;
 static uint32_t sdr_change_count;
 
+static SemaphoreHandle_t sdr_mutex;
+
 uint8_t compare_val(uint8_t val1, uint8_t val2, uint8_t comp, uint8_t sign)
 {
     if(sign == SIGNED) {
@@ -122,6 +124,8 @@ void sdr_init( void )
     sdr_head = NULL;
     sdr_tail = NULL;
 
+    sdr_mutex = xSemaphoreCreateMutex();
+
     /* Populate AMC SDR Device Locator Record */
     sdr_head = sdr_insert_entry( TYPE_12, (void *) &SDR0, NULL, 0, 0 );
 #ifdef MODULE_RTM
@@ -131,35 +135,40 @@ void sdr_init( void )
 
 sensor_t * sdr_insert_entry( SDR_TYPE type, void * sdr, TaskHandle_t *monitor_task, uint8_t diag_id, uint8_t chipid )
 {
-    uint8_t sdr_len = sdr_get_size_by_type(type);
+    if (xSemaphoreTake(sdr_mutex, portMAX_DELAY) == pdTRUE){
 
-    sensor_t * entry = pvPortMalloc( sizeof(sensor_t) );
-    memset( entry, 0, sizeof(sensor_t) );
+        uint8_t sdr_len = sdr_get_size_by_type(type);
 
-    entry->num = sdr_count;
-    entry->sdr_type = type;
-    entry->sdr = sdr;
-    entry->sdr_length = sdr_len;
-    entry->task_handle = monitor_task;
-    entry->diag_devID = diag_id;
-    entry->chipid = chipid;
-    entry->ownerID = ipmb_addr;
-    entry->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
-    entry->readout_value = 0;
-    entry->state = SENSOR_STATE_LOW_NON_REC;
-    entry->event_scan = 0xC0; /* Start with sensor enabled */
+        sensor_t * entry = pvPortMalloc( sizeof(sensor_t) );
+        memset( entry, 0, sizeof(sensor_t) );
 
-    /* Link the sdr list */
-    if (sdr_tail) {
-        sdr_tail->next = entry;
+        entry->num = sdr_count;
+        entry->sdr_type = type;
+        entry->sdr = sdr;
+        entry->sdr_length = sdr_len;
+        entry->task_handle = monitor_task;
+        entry->diag_devID = diag_id;
+        entry->chipid = chipid;
+        entry->ownerID = ipmb_addr;
+        entry->entityinstance =  0x60 | ((ipmb_addr - 0x70) >> 1);
+        entry->readout_value = 0;
+        entry->state = SENSOR_STATE_LOW_NON_REC;
+        entry->event_scan = 0xC0; /* Start with sensor enabled */
+
+        /* Link the sdr list */
+        if (sdr_tail) {
+            sdr_tail->next = entry;
+        }
+        sdr_tail = entry;
+        entry->next = NULL;
+
+        sdr_count++;
+        sdr_change_count++;
+
+        xSemaphoreGive(sdr_mutex);
+        return entry;
     }
-    sdr_tail = entry;
-    entry->next = NULL;
-
-    sdr_count++;
-    sdr_change_count++;
-
-    return entry;
+    return NULL;
 }
 
 sensor_t * sdr_add_settings(uint8_t chipid, void * settings)
@@ -202,30 +211,33 @@ sensor_t * find_sensor_by_id( uint8_t id )
 
 void sdr_remove_entry( sensor_t * entry )
 {
-    sensor_t * cur = sdr_head;
-    sensor_t * prev = NULL;
+    if (xSemaphoreTake(sdr_mutex, portMAX_DELAY) == pdTRUE){
+        sensor_t * cur = sdr_head;
+        sensor_t * prev = NULL;
 
-    if (entry == sdr_head) {
-        sdr_pop();
-    }
-
-    while (cur != entry) {
-        prev = cur;
-        cur = cur->next;
-        if (cur == NULL) {
-            /* We reached the end of the list and didn't find the entry */
-            return;
+        if (entry == sdr_head) {
+            sdr_pop();
         }
+
+        while (cur != entry) {
+            prev = cur;
+            cur = cur->next;
+            if (cur == NULL) {
+                /* We reached the end of the list and didn't find the entry */
+                return;
+            }
+        }
+
+        /* Relink the table */
+        prev->next = cur->next;
+
+        sdr_count--;
+        sdr_change_count++;
+
+        /* Free the entry */
+        vPortFree(cur);
+        xSemaphoreGive(sdr_mutex);
     }
-
-    /* Relink the table */
-    prev->next = cur->next;
-
-    sdr_count--;
-    sdr_change_count++;
-
-    /* Free the entry */
-    vPortFree(cur);
 }
 
 void sdr_pop( void )
