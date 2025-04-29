@@ -73,7 +73,12 @@ void Chip_SetupIrcClocking(void)
 	Chip_Clock_EnablePLL(SYSCTL_MAIN_PLL, SYSCTL_PLL_CONNECT);
 }
 
-#define CLOCK_8MHZ
+#define CLOCK_11_520MHZ
+#ifdef CLOCK_11_520MHZ
+#define PLL_M (18-1)
+#define PLL_N (1-1)
+#define CLK_DIV (25-1)
+#endif
 #ifdef CLOCK_100MHZ
 #define PLL_M (25-1)
 #define PLL_N (2-1)
