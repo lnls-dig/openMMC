@@ -200,9 +200,9 @@ int main(void)
     lp17_pincfg(0, 3, pin_mode_none, pin_func_alt1);
 
     /*
-     * Initialize UAR0 (19200bps, 8N1)
+     * Initialize UAR0 (115200bps, 8N1)
      */
-    lpc17_uart0_init(19200, 72000000);
+    lpc17_uart0_init(115200, 72000000);
 
     if (fw_header->magic == 0xAAAAAAAA)
     {

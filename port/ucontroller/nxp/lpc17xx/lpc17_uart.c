@@ -40,8 +40,8 @@ void uart_init ( uint8_t id )
 
     Chip_UART_Init( usart_cfg[id].ptr );
 
-    /* Standard 19200 baud rate */
-    uart_set_baud( UART_DEBUG, 19200 );
+    /* Standard 115200 baud rate */
+    uart_set_baud( UART_DEBUG, 115200 );
 
     /* Defaults to 8N1, no parity */
     uart_config_data( UART_DEBUG, ( UART_LCR_WLEN8 | UART_LCR_SBS_1BIT | UART_LCR_PARITY_DIS ) );
