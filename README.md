@@ -74,6 +74,14 @@ Flashing the MMC microcontroller via SWD/JTAG is supported for CMSIS-DAP and Jli
 
 This will create a `openocd.cfg` file in `<build_dir>/out`.
 
+For AFCv4.0 cards, you can program the MMC microcontroller via Xilinx XVC protocol if your MicroTCA crate supports it using the backplane JTAG interface. First, make sure the FPGA is powered off (M1 state), then configure the XVC hostname and port:
+
+To configure a build using XVC:
+
+    cmake ~/openmmc/ -DBOARD=afc -DVERSION=4.0 -DDEBUG_PROBE=xvc -DXVC_HOST=xvc_hostname -DXVC_PORT=xvc_port_number
+
+`Hint:` If the FPGA is powered off and OpenMMC is unresponsive — in the M7 (Error) state — this XVC configuration may still be valid and usable for programming the MMC. In such cases, attempting XVC programming can help recover the board without requiring physical access.
+
 To flash the application firmware only, run
 
     make program_app
