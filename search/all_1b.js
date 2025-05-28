@@ -36,8 +36,7 @@ var searchData=
   ['wdt_5ftv_5fcount_5fmsk_33',['WDT_TV_Count_Msk',['../group__PosMask__peripherals.html#gab61ea548e5c2a0a36135fbc6523bf099',1,'LPC176x5x.h']]],
   ['wdt_5ftv_5fcount_5fpos_34',['WDT_TV_Count_Pos',['../group__PosMask__peripherals.html#gaa9b3aa43da71da77e4e20a48ba4eaf76',1,'LPC176x5x.h']]],
   ['weak_35',['WEAK',['../cr__startup__lpc175x__6x_8c.html#ad1480e9557edcc543498ca259cee6c7d',1,'cr_startup_lpc175x_6x.c']]],
-  ['with_20nat_20mch_36',['Clock configuration on Schroff crate with NAT MCH',['../CLK_CFG.html#CLK_CFG_SCHROFF',1,'']]],
-  ['with_20overtemperature_20alarm_37',['MAX6642  Remote/Local Temperature Sensor with Overtemperature Alarm',['../group__MAX6642.html',1,'']]],
-  ['wr_5fcommand_38',['WR_COMMAND',['../fpga__spi_8h.html#a5de9a737c3e82d04fec7e9b305beb104',1,'fpga_spi.h']]],
-  ['write_5ff_39',['write_f',['../structfru__cfg.html#aeeb8800389cc0f266ee61c9a6189d665',1,'fru_cfg']]]
+  ['with_20overtemperature_20alarm_36',['MAX6642  Remote/Local Temperature Sensor with Overtemperature Alarm',['../group__MAX6642.html',1,'']]],
+  ['wr_5fcommand_37',['WR_COMMAND',['../fpga__spi_8h.html#a5de9a737c3e82d04fec7e9b305beb104',1,'fpga_spi.h']]],
+  ['write_5ff_38',['write_f',['../structfru__cfg.html#aeeb8800389cc0f266ee61c9a6189d665',1,'fru_cfg']]]
 ];

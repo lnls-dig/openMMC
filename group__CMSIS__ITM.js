@@ -16,7 +16,7 @@ var group__CMSIS__ITM =
       [ "PID5", "group__CMSIS__core__DebugFunctions.html#gaf9085648bf18f69b5f9d1136d45e1d37", null ],
       [ "PID6", "group__CMSIS__core__DebugFunctions.html#gad34dbe6b1072c77d36281049c8b169f6", null ],
       [ "PID7", "group__CMSIS__core__DebugFunctions.html#ga2bcec6803f28f30d5baf5e20e3517d3d", null ],
-      [ "PORT", "group__CMSIS__core__DebugFunctions.html#gad53be4ff303b0d6a8a8edfec7e84c49c", null ],
+      [ "PORT", "group__CMSIS__core__DebugFunctions.html#gad8b9bd1be9dd235ce3b855f6c6362257", null ],
       [ "RESERVED0", "group__CMSIS__core__DebugFunctions.html#ga33cc4a572650927fe5491d2f940ec696", null ],
       [ "RESERVED1", "group__CMSIS__core__DebugFunctions.html#gace50062fa5e817a6cbebb15878481a5b", null ],
       [ "RESERVED2", "group__CMSIS__core__DebugFunctions.html#ga80ab0d763321f43fc0f684b67561f2ae", null ],

@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['u16_0',['u16',['../group__CMSIS__core__DebugFunctions.html#ga962a970dfd286cad7f8a8577e87d4ad3',1,'ITM_Type::u16'],['../group__CMSIS__core__DebugFunctions.html#gaa4ee83c77b1134ff0960a774f9fc5370',1,'ITM_Type::@21::u16']]],
-  ['u32_1',['u32',['../group__CMSIS__core__DebugFunctions.html#ga5834885903a557674f078f3b71fa8bc8',1,'ITM_Type::u32'],['../group__CMSIS__core__DebugFunctions.html#gad66bedbbda19b8f66190c36c3861e087',1,'ITM_Type::@21::u32']]],
-  ['u8_2',['u8',['../group__CMSIS__core__DebugFunctions.html#gae773bf9f9dac64e6c28b14aa39f74275',1,'ITM_Type::u8'],['../group__CMSIS__core__DebugFunctions.html#ga98b40a03ae7b6639658a91e631b98c3c',1,'ITM_Type::@21::u8']]],
+  ['u16_0',['u16',['../group__CMSIS__core__DebugFunctions.html#ga962a970dfd286cad7f8a8577e87d4ad3',1,'ITM_Type::u16'],['../group__CMSIS__core__DebugFunctions.html#ga0313d8b41e89cac440cf5c21ddcf5e06',1,'ITM_Type::@325171270026154056370264242015361331252316174201::u16']]],
+  ['u32_1',['u32',['../group__CMSIS__core__DebugFunctions.html#ga5834885903a557674f078f3b71fa8bc8',1,'ITM_Type::u32'],['../group__CMSIS__core__DebugFunctions.html#ga5c8667cba3a5f98b697ce71cd532e3ad',1,'ITM_Type::@325171270026154056370264242015361331252316174201::u32']]],
+  ['u8_2',['u8',['../group__CMSIS__core__DebugFunctions.html#gae773bf9f9dac64e6c28b14aa39f74275',1,'ITM_Type::u8'],['../group__CMSIS__core__DebugFunctions.html#gaa5bed2e653b77674c6bda536a9ac2703',1,'ITM_Type::@325171270026154056370264242015361331252316174201::u8']]],
   ['u8_5fto_5fstr_3',['u8_to_str',['../port_2ucontroller_2nxp_2lpc17xx_2bootloader_2src_2main_8c.html#a65c1aec358b5a28aa00da5025670aacd',1,'main.c']]],
   ['uart0_5facr_5fabeointclr_5fmsk_4',['UART0_ACR_ABEOINTCLR_Msk',['../group__PosMask__peripherals.html#gacd9a41135d0e3e56f662a912f5373db2',1,'LPC176x5x.h']]],
   ['uart0_5facr_5fabeointclr_5fpos_5',['UART0_ACR_ABEOINTCLR_Pos',['../group__PosMask__peripherals.html#ga5fd6b7fad9951f69c0bb3d22529fd1ff',1,'LPC176x5x.h']]],

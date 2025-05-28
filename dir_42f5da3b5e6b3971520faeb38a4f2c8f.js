@@ -8,6 +8,8 @@ var dir_42f5da3b5e6b3971520faeb38a4f2c8f =
     [ "ina3221.h", "ina3221_8h.html", "ina3221_8h" ],
     [ "lm75.c", "lm75_8c.html", "lm75_8c" ],
     [ "lm75.h", "lm75_8h.html", "lm75_8h" ],
+    [ "max11609.c", "max11609_8c.html", "max11609_8c" ],
+    [ "max11609.h", "max11609_8h.html", "max11609_8h" ],
     [ "max6642.c", "max6642_8c.html", "max6642_8c" ],
     [ "max6642.h", "max6642_8h.html", "max6642_8h" ],
     [ "sensors.h", "sensors_8h.html", null ]

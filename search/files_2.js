@@ -4,7 +4,7 @@ var searchData=
   ['cdce906_2eh_1',['cdce906.h',['../cdce906_8h.html',1,'']]],
   ['cdce906_5fconfig_2eh_2',['cdce906_config.h',['../cdce906__config_8h.html',1,'']]],
   ['cdce906_5freg_2eh_3',['cdce906_reg.h',['../cdce906__reg_8h.html',1,'']]],
-  ['clock_5fcfg_2edox_4',['clock_cfg.dox',['../clock__cfg_8dox.html',1,'']]],
+  ['clk_2dsw_2dconfig_2epy_4',['clk-sw-config.py',['../clk-sw-config_8py.html',1,'']]],
   ['clock_5fconfig_2ec_5',['clock_config.c',['../clock__config_8c.html',1,'']]],
   ['clock_5fconfig_2eh_6',['clock_config.h',['../clock__config_8h.html',1,'']]],
   ['cmsis_5farmcc_2eh_7',['cmsis_armcc.h',['../cmsis__armcc_8h.html',1,'']]],

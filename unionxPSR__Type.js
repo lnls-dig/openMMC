@@ -2,7 +2,7 @@ var unionxPSR__Type =
 [
     [ "_reserved0", "group__CMSIS__core__DebugFunctions.html#gaf438e0f407357e914a70b5bd4d6a97c5", null ],
     [ "_reserved1", "group__CMSIS__core__DebugFunctions.html#ga790056bb6f20ea16cecc784b0dd19ad6", null ],
-    [ "b", "group__CMSIS__core__DebugFunctions.html#ga59524845cd5e7fede7fde407f41df8b0", null ],
+    [ "b", "group__CMSIS__core__DebugFunctions.html#ga3e60eb607dfafbf0686839e299caa976", null ],
     [ "C", "group__CMSIS__core__DebugFunctions.html#ga40213a6b5620410cac83b0d89564609d", null ],
     [ "ICI_IT_1", "group__CMSIS__core__DebugFunctions.html#gaa57a08ddc8ac3ee066e88dfddc3aa72a", null ],
     [ "ICI_IT_2", "group__CMSIS__core__DebugFunctions.html#gadf3639bb7c6e54e5712f2ddef46a702e", null ],

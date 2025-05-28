@@ -25,6 +25,7 @@ var dir_e05d7e2b1ecd646af5bb94391405f3b5 =
     [ "fru.h", "fru_8h.html", "fru_8h" ],
     [ "fru_editor.c", "fru__editor_8c.html", "fru__editor_8c" ],
     [ "fru_editor.h", "fru__editor_8h.html", "fru__editor_8h" ],
+    [ "GitSHA1.c", "GitSHA1_8c.html", "GitSHA1_8c" ],
     [ "GitSHA1.h", "GitSHA1_8h.html", "GitSHA1_8h" ],
     [ "hpm.c", "hpm_8c.html", "hpm_8c" ],
     [ "hpm.h", "hpm_8h.html", "hpm_8h" ],

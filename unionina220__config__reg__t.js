@@ -2,7 +2,7 @@ var unionina220__config__reg__t =
 [
     [ "bus_adc_resolution", "unionina220__config__reg__t.html#a34b5582b6b0f9b49b58dcb8c205578be", null ],
     [ "bus_voltage_range", "unionina220__config__reg__t.html#adbc6b1cc7e8f467de1a58c2f4d5bf80f", null ],
-    [ "cfg_struct", "unionina220__config__reg__t.html#a40f487d89a6b4b1af0eac55ee947b17c", null ],
+    [ "cfg_struct", "unionina220__config__reg__t.html#ae62fd8f319938725b590ad4c5229e5a9", null ],
     [ "cfg_word", "unionina220__config__reg__t.html#a20d82853bb659aa69702d48aabc920b3", null ],
     [ "mode", "unionina220__config__reg__t.html#a0680ce2aeac1e0a6067ad2927e3161ce", null ],
     [ "pga_gain", "unionina220__config__reg__t.html#a84e00dbce45740223ede3a35928a75e4", null ],

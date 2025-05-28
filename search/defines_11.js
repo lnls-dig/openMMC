@@ -15,9 +15,10 @@ var searchData=
   ['tskipmi_5fpriority_12',['tskIPMI_PRIORITY',['../task__priorities_8h.html#a1fc3db4ca93e6cd0fd7ad3753666b15d',1,'task_priorities.h']]],
   ['tskled_5fpriority_13',['tskLED_PRIORITY',['../task__priorities_8h.html#a0f48daaeb600eea20017bf6e9fa866dc',1,'task_priorities.h']]],
   ['tsklm75sensor_5fpriority_14',['tskLM75SENSOR_PRIORITY',['../task__priorities_8h.html#a09568135841b44603dd84e2af99e578a',1,'task_priorities.h']]],
-  ['tskmax6642sensor_5fpriority_15',['tskMAX6642SENSOR_PRIORITY',['../task__priorities_8h.html#a462b72a51dd387f40fbddaed3671e7a2',1,'task_priorities.h']]],
-  ['tskpayload_5fpriority_16',['tskPAYLOAD_PRIORITY',['../task__priorities_8h.html#a271e96f58798290b3688a9fbbe05d570',1,'task_priorities.h']]],
-  ['tskrtm_5fmanage_5fpriority_17',['tskRTM_MANAGE_PRIORITY',['../task__priorities_8h.html#a666bd6b9caa3f412d8ef213057a02224',1,'task_priorities.h']]],
-  ['tsksensor_5fpriority_18',['tskSENSOR_PRIORITY',['../task__priorities_8h.html#a72d1e31fa9931c529f38359d1e73c123',1,'task_priorities.h']]],
-  ['tskwatchdog_5fpriority_19',['tskWATCHDOG_PRIORITY',['../task__priorities_8h.html#ac6be47206a4b47edaa15f69828304a4d',1,'task_priorities.h']]]
+  ['tskmax11609sensor_5fpriority_15',['tskMAX11609SENSOR_PRIORITY',['../task__priorities_8h.html#a61b6b7f88267cc0028aa5fc4b2a68105',1,'task_priorities.h']]],
+  ['tskmax6642sensor_5fpriority_16',['tskMAX6642SENSOR_PRIORITY',['../task__priorities_8h.html#a462b72a51dd387f40fbddaed3671e7a2',1,'task_priorities.h']]],
+  ['tskpayload_5fpriority_17',['tskPAYLOAD_PRIORITY',['../task__priorities_8h.html#a271e96f58798290b3688a9fbbe05d570',1,'task_priorities.h']]],
+  ['tskrtm_5fmanage_5fpriority_18',['tskRTM_MANAGE_PRIORITY',['../task__priorities_8h.html#a666bd6b9caa3f412d8ef213057a02224',1,'task_priorities.h']]],
+  ['tsksensor_5fpriority_19',['tskSENSOR_PRIORITY',['../task__priorities_8h.html#a72d1e31fa9931c529f38359d1e73c123',1,'task_priorities.h']]],
+  ['tskwatchdog_5fpriority_20',['tskWATCHDOG_PRIORITY',['../task__priorities_8h.html#ac6be47206a4b47edaa15f69828304a4d',1,'task_priorities.h']]]
 ];

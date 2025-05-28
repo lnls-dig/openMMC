@@ -3,7 +3,7 @@ var group__CMSIS__CORE =
     [ "Nested Vectored Interrupt Controller (NVIC)", "group__CMSIS__NVIC.html", "group__CMSIS__NVIC" ],
     [ "APSR_Type", "unionAPSR__Type.html", [
       [ "_reserved0", "group__CMSIS__core__DebugFunctions.html#gafbce95646fd514c10aa85ec0a33db728", null ],
-      [ "b", "group__CMSIS__core__DebugFunctions.html#ga37c92a6ccab1d24079e1e1ac92011183", null ],
+      [ "b", "group__CMSIS__core__DebugFunctions.html#gac885f3a6f936a07fd67011f51eca9d94", null ],
       [ "C", "group__CMSIS__core__DebugFunctions.html#ga86e2c5b891ecef1ab55b1edac0da79a6", null ],
       [ "N", "group__CMSIS__core__DebugFunctions.html#ga7e7bbba9b00b0bb3283dc07f1abe37e0", null ],
       [ "Q", "group__CMSIS__core__DebugFunctions.html#ga22d10913489d24ab08bd83457daa88de", null ],
@@ -13,14 +13,14 @@ var group__CMSIS__CORE =
     ] ],
     [ "IPSR_Type", "unionIPSR__Type.html", [
       [ "_reserved0", "group__CMSIS__core__DebugFunctions.html#gad2eb0a06de4f03f58874a727716aa9aa", null ],
-      [ "b", "group__CMSIS__core__DebugFunctions.html#gadc200e389151f827f8cb044490ae671c", null ],
+      [ "b", "group__CMSIS__core__DebugFunctions.html#gac33e53e00e44e0d954dfc91ab8ad1c83", null ],
       [ "ISR", "group__CMSIS__core__DebugFunctions.html#gab46e5f1b2f4d17cfb9aca4fffcbb2fa5", null ],
       [ "w", "group__CMSIS__core__DebugFunctions.html#ga4adca999d3a0bc1ae682d73ea7cfa879", null ]
     ] ],
     [ "xPSR_Type", "unionxPSR__Type.html", [
       [ "_reserved0", "group__CMSIS__core__DebugFunctions.html#gaf438e0f407357e914a70b5bd4d6a97c5", null ],
       [ "_reserved1", "group__CMSIS__core__DebugFunctions.html#ga790056bb6f20ea16cecc784b0dd19ad6", null ],
-      [ "b", "group__CMSIS__core__DebugFunctions.html#ga59524845cd5e7fede7fde407f41df8b0", null ],
+      [ "b", "group__CMSIS__core__DebugFunctions.html#ga3e60eb607dfafbf0686839e299caa976", null ],
       [ "C", "group__CMSIS__core__DebugFunctions.html#ga40213a6b5620410cac83b0d89564609d", null ],
       [ "ICI_IT_1", "group__CMSIS__core__DebugFunctions.html#gaa57a08ddc8ac3ee066e88dfddc3aa72a", null ],
       [ "ICI_IT_2", "group__CMSIS__core__DebugFunctions.html#gadf3639bb7c6e54e5712f2ddef46a702e", null ],
@@ -34,7 +34,7 @@ var group__CMSIS__CORE =
     ] ],
     [ "CONTROL_Type", "unionCONTROL__Type.html", [
       [ "_reserved1", "group__CMSIS__core__DebugFunctions.html#gaa7a5662079a447f801034d108f80ce49", null ],
-      [ "b", "group__CMSIS__core__DebugFunctions.html#gae2a377b142c1903e75601191fc97d3a6", null ],
+      [ "b", "group__CMSIS__core__DebugFunctions.html#ga5f38ca7f894742804549a0e6ea8d7ee3", null ],
       [ "nPRIV", "group__CMSIS__core__DebugFunctions.html#ga35c1732cf153b7b5c4bd321cf1de9605", null ],
       [ "SPSEL", "group__CMSIS__core__DebugFunctions.html#ga8cc085fea1c50a8bd9adea63931ee8e2", null ],
       [ "w", "group__CMSIS__core__DebugFunctions.html#ga6b642cca3d96da660b1198c133ca2a1f", null ]

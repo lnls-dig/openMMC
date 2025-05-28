@@ -1,7 +1,0 @@
-<map id="port/board/afc&#45;timing/i2c_mapping.h" name="port/board/afc&#45;timing/i2c_mapping.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="97,5,257,50"/>
-<area shape="rect" id="Node000002" href="$afc-timing_2i2c__mapping_8c.html" title=" " alt="" coords="5,98,165,143"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,63,109,100,105,96,142,59"/>
-<area shape="rect" id="Node000003" href="$afc-timing_2sdr__list_8c.html" title=" " alt="" coords="189,98,349,143"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="212,59,249,96,245,100,208,63"/>
-</map>

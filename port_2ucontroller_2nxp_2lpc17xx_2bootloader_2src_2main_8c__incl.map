@@ -1,35 +1,35 @@
 <map id="port/ucontroller/nxp/lpc17xx/bootloader/src/main.c" name="port/ucontroller/nxp/lpc17xx/bootloader/src/main.c">
-<area shape="rect" id="Node000001" title=" " alt="" coords="357,5,530,67"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="387,342,457,370"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="357,58,228,92,160,116,98,144,48,175,30,193,17,211,10,230,9,250,16,270,31,292,53,309,88,322,131,333,181,340,283,349,371,352,371,357,283,354,180,346,130,338,86,327,51,313,27,296,11,273,4,250,4,229,12,208,26,189,45,171,95,139,158,111,226,87,356,52"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="185,115,251,143"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="369,70,265,111,263,106,367,65"/>
-<area shape="rect" id="Node000004" href="$LPC176x5x_8h.html" title=" " alt="" coords="275,115,380,143"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="406,70,358,107,354,103,403,65"/>
-<area shape="rect" id="Node000008" href="$lpc17__clock_8h.html" title=" " alt="" coords="321,191,430,218"/>
-<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="433,69,389,177,384,175,429,66"/>
-<area shape="rect" id="Node000009" href="$bootloader_2src_2lpc17__pincfg_8h.html" title=" " alt="" coords="412,266,528,294"/>
-<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="449,67,470,250,464,251,444,68"/>
-<area shape="rect" id="Node000010" href="$bootloader_2src_2lpc17__uart_8h.html" title=" " alt="" coords="506,115,607,143"/>
-<area shape="poly" id="edge13_Node000001_Node000010" title=" " alt="" coords="483,65,530,103,527,107,479,70"/>
-<area shape="rect" id="Node000012" href="$lpc17__iap_8h.html" title=" " alt="" coords="632,115,727,143"/>
-<area shape="poly" id="edge16_Node000001_Node000012" title=" " alt="" coords="523,65,632,107,630,112,521,70"/>
-<area shape="rect" id="Node000013" href="$start__app_8h.html" title=" " alt="" coords="743,191,837,218"/>
-<area shape="poly" id="edge19_Node000001_Node000013" title=" " alt="" coords="531,40,582,48,637,62,691,83,741,113,767,142,783,175,779,177,762,145,738,117,689,88,635,67,581,53,530,45"/>
-<area shape="rect" id="Node000005" href="$core__cm3_8h.html" title="CMSIS Cortex&#45;M3 Core Peripheral Access Layer Header File." alt="" coords="134,191,230,218"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="303,146,223,186,220,181,300,141"/>
-<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="134,219,93,232,57,249,44,259,37,269,36,280,43,292,64,308,98,321,187,339,286,348,372,352,371,357,286,354,186,345,96,326,62,313,39,296,31,281,32,267,40,255,54,244,92,227,133,214"/>
-<area shape="rect" id="Node000006" href="$cmsis__version_8h.html" title="CMSIS Core(M) Version definitions." alt="" coords="52,266,179,294"/>
-<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="172,221,139,257,135,253,168,217"/>
-<area shape="rect" id="Node000007" href="$cmsis__compiler_8h.html" title="CMSIS compiler generic header file." alt="" coords="202,266,338,294"/>
-<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="199,217,245,254,241,258,196,221"/>
-<area shape="poly" id="edge8_Node000007_Node000002" title=" " alt="" coords="298,292,383,333,380,337,296,297"/>
-<area shape="poly" id="edge10_Node000008_Node000002" title=" " alt="" coords="381,218,403,293,415,327,410,328,398,295,376,219"/>
-<area shape="poly" id="edge12_Node000009_Node000002" title=" " alt="" coords="464,296,441,330,437,328,459,293"/>
-<area shape="poly" id="edge14_Node000010_Node000002" title=" " alt="" coords="562,143,565,172,566,212,559,255,542,295,527,312,510,325,473,344,470,339,507,321,524,308,537,293,554,254,561,212,560,173,556,143"/>
-<area shape="rect" id="Node000011" title=" " alt="" coords="595,191,668,218"/>
-<area shape="poly" id="edge15_Node000010_Node000011" title=" " alt="" coords="572,141,609,178,605,181,568,145"/>
-<area shape="poly" id="edge17_Node000012_Node000002" title=" " alt="" coords="686,143,691,178,690,200,683,220,664,247,641,271,614,291,585,308,526,333,473,348,472,343,524,328,583,303,611,286,637,267,660,244,678,217,685,198,686,179,681,143"/>
-<area shape="poly" id="edge18_Node000012_Node000011" title=" " alt="" coords="673,145,650,179,646,176,669,142"/>
-<area shape="poly" id="edge20_Node000013_Node000002" title=" " alt="" coords="787,220,764,258,747,279,726,296,695,313,662,327,594,345,528,355,473,358,473,353,528,349,593,340,661,322,693,308,723,292,743,275,760,255,782,217"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="358,5,531,67"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="388,342,459,370"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="358,58,228,92,160,115,98,143,48,175,30,193,17,211,10,230,9,249,16,270,31,292,53,309,88,322,132,333,182,340,285,349,373,352,373,357,285,354,181,346,131,338,87,327,51,314,27,296,11,273,4,250,4,229,12,208,26,189,45,171,96,139,158,111,227,87,357,52"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="187,115,252,143"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="371,70,267,111,265,106,369,65"/>
+<area shape="rect" id="Node000004" href="$LPC176x5x_8h.html" title=" " alt="" coords="276,115,381,143"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="408,70,359,107,356,103,404,65"/>
+<area shape="rect" id="Node000008" href="$lpc17__clock_8h.html" title=" " alt="" coords="322,191,431,218"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="435,69,390,177,385,175,430,66"/>
+<area shape="rect" id="Node000009" href="$bootloader_2src_2lpc17__pincfg_8h.html" title=" " alt="" coords="414,266,529,294"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="451,67,471,250,466,251,445,68"/>
+<area shape="rect" id="Node000010" href="$bootloader_2src_2lpc17__uart_8h.html" title=" " alt="" coords="507,115,609,143"/>
+<area shape="poly" id="edge13_Node000001_Node000010" title=" " alt="" coords="484,65,532,103,528,107,481,70"/>
+<area shape="rect" id="Node000012" href="$lpc17__iap_8h.html" title=" " alt="" coords="633,115,728,143"/>
+<area shape="poly" id="edge16_Node000001_Node000012" title=" " alt="" coords="524,65,633,107,632,112,522,70"/>
+<area shape="rect" id="Node000013" href="$start__app_8h.html" title=" " alt="" coords="744,191,839,218"/>
+<area shape="poly" id="edge19_Node000001_Node000013" title=" " alt="" coords="532,40,583,48,638,62,693,83,742,113,768,142,785,175,780,177,764,145,739,117,690,88,637,67,582,53,531,45"/>
+<area shape="rect" id="Node000005" href="$core__cm3_8h.html" title="CMSIS Cortex&#45;M3 Core Peripheral Access Layer Header File." alt="" coords="135,191,232,218"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="304,146,224,186,222,181,302,141"/>
+<area shape="poly" id="edge5_Node000005_Node000002" title=" " alt="" coords="136,219,95,232,58,249,46,259,38,269,37,280,44,292,66,308,99,321,188,339,288,348,373,352,373,357,287,354,188,345,98,326,63,313,40,296,32,281,33,267,42,255,56,244,93,227,134,214"/>
+<area shape="rect" id="Node000006" href="$cmsis__version_8h.html" title="CMSIS Core(M) Version definitions." alt="" coords="54,266,180,294"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="173,221,141,257,137,253,170,217"/>
+<area shape="rect" id="Node000007" href="$cmsis__compiler_8h.html" title="CMSIS compiler generic header file." alt="" coords="204,266,339,294"/>
+<area shape="poly" id="edge7_Node000005_Node000007" title=" " alt="" coords="201,217,246,254,243,258,197,221"/>
+<area shape="poly" id="edge8_Node000007_Node000002" title=" " alt="" coords="300,292,384,333,382,337,297,297"/>
+<area shape="poly" id="edge10_Node000008_Node000002" title=" " alt="" coords="383,218,405,293,416,327,411,328,400,295,378,219"/>
+<area shape="poly" id="edge12_Node000009_Node000002" title=" " alt="" coords="465,296,442,330,438,328,461,293"/>
+<area shape="poly" id="edge14_Node000010_Node000002" title=" " alt="" coords="563,143,567,172,567,212,561,255,543,295,529,312,511,325,474,344,472,339,509,321,525,308,538,293,556,254,562,212,561,173,558,143"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="596,191,669,218"/>
+<area shape="poly" id="edge15_Node000010_Node000011" title=" " alt="" coords="573,141,610,178,607,181,570,145"/>
+<area shape="poly" id="edge17_Node000012_Node000002" title=" " alt="" coords="687,143,693,178,691,200,684,220,666,247,642,271,616,291,587,308,528,333,475,348,473,343,526,328,585,303,613,286,639,267,662,244,680,217,686,198,687,179,682,143"/>
+<area shape="poly" id="edge18_Node000012_Node000011" title=" " alt="" coords="674,145,652,179,647,176,670,142"/>
+<area shape="poly" id="edge20_Node000013_Node000002" title=" " alt="" coords="788,220,766,258,748,279,728,296,697,313,664,327,595,345,530,355,474,358,474,353,529,349,594,340,662,322,694,308,725,292,745,275,761,255,784,217"/>
 </map>

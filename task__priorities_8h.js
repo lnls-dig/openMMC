@@ -11,6 +11,7 @@ var task__priorities_8h =
     [ "tskIPMI_PRIORITY", "task__priorities_8h.html#a1fc3db4ca93e6cd0fd7ad3753666b15d", null ],
     [ "tskLED_PRIORITY", "task__priorities_8h.html#a0f48daaeb600eea20017bf6e9fa866dc", null ],
     [ "tskLM75SENSOR_PRIORITY", "task__priorities_8h.html#a09568135841b44603dd84e2af99e578a", null ],
+    [ "tskMAX11609SENSOR_PRIORITY", "task__priorities_8h.html#a61b6b7f88267cc0028aa5fc4b2a68105", null ],
     [ "tskMAX6642SENSOR_PRIORITY", "task__priorities_8h.html#a462b72a51dd387f40fbddaed3671e7a2", null ],
     [ "tskPAYLOAD_PRIORITY", "task__priorities_8h.html#a271e96f58798290b3688a9fbbe05d570", null ],
     [ "tskRTM_MANAGE_PRIORITY", "task__priorities_8h.html#a666bd6b9caa3f412d8ef213057a02224", null ],

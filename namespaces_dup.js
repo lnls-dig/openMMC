@@ -51,6 +51,19 @@ var namespaces_dup =
       [ "str", "namespaceafcv4-clksw-config.html#a3883185b8b998602376c25a9afe8d8e4", null ],
       [ "type", "namespaceafcv4-clksw-config.html#ad252fb1fbfaf7293c04eef8691f0391e", null ]
     ] ],
+    [ "afcv4-serial-term", "namespaceafcv4-serial-term.html", [
+      [ "baudrate", "namespaceafcv4-serial-term.html#a44c0ffde87e2310207d5b771c2631e98", null ],
+      [ "file", "namespaceafcv4-serial-term.html#a2590ca2626f459d283bd1ddfa727e9db", null ],
+      [ "filename", "namespaceafcv4-serial-term.html#a983bd8b9560a827542fd9e6c7cabb827", null ],
+      [ "line", "namespaceafcv4-serial-term.html#a98287d2c3b89d0cd383fc8ceccc1e9ef", null ],
+      [ "serport", "namespaceafcv4-serial-term.html#a4853d57cf8f341c92dcc94a0f77cb4b8", null ]
+    ] ],
+    [ "clk-sw-config", "namespaceclk-sw-config.html", [
+      [ "ipmi_conn", "namespaceclk-sw-config.html#a30572b9b2429ed4b121781e396182922", null ],
+      [ "ipmi_interface", "namespaceclk-sw-config.html#a338adf02405c1b1e8ff9e77c12d5988a", null ],
+      [ "target", "namespaceclk-sw-config.html#a203c966635e79444e0f964c1c3961359", null ]
+    ] ],
+    [ "ipmi-log", "namespaceipmi-log.html", null ],
     [ "run_cmd", "namespacerun__cmd.html", [
       [ "args", "namespacerun__cmd.html#a68d52094f6035d54d023301882447e62", null ],
       [ "default", "namespacerun__cmd.html#acc42c44d13fa2e317a10c163a51cf2fd", null ],

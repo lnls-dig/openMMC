@@ -1,9 +1,0 @@
-<map id="modules/error.c" name="modules/error.c">
-<area shape="rect" id="Node000001" title="Error handling functions." alt="" coords="27,5,150,33"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,79,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,35,61,69,56,67,78,32"/>
-<area shape="rect" id="Node000003" href="$error_8h.html" title="Error handling functions and codes." alt="" coords="103,81,168,109"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="99,32,121,67,117,69,95,35"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="103,157,168,184"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="138,109,138,141,133,141,133,109"/>
-</map>

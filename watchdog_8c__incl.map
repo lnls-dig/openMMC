@@ -1,7 +1,7 @@
 <map id="modules/watchdog.c" name="modules/watchdog.c">
 <area shape="rect" id="Node000001" title="Reset the uC if it fails to reload the watchdog timer." alt="" coords="538,5,694,33"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,308,102,336"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="552,36,479,56,401,83,303,135,212,195,135,254,80,300,77,296,132,250,209,191,300,130,399,79,477,51,551,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="552,36,478,56,400,83,302,135,211,195,135,254,80,300,77,296,131,250,208,191,299,130,398,79,476,50,551,31"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="126,308,187,336"/>
 <area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="579,36,506,64,412,107,311,164,263,198,218,234,191,265,172,296,167,293,187,261,214,230,260,194,309,160,410,103,504,59,577,31"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="694,81,776,109"/>

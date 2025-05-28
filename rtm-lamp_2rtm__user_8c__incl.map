@@ -17,7 +17,7 @@
 <area shape="rect" id="Node000042" href="$fru_8h.html" title=" " alt="" coords="580,249,632,277"/>
 <area shape="poly" id="edge51_Node000001_Node000042" title=" " alt="" coords="834,32,788,38,740,50,693,70,653,100,631,131,618,167,611,203,608,234,603,234,605,202,612,165,626,128,649,96,691,66,738,45,787,33,834,27"/>
 <area shape="rect" id="Node000043" href="$utils_8h.html" title="General utilities functions." alt="" coords="356,174,418,201"/>
-<area shape="poly" id="edge54_Node000001_Node000043" title=" " alt="" coords="834,41,707,63,636,80,567,101,489,133,423,168,421,163,487,128,565,95,635,75,706,58,833,36"/>
+<area shape="poly" id="edge54_Node000001_Node000043" title=" " alt="" coords="834,41,707,63,635,80,565,101,488,133,423,168,421,163,486,128,564,95,634,75,706,58,833,36"/>
 <area shape="rect" id="Node000044" href="$led_8h.html" title=" " alt="" coords="820,98,874,126"/>
 <area shape="poly" id="edge56_Node000001_Node000044" title=" " alt="" coords="896,52,869,87,865,84,892,49"/>
 <area shape="rect" id="Node000045" href="$board__led_8h.html" title=" " alt="" coords="949,98,1046,126"/>
@@ -98,7 +98,7 @@
 <area shape="rect" id="Node000040" href="$i2c_8h.html" title=" " alt="" coords="450,249,503,277"/>
 <area shape="poly" id="edge46_Node000039_Node000040" title=" " alt="" coords="511,203,493,237,488,234,506,201"/>
 <area shape="poly" id="edge47_Node000040_Node000009" title=" " alt="" coords="463,280,420,317,416,313,460,276"/>
-<area shape="poly" id="edge49_Node000040_Node000017" title=" " alt="" coords="484,276,521,347,552,390,590,426,621,445,655,460,720,479,719,484,653,465,619,450,587,430,548,393,517,350,479,278"/>
+<area shape="poly" id="edge49_Node000040_Node000017" title=" " alt="" coords="484,276,498,307,521,347,551,390,589,426,620,446,654,460,720,479,719,484,652,465,617,450,586,430,547,393,516,350,493,309,479,278"/>
 <area shape="poly" id="edge48_Node000040_Node000036" title=" " alt="" coords="451,277,329,322,327,317,449,272"/>
 <area shape="rect" id="Node000041" title=" " alt="" coords="565,325,646,353"/>
 <area shape="poly" id="edge50_Node000040_Node000041" title=" " alt="" coords="501,275,571,315,568,319,498,280"/>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['run_5fcmd_0',['run_cmd',['../namespacerun__cmd.html',1,'']]]
+  ['clk_2dsw_2dconfig_0',['clk-sw-config',['../namespaceclk-sw-config.html',1,'']]]
 ];

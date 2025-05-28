@@ -11,7 +11,7 @@
 <area shape="rect" id="Node000034" href="$task__priorities_8h.html" title=" " alt="" coords="1902,81,2028,109"/>
 <area shape="poly" id="edge41_Node000001_Node000034" title=" " alt="" coords="2021,35,1989,71,1985,68,2017,32"/>
 <area shape="rect" id="Node000035" href="$i2c_8h.html" title=" " alt="" coords="2263,232,2315,260"/>
-<area shape="poly" id="edge42_Node000001_Node000035" title=" " alt="" coords="2127,25,2184,33,2240,44,2288,59,2305,68,2318,79,2328,96,2333,114,2332,152,2321,189,2307,220,2302,218,2316,187,2326,151,2328,115,2323,98,2314,83,2302,73,2285,64,2239,49,2183,38,2126,31"/>
+<area shape="poly" id="edge42_Node000001_Node000035" title=" " alt="" coords="2126,25,2184,33,2241,44,2289,59,2307,68,2319,79,2329,96,2334,114,2333,152,2322,189,2307,220,2302,218,2317,187,2327,151,2329,115,2324,98,2315,83,2304,73,2287,64,2240,49,2183,38,2126,31"/>
 <area shape="rect" id="Node000037" title=" " alt="" coords="2166,81,2282,109"/>
 <area shape="poly" id="edge47_Node000001_Node000037" title=" " alt="" coords="2066,31,2177,73,2175,78,2064,36"/>
 <area shape="rect" id="Node000038" href="$ina220_8h.html" title="Definitions for INA220 Current/Voltage/Power Sensor." alt="" coords="1750,81,1828,109"/>
@@ -19,7 +19,7 @@
 <area shape="rect" id="Node000039" href="$fpga__spi_8h.html" title=" " alt="" coords="2053,81,2141,109"/>
 <area shape="poly" id="edge51_Node000001_Node000039" title=" " alt="" coords="2044,32,2077,68,2073,71,2040,35"/>
 <area shape="rect" id="Node000042" href="$fru_8h.html" title=" " alt="" coords="2396,232,2447,260"/>
-<area shape="poly" id="edge56_Node000001_Node000042" title=" " alt="" coords="2127,27,2250,47,2304,61,2341,79,2371,110,2393,146,2408,184,2418,216,2413,218,2403,186,2388,149,2367,113,2338,83,2303,66,2249,52,2126,33"/>
+<area shape="poly" id="edge56_Node000001_Node000042" title=" " alt="" coords="2127,27,2252,47,2307,61,2344,79,2373,110,2395,147,2409,184,2418,216,2413,218,2404,186,2390,149,2369,113,2341,83,2305,66,2251,52,2126,32"/>
 <area shape="rect" id="Node000005" title=" " alt="" coords="849,308,990,336"/>
 <area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="963,180,913,198,890,213,872,234,867,249,871,265,881,281,894,296,890,299,877,284,866,267,862,249,867,231,886,209,911,193,961,175"/>
 <area shape="rect" id="Node000006" href="$lpc17__gpio_8h.html" title=" " alt="" coords="702,232,805,260"/>
